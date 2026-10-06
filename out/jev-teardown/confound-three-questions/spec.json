@@ -1,0 +1,200 @@
+{
+ "series": "jev-teardown",
+ "concept": "confound-three-questions",
+ "lang": "zh-TW",
+ "status": "draft",
+ "hook": {
+  "style": "反直覺斷言",
+  "title": "快 193.6 倍、25 倍、約 5 倍？",
+  "subtitle": "官網頭條是最佳案例，另兩個是第三方實測",
+  "refs": [
+   "c3",
+   "c5"
+  ],
+  "candidate": "B4"
+ },
+ "slides": [
+  {
+   "layout": "cover",
+   "title": "快 [[193.6 倍、25 倍、約 5 倍]]？",
+   "body": "官網頭條是最佳案例，另兩個是第三方實測",
+   "refs": [
+    "c3",
+    "c5"
+   ]
+  },
+  {
+   "layout": "context",
+   "title": "這些倍數來自新創 TypeSafe AI 的 Jev",
+   "body": "官方把它叫做 decision layer。官網頭條拿它去比前沿大模型，第三方也各自做了測試。",
+   "refs": [
+    "c2",
+    "c3",
+    "c5"
+   ]
+  },
+  {
+   "layout": "text",
+   "title": "任何倍數出現之前，先問三件事",
+   "body": "我的判斷，先問：分母怎麼選的、評測方法有沒有讓某一方吃虧、參考答案會不會系統性偏袒某一方。",
+   "refs": [
+    "c1"
+   ]
+  },
+  {
+   "layout": "chart_sounding",
+   "title": "同一個產品的三組速度倍數",
+   "body": "我的判斷：分母越重越慢，倍數越好看",
+   "unit": "倍",
+   "refs": [
+    "c3",
+    "c5",
+    "c6"
+   ],
+   "bars": [
+    {
+     "name": "官網頭條",
+     "subs": [
+      "速度，最佳案例",
+      "對比前沿大模型"
+     ],
+     "value": 193.6,
+     "emphasize": true
+    },
+    {
+     "name": "Every 實測",
+     "subs": [
+      "速度",
+      "對比 Fable 5.1"
+     ],
+     "value": 25
+    },
+    {
+     "name": "Near Here 實測",
+     "subs": [
+      "速度，約略值",
+      "對比較輕量的模型"
+     ],
+     "value": 5
+    }
+   ],
+   "note": "數字來源：官網頭條、Every、Near Here"
+  },
+  {
+   "layout": "text",
+   "title": "官方的成本倍數，拿的是對手的標價",
+   "body": "Jev 的 $0.042/MTok 對比 Claude Fable 5.1 的標價 $10/MTok，約 238 倍。",
+   "refs": [
+    "c7"
+   ]
+  },
+  {
+   "layout": "text",
+   "title": "官方還用自家 adapter 包裝對手",
+   "body": "官方的做法是用開源的 System One adapter 包裝對手模型。我的判斷：這可能高估 Jev 的相對優勢。",
+   "refs": [
+    "c10",
+    "c11"
+   ]
+  },
+  {
+   "layout": "text",
+   "title": "官方一致率的標準答案，是兩個模型的平均答案",
+   "body": "出自官方 4-workflow benchmark 表格，不是人工標註的真值。我的判斷：量的是像不像裁判。",
+   "refs": [
+    "c12",
+    "c19"
+   ]
+  },
+  {
+   "layout": "takeaway",
+   "title": "看到效能對比數字，先問分母、比法、標準答案",
+   "label": "我的判斷",
+   "refs": [
+    "c1"
+   ]
+  },
+  {
+   "layout": "series_map",
+   "title": "一次看完這個系列",
+   "current": "confound-three-questions",
+   "nav": "完整文章：datasciocean.com/ai-concept/jev-overview",
+   "refs": [
+    "結構"
+   ]
+  }
+ ],
+ "threads": {
+  "body": {
+   "text": "快 5 倍、25 倍、193.6 倍？\n同一個產品：官網頭條說快 193.6 倍（最佳案例，不是平均值，對比前沿大模型），Every 實測對比 Fable 5.1 是 25 倍，Near Here 約 5 倍、對比的是較輕量的模型。\n我的判斷：加速倍數高度依賴拿哪個模型當分母。",
+   "refs": [
+    "c3",
+    "c5",
+    "c6"
+   ],
+   "quals": [
+    "c3#1"
+   ]
+  },
+  "items": [
+   {
+    "slide": 3,
+    "text": "我的判斷：加速倍數高度依賴拿哪個模型當分母，換了分母，倍數就不同。",
+    "refs": [
+     "c6"
+    ]
+   },
+   {
+    "slide": 4,
+    "text": "Every 測了 37 份文件、777 個判斷；抓瑕疵時，Jev 7 個抓到 6 個，Fable 5.1 全中。",
+    "refs": [
+     "c15"
+    ]
+   },
+   {
+    "slide": 5,
+    "text": "依我的整理，官方沒有把 444.6 倍這個成本倍數的確切分母模型講清楚。",
+    "refs": [
+     "c9"
+    ]
+   },
+   {
+    "slide": 6,
+    "text": "我的判斷：這可能讓對手顯得比原生使用時更慢更貴。",
+    "refs": [
+     "c11"
+    ]
+   },
+   {
+    "slide": 7,
+    "text": "我的判斷：Jev 與那兩個模型若因同樣原因答錯，這個方法完全偵測不出來。",
+    "refs": [
+     "c20"
+    ]
+   }
+  ],
+  "last": {
+   "text": "我的判斷：任何效能對比數字出現之前，先問三個問題：分母、比法、參考答案。\n文章：datasciocean.com/ai-concept/jev-overview\n同系列：Jev 補的是分類器與 LLM 之間的空隙",
+   "refs": [
+    "c1",
+    "c2"
+   ],
+   "link": "https://datasciocean.com/ai-concept/jev-overview/"
+  }
+ },
+ "caption": {
+  "first": "Jev 的效能倍數怎麼看？分母、比法與標準答案",
+  "first_refs": [
+   "c1",
+   "c3"
+  ],
+  "nav": "完整文章請在 datasciocean.com 搜尋「Jev」",
+  "hashtags": [
+   "DSO_Jev",
+   "benchmark",
+   "LLM",
+   "AI評測",
+   "效能比較"
+  ]
+ }
+}

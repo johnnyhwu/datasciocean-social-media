@@ -1,0 +1,3 @@
+[submodule "concept-wiki"]
+	path = concept-wiki
+	url = https://github.com/johnnyhwu/datasciocean-concept-wiki

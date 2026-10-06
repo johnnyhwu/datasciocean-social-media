@@ -1,0 +1,15 @@
+[project]
+name = "datasciocean-social-media"
+version = "0.1.0"
+description = "DataSci Ocean 觀念卡 -> IG 輪播與 Threads 串文（Stage 2：呈現觀念）"
+requires-python = ">=3.9"
+dependencies = [
+    "pyyaml>=6",
+    "playwright>=1.40",
+    "pillow>=10",
+]
+
+[tool.uv]
+# 所有 uv 資源都留在 repo 內，不污染本機
+cache-dir = ".uv-cache"
+package = false

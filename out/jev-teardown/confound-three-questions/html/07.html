@@ -1,0 +1,52 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><style>/* Jev 拆解系列模板（哲學：design/series-philosophies/jev-sounding.md）
+   顏色與字級只用 design-series-visuals/references/brand-and-layouts.md §2 規定的集合。字型內嵌自 assets/fonts。 */
+@font-face{font-family:"DSO";src:url("file:///Users/johnnyhwu/Desktop/datasciocean-social-media/assets/fonts/NotoSansCJKtc-Regular.otf");font-weight:400}
+@font-face{font-family:"DSO";src:url("file:///Users/johnnyhwu/Desktop/datasciocean-social-media/assets/fonts/NotoSansCJKtc-Bold.otf");font-weight:700}
+html,body{margin:0;width:1080px;height:1350px;overflow:hidden;background:#F2E0C0;
+  font-family:"DSO",sans-serif;color:#01353F}
+.slide{position:relative;width:1080px;height:1350px;overflow:hidden}
+.slide.dark{background:#01353F}
+.gfx{position:absolute;left:0;top:0}
+.t{margin:0}
+.abs{position:absolute}
+.tag{left:80px;top:88px;font-size:28px;font-weight:400;color:#076876;white-space:nowrap}
+.dark .tag{color:#F2E0C0}
+.title{left:80px;top:150px;width:920px;font-size:72px;font-weight:700;line-height:1.25;color:#076876;
+  word-break:keep-all;text-wrap:balance}
+.body{left:80px;top:352px;width:920px;font-size:40px;font-weight:400;line-height:1.6;word-break:keep-all}
+.body.one{white-space:nowrap;font-size:38px}
+.foot{left:80px;top:1262px;font-size:28px;font-weight:400;color:#01353F;white-space:nowrap}
+.foot.light,.dark .foot{color:#F2E0C0}
+.hl{background:linear-gradient(transparent 56%,#DDA642 56%,#DDA642 94%,transparent 94%);color:#01353F}
+/* 封面 */
+.cover-title{left:80px;top:330px;width:920px;font-size:76px;font-weight:700;line-height:1.25;color:#076876;
+  word-break:keep-all;text-wrap:balance}
+.cover-sub{left:80px;width:920px;font-size:40px;font-weight:400;line-height:1.6;word-break:keep-all}
+.band-name{left:80px;top:1150px;font-size:34px;font-weight:700;color:#F2E0C0;white-space:nowrap}
+/* 對照表 */
+.cell{font-size:38px;line-height:1.5;word-break:keep-all}
+.cell.k{font-weight:700;color:#076876}
+.cell.h{font-size:28px;font-weight:700;color:#076876}
+/* 圖表 */
+.name{font-size:34px;font-weight:700;line-height:1.5;white-space:nowrap}
+.sub{font-size:28px;font-weight:400;line-height:1.5;white-space:nowrap}
+.num{font-size:56px;font-weight:700;line-height:66px;white-space:nowrap}
+.legend{font-size:28px;white-space:nowrap}
+.note{font-size:28px;white-space:nowrap}
+.sea .name,.sea .sub,.sea .num,.sea .legend,.sea .note,.sea .foot{color:#F2E0C0}
+/* 帶走 */
+.take{left:80px;width:920px;top:430px;font-size:76px;font-weight:700;line-height:1.3;color:#DDA642;
+  word-break:keep-all;text-wrap:balance}
+.take-label{left:80px;font-size:28px;font-weight:400;color:#F2E0C0;white-space:nowrap}
+/* 系列地圖 */
+.item{font-size:34px;line-height:1.4;white-space:nowrap}
+.item.cur{color:#F2E0C0;font-weight:700}
+.nav{font-size:28px;line-height:1.5;color:#076876;white-space:nowrap}
+</style></head><body><div class="slide sea">
+<svg class="gfx" width="1080" height="1350" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#076876"/><stop offset=".38" stop-color="#01353F"/><stop offset="1" stop-color="#032027"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#DDA642" stop-opacity=".42"/><stop offset="1" stop-color="#DDA642" stop-opacity="0"/></radialGradient></defs><path class="bg" d="M0,760.0 L10,760.6 L20,761.2 L30,761.8 L40,762.3 L50,762.8 L60,763.3 L70,763.7 L80,764.1 L90,764.4 L100,764.7 L110,764.9 L120,765.0 L130,765.0 L140,765.0 L150,764.9 L160,764.7 L170,764.4 L180,764.1 L190,763.7 L200,763.3 L210,762.8 L220,762.3 L230,761.8 L240,761.2 L250,760.6 L260,760.0 L270,759.4 L280,758.8 L290,758.2 L300,757.7 L310,757.2 L320,756.7 L330,756.3 L340,755.9 L350,755.6 L360,755.3 L370,755.1 L380,755.0 L390,755.0 L400,755.0 L410,755.1 L420,755.3 L430,755.6 L440,755.9 L450,756.3 L460,756.7 L470,757.2 L480,757.7 L490,758.2 L500,758.8 L510,759.4 L520,760.0 L530,760.6 L540,761.2 L550,761.8 L560,762.3 L570,762.8 L580,763.3 L590,763.7 L600,764.1 L610,764.4 L620,764.7 L630,764.9 L640,765.0 L650,765.0 L660,765.0 L670,764.9 L680,764.7 L690,764.4 L700,764.1 L710,763.7 L720,763.3 L730,762.8 L740,762.3 L750,761.8 L760,761.2 L770,760.6 L780,760.0 L790,759.4 L800,758.8 L810,758.2 L820,757.7 L830,757.2 L840,756.7 L850,756.3 L860,755.9 L870,755.6 L880,755.3 L890,755.1 L900,755.0 L910,755.0 L920,755.0 L930,755.1 L940,755.3 L950,755.6 L960,755.9 L970,756.3 L980,756.7 L990,757.2 L1000,757.7 L1010,758.2 L1020,758.8 L1030,759.4 L1040,760.0 L1050,760.6 L1060,761.2 L1070,761.8 L1080,762.3 L1080,1350 L0,1350 Z" fill="#69B4AA"/><path class="bg" d="M0,788.9 L10,789.0 L20,789.0 L30,788.9 L40,788.7 L50,788.4 L60,788.0 L70,787.6 L80,787.1 L90,786.6 L100,786.0 L110,785.3 L120,784.7 L130,784.0 L140,783.4 L150,782.7 L160,782.1 L170,781.5 L180,780.9 L190,780.4 L200,780.0 L210,779.6 L220,779.3 L230,779.1 L240,779.0 L250,779.0 L260,779.1 L270,779.2 L280,779.5 L290,779.8 L300,780.2 L310,780.6 L320,781.2 L330,781.7 L340,782.3 L350,783.0 L360,783.6 L370,784.3 L380,785.0 L390,785.6 L400,786.2 L410,786.8 L420,787.3 L430,787.8 L440,788.2 L450,788.5 L460,788.8 L470,788.9 L480,789.0 L490,789.0 L500,788.9 L510,788.7 L520,788.4 L530,788.0 L540,787.6 L550,787.1 L560,786.6 L570,786.0 L580,785.3 L590,784.7 L600,784.0 L610,783.4 L620,782.7 L630,782.1 L640,781.5 L650,780.9 L660,780.4 L670,780.0 L680,779.6 L690,779.3 L700,779.1 L710,779.0 L720,779.0 L730,779.1 L740,779.2 L750,779.5 L760,779.8 L770,780.2 L780,780.6 L790,781.2 L800,781.7 L810,782.3 L820,783.0 L830,783.6 L840,784.3 L850,785.0 L860,785.6 L870,786.2 L880,786.8 L890,787.3 L900,787.8 L910,788.2 L920,788.5 L930,788.8 L940,788.9 L950,789.0 L960,789.0 L970,788.9 L980,788.7 L990,788.4 L1000,788.0 L1010,787.6 L1020,787.1 L1030,786.6 L1040,786.0 L1050,785.3 L1060,784.7 L1070,784.0 L1080,783.4 L1080,1350 L0,1350 Z" fill="#1F8A8D"/><path class="bg" d="M0,810.6 L10,810.1 L20,809.6 L30,809.0 L40,808.5 L50,807.9 L60,807.3 L70,806.8 L80,806.3 L90,805.7 L100,805.3 L110,804.8 L120,804.4 L130,804.0 L140,803.7 L150,803.5 L160,803.2 L170,803.1 L180,803.0 L190,803.0 L200,803.0 L210,803.1 L220,803.3 L230,803.5 L240,803.8 L250,804.2 L260,804.5 L270,805.0 L280,805.4 L290,805.9 L300,806.4 L310,807.0 L320,807.5 L330,808.1 L340,808.7 L350,809.2 L360,809.7 L370,810.3 L380,810.7 L390,811.2 L400,811.6 L410,812.0 L420,812.3 L430,812.5 L440,812.8 L450,812.9 L460,813.0 L470,813.0 L480,813.0 L490,812.9 L500,812.7 L510,812.5 L520,812.2 L530,811.8 L540,811.5 L550,811.0 L560,810.6 L570,810.1 L580,809.6 L590,809.0 L600,808.5 L610,807.9 L620,807.3 L630,806.8 L640,806.3 L650,805.7 L660,805.3 L670,804.8 L680,804.4 L690,804.0 L700,803.7 L710,803.5 L720,803.2 L730,803.1 L740,803.0 L750,803.0 L760,803.0 L770,803.1 L780,803.3 L790,803.5 L800,803.8 L810,804.2 L820,804.5 L830,805.0 L840,805.4 L850,805.9 L860,806.4 L870,807.0 L880,807.5 L890,808.1 L900,808.7 L910,809.2 L920,809.7 L930,810.3 L940,810.7 L950,811.2 L960,811.6 L970,812.0 L980,812.3 L990,812.5 L1000,812.8 L1010,812.9 L1020,813.0 L1030,813.0 L1040,813.0 L1050,812.9 L1060,812.7 L1070,812.5 L1080,812.2 L1080,1350 L0,1350 Z" fill="#076876"/><path class="bg" d="M0,828.2 L10,827.8 L20,827.5 L30,827.3 L40,827.1 L50,827.0 L60,827.0 L70,827.1 L80,827.2 L90,827.4 L100,827.7 L110,828.1 L120,828.5 L130,829.0 L140,829.5 L150,830.1 L160,830.7 L170,831.3 L180,831.9 L190,832.5 L200,833.1 L210,833.7 L220,834.3 L230,834.9 L240,835.3 L250,835.8 L260,836.2 L270,836.5 L280,836.7 L290,836.9 L300,837.0 L310,837.0 L320,836.9 L330,836.8 L340,836.6 L350,836.3 L360,835.9 L370,835.5 L380,835.0 L390,834.5 L400,833.9 L410,833.3 L420,832.7 L430,832.1 L440,831.5 L450,830.9 L460,830.3 L470,829.7 L480,829.1 L490,828.7 L500,828.2 L510,827.8 L520,827.5 L530,827.3 L540,827.1 L550,827.0 L560,827.0 L570,827.1 L580,827.2 L590,827.4 L600,827.7 L610,828.1 L620,828.5 L630,829.0 L640,829.5 L650,830.1 L660,830.7 L670,831.3 L680,831.9 L690,832.5 L700,833.1 L710,833.7 L720,834.3 L730,834.9 L740,835.3 L750,835.8 L760,836.2 L770,836.5 L780,836.7 L790,836.9 L800,837.0 L810,837.0 L820,836.9 L830,836.8 L840,836.6 L850,836.3 L860,835.9 L870,835.5 L880,835.0 L890,834.5 L900,833.9 L910,833.3 L920,832.7 L930,832.1 L940,831.5 L950,830.9 L960,830.3 L970,829.7 L980,829.1 L990,828.7 L1000,828.2 L1010,827.8 L1020,827.5 L1030,827.3 L1040,827.1 L1050,827.0 L1060,827.0 L1070,827.1 L1080,827.2 L1080,1350 L0,1350 Z" fill="url(#sea)"/><g><line class="g deco" x1="540" y1="832" x2="540" y2="1040" stroke="#F2E0C0" stroke-width="4"/><circle class="bg" cx="540" cy="1040" r="95" fill="url(#glow)"/><polygon class="g deco" data-e="1" points="540,1028 548,1040 540,1052 532,1040" fill="#DDA642"/></g></svg>
+<div class="t abs tag">Jev 拆解系列</div>
+<div class="t abs title chk" id="title">官方一致率的標準答案，是兩個模型的平均答案</div>
+<div class="t abs body chk" id="body">出自官方 4-workflow benchmark 表格，不是人工標註的真值。我的判斷：量的是像不像裁判。</div>
+<div class="t abs foot">@datasciocean</div>
+</div>
+</body></html>

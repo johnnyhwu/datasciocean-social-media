@@ -1,0 +1,219 @@
+{
+ "series": "jev-teardown",
+ "concept": "jev-overview",
+ "lang": "zh-TW",
+ "status": "draft",
+ "hook": {
+  "style": "情境痛點",
+  "title": "分類器換任務要重訓，[[LLM 又慢又貴]]",
+  "subtitle": "我的判斷：Jev 想補的，正是這兩條路中間的空隙",
+  "refs": [
+   "c5",
+   "c1"
+  ],
+  "candidate": "A3"
+ },
+ "slides": [
+  {
+   "layout": "cover",
+   "title": "分類器換任務要重訓，[[LLM 又慢又貴]]",
+   "body": "我的判斷：Jev 想補的，正是這兩條路中間的空隙",
+   "refs": [
+    "c5",
+    "c1"
+   ]
+  },
+  {
+   "layout": "context",
+   "title": "Jev 是新創 TypeSafe AI 的產品",
+   "body": "官方把它叫做 decision layer 或 smart if-statement，自稱 System One Model，而不是取代 LLM。",
+   "refs": [
+    "c2"
+   ]
+  },
+  {
+   "layout": "text",
+   "title": "分類器的缺口在重訓，LLM 的在輸出",
+   "body": "分類器每換一個任務就要重新標註與訓練；LLM 輸出是自由文字，要自己 parse，篤定感也不等於答對的機率。",
+   "refs": [
+    "c5"
+   ]
+  },
+  {
+   "layout": "table",
+   "title": "官方明講：輸入是 state 加多個問題",
+   "body": "state 是背景資料，每題要指定型別",
+   "refs": [
+    "c8",
+    "c9",
+    "c10"
+   ],
+   "rows": [
+    [
+     "Choice",
+     "輸出選中的選項，加每個選項的機率"
+    ],
+    [
+     "Score",
+     "可落在等級之間的浮點分數"
+    ],
+    [
+     "Noul",
+     "0 到 1 之間的機率值"
+    ]
+   ],
+   "note": "輸出限定這三種型別：依我的整理"
+  },
+  {
+   "layout": "chart_bars",
+   "title": "官方量到的一致率：Jev 67.8%，Sol 74.1%",
+   "body": "參考答案是兩個前沿模型的平均答案",
+   "unit": "%",
+   "refs": [
+    "c15",
+    "c16"
+   ],
+   "bars": [
+    {
+     "name": "Jev",
+     "subs": [
+      "官方 4-workflow benchmark"
+     ],
+     "value": 67.8,
+     "emphasize": true
+    },
+    {
+     "name": "GPT-5.6 Sol",
+     "subs": [
+      "官方 4-workflow benchmark"
+     ],
+     "value": 74.1
+    }
+   ],
+   "note": "我的判斷：Jev 的 67.8% 一致率，量的是有多像，不是對不對"
+  },
+  {
+   "layout": "table",
+   "title": "官方自己劃了線：能做的與不能做的",
+   "body": "以下是官方自己劃出的範圍",
+   "refs": [
+    "c11",
+    "c12"
+   ],
+   "rows": [
+    [
+     "官方建議",
+     "smart if-statements、逐列決策的 Map-reduce、即時應用、Verify everything"
+    ],
+    [
+     "官方排除",
+     "聊天、程式生成、需要書面說明或理由的任務、算術計數日期運算、一次性複雜推理"
+    ]
+   ]
+  },
+  {
+   "layout": "text",
+   "title": "官方自己承認的失效模式",
+   "body": "計數不可靠、日期是文字不是有序量、塞進不相關內容會拖累準確率，算術要留在程式碼裡做。",
+   "refs": [
+    "c19",
+    "c20",
+    "c21"
+   ]
+  },
+  {
+   "layout": "takeaway",
+   "title": "錯誤代價低、量大，Jev 的效率權衡划算；代價高，保留前沿大模型，或只把 Jev 當第一道篩選",
+   "label": "我的判斷",
+   "refs": [
+    "c18"
+   ]
+  },
+  {
+   "layout": "series_map",
+   "title": "一次看完這個系列",
+   "current": "jev-overview",
+   "nav": "完整文章：datasciocean.com/ai-concept/jev-overview",
+   "refs": [
+    "結構"
+   ]
+  }
+ ],
+ "threads": {
+  "body": {
+   "text": "分類器換任務要重訓，LLM 又慢又貴。\nTypeSafe AI 的 Jev，官方把它叫做 decision layer，而不是取代 LLM。\n我的判斷：它想補的，正是這兩條路中間的空隙。\n不過，校準只是官方宣稱，未經外部驗證。",
+   "refs": [
+    "c5",
+    "c2",
+    "c1",
+    "c6"
+   ],
+   "quals": [
+    "c6#1"
+   ]
+  },
+  "items": [
+   {
+    "slide": 3,
+    "text": "我的判斷：這兩個缺點，就是 Jev 想補的空隙。",
+    "refs": [
+     "c1",
+     "c5"
+    ]
+   },
+   {
+    "slide": 4,
+    "text": "官方明講，Jev 可以一次送多題；依我的整理，型別安全就是靠限定輸出型別來保證的。",
+    "refs": [
+     "c8",
+     "c9"
+    ]
+   },
+   {
+    "slide": 5,
+    "text": "這組一致率沒有拿人工標註當標準。",
+    "refs": [
+     "c15"
+    ]
+   },
+   {
+    "slide": 6,
+    "text": "我的判斷：排除清單的共同點，是需要輸出自然語言或單次深度推理，Jev 不是刻意不做，而是架構上做不到；官方沒有公開具體模型架構。",
+    "refs": [
+     "c13"
+    ],
+    "quals": [
+     "c13#1"
+    ]
+   },
+   {
+    "slide": 7,
+    "text": "官方原文直接寫：Jev suffers from context rot。",
+    "refs": [
+     "c21"
+    ]
+   }
+  ],
+  "last": {
+   "text": "我的判斷：錯誤代價低、量大，Jev 這類產品的效率權衡划算；代價高，保留前沿大模型，或只把 Jev 當第一道篩選。\n文章：datasciocean.com/ai-concept/jev-overview\n同系列：看效能對比數字之前，先問三個問題（尚未發布）",
+   "refs": [
+    "c18"
+   ],
+   "link": "https://datasciocean.com/ai-concept/jev-overview/"
+  }
+ },
+ "caption": {
+  "first": "Jev 是什麼？官方稱它是 decision layer，不是取代 LLM",
+  "first_refs": [
+   "c2"
+  ],
+  "nav": "完整文章請在 datasciocean.com 搜尋「Jev」",
+  "hashtags": [
+   "DSO_Jev",
+   "LLM",
+   "AI工程",
+   "分類器",
+   "決策層"
+  ]
+ }
+}
