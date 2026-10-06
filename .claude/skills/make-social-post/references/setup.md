@@ -28,13 +28,13 @@ PLAYWRIGHT_BROWSERS_PATH=$PWD/.playwright-browsers uv run playwright install chr
 ```
 uv run python tests/test_check_a.py          # 程式 A 回歸，需要 concept-wiki 已初始化
 uv run python tests/test_state_and_batch.py
-uv run python .claude/skills/make-social-post/scripts/render.py out/<series>/<concept>/spec.json
+uv run python .claude/skills/make-social-post/scripts/render.py out/<series>/<concept>/_build/spec.json
 ```
 
 渲染是確定性的：同一份 spec.json 與同一版模板，重渲染的 PNG 與既有發布包逐位元相同（重構時用來驗證搬家沒有改壞任何東西）。
 
 ## 已知限制
 
-- `render.py` 的版型幾何（海浪、測深圖的水面線與刻度、系列色對應 `SERIES_COLORS`）有一部分寫在程式裡，不只在 HTML 模板；新系列若用不同的系列色或新版型，要同時改 `render.py` 與 `templates/<series>/`，詳見 `design-series-visuals` skill。
+- `render.py` 的版型幾何（海浪、測深圖的水面線與刻度、系列色對應 `SERIES_COLORS`）有一部分寫在程式裡，不只在 HTML 模板；新系列若用不同的系列色或新版型，要同時改 `render.py` 與 `series/<id>/templates/`，詳見 `design-series-visuals` skill。
 - 測深圖最多 3 條繩（`chart_sounding`），橫條圖版型沒有條數預檢。
 - 只在 1080 寬的畫面檢查過；手機實機顯示（含個人頁面縮圖左右各裁約 34px 的假設）還沒驗證。

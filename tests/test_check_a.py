@@ -56,6 +56,7 @@ CASES = [  # (名稱, 基底, 修改, 預期錯誤中要出現的字串)
     ("脈絡張沒引用 context 主張", GOOD_A, lambda s: s["slides"][1].update(refs=["c11"]), "脈絡張"),
     ("補充字數不在 40 到 60", GOOD_A, lambda s: s["slides"][6].update(body="Jev 會漏掉。"), "補充"),
     ("投影片超過 10 張", GOOD_A, lambda s: s["slides"].extend([copy.deepcopy(s["slides"][2]) for _ in range(2)]), "超過 10"),
+    ("用語：貼文寫了「判官」而不是 Judge", GOOD_A, lambda s: s["threads"]["items"][0].update(text=s["threads"]["items"][0]["text"] + "這個判官很快。"), "用語"),
     ("caption 第一句太長", GOOD_A, lambda s: s["caption"].update(first="很長" * 30), "第一句"),
 ]
 

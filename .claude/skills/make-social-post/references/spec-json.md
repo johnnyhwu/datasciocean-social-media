@@ -1,12 +1,12 @@
-# 內容規格 JSON（`out/<series>/<concept>/spec.json`）
+# 內容規格 JSON（`out/<series>/<concept>/_build/spec.json`）
 
-LLM 只產出這份 JSON；外觀完全由模板決定。範例：`tests/fixtures/out/jev-teardown/confound-three-questions/spec.json`。
+LLM 只產出這份 JSON；外觀完全由模板決定。範例：`out/jev-cascade/jev-cascade-overview/_build/spec.json`（現行完整範例）。
 
 ## 頂層
 
 ```json
 {
-  "series": "jev-teardown",            // series/<id>.md；獨立 post 沒有系列
+  "series": "jev-cascade",            // series/<id>/series.md；獨立 post 沒有系列
   "concept": "confound-three-questions",
   "lang": "zh-TW",
   "status": "draft",
@@ -69,11 +69,17 @@ caption 第一句用 `first_refs`。`refs` 只證明「有對應」，不證明�
 
 逐張摘要不放進 JSON，由 `build_package.py` 依最終投影片自動產生（所以必須在張數定案之後才跑）。
 
-## 產物（同資料夾）
+## 發布包結構（`out/<series>/<concept>/`）
 
-| 檔案 | 誰產生 |
-|---|---|
-| `ig/01.png` … | `render.py` |
-| `checks-b.json`（含 `template_hash`）、`alt-text.json` | `render.py` |
-| `post-with-refs.md`、`post-reader.md`、`ig/caption.txt`、`threads.txt` | `build_package.py` |
-| `contact-sheet.png` | `contact_sheet.py` |
+```
+README.md          這則貼文的唯一入口：縮圖、檢查結果、發布前後待辦        build_package.py
+ig/post.md         每一頁的圖與文字、替代文字，最後是整段 caption           build_package.py
+ig/01.png …        投影片                                                    render.py
+threads/post.md    正文、每則串文（附圖，圖在 ../ig/）、最後一則            build_package.py
+_build/            機器用，不用看
+  spec.json        內容規格（唯一的真相來源）                                人／撰寫者寫
+  checks-b.json    程式 B 結果與 template_hash；alt-text.json；html/          render.py
+  post-with-refs.md、post-reader.md   審查者用                              build_package.py
+  contact-sheet.png                                                          contact_sheet.py
+```
+另有索引 `out/README.md` 與 `out/<series>/README.md`（`build_package.py` 重新產生，不手改）。

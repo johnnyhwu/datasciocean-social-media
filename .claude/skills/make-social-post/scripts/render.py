@@ -4,7 +4,7 @@
 外觀完全由模板決定；LLM 只給內容規格。
 
 用法（repo 根目錄；Chromium 在 repo 內 .playwright-browsers/，程式會自己設好路徑）：
-  uv run python .claude/skills/make-social-post/scripts/render.py out/<series>/<concept>/spec.json [--only 3,5]
+  uv run python .claude/skills/make-social-post/scripts/render.py out/<series>/<concept>/_build/spec.json [--only 3,5]
 結束碼：0 全部通過、1 有程式 B 檢查不通過。
 """
 from __future__ import annotations
@@ -37,13 +37,13 @@ ZERO_Y = 706          # 測深圖水面（0）
 
 
 def load_series(series_id: str) -> dict:
-    txt = (ROOT / "series" / f"{series_id}.md").read_text(encoding="utf-8")
+    txt = W.series_file(series_id).read_text(encoding="utf-8")
     m = re.match(r"^---\n(.*?)\n---", txt, re.S)
     return yaml.safe_load(m.group(1))
 
 
 def template_dir(series_id: str) -> Path:
-    return ROOT / "templates" / series_id
+    return W.series_dir(series_id) / "templates"
 
 
 def template_hash(series_id: str) -> str:
@@ -58,8 +58,17 @@ def esc(s: str) -> str:
     return html.escape(s, quote=False)
 
 
+def bind_nums(s: str) -> str:
+    """數字與它的單位、前綴詞之間的空白改成不斷行空格，避免「1.87／秒」「只轉／25%」被拆成兩行。
+    只在渲染時處理，spec 與 alt-text 保持原文。DSO_NO_NUMBIND=1 只給測試用（驗證程式 B 抓得到拆行）。"""
+    if os.environ.get("DSO_NO_NUMBIND"):
+        return s
+    s = re.sub(r"(?<=[0-9%]) +(?=[\u4e00-\u9fff])", "\u00a0", s)      # 27% 的、GPT-6 單獨、1.87 秒
+    return re.sub(r"(?<=[\u4e00-\u9fff]) +(?=[0-9])", "\u00a0", s)    # 只轉 25%、費用 27%
+
+
 def title_html(s: str) -> str:
-    return re.sub(r"\[\[(.+?)\]\]", lambda m: f'<span class="hl">{esc(m.group(1))}</span>', esc(s))
+    return re.sub(r"\[\[(.+?)\]\]", lambda m: f'<span class="hl">{esc(m.group(1))}</span>', esc(bind_nums(s)))
 
 
 def plain(s: str) -> str:
@@ -104,7 +113,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     tdir = template_dir(series["id"])
     tpl = (tdir / f"{lay}.html").read_text(encoding="utf-8")
     sc = SERIES_COLORS.get(series.get("color"), MID)
-    kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(spec.get("body", ""))}
+    kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", "")))}
 
     if lay == "cover":
         kw["SVG"] = svg_wrap(waves(1000, sc))
@@ -271,7 +280,10 @@ MEASURE_JS = r"""
     const seg=[...new Intl.Segmenter('zh',{granularity:'word'}).segment(text)];
     const bad=starts.filter(i=>seg.some(g=>g.index<i&&i<g.index+g.segment.length)).map(i=>text.slice(Math.max(0,i-2),i+2));
     const lastLine=Math.max(...L.filter(x=>x!==null)); const lastChars=L.filter(x=>x===lastLine).length;
-    return {lines:cl.length,lastChars,bad,text};
+    const cjk=c=>/[\u4e00-\u9fff]/.test(c||''), num=c=>/[0-9.%]/.test(c||''), sp=c=>/[\s\u00a0]/.test(c||'');
+    const badNum=starts.filter(i=>{let j=i-1; while(j>=0&&sp(text[j])) j--;
+      return (num(text[j])&&cjk(text[i]))||(cjk(text[j])&&/[0-9]/.test(text[i]))||(text[j]==='-'&&/[0-9A-Za-z]/.test(text[i]));}).map(i=>text.slice(Math.max(0,i-3),i+3));
+    return {lines:cl.length,lastChars,bad,badNum,text};
   }
   const chk={}; document.querySelectorAll('.chk').forEach(e=>chk[e.id]=lines(e));
   return {ts,gs,ropes,bobs,bars,axis,ticks,emph,chk,
@@ -326,12 +338,15 @@ def program_b(spec: dict, m: dict, img: Image.Image, series_name: str, tag_texts
         mx = 4 if lay == "takeaway" else PARAMS["title_max_lines"]
         chk(f"標題最多 {mx} 行", ti["lines"] <= mx, f"{ti['lines']} 行")
         chk("標題末行 >= 2 字、換行不拆詞", ti["lastChars"] >= 2 and not ti["bad"], {"lastChars": ti["lastChars"], "bad": ti["bad"]})
+        chk("標題的數字與單位不拆成兩行", not ti["badNum"], ti["badNum"])
     bo = m["chk"].get("body")
     if bo:
         if lay in ("table", "chart_bars", "chart_sounding"):
             chk("圖表版型補充只有一行、不拆詞", bo["lines"] == 1 and not bo["bad"], {"lines": bo["lines"], "bad": bo["bad"]})
         else:
             chk("補充不拆詞、末行 >= 2 字", not bo["bad"] and (bo["lines"] == 1 or bo["lastChars"] >= 2), {"lines": bo["lines"], "bad": bo["bad"], "lastChars": bo["lastChars"]})
+    if bo:
+        chk("補充的數字與單位不拆成兩行", not bo["badNum"], bo["badNum"])
     if m["ropes"]:
         rat = [r["len"] / r["v"] for r in m["ropes"]]
         chk("測深繩長與數值成正比（水面為 0）", max(rat) / min(rat) < 1.01, f"每單位 {min(rat):.3f}~{max(rat):.3f}px")
@@ -356,8 +371,9 @@ def render_all(spec_path: Path, only: set[int] | None = None) -> int:
     series = load_series(doc["series"])
     series["id"] = series.get("id", doc["series"])
     tag = series["name"]
-    outdir = spec_path.parent / "ig"
-    htmldir = spec_path.parent / "html"
+    pack, bld = W.pack_dir(spec_path), W.build_dir(spec_path)
+    outdir = pack / "ig"
+    htmldir = bld / "html"
     outdir.mkdir(parents=True, exist_ok=True); htmldir.mkdir(parents=True, exist_ok=True)
     css = (template_dir(series["id"]) / "style.css").read_text(encoding="utf-8")
     css = css.replace("{{FONT_REGULAR}}", (ROOT / "assets/fonts/NotoSansCJKtc-Regular.otf").as_uri())
@@ -401,8 +417,8 @@ def render_all(spec_path: Path, only: set[int] | None = None) -> int:
             else:
                 alts[f"{i:02d}.png"] = (plain(sl.get("title", "")) + ("。" + body if body else ""))
         b.close()
-    (spec_path.parent / "alt-text.json").write_text(json.dumps(alts, ensure_ascii=False, indent=2), encoding="utf-8")
-    (spec_path.parent / "checks-b.json").write_text(json.dumps({"template_hash": thash, "slides": report}, ensure_ascii=False, indent=2), encoding="utf-8")
+    (bld / "alt-text.json").write_text(json.dumps(alts, ensure_ascii=False, indent=2), encoding="utf-8")
+    (bld / "checks-b.json").write_text(json.dumps({"template_hash": thash, "slides": report}, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"template_hash={thash}  程式 B：{len(report) - failed}/{len(report)} 張通過")
     return 1 if failed else 0
 

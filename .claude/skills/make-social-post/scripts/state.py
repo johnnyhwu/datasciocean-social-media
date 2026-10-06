@@ -97,7 +97,7 @@ def record(concept: str, fmt: str, url: str, published_at: str, series_id: str |
 def backfill() -> None:
     """已發布、但缺少「之後才發布的同系列或提及觀念」連結的貼文。"""
     series_members: dict[str, list[str]] = {}
-    for f in W.SERIES_DIR.glob("*.md"):
+    for f in W.SERIES_DIR.glob("*/series.md"):
         s = yaml.safe_load(re.match(r"^---\n(.*?)\n---", f.read_text(encoding="utf-8"), re.S).group(1))
         series_members[s["id"]] = [m["concept"] for m in s["members"]]
     states = {cid: load(cid) for cid in concept_ids()}

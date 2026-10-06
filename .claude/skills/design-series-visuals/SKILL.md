@@ -16,7 +16,7 @@ description: 設計 IG 輪播與 Threads 附圖的視覺：新系列的視覺哲
 1. `references/principles.md`：IG 圖片設計原則（先哲學後畫面、暗藏主題參照、文字是視覺元素、工藝感、不重疊不出框、最後一步只減不加、多張是同一哲學的變奏）。
 2. `references/brand-and-layouts.md`：畫布與邊界、品牌色與字型字級、對比度、八種版型、依內容選圖、測深圖。
 3. `references/series-philosophy-and-templates.md`：兩層視覺哲學、模板怎麼來、做新系列的步驟。
-4. 想看範例：第一次實跑的哲學與模板已從工作目錄移除，在 git 歷史 commit `4b5a42e`（`git show 4b5a42e:design/series-philosophies/jev-sounding.md`、`git ls-tree -r 4b5a42e templates/jev-teardown/`）。
+4. 想看範例：現行的 `series/jev-cascade/`（`philosophy.md`「潮線」、`templates/`、`series.md`），以及 `out/jev-cascade/jev-cascade-overview/` 的成品。
 5. 需要原始設計哲學時再讀 `references/canvas-design-original.md`（上游 skill 原文；授權見 `references/canvas-design-LICENSE.txt`）。
 
 ## 鐵則

@@ -12,7 +12,7 @@ caption_nav_line_mode: article_title   # 可改 search_term（見 references/thr
 hashtags_max: 5
 thread_body_max_chars: 500
 thread_desc_overlap_max: 0.40
-hook_candidates: [6, 10]
+hook_candidates: [5, 6]         # 2026-10-06 改：自己先提 5～6 個大膽候選（見 references/hooks.md）
 hook_min_styles: 3
 review_max_rounds: 3
 min_stock: 7

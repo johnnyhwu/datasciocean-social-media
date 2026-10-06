@@ -30,6 +30,30 @@ WIKI = Path(os.environ.get("DSO_CONCEPT_WIKI") or ROOT / "concept-wiki")
 SERIES_DIR = Path(os.environ.get("DSO_SERIES_DIR") or ROOT / "series")
 
 
+def series_dir(sid: str) -> Path:
+    """一個系列的所有東西都在 series/<id>/：series.md、philosophy.md、templates/。"""
+    return SERIES_DIR / sid
+
+
+def series_file(sid: str) -> Path:
+    return series_dir(sid) / "series.md"
+
+
+def series_ids() -> list[str]:
+    return sorted(p.name for p in SERIES_DIR.iterdir() if (p / "series.md").exists()) if SERIES_DIR.exists() else []
+
+
+def build_dir(spec_path: Path) -> Path:
+    """機器用的中間檔都在發布包的 _build/（spec.json、checks-b.json、html/…）。"""
+    return Path(spec_path).resolve().parent
+
+
+def pack_dir(spec_path: Path) -> Path:
+    """發布包資料夾：spec 在 <pack>/_build/spec.json 時是上一層；測試用的暫存資料夾直接放 spec，就是同一層。"""
+    b = build_dir(spec_path)
+    return b.parent if b.name == "_build" else b
+
+
 def load_params() -> dict:
     return yaml.safe_load((ROOT / "config" / "params.yaml").read_text(encoding="utf-8"))
 

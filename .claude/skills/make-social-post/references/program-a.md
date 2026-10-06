@@ -2,7 +2,7 @@
 
 貼文被改寫過，不能比對字面，所以靠「標記編號」：每個區塊（hook、投影片、Threads 的正文／每則串文／最後一則、caption 第一句）都要標它引用的 claim id，或標「結構」。**引用只證明「有對應」，不證明意思沒走樣**；走樣由忠實者判斷。
 
-`uv run python .claude/skills/make-social-post/scripts/check_a.py out/<series>/<concept>/spec.json`：ERROR 清零才算過；HINT 交給忠實者重點檢查。程式 A 不算審查輪數，撰寫者可自己先跑到通過。
+`uv run python .claude/skills/make-social-post/scripts/check_a.py out/<series>/<concept>/_build/spec.json`：ERROR 清零才算過；HINT 交給忠實者重點檢查。程式 A 不算審查輪數，撰寫者可自己先跑到通過。
 
 ## ERROR（退回）
 
@@ -18,6 +18,7 @@
 | 中文 AI 腔黑名單（`ai_tone_blacklist`）；出現「podcast」 | 風格與規則違反 |
 | 被使用的主張，它的每條限定條件（`cid#k`）必須在整則貼文某處被 `quals` 標記帶出 | 壓縮時限定條件被砍 |
 | 卡的 `context_type` 是 `evidence_from_single_source` 或 `bound_to_source` 時，脈絡張必須引用 `role: context` 的主張 | 漏交代方法來源 |
+| 貼文或系列檔的 `planned_title` 出現 `config/terms.yaml` 左邊的詞（例如「判官」，應寫 Judge） | 用語不一致（導流行引用的文章原標題不檢查） |
 | 張數不超過 `slides_max`；文字張補充 40～60 字；圖表版型補充不超過 24 字；脈絡張補充不超過 90 字 | 超長 |
 | Threads：正文不超過 500 字；連結只放最後一則；串文與內容投影片一對一；串文描述與圖上文字的二連詞重疊率不超過 40% | 格式違規；描述只是重述圖 |
 | caption：第一句不超過 50 字；hashtag 不超過 5 個；系列貼文含系列標籤；整份 spec 不出現 podcast | 格式違規 |

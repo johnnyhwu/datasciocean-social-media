@@ -10,17 +10,17 @@
 | `standalone_classic` | 預設獨立 post |
 | 系列只剩一則 | 視為獨立 post |
 
-## 2. 系列檔 `series/<series-id>.md`
+## 2. 系列檔 `series/<series-id>/series.md`（同資料夾還有 `philosophy.md`、`templates/`）
 
 ```yaml
-id: jev-teardown
-name: Jev 拆解系列               # 每張投影片的系列標籤，必須與此完全相同
-philosophy: design/series-philosophies/jev-sounding.md
+id: jev-cascade
+name: JEV 串接 Judge 系列        # 每張投影片的系列標籤，必須與此完全相同
+philosophy: series/jev-cascade/philosophy.md
 color: teal-mid                  # 封面海浪色帶，相鄰系列不同色
 members:                         # 發文順序
-  - concept: jev-overview
-    planned_title: Jev 補的是分類器與 LLM 之間的空隙
-hashtag: DSO_Jev
+  - concept: jev-cascade-overview
+    planned_title: 便宜的 Judge 先判，沒把握才轉給 GPT-6
+hashtag: DSO_LLMJudge
 status: planning                 # planning | publishing | done
 ```
 
@@ -42,36 +42,19 @@ status: planning                 # planning | publishing | done
 
 ## 5. 人最後確認
 
-交給人看：`contact-sheet.png` 加每則的 `ig/caption.txt`、`threads.txt`、`alt-text.json`；報告裡說明：被審查者改過的 hook、被刪掉的投影片、HINT 與未解決的 minor、任何和先前慣例不同的地方（例如導流行寫法）。人確認後才進入發布包。
+交給人看：每則貼文的 `README.md`（含縮圖）、`ig/post.md`、`threads/post.md`；報告裡說明：被審查者改過的 hook、被刪掉的投影片、HINT 與未解決的 minor、任何和先前慣例不同的地方（例如導流行寫法）。人確認後才進入發布包。
 
 ## 6. 輸出
 
-發布包（`out/<series-or-standalone>/<concept-id>/`）：
-- `ig/01.png` … 依順序編號的投影片
-- `ig/caption.txt`、`alt-text.json`
-- `threads.txt`（正文，加每則串文的文字與對應圖檔）
-- `spec.json`（投影片規格，含引用編號；`checks-b.json` 含模板版本 hash）
-- 審查用的中間檔（`post-with-refs.md`、`post-reader.md`、`contact-sheet.png`）一併留著
+發布包（`out/<series-or-standalone>/<concept-id>/`）的結構見 `spec-json.md`「發布包結構」。人只需要看三個檔案：
 
-確認後：`state.py ready <concept> <format> <pack-dir>`（每個格式各一次），並寫（或更新）`out/<series>/publish-checklist.md`：
+- `README.md`：入口。縮圖、檢查結果、發布前後待辦（`- [ ]` 清單，由 `build_package.py` 產生，不用另外寫 checklist）
+- `ig/post.md`：IG 每一頁的圖與文字、替代文字、整段 caption
+- `threads/post.md`：Threads 正文、每則串文（附圖）、最後一則
 
-```
-# <系列名>：發布後待辦清單
-系統不自動發布。以下由人手動做。
-| 順序 | 觀念 | 貼文資料夾 | hook 樣態 |
-## 發布前
-- [ ] 人最後確認圖、caption、threads.txt、alt-text.json
-- [ ] IG：依 ig/01.png… 順序上傳，貼 ig/caption.txt，替代文字貼自 alt-text.json
-- [ ] Threads：正文用「新增到串文」一次發出，每則串文附 threads.txt 標註的圖檔，最後一則（置頂）含文章連結
-- [ ] 存量提醒（低於 min_stock 時）
-## 發布後（每則）
-- [ ] 發限時動態並加連結貼紙，指向文章
-- [ ] 收進系列精選集；概覽發布後置頂概覽 post；置頂最後一則 Threads 回覆
-- [ ] 把發布紀錄（網址、時間）交給系統寫回
-- [ ] 系列其他則發布後，依 state/backfill.md 回補：IG 改 caption 補延伸連結；Threads 在原串文下加回覆補完整連結
-```
+`out/README.md` 是全部貼文的總入口（待發布清單與各系列狀態），`out/<series>/README.md` 是系列的發文順序。
 
-範例：git 歷史 commit `4b5a42e` 的 `out/jev-teardown/publish-checklist.md`。
+確認後：`state.py ready <concept> <format> <pack-dir>`（每個格式各一次）。
 
 ## 7. 人手動發布後：寫回狀態
 

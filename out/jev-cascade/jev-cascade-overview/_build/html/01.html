@@ -1,0 +1,52 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><style>/* JEV 串接判官系列模板（哲學：series/jev-cascade/philosophy.md）
+   顏色與字級只用 design-series-visuals/references/brand-and-layouts.md §2 規定的集合。字型內嵌自 assets/fonts。 */
+@font-face{font-family:"DSO";src:url("file:///Users/johnnyhwu/Desktop/datasciocean-social-media/assets/fonts/NotoSansCJKtc-Regular.otf");font-weight:400}
+@font-face{font-family:"DSO";src:url("file:///Users/johnnyhwu/Desktop/datasciocean-social-media/assets/fonts/NotoSansCJKtc-Bold.otf");font-weight:700}
+html,body{margin:0;width:1080px;height:1350px;overflow:hidden;background:#F2E0C0;
+  font-family:"DSO",sans-serif;color:#01353F}
+.slide{position:relative;width:1080px;height:1350px;overflow:hidden}
+.slide.dark{background:#01353F}
+.gfx{position:absolute;left:0;top:0}
+.t{margin:0}
+.abs{position:absolute}
+.tag{left:80px;top:88px;font-size:28px;font-weight:400;color:#076876;white-space:nowrap}
+.dark .tag{color:#F2E0C0}
+.title{left:80px;top:150px;width:920px;font-size:72px;font-weight:700;line-height:1.25;color:#076876;
+  word-break:keep-all;text-wrap:balance}
+.body{left:80px;top:352px;width:920px;font-size:40px;font-weight:400;line-height:1.6;word-break:keep-all}
+.body.one{white-space:nowrap;font-size:38px}
+.foot{left:80px;top:1262px;font-size:28px;font-weight:400;color:#01353F;white-space:nowrap}
+.foot.light,.dark .foot{color:#F2E0C0}
+.hl{background:linear-gradient(transparent 56%,#DDA642 56%,#DDA642 94%,transparent 94%);color:#01353F}
+/* 封面 */
+.cover-title{left:80px;top:330px;width:920px;font-size:76px;font-weight:700;line-height:1.25;color:#076876;
+  word-break:keep-all;text-wrap:balance}
+.cover-sub{left:80px;width:920px;font-size:40px;font-weight:400;line-height:1.6;word-break:keep-all}
+.band-name{left:80px;top:1150px;font-size:34px;font-weight:700;color:#F2E0C0;white-space:nowrap}
+/* 對照表 */
+.cell{font-size:38px;line-height:1.5;word-break:keep-all}
+.cell.k{font-weight:700;color:#076876}
+.cell.h{font-size:28px;font-weight:700;color:#076876}
+/* 圖表 */
+.name{font-size:34px;font-weight:700;line-height:1.5;white-space:nowrap}
+.sub{font-size:28px;font-weight:400;line-height:1.5;white-space:nowrap}
+.num{font-size:56px;font-weight:700;line-height:66px;white-space:nowrap}
+.legend{font-size:28px;white-space:nowrap}
+.note{font-size:28px;white-space:nowrap}
+.sea .name,.sea .sub,.sea .num,.sea .legend,.sea .note,.sea .foot{color:#F2E0C0}
+/* 帶走 */
+.take{left:80px;width:920px;top:430px;font-size:76px;font-weight:700;line-height:1.3;color:#DDA642;
+  word-break:keep-all;text-wrap:balance}
+.take-label{left:80px;font-size:28px;font-weight:400;color:#F2E0C0;white-space:nowrap}
+/* 系列地圖 */
+.item{font-size:34px;line-height:1.4;white-space:nowrap}
+.item.cur{color:#F2E0C0;font-weight:700}
+.nav{font-size:28px;line-height:1.5;color:#076876;white-space:nowrap}
+</style></head><body><div class="slide">
+<svg class="gfx" width="1080" height="1350" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#076876"/><stop offset=".38" stop-color="#01353F"/><stop offset="1" stop-color="#032027"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#DDA642" stop-opacity=".42"/><stop offset="1" stop-color="#DDA642" stop-opacity="0"/></radialGradient></defs><path class="bg" d="M0,1000.0 L10,1000.6 L20,1001.2 L30,1001.8 L40,1002.3 L50,1002.8 L60,1003.3 L70,1003.7 L80,1004.1 L90,1004.4 L100,1004.7 L110,1004.9 L120,1005.0 L130,1005.0 L140,1005.0 L150,1004.9 L160,1004.7 L170,1004.4 L180,1004.1 L190,1003.7 L200,1003.3 L210,1002.8 L220,1002.3 L230,1001.8 L240,1001.2 L250,1000.6 L260,1000.0 L270,999.4 L280,998.8 L290,998.2 L300,997.7 L310,997.2 L320,996.7 L330,996.3 L340,995.9 L350,995.6 L360,995.3 L370,995.1 L380,995.0 L390,995.0 L400,995.0 L410,995.1 L420,995.3 L430,995.6 L440,995.9 L450,996.3 L460,996.7 L470,997.2 L480,997.7 L490,998.2 L500,998.8 L510,999.4 L520,1000.0 L530,1000.6 L540,1001.2 L550,1001.8 L560,1002.3 L570,1002.8 L580,1003.3 L590,1003.7 L600,1004.1 L610,1004.4 L620,1004.7 L630,1004.9 L640,1005.0 L650,1005.0 L660,1005.0 L670,1004.9 L680,1004.7 L690,1004.4 L700,1004.1 L710,1003.7 L720,1003.3 L730,1002.8 L740,1002.3 L750,1001.8 L760,1001.2 L770,1000.6 L780,1000.0 L790,999.4 L800,998.8 L810,998.2 L820,997.7 L830,997.2 L840,996.7 L850,996.3 L860,995.9 L870,995.6 L880,995.3 L890,995.1 L900,995.0 L910,995.0 L920,995.0 L930,995.1 L940,995.3 L950,995.6 L960,995.9 L970,996.3 L980,996.7 L990,997.2 L1000,997.7 L1010,998.2 L1020,998.8 L1030,999.4 L1040,1000.0 L1050,1000.6 L1060,1001.2 L1070,1001.8 L1080,1002.3 L1080,1350 L0,1350 Z" fill="#69B4AA"/><path class="bg" d="M0,1028.9 L10,1029.0 L20,1029.0 L30,1028.9 L40,1028.7 L50,1028.4 L60,1028.0 L70,1027.6 L80,1027.1 L90,1026.6 L100,1026.0 L110,1025.3 L120,1024.7 L130,1024.0 L140,1023.4 L150,1022.7 L160,1022.1 L170,1021.5 L180,1020.9 L190,1020.4 L200,1020.0 L210,1019.6 L220,1019.3 L230,1019.1 L240,1019.0 L250,1019.0 L260,1019.1 L270,1019.2 L280,1019.5 L290,1019.8 L300,1020.2 L310,1020.6 L320,1021.2 L330,1021.7 L340,1022.3 L350,1023.0 L360,1023.6 L370,1024.3 L380,1025.0 L390,1025.6 L400,1026.2 L410,1026.8 L420,1027.3 L430,1027.8 L440,1028.2 L450,1028.5 L460,1028.8 L470,1028.9 L480,1029.0 L490,1029.0 L500,1028.9 L510,1028.7 L520,1028.4 L530,1028.0 L540,1027.6 L550,1027.1 L560,1026.6 L570,1026.0 L580,1025.3 L590,1024.7 L600,1024.0 L610,1023.4 L620,1022.7 L630,1022.1 L640,1021.5 L650,1020.9 L660,1020.4 L670,1020.0 L680,1019.6 L690,1019.3 L700,1019.1 L710,1019.0 L720,1019.0 L730,1019.1 L740,1019.2 L750,1019.5 L760,1019.8 L770,1020.2 L780,1020.6 L790,1021.2 L800,1021.7 L810,1022.3 L820,1023.0 L830,1023.6 L840,1024.3 L850,1025.0 L860,1025.6 L870,1026.2 L880,1026.8 L890,1027.3 L900,1027.8 L910,1028.2 L920,1028.5 L930,1028.8 L940,1028.9 L950,1029.0 L960,1029.0 L970,1028.9 L980,1028.7 L990,1028.4 L1000,1028.0 L1010,1027.6 L1020,1027.1 L1030,1026.6 L1040,1026.0 L1050,1025.3 L1060,1024.7 L1070,1024.0 L1080,1023.4 L1080,1350 L0,1350 Z" fill="#1F8A8D"/><path class="bg" d="M0,1050.6 L10,1050.1 L20,1049.6 L30,1049.0 L40,1048.5 L50,1047.9 L60,1047.3 L70,1046.8 L80,1046.3 L90,1045.7 L100,1045.3 L110,1044.8 L120,1044.4 L130,1044.0 L140,1043.7 L150,1043.5 L160,1043.2 L170,1043.1 L180,1043.0 L190,1043.0 L200,1043.0 L210,1043.1 L220,1043.3 L230,1043.5 L240,1043.8 L250,1044.2 L260,1044.5 L270,1045.0 L280,1045.4 L290,1045.9 L300,1046.4 L310,1047.0 L320,1047.5 L330,1048.1 L340,1048.7 L350,1049.2 L360,1049.7 L370,1050.3 L380,1050.7 L390,1051.2 L400,1051.6 L410,1052.0 L420,1052.3 L430,1052.5 L440,1052.8 L450,1052.9 L460,1053.0 L470,1053.0 L480,1053.0 L490,1052.9 L500,1052.7 L510,1052.5 L520,1052.2 L530,1051.8 L540,1051.5 L550,1051.0 L560,1050.6 L570,1050.1 L580,1049.6 L590,1049.0 L600,1048.5 L610,1047.9 L620,1047.3 L630,1046.8 L640,1046.3 L650,1045.7 L660,1045.3 L670,1044.8 L680,1044.4 L690,1044.0 L700,1043.7 L710,1043.5 L720,1043.2 L730,1043.1 L740,1043.0 L750,1043.0 L760,1043.0 L770,1043.1 L780,1043.3 L790,1043.5 L800,1043.8 L810,1044.2 L820,1044.5 L830,1045.0 L840,1045.4 L850,1045.9 L860,1046.4 L870,1047.0 L880,1047.5 L890,1048.1 L900,1048.7 L910,1049.2 L920,1049.7 L930,1050.3 L940,1050.7 L950,1051.2 L960,1051.6 L970,1052.0 L980,1052.3 L990,1052.5 L1000,1052.8 L1010,1052.9 L1020,1053.0 L1030,1053.0 L1040,1053.0 L1050,1052.9 L1060,1052.7 L1070,1052.5 L1080,1052.2 L1080,1350 L0,1350 Z" fill="#076876"/><path class="bg" d="M0,1068.2 L10,1067.8 L20,1067.5 L30,1067.3 L40,1067.1 L50,1067.0 L60,1067.0 L70,1067.1 L80,1067.2 L90,1067.4 L100,1067.7 L110,1068.1 L120,1068.5 L130,1069.0 L140,1069.5 L150,1070.1 L160,1070.7 L170,1071.3 L180,1071.9 L190,1072.5 L200,1073.1 L210,1073.7 L220,1074.3 L230,1074.9 L240,1075.3 L250,1075.8 L260,1076.2 L270,1076.5 L280,1076.7 L290,1076.9 L300,1077.0 L310,1077.0 L320,1076.9 L330,1076.8 L340,1076.6 L350,1076.3 L360,1075.9 L370,1075.5 L380,1075.0 L390,1074.5 L400,1073.9 L410,1073.3 L420,1072.7 L430,1072.1 L440,1071.5 L450,1070.9 L460,1070.3 L470,1069.7 L480,1069.1 L490,1068.7 L500,1068.2 L510,1067.8 L520,1067.5 L530,1067.3 L540,1067.1 L550,1067.0 L560,1067.0 L570,1067.1 L580,1067.2 L590,1067.4 L600,1067.7 L610,1068.1 L620,1068.5 L630,1069.0 L640,1069.5 L650,1070.1 L660,1070.7 L670,1071.3 L680,1071.9 L690,1072.5 L700,1073.1 L710,1073.7 L720,1074.3 L730,1074.9 L740,1075.3 L750,1075.8 L760,1076.2 L770,1076.5 L780,1076.7 L790,1076.9 L800,1077.0 L810,1077.0 L820,1076.9 L830,1076.8 L840,1076.6 L850,1076.3 L860,1075.9 L870,1075.5 L880,1075.0 L890,1074.5 L900,1073.9 L910,1073.3 L920,1072.7 L930,1072.1 L940,1071.5 L950,1070.9 L960,1070.3 L970,1069.7 L980,1069.1 L990,1068.7 L1000,1068.2 L1010,1067.8 L1020,1067.5 L1030,1067.3 L1040,1067.1 L1050,1067.0 L1060,1067.0 L1070,1067.1 L1080,1067.2 L1080,1350 L0,1350 Z" fill="url(#sea)"/></svg>
+<div class="t abs cover-title chk" id="title">便宜的 Judge JEV 先判，<span class="hl">成績居然贏過 GPT-6 單打</span></div>
+<div class="t abs cover-sub chk" id="body" style="top:560px">RewardBench 上，只有 JEV 沒把握的 25% 才丟給 GPT-6，費用只要 GPT-6 單獨的 27%</div>
+<div class="t abs band-name">JEV 串接 Judge 系列</div>
+<div class="t abs foot light">@datasciocean</div>
+</div>
+</body></html>

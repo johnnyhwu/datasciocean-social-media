@@ -1,6 +1,6 @@
 """程式 A：貼文的引用標記與格式檢查（引用標記、比較詞、限定條件、字數、重疊率…；規則見 references/program-a.md）。
 
-用法：uv run python .claude/skills/make-social-post/scripts/check_a.py out/<series>/<concept>/spec.json
+用法：uv run python .claude/skills/make-social-post/scripts/check_a.py out/<series>/<concept>/_build/spec.json
 結束碼：0 通過（可能有 HINT）、1 有 ERROR。
 
 貼文被改寫過，不能比對字面，所以靠「標記編號」：每個區塊（投影片、串文、caption 的各部分）
@@ -57,8 +57,9 @@ def main(spec_path: str) -> int:
     doc = json.loads(sp.read_text(encoding="utf-8"))
     card = W.parse_card(W.WIKI / "wiki" / "concepts" / f"{doc['concept']}.md")
     claims = {c["id"]: c for c in card.claims}
-    series = yaml.safe_load(re.match(r"^---\n(.*?)\n---", (W.SERIES_DIR / f"{doc['series']}.md").read_text(encoding="utf-8"), re.S).group(1))
+    series = yaml.safe_load(re.match(r"^---\n(.*?)\n---", W.series_file(doc["series"]).read_text(encoding="utf-8"), re.S).group(1))
     err, hint = [], []
+    terms = (yaml.safe_load((W.ROOT / "config" / "terms.yaml").read_text(encoding="utf-8")) or {}).get("replace", {})
 
     def claim_text(cid):
         c = claims[cid]
@@ -123,6 +124,10 @@ def main(spec_path: str) -> int:
                 if w in f and w not in ref_text:
                     err.append(f"{name}: 比較詞/全稱詞 {w!r} 出現在貼文，卻不在引用主張原文")
                     break
+        # 用語對照（config/terms.yaml）
+        for old, new in terms.items():
+            if old in txt_all:
+                err.append(f"{name}: 用語 {old!r} 應寫成 {new!r}（config/terms.yaml）")
         # 12. AI 腔黑名單
         for w in P["ai_tone_blacklist"]:
             if w in txt_all:
@@ -133,6 +138,11 @@ def main(spec_path: str) -> int:
         if any(claims[r]["anchor_type"] == "部落格判斷" for r in refs) and "我的判斷" not in txt_all and sl is not None and sl["layout"] not in ("cover", "series_map"):
             hint.append(f"{name}: 引用了部落格判斷，區塊內沒有「我的判斷」字樣（交忠實者確認寫法）")
 
+    # 系列檔的 planned_title 會自動填進系列地圖與 Threads 最後一則，也要符合用語對照
+    for m in series["members"]:
+        for old, new in terms.items():
+            if old in m["planned_title"]:
+                err.append(f"系列檔 planned_title {m['planned_title']!r}: 用語 {old!r} 應寫成 {new!r}")
     # 3. 被使用的主張，它綁定的限定條件必須出現在貼文某處（以 quals 標記）
     for cid in sorted(used_claims):
         for k, q in enumerate(claims[cid].get("qualifiers", []), 1):
@@ -188,7 +198,7 @@ def main(spec_path: str) -> int:
     if cur and cur[0] not in [m["concept"] for m in series["members"]]:
         err.append(f"系列地圖 current={cur[0]} 不在系列成員內")
 
-    print(f"== 程式 A {sp.parent.name}: {'FAIL' if err else 'PASS'}（ERROR {len(err)}，HINT {len(hint)}）")
+    print(f"== 程式 A {doc['concept']}: {'FAIL' if err else 'PASS'}（ERROR {len(err)}，HINT {len(hint)}）")
     for e in err:
         print("  ERROR", e)
     for h in hint:

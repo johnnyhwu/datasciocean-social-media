@@ -5,7 +5,7 @@ spec.json → 填入該系列的 HTML 模板（內嵌字型）→ Playwright 無
           → 程式 B 逐張檢查（量 DOM 與實際像素）→ 通過後才交給 subagent 審查
 ```
 
-`uv run python .claude/skills/make-social-post/scripts/render.py out/<series>/<concept>/spec.json [--only 3,5]`
+`uv run python .claude/skills/make-social-post/scripts/render.py out/<series>/<concept>/_build/spec.json [--only 3,5]`
 
 輸出：`ig/NN.png`、`checks-b.json`（每張每項檢查的結果與 `template_hash`）、`alt-text.json`（每張替代文字，由主標加補充自動產生；系列地圖是標題加各則 planned_title）。`--only` 只重渲指定張。結束碼 1 = 有檢查不通過。規格記錄模板版本的 hash，同一系列所有貼文必須用同一版模板（`batch_check.py` 檢查）。
 
@@ -21,6 +21,7 @@ spec.json → 填入該系列的 HTML 模板（內嵌字型）→ Playwright 無
 | 字級 | 最小 28px；所有字級都在允許集合 {28, 34, 38, 40, 56, 72, 76} 內 |
 | **對比度** | 取文字框外緣四角（內縮 2px）的**實際背景色**計算（量截圖像素，不用設計稿的色碼），至少 4.5 |
 | 換行 | 標題與補充用 `word-break: keep-all`，用詞界分段檢查「換行不拆詞」（例如「倍數」不能被拆成「倍／數」）；末行至少 2 字 |
+| 數字與單位不拆行 | 標題與補充在換行處，數字（含 % 與小數點）與緊接的中文字、或中文字與緊接的數字，不得被拆成兩行（例如「1.87／秒」「只轉／25%」）。渲染時 `bind_nums` 會把這種空白改成不斷行空格，這項檢查是保險 |
 | 行數 | 主標最多 2 行（帶走張 4 行）；圖表版型補充 1 行 |
 | 比例（圖表） | 橫條長度與數值成正比、軸從 0 起；測深繩長與數值成正比（水面為 0）、菱形中心落在繩端、刻度等距且間距 = 單位 × 每單位像素 |
 | 強調 | 全圖只有一組強調元素（金色） |
@@ -29,6 +30,9 @@ spec.json → 填入該系列的 HTML 模板（內嵌字型）→ Playwright 無
 投影片上每個數字都要出現在引用主張裡的檢查，在實作上放在**程式 A**（HINT 與比較對象 ERROR），不在程式 B。
 
 ## 重要經驗
+
+- 第二次實跑：程式 B 原本沒抓到「1.87／秒」被拆成兩行（詞界檢查看不出來），是看圖才發現。已加 `bind_nums` 與上表的檢查，回歸測試是 `tests/test_render_numunit.py`（用 `DSO_NO_NUMBIND=1` 關掉綁定，檢查必須抓到）。
+- 圖表版型（`chart_bars`）數值很小的短條，配上長的副標籤時，數字標籤會壓到副標籤（重疊與對比度都會失敗）；副標籤要短，或改用 `chart_sounding`。
 
 - **檢查全過不代表好看。** 撰寫者在交出前必須自己看一次渲染後的 PNG（例如標題把「倍數」拆開，是看圖才發現的）；用 `contact_sheet.py` 拼縮圖看整體節奏。
 - 檢查寫進程式後，要用「故意做壞的版本」驗證檢查真的抓得到。

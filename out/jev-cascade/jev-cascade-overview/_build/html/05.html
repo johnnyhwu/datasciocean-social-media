@@ -1,0 +1,54 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><style>/* JEV 串接判官系列模板（哲學：series/jev-cascade/philosophy.md）
+   顏色與字級只用 design-series-visuals/references/brand-and-layouts.md §2 規定的集合。字型內嵌自 assets/fonts。 */
+@font-face{font-family:"DSO";src:url("file:///Users/johnnyhwu/Desktop/datasciocean-social-media/assets/fonts/NotoSansCJKtc-Regular.otf");font-weight:400}
+@font-face{font-family:"DSO";src:url("file:///Users/johnnyhwu/Desktop/datasciocean-social-media/assets/fonts/NotoSansCJKtc-Bold.otf");font-weight:700}
+html,body{margin:0;width:1080px;height:1350px;overflow:hidden;background:#F2E0C0;
+  font-family:"DSO",sans-serif;color:#01353F}
+.slide{position:relative;width:1080px;height:1350px;overflow:hidden}
+.slide.dark{background:#01353F}
+.gfx{position:absolute;left:0;top:0}
+.t{margin:0}
+.abs{position:absolute}
+.tag{left:80px;top:88px;font-size:28px;font-weight:400;color:#076876;white-space:nowrap}
+.dark .tag{color:#F2E0C0}
+.title{left:80px;top:150px;width:920px;font-size:72px;font-weight:700;line-height:1.25;color:#076876;
+  word-break:keep-all;text-wrap:balance}
+.body{left:80px;top:352px;width:920px;font-size:40px;font-weight:400;line-height:1.6;word-break:keep-all}
+.body.one{white-space:nowrap;font-size:38px}
+.foot{left:80px;top:1262px;font-size:28px;font-weight:400;color:#01353F;white-space:nowrap}
+.foot.light,.dark .foot{color:#F2E0C0}
+.hl{background:linear-gradient(transparent 56%,#DDA642 56%,#DDA642 94%,transparent 94%);color:#01353F}
+/* 封面 */
+.cover-title{left:80px;top:330px;width:920px;font-size:76px;font-weight:700;line-height:1.25;color:#076876;
+  word-break:keep-all;text-wrap:balance}
+.cover-sub{left:80px;width:920px;font-size:40px;font-weight:400;line-height:1.6;word-break:keep-all}
+.band-name{left:80px;top:1150px;font-size:34px;font-weight:700;color:#F2E0C0;white-space:nowrap}
+/* 對照表 */
+.cell{font-size:38px;line-height:1.5;word-break:keep-all}
+.cell.k{font-weight:700;color:#076876}
+.cell.h{font-size:28px;font-weight:700;color:#076876}
+/* 圖表 */
+.name{font-size:34px;font-weight:700;line-height:1.5;white-space:nowrap}
+.sub{font-size:28px;font-weight:400;line-height:1.5;white-space:nowrap}
+.num{font-size:56px;font-weight:700;line-height:66px;white-space:nowrap}
+.legend{font-size:28px;white-space:nowrap}
+.note{font-size:28px;white-space:nowrap}
+.sea .name,.sea .sub,.sea .num,.sea .legend,.sea .note,.sea .foot{color:#F2E0C0}
+/* 帶走 */
+.take{left:80px;width:920px;top:430px;font-size:76px;font-weight:700;line-height:1.3;color:#DDA642;
+  word-break:keep-all;text-wrap:balance}
+.take-label{left:80px;font-size:28px;font-weight:400;color:#F2E0C0;white-space:nowrap}
+/* 系列地圖 */
+.item{font-size:34px;line-height:1.4;white-space:nowrap}
+.item.cur{color:#F2E0C0;font-weight:700}
+.nav{font-size:28px;line-height:1.5;color:#076876;white-space:nowrap}
+</style></head><body><div class="slide">
+<svg class="gfx" width="1080" height="1350" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#076876"/><stop offset=".38" stop-color="#01353F"/><stop offset="1" stop-color="#032027"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#DDA642" stop-opacity=".42"/><stop offset="1" stop-color="#DDA642" stop-opacity="0"/></radialGradient></defs><line class="g sep" x1="80" y1="500" x2="1000" y2="500" stroke="#01353F" stroke-width="2" opacity=".35"/><line class="g sep" x1="80" y1="621" x2="1000" y2="621" stroke="#01353F" stroke-width="2" opacity=".35"/><line class="g sep" x1="80" y1="742" x2="1000" y2="742" stroke="#01353F" stroke-width="2" opacity=".35"/><line class="g sep" x1="80" y1="863" x2="1000" y2="863" stroke="#01353F" stroke-width="2" opacity=".35"/></svg>
+<div class="t abs tag">JEV 串接 Judge 系列</div>
+<div class="t abs title chk" id="title">JudgeBench 與新任務：追平，只省約 9% 到 33%</div>
+<div class="t abs body one chk" id="body">對比 GPT-6 單獨</div>
+<div class="t abs cell k" style="left:80px;top:528px;width:300px">轉出的題</div><div class="t abs cell" style="left:400px;top:528px;width:600px">65% 到 89%</div><div class="t abs cell k" style="left:80px;top:649px;width:300px">省下的費用</div><div class="t abs cell" style="left:400px;top:649px;width:600px">約 9% 到 33%</div><div class="t abs cell k" style="left:80px;top:770px;width:300px">準確度</div><div class="t abs cell" style="left:400px;top:770px;width:600px">追平 GPT-6</div>
+<div class="t abs note" style="left:80px;top:1196px">追平只在門檻選對時成立</div>
+<div class="t abs foot">@datasciocean</div>
+</div>
+</body></html>

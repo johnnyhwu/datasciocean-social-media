@@ -1,7 +1,7 @@
 """把一則貼文的投影片拼成一張縮圖總覽（給人看，也給撰寫者自己在交出前看一次）。
 
 用法：uv run python .claude/skills/make-social-post/scripts/contact_sheet.py out/<series>/<concept>
-輸出：out/<series>/<concept>/contact-sheet.png
+輸出：out/<series>/<concept>/_build/contact-sheet.png
 """
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def main(pack: Path) -> None:
     for i, f in enumerate(files):
         im = Image.open(f).convert("RGB").resize((tw, th))
         sheet.paste(im, (8 + (i % cols) * (tw + 8), 8 + (i // cols) * (th + 8)))
-    out = pack / "contact-sheet.png"
+    out = (pack / "_build" if (pack / "_build").exists() else pack) / "contact-sheet.png"
     sheet.save(out)
     print(out, sheet.size, f"{len(files)} 張")
 
