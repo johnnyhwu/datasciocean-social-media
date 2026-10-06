@@ -71,7 +71,7 @@ status: planning                 # planning | publishing | done
 - [ ] 系列其他則發布後，依 state/backfill.md 回補：IG 改 caption 補延伸連結；Threads 在原串文下加回覆補完整連結
 ```
 
-範例：`out/jev-teardown/publish-checklist.md`。
+範例：git 歷史 commit `4b5a42e` 的 `out/jev-teardown/publish-checklist.md`。
 
 ## 7. 人手動發布後：寫回狀態
 

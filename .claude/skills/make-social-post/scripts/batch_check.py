@@ -25,7 +25,7 @@ P = W.load_params()
 
 
 def load_series(sid: str) -> dict:
-    t = (W.ROOT / "series" / f"{sid}.md").read_text(encoding="utf-8")
+    t = (W.SERIES_DIR / f"{sid}.md").read_text(encoding="utf-8")
     return yaml.safe_load(re.match(r"^---\n(.*?)\n---", t, re.S).group(1))
 
 

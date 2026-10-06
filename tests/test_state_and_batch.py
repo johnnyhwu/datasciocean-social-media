@@ -1,7 +1,7 @@
 """批次層檢查（batch_check）與狀態／回補（state）的回歸測試。
 
 用法（repo 根目錄）：uv run python tests/test_state_and_batch.py
-需要 concept-wiki submodule 已初始化。state 的測試用暫存目錄，不會動到 state/ 裡的真實資料。
+測試資料在 tests/fixtures/；state 的測試用暫存目錄，不會動到 state/ 裡的真實資料。
 """
 from __future__ import annotations
 
@@ -15,6 +15,11 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# 測試資料放在 tests/fixtures/（第一次實跑的兩則貼文、系列檔與對應的觀念卡），不依賴真實的 out/、series/、concept-wiki/
+import os
+FX = Path(__file__).resolve().parent / "fixtures"
+os.environ["DSO_CONCEPT_WIKI"] = str(FX / "concept-wiki")
+os.environ["DSO_SERIES_DIR"] = str(FX / "series")
 sys.path.insert(0, str(ROOT / ".claude/skills/make-social-post/scripts"))
 
 import batch_check as BC  # noqa: E402
@@ -29,8 +34,8 @@ def check(name: str, ok: bool, detail: str = "") -> None:
         fails.append(name)
 
 
-A = ROOT / "out/jev-teardown/jev-overview"
-B = ROOT / "out/jev-teardown/confound-three-questions"
+A = FX / "out/jev-teardown/jev-overview"
+B = FX / "out/jev-teardown/confound-three-questions"
 
 
 def run_batch(tweak_a=None, tweak_b=None, hash_b=None) -> tuple[int, str]:

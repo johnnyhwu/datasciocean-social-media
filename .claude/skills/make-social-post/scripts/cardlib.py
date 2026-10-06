@@ -4,7 +4,7 @@
 **只讀不寫**。卡的格式契約：concept-wiki/docs/card-format.md。這裡只實作「讀」所需的最小部分，
 刻意不依賴 concept-wiki 裡的程式碼，兩個 repo 只靠卡格式耦合。
 
-要換位置（例如測試）：環境變數 DSO_CONCEPT_WIKI 指向 concept-wiki 的根目錄。
+要換位置（例如測試）：環境變數 DSO_CONCEPT_WIKI 指向 concept-wiki 的根目錄；DSO_SERIES_DIR 指向系列檔目錄。
 """
 from __future__ import annotations
 
@@ -26,6 +26,8 @@ def project_root() -> Path:
 
 ROOT = project_root()
 WIKI = Path(os.environ.get("DSO_CONCEPT_WIKI") or ROOT / "concept-wiki")
+# 系列檔目錄；DSO_SERIES_DIR 只給測試用（指向 tests/fixtures/series）
+SERIES_DIR = Path(os.environ.get("DSO_SERIES_DIR") or ROOT / "series")
 
 
 def load_params() -> dict:

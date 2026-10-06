@@ -25,8 +25,6 @@ datasciocean-concept-wiki（Stage 1，submodule：concept-wiki/）
 | 開新系列、設計模板、新增版型或圖表類型、調整品牌常數 | `.claude/skills/design-series-visuals/SKILL.md` |
 | 卡長什麼樣、`status` 的語意（pending 不用、author_confirmed 取保守） | `concept-wiki/docs/card-format.md` |
 | 調整參數（張數、字數、詞表、輪數、存量） | `config/params.yaml` |
-| 已討論但還沒做的改進 | `docs/backlog.md` |
-| 第一次實跑發現的問題與當時的處理 | `docs/first-run-findings.md`（歷史紀錄，結論已併入 skill） |
 
 ## 不可違反的規則
 
@@ -60,14 +58,13 @@ CLAUDE.md
 .claude/skills/design-series-visuals/   系列視覺哲學、版型、品牌常數（新系列才用）
 concept-wiki/                           submodule：觀念卡（唯讀）
 config/params.yaml                      Stage 2 所有可調參數
-series/<系列 id>.md                     系列定義（成員、planned_title、hashtag、色）
-design/series-philosophies/<id>.md      每個系列的視覺哲學
-templates/<系列 id>/                    每個系列一套 HTML 模板
+series/<系列 id>.md                     系列定義（現在是空的）（成員、planned_title、hashtag、色）
+design/series-philosophies/<id>.md      每個系列的視覺哲學（開新系列時由 design-series-visuals 建立）
+templates/<系列 id>/                    每個系列一套 HTML 模板（同上）
 assets/fonts/、assets/brand/            內嵌字型、品牌來源圖
 state/<觀念 id>.yaml、state/backfill.md  各觀念各格式的狀態、發布紀錄、待回補清單
 out/<系列>/<觀念>/                      發布包
-docs/                                   backlog.md、first-run-findings.md
-tests/                                  test_check_a.py、test_state_and_batch.py
+tests/                                  test_check_a.py、test_state_and_batch.py、fixtures/（第一次實跑的兩則貼文、系列檔與觀念卡，只給測試用）
 ```
 
 為什麼 `config/`、`series/`、`templates/`、`state/` 在根目錄而不在 skill 裡：這些是人會改、會審、會長期累積的資料與設定；`.claude/` 放的是「Claude 怎麼做事」的流程與腳本。
@@ -83,15 +80,15 @@ git submodule add https://github.com/johnnyhwu/datasciocean-concept-wiki concept
 
 之後 `git submodule update --remote` 就會把最新的卡拉進來。
 
-## 目前狀態（2026-10-04）
+## 目前狀態（2026-10-06）
 
-- 系列 `jev-teardown`（6 個觀念）：第一次實跑做了 2 則（`jev-overview`、`confound-three-questions`），程式 A、B、忠實者、工程師讀者都過了，**狀態 `ready`，等人最後確認與手動發布**（`state/` 裡兩個觀念的兩種格式都是 ready）；其餘 4 個觀念 `not_tried`。存量 2 則，低於 `min_stock: 7`。
-- 兩則已產出的貼文導流行用「搜尋 Jev」，因為做的時候卡還沒有 `article_title`；現在卡有了，之後的貼文改用文章標題。
+- 已重置成「還沒處理過任何文章」：沒有系列、沒有視覺哲學與模板、`out/`、`state/` 是空的。第一次實跑（系列 `jev-teardown`，做了 `jev-overview`、`confound-three-questions` 兩則）的完整成果在 git 歷史（commit `4b5a42e`），其中系列檔、視覺哲學 `jev-sounding.md`、模板 `templates/jev-teardown/`、發布包可以當範例參考；回歸測試用的子集留在 `tests/fixtures/`。
+- 第一次要做的事：等 `datasciocean-concept-wiki` 產生新的觀念卡 → `git submodule update --remote` → 用 `design-series-visuals` 為新系列做視覺哲學與樣張（由人審）→ 用 `make-social-post` 做貼文。
 - `config/params.yaml` 的 `structure_text_max_chars` 與 `ai_tone_blacklist` 是初稿，待人確認。
-- 流程已依第一次實跑整理成 skill，**重構後尚未用新流程做過新貼文**；第一次用新流程做貼文時，要量 token 並記進 `docs/`。
+- 重構後尚未用新流程做過貼文；第一次用新流程做貼文時，要量 token 並記錄下來。
 
 ## 工作方式
 
 - skill 與 `references/` 是依實測整理出來的；細節有疑問時以它們為準，沒寫到的先問人，不要自己決定。
 - 修改任何程式檢查或審查流程後，重跑 `uv run python tests/test_check_a.py` 與 `uv run python tests/test_state_and_batch.py`；新增檢查要加「故意做壞的版本」確認抓得到。
-- 範例資料：`out/jev-teardown/confound-three-questions/` 是完整發布包（`spec.json`、`ig/`、`threads.txt`、`checks-b.json`…）。
+- 範例資料：`tests/fixtures/out/jev-teardown/confound-three-questions/spec.json` 是完整的內容規格範例；完整發布包（含 `ig/`、`threads.txt`）在 git 歷史 commit `4b5a42e` 的 `out/jev-teardown/`。

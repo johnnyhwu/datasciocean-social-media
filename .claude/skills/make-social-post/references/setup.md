@@ -28,7 +28,7 @@ PLAYWRIGHT_BROWSERS_PATH=$PWD/.playwright-browsers uv run playwright install chr
 ```
 uv run python tests/test_check_a.py          # 程式 A 回歸，需要 concept-wiki 已初始化
 uv run python tests/test_state_and_batch.py
-uv run python .claude/skills/make-social-post/scripts/render.py out/jev-teardown/jev-overview/spec.json
+uv run python .claude/skills/make-social-post/scripts/render.py out/<series>/<concept>/spec.json
 ```
 
 渲染是確定性的：同一份 spec.json 與同一版模板，重渲染的 PNG 與既有發布包逐位元相同（重構時用來驗證搬家沒有改壞任何東西）。

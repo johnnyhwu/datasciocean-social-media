@@ -1,6 +1,6 @@
 """程式 A 的回歸測試：故意做壞的貼文，程式 A 必須抓到；正確的貼文必須通過（測誤殺）。
 
-需要 concept-wiki submodule 已初始化（測試用的是 out/ 裡兩則貼文與對應的觀念卡）。
+測試資料在 tests/fixtures/（不需要 submodule，也不依賴 out/ 與 series/）。
 用法（repo 根目錄）：uv run python tests/test_check_a.py
 """
 import copy
@@ -11,9 +11,14 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# 測試資料放在 tests/fixtures/（第一次實跑的兩則貼文、系列檔與對應的觀念卡），不依賴真實的 out/、series/、concept-wiki/
+import os
+FX = Path(__file__).resolve().parent / "fixtures"
+os.environ["DSO_CONCEPT_WIKI"] = str(FX / "concept-wiki")
+os.environ["DSO_SERIES_DIR"] = str(FX / "series")
 SCRIPT = ROOT / ".claude/skills/make-social-post/scripts/check_a.py"
-GOOD_A = json.loads((ROOT / "out/jev-teardown/jev-overview/spec.json").read_text(encoding="utf-8"))
-GOOD_B = json.loads((ROOT / "out/jev-teardown/confound-three-questions/spec.json").read_text(encoding="utf-8"))
+GOOD_A = json.loads((FX / "out/jev-teardown/jev-overview/spec.json").read_text(encoding="utf-8"))
+GOOD_B = json.loads((FX / "out/jev-teardown/confound-three-questions/spec.json").read_text(encoding="utf-8"))
 
 
 def run(spec):

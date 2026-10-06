@@ -1,6 +1,6 @@
 # 內容規格 JSON（`out/<series>/<concept>/spec.json`）
 
-LLM 只產出這份 JSON；外觀完全由模板決定。範例：`out/jev-teardown/confound-three-questions/spec.json`。
+LLM 只產出這份 JSON；外觀完全由模板決定。範例：`tests/fixtures/out/jev-teardown/confound-three-questions/spec.json`。
 
 ## 頂層
 

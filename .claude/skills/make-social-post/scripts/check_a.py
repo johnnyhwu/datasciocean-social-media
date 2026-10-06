@@ -57,7 +57,7 @@ def main(spec_path: str) -> int:
     doc = json.loads(sp.read_text(encoding="utf-8"))
     card = W.parse_card(W.WIKI / "wiki" / "concepts" / f"{doc['concept']}.md")
     claims = {c["id"]: c for c in card.claims}
-    series = yaml.safe_load(re.match(r"^---\n(.*?)\n---", (W.ROOT / "series" / f"{doc['series']}.md").read_text(encoding="utf-8"), re.S).group(1))
+    series = yaml.safe_load(re.match(r"^---\n(.*?)\n---", (W.SERIES_DIR / f"{doc['series']}.md").read_text(encoding="utf-8"), re.S).group(1))
     err, hint = [], []
 
     def claim_text(cid):
