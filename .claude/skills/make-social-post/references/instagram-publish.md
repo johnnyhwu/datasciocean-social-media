@@ -2,7 +2,7 @@
 
 走 Meta 官方 API（host: `graph.instagram.com`，Instagram User access token，**不需要** Facebook Page），不使用任何第三方封裝服務。
 
-**規則**：預設 dry-run；要實際發佈必須由人明確確認後才加 `--confirm`（CLAUDE.md 規則 9）。token 只放 `.env`，不得出現在聊天、log、錯誤訊息、commit。Threads 還沒做，仍由人手動發布。
+**規則**：預設 dry-run；要實際發佈必須由人明確確認後才加 `--confirm`（CLAUDE.md 規則 9）。token 只放 `.env`，不得出現在聊天、log、錯誤訊息、commit。Threads 的設定與發佈見 `threads-publish.md`；**兩個平台從頭到尾的發布程序見 `publish-flow.md`**（照那份做）。
 
 ## 一次性設定（人做）
 
@@ -46,7 +46,7 @@ publish --confirm → 預檢在 23 小時內、內容指紋沒變、container �
 |---|---|
 | 圖片 | 只支援 **JPEG**（MPO、JPS 不支援）；8 MB 以內；寬 320～1440；比例 4:5～1.91:1；sRGB。我們的 1080×1350 剛好是 4:5 下限 |
 | 圖片網址 | 必須是公開、不需登入、可直接下載、**不帶 query 參數**；Meta 自己去抓。**圖片沒有「直接上傳本機檔案」的方式**（`rupload` 只文件化了影片） |
-| 輪播 | 最多 10 張；`is_carousel_item=true` 的子項各建一個 container，再建 `media_type=CAROUSEL`、`children=…` 的 container；**caption 只放在 carousel container**，子項不支援 |
+| 輪播 | 最多 10 張（實測 4:5 不會被裁）；`is_carousel_item=true` 的子項各建一個 container，再建 `media_type=CAROUSEL`、`children=…` 的 container；**caption 只放在 carousel container**，子項不支援 |
 | alt_text | 單圖與輪播每張圖都支援 `alt_text` |
 | is_ai_generated | 輪播只能設在 carousel container，子項會報錯。專案規則 10：預設不加（`IG_AI_GENERATED=false`） |
 | caption | 最多 2200 字元、30 個 hashtag、20 個 @tag |
@@ -55,12 +55,17 @@ publish --confirm → 預檢在 23 小時內、內容指紋沒變、container �
 | token | 長效 60 天；`GET graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token`；token 存在滿 24 小時、未過期才能 refresh；60 天沒 refresh 就失效且無法再 refresh |
 | 錯誤碼 | 9004（抓不到圖）、9007（容器還沒 FINISHED）、9（超過發文上限）、36000（圖太大）、36001（格式不支援）；token 過期（190）官方錯誤碼頁沒列 |
 
-## 還沒驗證（要實測）
+## 已實測驗證（2026-10-07，帳號 @datasciocean）
 
-1. **輪播的 4:5 會不會被裁成 1:1。** 官方寫「所有圖片依第一張裁切」「預設 1:1」「封面取中間 1:1」，沒講清楚 4:5 的輪播是否保持 4:5。若被裁，標題與系列標籤（在上方 88px 處）會被切掉。第一次實測就是為了確認這件事。
-2. Development 模式的帳號角色（見上）。
-3. `raw.githubusercontent.com` 的網址是否被 Meta 順利抓取。
-4. API 發出去的貼文，據我所知不能由 API 刪除，要到 IG app 手動刪。
+1. **4:5 的輪播不會被裁成 1:1。** 發了一則 3 張（1080×1350）的測試輪播，人在 IG app 確認上方系列標籤與下方 `@datasciocean` 都完整保留。所以版面的上下邊緣不需要為 1:1 預留安全區。
+2. **自己的帳號、自己的 App，不需要額外設定角色**：用 Dashboard 產生的 token，`whoami`、建立 container、發佈都成功。（App 當時是不是 Development 模式我沒有查證。）
+3. **Meta 抓得到 `raw.githubusercontent.com` 的圖**（公開 repo、JPEG、無 query 參數）。
+4. 預檢建的 container 可以直接沿用於 `media_publish`，只送一個請求。
+
+## 還沒驗證
+
+1. API 能不能刪除或封存貼文：官方文件沒寫，我們一律由人在 IG app 手動處理（測試貼文是人手動封存）。
+2. 官方各頁對發文上限的說法不一致；實際帳號 `content_publishing_limit` 回報上限 100／24 小時，用量 0。
 
 ## 錯誤處理
 
@@ -71,3 +76,16 @@ publish --confirm → 預檢在 23 小時內、內容指紋沒變、container �
 | 9007 | 不是重試，是輪詢到 FINISHED 才發佈 |
 | 已發布過（state 是 `published`） | 拒絕再發 |
 | 圖片網址抓不到（常見：還沒 push） | 不發，列出哪張的網址不能用 |
+
+## 限時動態（Stories）：研究結論（2026-10-07，尚未實作）
+
+官方 `POST /<IG_ID>/media` 參考頁：`media_type=STORIES` 可以發限時動態，**但：**
+
+| 項目 | 結果 |
+|---|---|
+| 圖片規格 | JPEG、8 MB 以內、sRGB；建議 9:16（否則會裁切或留白）。我們的版型是 4:5，要發 Stories 需要另做 9:16 的版型 |
+| 可用參數 | `image_url`（或 `video_url`）、`user_tags`（標記帳號與座標）。**沒有 `caption`、`alt_text`** |
+| **連結貼紙** | **不支援。** 官方寫「Publishing stickers (i.e., link, poll, location) is not supported」；互動貼紙只能在 app 內加 |
+| 其他 | 提及帳號可以（用 `user_tags`，不是貼紙）；不支援 `collaborators`；是否計入發文額度、Stories 的存在時間，官方頁沒寫（一般是 24 小時） |
+
+**結論**：我們限時動態的目的是「加連結貼紙指向文章」，API 做不到，所以**維持人手動**（在 app 內把貼文分享到限時動態並加連結貼紙，數秒就能完成）。要不要做 9:16 版型的純圖限時動態，是另一件事，需要人決定。精選集也是人手動建立。

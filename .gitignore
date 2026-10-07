@@ -11,3 +11,8 @@ __pycache__/
 
 # IG 預檢的 container id（24 小時就過期，不進 git）
 out/**/_build/ig-prepared.json
+# Threads 串文的進度（每則發佈後記錄 id；發完會刪除）
+out/**/_build/threads-progress.json
+
+# 渲染的中間 HTML（重新渲染就會產生，不追蹤）
+out/**/_build/html/

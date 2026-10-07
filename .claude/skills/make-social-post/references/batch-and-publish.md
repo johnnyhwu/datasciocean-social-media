@@ -54,11 +54,11 @@ status: planning                 # planning | publishing | done
 
 `out/README.md` 是全部貼文的總入口（待發布清單與各系列狀態），`out/<series>/README.md` 是系列的發文順序。
 
-確認後：`state.py ready <concept> <format> <pack-dir>`（每個格式各一次）。
+確認後：`state.py ready <concept> <format> <pack-dir>`（每個格式各一次），接著依 `publish-flow.md` 發布。
 
-## 7. 人手動發布後：寫回狀態
+## 7. 發布後：寫回狀態
 
-人回報網址與時間後：
+**用 API 發布（`ig_publish.py`、`threads_publish.py` 的 `--confirm`）時，成功後會自動寫回**，不需要手動 `state.py record`（流程見 `publish-flow.md`）。只有人手動發布時，才在人回報網址與時間後執行：
 
 ```
 uv run python .claude/skills/make-social-post/scripts/state.py record <concept> <format> \

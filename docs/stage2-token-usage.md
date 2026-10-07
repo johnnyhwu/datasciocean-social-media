@@ -1,6 +1,6 @@
 # Stage 2 token 用量紀錄
 
-CLAUDE.md 要求「第一次用新流程做貼文時量 token 並記錄」。以下是第一次實跑新流程（系列 `jev-cascade`，觀念 `jev-cascade-overview`，2026-10-06）。數字是各 subagent 完成通知上的 token；**主 session 的用量算不準，沒有列**。
+第一則貼文 `jev-cascade-overview`（系列 `jev-cascade`，2026-10-06 到 07）從做貼文到發布到 IG 與 Threads 的紀錄。數字是各 subagent 完成通知上的 token；**主 session 的用量算不準，沒有列**。
 
 ## subagent 用量
 
@@ -23,6 +23,16 @@ CLAUDE.md 要求「第一次用新流程做貼文時量 token 並記錄」。以
 - **用語**：「判官」vs「Judge」靠逐處替換。→ `config/terms.yaml` 加程式 A 檢查。
 - caption 摘要從「3｜」開始編號會誤導。→ 改成不編號。
 - 改文字時有審查者在跑會白花一輪。→ `review-loop.md` 加規則。
+
+## 發布階段（IG 與 Threads 官方 API）
+
+沒有用 subagent；主要成本是研究官方文件與實測來回。學到的：
+
+- **用 WebFetch 讀官方文件，摘要是小模型轉述，同一件事兩頁會互相矛盾**（例如發文上限出現 25、50、100 三種；圖片大小一頁說沒限制、另一頁說 8 MB）。關鍵數字要用第二次提問或實測再核對，不要只信一次摘要。
+- **權限是在產生 token 的當下決定的**：Threads 沒勾 `threads_delete`，DELETE 回 403，更新 `.env` 的 token 也沒用，要在 App 設定頁加權限後**重新產生**。`threads_publish.py token-info`（官方 `/debug_token`）可以直接查實際權限與到期時間，不必猜。
+- **IG API 沒有草稿、排程、預覽、刪除**；最接近草稿的是「預檢」（建好 container 但不發佈，23 小時內可沿用）。Threads 有 DELETE，但需要 `threads_delete`；Threads 的串文無法預檢（回覆需要前一則已發佈的 id）。
+- 兩次真實帳號實測（IG 3 張測試輪播、Threads 3 則測試串文）都用專用測試包與 `--no-record`，並由人確認後才發；實測驗證了：4:5 輪播不會被裁、回覆前一則會形成同一串、圖片與連結預覽正常、Dashboard 的 Threads token 是 60 天長效。
+- 狀態寫回的訊息（`state.py record` 會印字）混進 JSON 輸出，造成解析失敗；已導到 stderr。**輸出給 Agent 讀的指令，stdout 只能有 JSON。**
 
 ## 還沒做的（人的決定）
 
