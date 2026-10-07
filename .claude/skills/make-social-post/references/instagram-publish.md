@@ -18,18 +18,27 @@
 
 **還沒驗證**：App 在 Development 模式時，帳號是否要先被加進 App 角色／測試人員，官方沒有講；若 `whoami` 失敗，先查這個。
 
-## 流程
+## 流程（API 沒有草稿功能，「預檢」是最接近的替代）
+
+官方文件與 `POST /<IG_ID>/media` 的完整參數表裡，**沒有草稿、排程、在 IG app 預覽、或用 API 刪除貼文的功能**（第三方文章提到的 `scheduled_publish_time` 官方參數表沒有，不採信）。所以流程是：
 
 ```
-prepare  → 發布包的 ig/NN.png 轉成 ig/jpg/NN.jpg（sRGB、品質 95），並驗證官方限制
+prepare   → 發布包的 ig/NN.png 轉成 ig/jpg/NN.jpg（sRGB、品質 95），並驗證官方限制
 commit + push ig/jpg/        （託管是這個公開 repo 的 raw 網址，圖一定要先 push，Meta 才抓得到）
-publish  → dry-run：印出將送出的請求、檢查網址公開可抓、額度、是否已發布過
-人確認
-publish --confirm → 每張建 container（附 alt_text）→ 輪詢 FINISHED → 建 carousel container（caption 在這層）→ 輪詢 → media_publish
+preflight → 預檢：建好每張的 container 與 carousel container、等到 FINISHED，但「不發佈」
+            （貼文不會出現在帳號上，IG app 裡也看不到；container 24 小時後自動過期）
+            結果記在 _build/ig-prepared.json（不進 git）
+人看 ig/post.md 確認
+publish   → dry-run：印出將送出的請求、檢查網址與額度、報告預檢能不能沿用
+人說「發」
+publish --confirm → 預檢在 23 小時內、內容指紋沒變、container 仍是 FINISHED → 直接 media_publish（只送一個 POST）
+                    否則（過期、改過內容、不是 FINISHED、加了 --no-reuse）→ 重新建 container 再發
                     → 取 permalink → state.py record（格式變 published）→ 寫 state/ig-publish-log.jsonl（media id、時間；不含 token）
 ```
 
-指令見 `scripts/ig_publish.py` 開頭。其他：`limit`（查 `content_publishing_limit`）、`token-status`、`refresh-token`、`publish-image`（單張）。
+預檢檢查的是 **Meta 那一邊**的事：Meta 的伺服器抓得到圖片網址嗎？接受這些 JPEG 嗎？替代文字與 caption 被接受嗎？沒過就在這步出錯，還沒有任何東西發出去。它不花發文額度（官方的 `quota_usage` 算的是「發佈」次數）。
+
+指令見 `scripts/ig_publish.py` 開頭。其他：`limit`（查 `content_publishing_limit`）、`token-status`、`refresh-token`、`whoami [--no-write]`、`publish-image`（單張）。第一次實測的測試貼文用 `--no-record`。
 
 ## 官方限制（已查證；來源是官方文件的 `.md` 頁面）
 

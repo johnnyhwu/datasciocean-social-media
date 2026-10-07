@@ -10,7 +10,8 @@ token、錯誤訊息、log 都不會出現 token。設定與限制見 references
   uv run python .claude/skills/make-social-post/scripts/ig_publish.py token-status
   uv run python .claude/skills/make-social-post/scripts/ig_publish.py refresh-token
   uv run python .claude/skills/make-social-post/scripts/ig_publish.py prepare out/<series>/<concept>
-  uv run python .claude/skills/make-social-post/scripts/ig_publish.py publish out/<series>/<concept> [--confirm] [--no-record]
+  uv run python .claude/skills/make-social-post/scripts/ig_publish.py preflight out/<series>/<concept>      # 建好 container 但不發佈
+  uv run python .claude/skills/make-social-post/scripts/ig_publish.py publish out/<series>/<concept> [--confirm] [--no-record] [--no-reuse]
   uv run python .claude/skills/make-social-post/scripts/ig_publish.py publish-image <jpeg 路徑> --caption "…" [--alt "…"] [--confirm]
 輸出一律是 JSON（給 Agent 讀）。
 """
@@ -198,64 +199,140 @@ def log_publish(entry: dict, path: Path = PUBLISH_LOG) -> None:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
-def publish_carousel(pack: Path, confirm: bool, env: dict, client: ig_api.IGClient | None, host: hosting.Host,
-                     fetch=hosting.urllib.request.urlopen, now=None, record: bool = True) -> dict:
-    plan = plan_carousel(pack, host, env)
-    version = env.get("IG_API_VERSION") or ig_api.API_VERSION
-    result = {"ok": False, "mode": "publish" if confirm else "dry-run", "concept": plan["concept"], "image_count": len(plan["images"]),
-              "problems": list(plan["problems"]), "requests": describe_requests(plan, version), "caption": plan["caption"]}
-    # 唯讀檢查：網址是否公開可抓
-    url_checks = []
+PREPARED_NAME = "ig-prepared.json"      # 預檢建好的 container（在 _build/，不進 git；container id 24 小時就過期）
+PREPARED_MAX_HOURS = 23                 # 官方：container 24 小時沒發佈就 EXPIRED，保守用 23 小時
+
+
+def fingerprint(plan: dict, pack: Path, version: str, user_id: str | None) -> str:
+    """內容指紋：圖片檔、網址、caption、替代文字、AI 揭露、API 版本、帳號任何一項改變，預檢結果就作廢。"""
+    import hashlib
+    h = hashlib.sha256()
+    for j in sorted((pack / "ig" / "jpg").glob("[0-9][0-9].jpg")):
+        h.update(j.read_bytes())
+    h.update(json.dumps([plan["images"], plan["caption"], plan["alt_texts"], plan["is_ai_generated"], version, user_id],
+                        ensure_ascii=False).encode())
+    return h.hexdigest()[:16]
+
+
+def load_prepared(pack: Path) -> dict | None:
+    f = pack / "_build" / PREPARED_NAME
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else None
+
+
+def prepared_status(prepared: dict | None, fp: str, now: dt.datetime) -> tuple[bool, str, float | None]:
+    """(能不能沿用, 原因, 已過幾小時)。不查網路；container 本身的狀態在真的發佈前另外查。"""
+    if not prepared:
+        return False, "還沒預檢", None
+    age = (now - dt.datetime.fromisoformat(prepared["created_at"])).total_seconds() / 3600
+    if prepared.get("fingerprint") != fp:
+        return False, "預檢之後內容（圖、caption、替代文字…）有改，需要重新預檢", age
+    if age >= PREPARED_MAX_HOURS:
+        return False, f"預檢已過 {age:.1f} 小時，container 快過期或已過期，會重新建立", age
+    return True, f"已預檢（{age:.1f} 小時前），可直接發佈，約剩 {PREPARED_MAX_HOURS - age:.1f} 小時有效", age
+
+
+def _checks(plan: dict, env: dict, client, fetch) -> tuple[list[str], list[dict], dict]:
+    """預檢與發佈共用的唯讀檢查：計畫本身的問題、圖片網址是否公開可抓、是否已發布過、額度。"""
+    problems, url_checks, extra = list(plan["problems"]), [], {}
     for u in plan["images"]:
         ok, why = hosting.check_public(u, opener=fetch)
         url_checks.append({"url": u, "ok": ok, "detail": why})
         if not ok:
-            result["problems"].append(f"圖片網址不能用：{u}｜{why}")
-    result["url_checks"] = url_checks
-    # 已發布過就不再發
+            problems.append(f"圖片網址不能用：{u}｜{why}")
     if ST.load(plan["concept"])["formats"].get("ig_carousel", {}).get("status") == "published":
-        result["problems"].append("state 顯示這則的 IG 輪播已發布過；不重複發佈")
-    # 額度（唯讀，需要 token）
+        problems.append("state 顯示這則的 IG 輪播已發布過；不重複發佈")
     if client and client.user_id:
         try:
             lim = client.publishing_limit()
-            result["publishing_limit"] = lim
+            extra["publishing_limit"] = lim
             data = (lim.get("data") or [lim])[0]
             used, total = data.get("quota_usage"), (data.get("config") or {}).get("quota_total")
             if used is not None and total is not None and used >= total:
-                result["problems"].append(f"已達發文上限（{used}/{total}）")
+                problems.append(f"已達發文上限（{used}/{total}）")
         except ig_api.IGError as e:
-            result["limit_error"] = str(e)
+            extra["limit_error"] = str(e)
+    return problems, url_checks, extra
+
+
+def _create_all(client: ig_api.IGClient, plan: dict) -> tuple[list[str], str]:
+    child_ids = [client.create_container(image_url=u, alt_text=a or None, carousel_item=True)
+                 for u, a in zip(plan["images"], plan["alt_texts"])]
+    for cid in child_ids:
+        client.wait_finished(cid)
+    car = client.create_container(children=child_ids, caption=plan["caption"], is_ai_generated=plan["is_ai_generated"])
+    client.wait_finished(car)
+    return child_ids, car
+
+
+def preflight_carousel(pack: Path, env: dict, client: ig_api.IGClient | None, host: hosting.Host,
+                       fetch=hosting.urllib.request.urlopen, now: dt.datetime | None = None) -> dict:
+    """預檢：建好所有 container 並等到 FINISHED，但**不發佈**（貼文不會出現在帳號上）。結果記在 _build/ig-prepared.json，
+    之後 publish --confirm 在 23 小時內、內容沒變時直接沿用，不重建。"""
+    now = now or dt.datetime.now(dt.timezone.utc)
+    plan = plan_carousel(pack, host, env)
+    version = env.get("IG_API_VERSION") or ig_api.API_VERSION
+    problems, url_checks, extra = _checks(plan, env, client, fetch)
+    result = {"ok": False, "mode": "preflight", "concept": plan["concept"], "problems": problems, "url_checks": url_checks, **extra}
+    if problems or not client:
+        result["error"] = "有問題或沒有 token，沒有建立 container"
+        return result
+    try:
+        child_ids, car = _create_all(client, plan)
+    except ig_api.IGError as e:
+        result.update(error=str(e), hint=e.hint())
+        return result
+    prepared = {"created_at": now.isoformat(timespec="seconds"), "fingerprint": fingerprint(plan, pack, version, client.user_id),
+                "children": child_ids, "carousel": car}
+    (pack / "_build" / PREPARED_NAME).write_text(json.dumps(prepared, ensure_ascii=False, indent=2), encoding="utf-8")
+    result.update(ok=True, children=child_ids, carousel=car, valid_for_hours=PREPARED_MAX_HOURS,
+                  note="預檢通過：Meta 已接受所有圖片，container 已準備好但沒有發佈（你的帳號上看不到）。人確認後執行 publish --confirm 會直接沿用。")
+    return result
+
+
+def publish_carousel(pack: Path, confirm: bool, env: dict, client: ig_api.IGClient | None, host: hosting.Host,
+                     fetch=hosting.urllib.request.urlopen, now=None, record: bool = True, reuse: bool = True) -> dict:
+    now = now or dt.datetime.now(dt.timezone.utc)
+    plan = plan_carousel(pack, host, env)
+    version = env.get("IG_API_VERSION") or ig_api.API_VERSION
+    problems, url_checks, extra = _checks(plan, env, client, fetch)
+    fp = fingerprint(plan, pack, version, client.user_id if client else env.get("IG_USER_ID"))
+    can_reuse, why, age = prepared_status(load_prepared(pack), fp, now)
+    result = {"ok": False, "mode": "publish" if confirm else "dry-run", "concept": plan["concept"], "image_count": len(plan["images"]),
+              "problems": problems, "requests": describe_requests(plan, version), "caption": plan["caption"],
+              "url_checks": url_checks, "prepared": {"reusable": can_reuse, "detail": why}, **extra}
     if not confirm:
         result["note"] = "dry-run：沒有送出任何發文請求。要實際發佈請先經人確認，再加 --confirm。"
-        result["ok"] = not result["problems"]
+        result["ok"] = not problems
         return result
-    if result["problems"]:
+    if problems:
         result["error"] = "有問題，沒有發佈"
         return result
     if not client:
         result["error"] = "沒有 token，無法發佈"
         return result
     try:
-        child_ids = []
-        for u, a in zip(plan["images"], plan["alt_texts"]):
-            child_ids.append(client.create_container(image_url=u, alt_text=a or None, carousel_item=True))
-        for cid in child_ids:
-            client.wait_finished(cid)
-        car = client.create_container(children=child_ids, caption=plan["caption"], is_ai_generated=plan["is_ai_generated"])
-        client.wait_finished(car)
+        car, reused = None, False
+        if can_reuse and reuse:
+            prepared = load_prepared(pack)
+            if client.container_status(prepared["carousel"]) == "FINISHED":
+                car, reused = prepared["carousel"], True
+            else:
+                result["prepared"]["detail"] = "預檢的 container 已不是 FINISHED，改為重新建立"
+        if car is None:
+            _, car = _create_all(client, plan)
         media_id = client.publish(car)
         info = client.media_info(media_id)
     except ig_api.IGError as e:
         result["error"] = str(e)
         result["hint"] = e.hint()
         return result
-    when = info.get("timestamp") or (now or dt.datetime.now(dt.timezone.utc)).isoformat(timespec="seconds")
+    (pack / "_build" / PREPARED_NAME).unlink(missing_ok=True)
+    when = info.get("timestamp") or now.isoformat(timespec="seconds")
     if record:     # 實測（之後會手動刪除的測試貼文）用 --no-record，不要把狀態標成 published
         ST.record(plan["concept"], "ig_carousel", info.get("permalink", ""), when, plan["series"], plan["hook_style"], [])
     log_publish({"time": when, "concept": plan["concept"], "format": "ig_carousel", "media_id": media_id,
-                 "permalink": info.get("permalink"), "container_id": car})
-    result.update(ok=True, media_id=media_id, permalink=info.get("permalink"), published_at=when)
+                 "permalink": info.get("permalink"), "container_id": car, "reused_preflight": reused})
+    result.update(ok=True, media_id=media_id, permalink=info.get("permalink"), published_at=when, reused_preflight=reused)
     return result
 
 
@@ -305,10 +382,11 @@ def main(argv: list[str]) -> int:
         sp = sub.add_parser(name)
         if name == "whoami":
             sp.add_argument("--no-write", action="store_true", help="只查詢，不把 IG_USER_ID、IG_TOKEN_REFRESHED_AT 寫進 .env")
-    for name in ("prepare", "publish"):
+    for name in ("prepare", "preflight", "publish"):
         p = sub.add_parser(name)
         p.add_argument("pack")
         if name == "publish":
+            p.add_argument("--no-reuse", action="store_true", help="不沿用預檢的 container，重新建立")
             p.add_argument("--confirm", action="store_true", help="實際發佈（沒有這個旗標一律是 dry-run）")
             p.add_argument("--no-record", action="store_true", help="實測用：發佈後不寫回 state（因為測試貼文會被手動刪除）")
     p = sub.add_parser("publish-image")
@@ -322,7 +400,7 @@ def main(argv: list[str]) -> int:
     host = hosting.GitHubRawHost(W.ROOT)
     if a.cmd == "prepare":
         return emit(prepare_images(Path(a.pack).resolve()))
-    needs_token = a.cmd in ("whoami", "limit", "token-status", "refresh-token") or getattr(a, "confirm", False)
+    needs_token = a.cmd in ("whoami", "limit", "token-status", "refresh-token", "preflight") or getattr(a, "confirm", False)
     client = None
     if env.get("IG_ACCESS_TOKEN"):
         client = make_client(env)
@@ -368,8 +446,10 @@ def main(argv: list[str]) -> int:
         set_env("IG_ACCESS_TOKEN", body["access_token"])
         set_env("IG_TOKEN_REFRESHED_AT", dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"))
         return emit({"ok": True, "expires_in_s": body.get("expires_in"), "note": "新 token 已寫入 .env（不會顯示）"})
+    if a.cmd == "preflight":
+        return emit(preflight_carousel(Path(a.pack).resolve(), env, client, host) | {"warnings": warns})
     if a.cmd == "publish":
-        return emit(publish_carousel(Path(a.pack).resolve(), a.confirm, env, client, host, record=not a.no_record) | {"warnings": warns})
+        return emit(publish_carousel(Path(a.pack).resolve(), a.confirm, env, client, host, record=not a.no_record, reuse=not a.no_reuse) | {"warnings": warns})
     if a.cmd == "publish-image":
         return emit(publish_image(Path(a.image).resolve(), a.caption, a.alt, a.confirm, env, client, host) | {"warnings": warns})
     return 1

@@ -198,6 +198,61 @@ def main():
         r = P.publish_carousel(pack, True, env, ig_api.IGClient(TOKEN, "U1", transport=Fake(), sleep=lambda s: None), H(), fetch=opener_ok)
         check("抓得到：JPEG 張數與投影片不符 → 不發", not r["ok"] and any("先執行 prepare" in p for p in r["problems"]))
 
+        # ---- 預檢（preflight）與沿用
+        T0 = dt.datetime(2026, 10, 7, 10, 0, tzinfo=dt.timezone.utc)
+        H1 = dt.timedelta(hours=1)
+        kind = lambda x: ("child" if x[2].get("is_carousel_item") else "carousel" if x[2].get("media_type") else "publish")
+        posts_of = lambda fk_: [kind(x) for x in fk_.calls if x[0] == "POST"]
+
+        def prepared_pack(name):
+            pk = fake_pack(tmp / name)
+            fkp = Fake(); cp = ig_api.IGClient(TOKEN, "U1", transport=fkp, sleep=lambda s: None)
+            rp = P.preflight_carousel(pk, env, cp, H(), fetch=opener_ok, now=T0)
+            return pk, fkp, rp
+
+        pk, fkp, rp = prepared_pack("pf1")
+        check("預檢：建 3 個子項與 carousel container，沒有 media_publish", rp["ok"] and posts_of(fkp) == ["child"] * 3 + ["carousel"], (posts_of(fkp), rp.get("error")))
+        pf = pk / "_build" / P.PREPARED_NAME
+        check("預檢結果寫進 _build/ig-prepared.json，且不含 token", pf.exists() and TOKEN not in pf.read_text(encoding="utf-8"))
+        fk = Fake(); c = ig_api.IGClient(TOKEN, "U1", transport=fk, sleep=lambda s: None)
+        r = P.publish_carousel(pk, False, env, c, H(), fetch=opener_ok, now=T0 + H1)
+        check("dry-run 會報告預檢可沿用，且沒有 POST", r["prepared"]["reusable"] and not posts_of(fk), r["prepared"])
+        fk = Fake(); c = ig_api.IGClient(TOKEN, "U1", transport=fk, sleep=lambda s: None)
+        r = P.publish_carousel(pk, True, env, c, H(), fetch=opener_ok, now=T0 + 2 * H1)
+        check("沿用預檢：只送 media_publish 一個 POST", r["ok"] and r["reused_preflight"] and posts_of(fk) == ["publish"], (posts_of(fk), r.get("error")))
+        check("發佈後預檢檔被刪除，紀錄標示沿用", not pf.exists() and logs[-1]["reused_preflight"] is True)
+
+        pk, _, _ = prepared_pack("pf2")
+        spec_f = pk / "_build" / "spec.json"
+        sp = json.loads(spec_f.read_text(encoding="utf-8")); sp["caption"]["first"] = "改過的第一句"
+        spec_f.write_text(json.dumps(sp, ensure_ascii=False), encoding="utf-8")
+        fk = Fake(); c = ig_api.IGClient(TOKEN, "U1", transport=fk, sleep=lambda s: None)
+        r = P.publish_carousel(pk, True, env, c, H(), fetch=opener_ok, now=T0 + H1)
+        check("抓得到：預檢後 caption 改了 → 不沿用，重建後才發", r["ok"] and not r["reused_preflight"] and posts_of(fk) == ["child"] * 3 + ["carousel", "publish"], posts_of(fk))
+        pk, _, _ = prepared_pack("pf3")
+        fk = Fake(); c = ig_api.IGClient(TOKEN, "U1", transport=fk, sleep=lambda s: None)
+        r = P.publish_carousel(pk, True, env, c, H(), fetch=opener_ok, now=T0 + 24 * H1)
+        check("抓得到：預檢超過 23 小時 → 不沿用，重建", r["ok"] and not r["reused_preflight"] and posts_of(fk) == ["child"] * 3 + ["carousel", "publish"], posts_of(fk))
+        pk, _, _ = prepared_pack("pf4")
+        fk = Fake(statuses=["EXPIRED"]); c = ig_api.IGClient(TOKEN, "U1", transport=fk, sleep=lambda s: None)
+        r = P.publish_carousel(pk, True, env, c, H(), fetch=opener_ok, now=T0 + H1)
+        check("抓得到：預檢的 container 已 EXPIRED → 不沿用，重建", r["ok"] and not r["reused_preflight"] and posts_of(fk) == ["child"] * 3 + ["carousel", "publish"], posts_of(fk))
+        pk, _, _ = prepared_pack("pf5")
+        fk = Fake(); c = ig_api.IGClient(TOKEN, "U1", transport=fk, sleep=lambda s: None)
+        r = P.publish_carousel(pk, True, env, c, H(), fetch=opener_ok, now=T0 + H1, reuse=False)
+        check("--no-reuse：即使預檢有效也重建", r["ok"] and not r["reused_preflight"] and len(posts_of(fk)) == 5)
+        pk = fake_pack(tmp / "pf6")
+        fk = Fake(); c = ig_api.IGClient(TOKEN, "U1", transport=fk, sleep=lambda s: None)
+        r = P.preflight_carousel(pk, env, c, H(), fetch=opener_404, now=T0)
+        check("抓得到：預檢時圖片網址抓不到 → 不建 container", not r["ok"] and not posts_of(fk) and not (pk / "_build" / P.PREPARED_NAME).exists())
+        P.ST.load = lambda c_: {"formats": {"ig_carousel": {"status": "published"}}, "posts": []}
+        fk = Fake(); c = ig_api.IGClient(TOKEN, "U1", transport=fk, sleep=lambda s: None)
+        r = P.preflight_carousel(pk, env, c, H(), fetch=opener_ok, now=T0)
+        check("抓得到：已發布過的貼文不預檢", not r["ok"] and not posts_of(fk))
+        P.ST.load = orig_load
+        r = P.preflight_carousel(pk, env, None, H(), fetch=opener_ok, now=T0)
+        check("沒有 token → 預檢不送請求，也不當機", not r["ok"] and "沒有 token" in r.get("error", ""))
+
         # ---- .env 與 token 效期
         envf = tmp / ".env"
         envf.write_text("IG_USER_ID=U1\nIG_ACCESS_TOKEN=old\n# note\n", encoding="utf-8")

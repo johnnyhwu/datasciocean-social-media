@@ -47,7 +47,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | 7 | **先照 `references/self-check.md` 自檢**，再派忠實者、工程師讀者、編輯；`verify_faithful.py`、`verify_reader.py` | `references/review-loop.md`、`references/self-check.md` |
 | 8 | `batch_check.py <spec>...`（參數順序 = 預計發文順序） | `references/batch-and-publish.md` §4 |
 | 9–10 | 給人看縮圖與文字，確認後 `state.py ready`（發布前後待辦在貼文的 `README.md`） | `references/batch-and-publish.md` §5–6 |
-| 11 | 發布：IG 可用官方 API（`ig_publish.py prepare` → push `ig/jpg/` → `publish` dry-run → 人確認 → `--confirm`，成功後自動 `state.py record`）；Threads 與 API 之外的情況由人手動發，回報網址與時間 → `state.py record` | `references/instagram-publish.md`、`references/batch-and-publish.md` §7 |
+| 11 | 發布：IG 可用官方 API（`ig_publish.py prepare` → push `ig/jpg/` → `preflight`（建好 container 但不發佈）→ `publish` dry-run → 人確認 → `--confirm`（沿用預檢），成功後自動 `state.py record`）；Threads 與 API 之外的情況由人手動發，回報網址與時間 → `state.py record` | `references/instagram-publish.md`、`references/batch-and-publish.md` §7 |
 
 第一次是新系列時，先用 `design-series-visuals` 把視覺哲學與六種版型的樣張做出來、**由人審過**才量產。系列已有模板就直接用，同一系列的所有貼文用同一版模板。
 

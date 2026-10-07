@@ -26,7 +26,7 @@
 ## 發布前
 
 - [ ] 人最後確認圖、文字、caption
-- [ ] IG：手動上傳 `ig/01.png` …，貼 caption，替代文字貼自 `ig/post.md`；**或**用 API：`ig_publish.py prepare` → push `ig/jpg/` → `publish`（dry-run）→ 確認後 `--confirm`（見 references/instagram-publish.md）
+- [ ] IG：手動上傳 `ig/01.png` …，貼 caption，替代文字貼自 `ig/post.md`；**或**用 API：`ig_publish.py prepare` → push `ig/jpg/` → `preflight` → `publish`（dry-run）→ 確認後 `--confirm`（見 references/instagram-publish.md）
 - [ ] Threads：正文用「新增到串文」一次發出，每則串文附圖，最後一則（置頂）含文章連結
 
 ## 發布後

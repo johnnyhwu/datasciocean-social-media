@@ -8,3 +8,6 @@ __pycache__/
 .env
 .env.*
 !.env.example
+
+# IG 預檢的 container id（24 小時就過期，不進 git）
+out/**/_build/ig-prepared.json
