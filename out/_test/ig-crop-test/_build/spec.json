@@ -1,0 +1,16 @@
+{
+ "series": "jev-cascade",
+ "concept": "ig-crop-test",
+ "lang": "zh-TW",
+ "status": "test",
+ "hook": {"style": "測試"},
+ "slides": [
+  {"layout": "cover", "title": "測試貼文：[[請忽略]]", "body": "IG API 輪播裁切驗證，馬上會刪除"},
+  {"layout": "text", "title": "測試貼文：上下邊緣有沒有被裁掉", "body": "上方有系列標籤、下方有 @datasciocean，兩者最靠近邊緣；若被裁成 1:1，它們會先消失。"},
+  {"layout": "chart_sounding", "title": "測試貼文：圖表版型的邊緣", "body": "左右刻度與底部圖註", "unit": "%",
+   "bars": [{"name": "測試甲", "subs": ["無意義"], "value": 100}, {"name": "測試乙", "subs": ["無意義"], "value": 27, "emphasize": true}],
+   "note": "測試圖註：請忽略"}
+ ],
+ "threads": {"body": {"text": "測試", "refs": ["結構"]}, "items": [], "last": {"text": "測試", "refs": ["結構"]}},
+ "caption": {"first": "【測試】IG API 輪播裁切驗證，請忽略，馬上刪除", "nav": "此為測試貼文", "hashtags": []}
+}
