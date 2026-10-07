@@ -7,12 +7,12 @@
   uv run python .claude/skills/make-social-post/scripts/state.py status
       列出每個觀念的論點、各格式狀態（新格式與沒有狀態檔的觀念都算 not_tried）
   uv run python .claude/skills/make-social-post/scripts/state.py ready <concept> <format> <pack-dir>
-      發布包完成、等人手動發布（存量就是 ready 的數量）
+      發布包完成、等人確認後發布（存量就是 ready 的數量）
   uv run python .claude/skills/make-social-post/scripts/state.py unsuitable <concept> <format> "<原因>"
       這個格式做不出合格版本（pipeline 不再自動嘗試；觀念卡不動）
   uv run python .claude/skills/make-social-post/scripts/state.py record <concept> <format> --url URL
         --published-at 2026-10-05T20:00 [--series-id ID] [--hook-type 樣態] [--mentions a,b]
-      人手動發布之後寫回；狀態改為 published，並重算回補清單
+      寫回發布紀錄；狀態改為 published，並重算回補清單。API 發佈（--confirm）成功後會自動呼叫，只有人手動發布時才需要手動執行
   uv run python .claude/skills/make-social-post/scripts/state.py backfill
       重新產生 state/backfill.md（程式產生，不手改）
 

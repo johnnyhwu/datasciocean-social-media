@@ -18,9 +18,9 @@ token、錯誤訊息、log 都不會出現 token。設定與限制見 references
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime as dt
 import json
-import os
 import re
 import sys
 from pathlib import Path
@@ -30,102 +30,17 @@ import cardlib as W
 import hosting
 import ig_api
 import state as ST
+from publish_common import (ENV_PATH, MAX_BYTES, TOKEN_LIFETIME_DAYS, WARN_DAYS, ensure_token_fresh, load_env,  # noqa: F401
+                            set_env, token_days_left, validate_jpeg)
 
-ENV_PATH = W.ROOT / ".env"
-TOKEN_LIFETIME_DAYS = 60
-WARN_DAYS = 14                 # 剩餘效期少於這個天數就警告，並在 token 存在滿 24 小時時自動 refresh
-MIN_WIDTH, MAX_WIDTH = 320, 1440
-RATIO_MIN, RATIO_MAX = 4 / 5, 1.91
-MAX_BYTES = hosting.MAX_BYTES
 PUBLISH_LOG = W.ROOT / "state" / "ig-publish-log.jsonl"
 
 
 # ---------------------------------------------------------------- .env 與 token
-def load_env(path: Path = ENV_PATH) -> dict:
-    env = {}
-    if path.exists():
-        for line in path.read_text(encoding="utf-8").splitlines():
-            m = re.match(r"^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$", line)
-            if m and not line.lstrip().startswith("#"):
-                env[m.group(1)] = m.group(2).strip("\"'")
-    for k in ("IG_ACCESS_TOKEN", "IG_USER_ID", "IG_API_VERSION", "IG_TOKEN_REFRESHED_AT", "IG_AI_GENERATED"):
-        if os.environ.get(k):
-            env[k] = os.environ[k]
-    return env
-
-
-def set_env(key: str, value: str, path: Path = ENV_PATH) -> None:
-    lines = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
-    out, done = [], False
-    for line in lines:
-        if re.match(rf"^\s*{key}\s*=", line):
-            out.append(f"{key}={value}"); done = True
-        else:
-            out.append(line)
-    if not done:
-        out.append(f"{key}={value}")
-    path.write_text("\n".join(out) + "\n", encoding="utf-8")
-
-
-def token_days_left(env: dict, now: dt.datetime | None = None) -> float | None:
-    ts = env.get("IG_TOKEN_REFRESHED_AT")
-    if not ts:
-        return None
-    now = now or dt.datetime.now(dt.timezone.utc)
-    t0 = dt.datetime.fromisoformat(ts)
-    if t0.tzinfo is None:
-        t0 = t0.replace(tzinfo=dt.timezone.utc)
-    return TOKEN_LIFETIME_DAYS - (now - t0).total_seconds() / 86400
-
-
 def make_client(env: dict, **kw) -> ig_api.IGClient:
     if not env.get("IG_ACCESS_TOKEN"):
         raise SystemExit(json.dumps({"ok": False, "error": "沒有 IG_ACCESS_TOKEN：請照 references/instagram-publish.md 把 token 放進 .env（不要貼進聊天）"}, ensure_ascii=False))
     return ig_api.IGClient(env["IG_ACCESS_TOKEN"], env.get("IG_USER_ID"), version=env.get("IG_API_VERSION") or ig_api.API_VERSION, **kw)
-
-
-def ensure_token_fresh(client: ig_api.IGClient, env: dict, now: dt.datetime | None = None, env_path: Path = ENV_PATH) -> list[str]:
-    """剩餘效期過短時警告；token 存在滿 24 小時才會自動 refresh。回傳警告訊息（不含 token）。"""
-    warns = []
-    left = token_days_left(env, now)
-    if left is None:
-        warns.append("IG_TOKEN_REFRESHED_AT 未設定，無法追蹤 token 效期（whoami 成功後會自動補上）")
-        return warns
-    if left < WARN_DAYS:
-        warns.append(f"token 剩餘約 {left:.0f} 天，少於 {WARN_DAYS} 天")
-        age_days = TOKEN_LIFETIME_DAYS - left
-        if age_days >= 1 and left > 0:
-            try:
-                body = client.refresh_token()
-                set_env("IG_ACCESS_TOKEN", body["access_token"], env_path)
-                set_env("IG_TOKEN_REFRESHED_AT", (now or dt.datetime.now(dt.timezone.utc)).isoformat(timespec="seconds"), env_path)
-                client.token = body["access_token"]
-                warns.append("已自動 refresh token（新 token 已寫入 .env）")
-            except ig_api.IGError as e:
-                warns.append(f"自動 refresh 失敗：{e}")
-    return warns
-
-
-# ---------------------------------------------------------------- 圖片
-def validate_jpeg(path: Path) -> list[str]:
-    """回傳違反官方限制的清單（空 = 通過）。"""
-    from PIL import Image
-    errs = []
-    data = path.read_bytes()
-    if data[:3] != b"\xff\xd8\xff":
-        return [f"{path.name}: 不是 JPEG（IG 只支援 JPEG）"]
-    if len(data) >= MAX_BYTES:
-        errs.append(f"{path.name}: {len(data) / 1048576:.1f} MiB，需小於 8 MiB")
-    im = Image.open(path)
-    if im.format != "JPEG":
-        errs.append(f"{path.name}: 格式 {im.format}（MPO、JPS 等延伸 JPEG 不支援）")
-    w, h = im.size
-    if not (MIN_WIDTH <= w <= MAX_WIDTH):
-        errs.append(f"{path.name}: 寬 {w}px，需在 {MIN_WIDTH} 到 {MAX_WIDTH}")
-    r = w / h
-    if not (RATIO_MIN - 1e-9 <= r <= RATIO_MAX + 1e-9):
-        errs.append(f"{path.name}: 比例 {r:.3f}，需在 4:5 到 1.91:1")
-    return errs
 
 
 def prepare_images(pack: Path) -> dict:
@@ -329,7 +244,8 @@ def publish_carousel(pack: Path, confirm: bool, env: dict, client: ig_api.IGClie
     (pack / "_build" / PREPARED_NAME).unlink(missing_ok=True)
     when = info.get("timestamp") or now.isoformat(timespec="seconds")
     if record:     # 實測（之後會手動刪除的測試貼文）用 --no-record，不要把狀態標成 published
-        ST.record(plan["concept"], "ig_carousel", info.get("permalink", ""), when, plan["series"], plan["hook_style"], [])
+        with contextlib.redirect_stdout(sys.stderr):      # record 會印訊息；stdout 只留 JSON
+            ST.record(plan["concept"], "ig_carousel", info.get("permalink", ""), when, plan["series"], plan["hook_style"], [])
     log_publish({"time": when, "concept": plan["concept"], "format": "ig_carousel", "media_id": media_id,
                  "permalink": info.get("permalink"), "container_id": car, "reused_preflight": reused})
     result.update(ok=True, media_id=media_id, permalink=info.get("permalink"), published_at=when, reused_preflight=reused)

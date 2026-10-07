@@ -178,7 +178,7 @@ def readme_md(d: dict, title: str, series: dict | None, pack: Path, build: Path)
           "## 發布前", "",
           "- [ ] 人最後確認圖、文字、caption",
           "- [ ] IG：手動上傳 `ig/01.png` …，貼 caption，替代文字貼自 `ig/post.md`；**或**用 API：`ig_publish.py prepare` → push `ig/jpg/` → `preflight` → `publish`（dry-run）→ 確認後 `--confirm`（見 references/instagram-publish.md）",
-          "- [ ] Threads：正文用「新增到串文」一次發出，每則串文附圖，最後一則（置頂）含文章連結", "",
+          "- [ ] Threads：手動用「新增到串文」一次發出，每則串文附圖，最後一則（置頂）含文章連結；**或**用 API：`threads_publish.py publish`（dry-run）→ 確認後 `--confirm`（見 references/threads-publish.md）", "",
           "## 發布後", "",
           "- [ ] 發限時動態並加連結貼紙，指向文章",
           "- [ ] 收進系列精選集；概覽發布後置頂概覽 post；置頂最後一則 Threads 回覆",
@@ -210,7 +210,7 @@ def indexes() -> None:
             if "ready" in st.values():
                 ready_lines.append(f"- {s['name']} 第 {i} 則：[{m['planned_title']}]({sid}/{c}/README.md)")
         if any_pack:
-            (out / sid / "README.md").write_text("\n".join([f"# {s['name']}", "", "發文順序依下表（概覽先發，被依賴的先發）。發文時間由人決定；系統不自動發布。", ""] + rows) + "\n", encoding="utf-8")
+            (out / sid / "README.md").write_text("\n".join([f"# {s['name']}", "", "發文順序依下表（概覽先發，被依賴的先發）。發文時間由人決定；經人確認後才發布。", ""] + rows) + "\n", encoding="utf-8")
         top += [f"## {s['name']}（`{sid}`）", ""] + rows + [""]
     top[4:4] = ["## 待發布", ""] + (ready_lines or ["（目前沒有）"]) + [""]
     out.mkdir(exist_ok=True)

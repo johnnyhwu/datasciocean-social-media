@@ -36,12 +36,13 @@ HINTS = {
 }
 
 
-def scrub(text: str, token: str | None = None) -> str:
-    """把 token 從任何文字裡拿掉。"""
+def scrub(text: str, token: str | None = None, *more: str) -> str:
+    """把 token（與其他祕密，例如 app secret）從任何文字裡拿掉。"""
     out = str(text)
-    if token:
-        out = out.replace(token, "***")
-    return re.sub(r"(access_token=)[^&\s\"']+", r"\1***", out)
+    for secret in (token, *more):
+        if secret:
+            out = out.replace(secret, "***")
+    return re.sub(r"((?:access_token|client_secret)=)[^&\s\"']+", r"\1***", out)
 
 
 class IGError(Exception):
@@ -60,7 +61,7 @@ class IGError(Exception):
 def default_transport(method: str, url: str, params: dict) -> tuple[int, dict]:
     """GET 把參數放在 query；POST 用 form body。回傳 (HTTP 狀態碼, JSON)。"""
     data = None
-    if method == "GET":
+    if method in ("GET", "DELETE"):
         url = f"{url}?{urllib.parse.urlencode(params)}"
     else:
         data = urllib.parse.urlencode(params).encode()

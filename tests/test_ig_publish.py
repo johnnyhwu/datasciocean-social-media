@@ -18,6 +18,7 @@ from PIL import Image  # noqa: E402
 import hosting  # noqa: E402
 import ig_api  # noqa: E402
 import ig_publish as P  # noqa: E402
+import publish_common as PC  # noqa: E402
 
 TOKEN = "IGAAsecretTOKEN123"
 FAILS = []
@@ -102,10 +103,10 @@ def main():
         check("抓得到：寬度超過 1440", any("寬" in e for e in P.validate_jpeg(tmp / "wide.jpg")))
         jpeg(tmp / "tall.jpg", (800, 2400))
         check("抓得到：比例超出 4:5～1.91:1", any("比例" in e for e in P.validate_jpeg(tmp / "tall.jpg")))
-        old = P.MAX_BYTES
-        P.MAX_BYTES = 100
+        old = PC.MAX_BYTES
+        PC.MAX_BYTES = 100
         check("抓得到：超過 8 MiB（門檻暫時調小）", any("MiB" in e for e in P.validate_jpeg(tmp / "ok.jpg")))
-        P.MAX_BYTES = old
+        PC.MAX_BYTES = old
         pack0 = tmp / "prep"
         (pack0 / "ig").mkdir(parents=True)
         Image.new("RGB", (1080, 1350), (10, 100, 120)).save(pack0 / "ig" / "01.png")
