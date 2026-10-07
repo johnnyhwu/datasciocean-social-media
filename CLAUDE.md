@@ -36,13 +36,14 @@ datasciocean-concept-wiki（Stage 1，submodule：concept-wiki/）
 6. **每個數字都要有比較對象；錨點類型決定寫法。** 設計參數主詞要是方法名、官方宣稱主詞要是宣稱方、我的判斷要標「我的判斷」。
 7. **限定條件綁在主張上。** 用了某條主張，它的限定條件必須一起出現。
 8. **圖片由程式產生。** LLM 只產出內容規格 JSON；外觀由模板決定；數據圖與文字圖不用 AI 生圖。同一系列用同一份視覺哲學與同一套模板。
-9. **不自動發布。** 發布由人手動做。系統只產出發布包與待辦清單。
+9. **發布一定要經人確認；經確認後 IG 可以用官方 API 自動發布。** 預設只產出發布包與待辦清單；`ig_publish.py` 預設是 dry-run，只有人明確確認後才加 `--confirm`。Threads 目前仍由人手動發布。已發布過的貼文不重複發。
 10. **貼文不提 podcast，不加 AI 揭露。** podcast 連結只放個人檔案。
 11. **寧可暫停，也不降低標準。** 存量不足時暫停發文，不為了維持每天一則而放行未通過審查的內容。
 12. **不確定就停下來問人。** hook（由人挑）、版型樣張（由人審）、審查者爭議、最後確認、任何與先前慣例不同的做法，都由人決定。
 13. **審查者要求改人選的 hook 時，要告知人**（原文、改後、原因）。與審查者對語氣或留白有爭議時，標「爭議」交給人，人可以改審查者提示詞。
 14. **封面 hook 以吸引點擊為先，不欺騙為界**：可以沒說完整（留白、反差、口語語氣詞），但主標副標合看字面為真、範圍不放大、限定條件在內文出現（`references/hooks.md`）。取捨時預設選更吸引人。
-15. **不要自己 commit 或 push**；commit 與 push 由人決定時機。
+15. **不要自己 commit 或 push**；commit 與 push 由人決定時機（人明確要求時例外）。IG 發文需要圖片已 push（託管是這個公開 repo 的 raw 網址），要 push 時先問人。
+16. **憑證只放 `.env`**（已在 `.gitignore`）：token 不得出現在聊天、log、錯誤訊息、commit；不要要求人把 token 貼進聊天。
 
 ## 範圍外（不要做）
 
@@ -59,22 +60,24 @@ CLAUDE.md
 .claude/skills/design-series-visuals/   系列視覺哲學、版型、品牌常數（新系列才用）
 concept-wiki/                           submodule：觀念卡（唯讀）
 config/                                 人會改的設定：params.yaml（參數）、terms.yaml（用語對照，判官 → Judge）
+.env / .env.example                     IG 憑證（.env 不進 git；範本是 .env.example）
 assets/                                 fonts/（內嵌字型）、brand/（品牌來源圖）
 series/<系列 id>/                       一個系列的一切都在這裡
     series.md                             系列定義（成員、planned_title、hashtag、色）
     philosophy.md                         視覺哲學（開新系列時由 design-series-visuals 建立）
     templates/                            HTML 模板與 style.css
-state/                                  <觀念 id>.yaml（各格式狀態、發布紀錄）、backfill.md（待回補清單）
+state/                                  <觀念 id>.yaml（各格式狀態、發布紀錄）、backfill.md（待回補清單）、ig-publish-log.jsonl（API 發文紀錄）
 out/                                    發布包（程式產生）
     README.md                             總入口：待發布清單、各系列狀態（build_package.py 產生，不手改）
     <系列 id>/README.md                   系列的發文順序與各則狀態
     <系列 id>/<觀念 id>/                  一則貼文
         README.md                           這則貼文的入口：縮圖、檢查結果、發布前後待辦
         ig/post.md、ig/01.png …             IG 輪播：每一頁的圖與文字、替代文字、整段 caption
+        ig/jpg/01.jpg …                     給 IG API 用的 JPEG（ig_publish.py prepare 產生，要 push 才有公開網址）
         threads/post.md                     Threads 串文：正文、每則串文（附圖）、最後一則
         _build/                             機器用：spec.json（內容規格）、checks-b.json、html/、審查用文字…
 docs/                                   stage2-token-usage.md（第一次實跑的 token 用量與觀察）
-tests/                                  test_check_a.py、test_state_and_batch.py、test_render_numunit.py、fixtures/（第一次實跑的兩則貼文、系列檔與觀念卡，只給測試用）
+tests/                                  test_check_a.py、test_state_and_batch.py、test_render_numunit.py、test_ig_publish.py、fixtures/（第一次實跑的兩則貼文、系列檔與觀念卡，只給測試用）
 ```
 
 **找東西的規則**：要發文，從 `out/README.md` 進去，打開貼文的 `README.md`；要改內容，改該貼文 `_build/spec.json`，然後依序重跑 `check_a.py` → `render.py` → `contact_sheet.py` → `build_package.py`（`contact_sheet.py` 要在 `build_package.py` 之前，README 才會有縮圖）。
@@ -96,5 +99,5 @@ tests/                                  test_check_a.py、test_state_and_batch.p
 - 整理 repo 或文件時，順便檢查：討論中得到的回饋是否已寫進 CLAUDE.md 或 skill、有沒有過時（legacy）內容可刪、哪些屬於 `.claude/`（Claude 怎麼做事）而不是資料與設定。
 
 - skill 與 `references/` 是依實測整理出來的；細節有疑問時以它們為準，沒寫到的先問人，不要自己決定。
-- 修改任何程式檢查或審查流程後，重跑 `uv run python tests/test_check_a.py`、`uv run python tests/test_state_and_batch.py` 與 `uv run python tests/test_render_numunit.py`；新增檢查要加「故意做壞的版本」確認抓得到。
+- 修改任何程式檢查或審查流程後，重跑 `uv run python tests/test_check_a.py`、`uv run python tests/test_state_and_batch.py` 、`uv run python tests/test_render_numunit.py` 與 `uv run python tests/test_ig_publish.py`；新增檢查要加「故意做壞的版本」確認抓得到。
 - 範例資料：現行的完整範例是 `out/jev-cascade/jev-cascade-overview/`（內容規格在 `_build/spec.json`）；`tests/fixtures/` 只給回歸測試用（第一次實跑 `jev-teardown` 的兩則貼文、系列檔與觀念卡）。

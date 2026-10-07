@@ -177,7 +177,7 @@ def readme_md(d: dict, title: str, series: dict | None, pack: Path, build: Path)
           "- 程式 A、批次檢查、忠實者與讀者審查的結果不存在發布包裡（審查產出放暫存，不進 repo）；最後確認時由 Claude 在報告中說明", "",
           "## 發布前", "",
           "- [ ] 人最後確認圖、文字、caption",
-          "- [ ] IG：依頁碼上傳 `ig/01.png` …，貼 caption，替代文字貼自 `ig/post.md`",
+          "- [ ] IG：手動上傳 `ig/01.png` …，貼 caption，替代文字貼自 `ig/post.md`；**或**用 API：`ig_publish.py prepare` → push `ig/jpg/` → `publish`（dry-run）→ 確認後 `--confirm`（見 references/instagram-publish.md）",
           "- [ ] Threads：正文用「新增到串文」一次發出，每則串文附圖，最後一則（置頂）含文章連結", "",
           "## 發布後", "",
           "- [ ] 發限時動態並加連結貼紙，指向文章",

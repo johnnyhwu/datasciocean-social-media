@@ -47,7 +47,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | 7 | **先照 `references/self-check.md` 自檢**，再派忠實者、工程師讀者、編輯；`verify_faithful.py`、`verify_reader.py` | `references/review-loop.md`、`references/self-check.md` |
 | 8 | `batch_check.py <spec>...`（參數順序 = 預計發文順序） | `references/batch-and-publish.md` §4 |
 | 9–10 | 給人看縮圖與文字，確認後 `state.py ready`（發布前後待辦在貼文的 `README.md`） | `references/batch-and-publish.md` §5–6 |
-| 11 | 人回報發布網址與時間 → `state.py record` | `references/batch-and-publish.md` §7 |
+| 11 | 發布：IG 可用官方 API（`ig_publish.py prepare` → push `ig/jpg/` → `publish` dry-run → 人確認 → `--confirm`，成功後自動 `state.py record`）；Threads 與 API 之外的情況由人手動發，回報網址與時間 → `state.py record` | `references/instagram-publish.md`、`references/batch-and-publish.md` §7 |
 
 第一次是新系列時，先用 `design-series-visuals` 把視覺哲學與六種版型的樣張做出來、**由人審過**才量產。系列已有模板就直接用，同一系列的所有貼文用同一版模板。
 
@@ -66,6 +66,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | `verify_reader.py` | 驗證工程師讀者 JSON：引用逐字出自貼文、陷阱題 |
 | `contact_sheet.py` | 把投影片拼成縮圖總覽 |
 | `batch_check.py` | 批次層檢查：相鄰 hook 樣態、相鄰系列色、模板 hash、標題一致、存量 |
+| `ig_publish.py`、`ig_api.py`、`hosting.py` | IG 官方 API 發佈（dry-run 預設、`--confirm` 才發）、API 客戶端、圖片託管介面（GitHub raw 網址） |
 | `state.py` | 各觀念各格式的狀態、發布紀錄、回補清單（`state/`） |
 | `cardlib.py` | 共用：唯讀解析觀念卡、文字正規化與逐字比對 |
 

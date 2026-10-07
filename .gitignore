@@ -3,3 +3,8 @@ __pycache__/
 .venv/
 .uv-cache/
 .playwright-browsers/
+
+# 憑證：只放在本機，絕不 commit
+.env
+.env.*
+!.env.example
