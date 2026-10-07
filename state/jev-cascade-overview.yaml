@@ -1,9 +1,23 @@
 concept: jev-cascade-overview
 formats:
   ig_carousel:
-    status: ready
-    pack: out/jev-cascade/jev-cascade-overview
+    status: published
   threads_thread:
-    status: ready
-    pack: out/jev-cascade/jev-cascade-overview
-posts: []
+    status: published
+posts:
+- post_id: jev-cascade-overview:ig_carousel
+  format: ig_carousel
+  series_id: jev-cascade
+  url: https://www.instagram.com/p/DeLvR1goG7Z/
+  published_at: 2026-10-07T06:57:51+0000
+  hook_type: 反直覺斷言
+  mentions: []
+  backfilled: []
+- post_id: jev-cascade-overview:threads_thread
+  format: threads_thread
+  series_id: jev-cascade
+  url: https://www.threads.com/@datasciocean/post/DeMHNAeEzm2
+  published_at: 2026-10-07T10:10:54+0000
+  hook_type: 反直覺斷言
+  mentions: []
+  backfilled: []

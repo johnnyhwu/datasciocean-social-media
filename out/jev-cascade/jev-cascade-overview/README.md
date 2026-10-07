@@ -5,8 +5,8 @@
 | 系列 | JEV 串接 Judge 系列 |
 | 觀念 | `jev-cascade-overview`（卡：`concept-wiki/wiki/concepts/jev-cascade-overview.md`） |
 | hook 樣態 | 反直覺斷言 |
-| IG 輪播 | 待發布（9 張） |
-| Threads 串文 | 待發布（7 則） |
+| IG 輪播 | 已發布（9 張） |
+| Threads 串文 | 已發布（7 則） |
 
 ## 要看／要發的檔案
 
@@ -27,7 +27,7 @@
 
 - [ ] 人最後確認圖、文字、caption
 - [ ] IG：手動上傳 `ig/01.png` …，貼 caption，替代文字貼自 `ig/post.md`；**或**用 API：`ig_publish.py prepare` → push `ig/jpg/` → `preflight` → `publish`（dry-run）→ 確認後 `--confirm`（見 references/instagram-publish.md）
-- [ ] Threads：正文用「新增到串文」一次發出，每則串文附圖，最後一則（置頂）含文章連結
+- [ ] Threads：手動用「新增到串文」一次發出，每則串文附圖，最後一則（置頂）含文章連結；**或**用 API：`threads_publish.py publish`（dry-run）→ 確認後 `--confirm`（見 references/threads-publish.md）
 
 ## 發布後
 
