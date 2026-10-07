@@ -1,0 +1,17 @@
+{
+ "series": "jev-cascade",
+ "concept": "threads-chain-test",
+ "lang": "zh-TW",
+ "status": "test",
+ "hook": {"style": "測試"},
+ "slides": [
+  {"layout": "cover", "title": "測試貼文：[[請忽略]]", "body": "Threads API 串文測試，馬上會刪除"},
+  {"layout": "text", "title": "測試貼文：第 2 則附圖", "body": "這張圖是 Threads 串文測試用的附圖，請忽略。"}
+ ],
+ "threads": {
+  "body": {"text": "【測試】Threads API 串文測試，請忽略，馬上會刪除。這是串文的第 1 則（正文）。", "refs": ["結構"]},
+  "items": [{"slide": 2, "text": "【測試】第 2 則：附圖的串文。請忽略。", "refs": ["結構"]}],
+  "last": {"text": "【測試】第 3 則（最後一則）：帶連結預覽。請忽略。\n網站：datasciocean.com", "refs": ["結構"], "link": "https://datasciocean.com/"}
+ },
+ "caption": {"first": "測試", "nav": "測試", "hashtags": []}
+}
