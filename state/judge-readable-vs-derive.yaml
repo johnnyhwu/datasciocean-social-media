@@ -1,0 +1,23 @@
+concept: judge-readable-vs-derive
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: judge-readable-vs-derive:ig_carousel
+  format: ig_carousel
+  series_id: jev-cascade
+  url: https://www.instagram.com/p/DeNyAsCGDTq/
+  published_at: 2026-10-08T01:48:47+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []
+- post_id: judge-readable-vs-derive:threads_thread
+  format: threads_thread
+  series_id: jev-cascade
+  url: https://www.threads.com/@datasciocean/post/DeNyxyxmAFX
+  published_at: 2026-10-08T01:50:54+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []

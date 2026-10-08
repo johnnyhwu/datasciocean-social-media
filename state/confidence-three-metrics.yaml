@@ -1,0 +1,9 @@
+concept: confidence-three-metrics
+formats:
+  ig_carousel:
+    status: published
+    merged_into: judge-readable-vs-derive
+  threads_thread:
+    status: published
+    merged_into: judge-readable-vs-derive
+posts: []

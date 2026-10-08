@@ -18,7 +18,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=973"
+          "detail": "最小左=80, 最大右=865"
         },
         {
           "name": "文字框無橫向溢出",
@@ -53,7 +53,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（便宜的 Judge JEV 先判）"
+          "detail": "最低 5.0（便宜的 Judge JEV，判得）"
         },
         {
           "name": "標題最多 2 行",
@@ -63,7 +63,7 @@
         {
           "name": "標題末行 >= 2 字、換行不拆詞",
           "ok": true,
-          "detail": "{'lastChars': 15, 'bad': []}"
+          "detail": "{'lastChars': 13, 'bad': []}"
         },
         {
           "name": "標題的數字與單位不拆成兩行",
@@ -73,7 +73,7 @@
         {
           "name": "補充不拆詞、末行 >= 2 字",
           "ok": true,
-          "detail": "{'lines': 2, 'bad': [], 'lastChars': 24}"
+          "detail": "{'lines': 3, 'bad': [], 'lastChars': 20}"
         },
         {
           "name": "補充的數字與單位不拆成兩行",
@@ -104,7 +104,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=918"
+          "detail": "最小左=80, 最大右=901"
         },
         {
           "name": "文字框無橫向溢出",
@@ -149,7 +149,7 @@
         {
           "name": "標題末行 >= 2 字、換行不拆詞",
           "ok": true,
-          "detail": "{'lastChars': 9, 'bad': []}"
+          "detail": "{'lastChars': 12, 'bad': []}"
         },
         {
           "name": "標題的數字與單位不拆成兩行",
@@ -159,7 +159,7 @@
         {
           "name": "補充不拆詞、末行 >= 2 字",
           "ok": true,
-          "detail": "{'lines': 3, 'bad': [], 'lastChars': 22}"
+          "detail": "{'lines': 4, 'bad': [], 'lastChars': 8}"
         },
         {
           "name": "補充的數字與單位不拆成兩行",
@@ -175,203 +175,6 @@
     },
     {
       "slide": 3,
-      "layout": "text",
-      "checks": [
-        {
-          "name": "尺寸 1080x1350、無捲動溢出",
-          "ok": true,
-          "detail": "scroll=1080x1350"
-        },
-        {
-          "name": "字型已內嵌載入（Noto Sans CJK TC）",
-          "ok": true,
-          "detail": ""
-        },
-        {
-          "name": "文字左右邊界 >= 40px",
-          "ok": true,
-          "detail": "最小左=80, 最大右=989"
-        },
-        {
-          "name": "文字框無橫向溢出",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "文字與圖形不超出版面下緣（至少留 20px）",
-          "ok": true,
-          "detail": "最低 1302px，版面 1350px"
-        },
-        {
-          "name": "文字與文字不重疊",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "最小字級 >= 28px",
-          "ok": true,
-          "detail": "最小 28px"
-        },
-        {
-          "name": "字級都在規定集合內",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
-          "ok": true,
-          "detail": "最低 5.0（JEV 串接 Judge 系列）"
-        },
-        {
-          "name": "標題最多 2 行",
-          "ok": true,
-          "detail": "2 行"
-        },
-        {
-          "name": "標題末行 >= 2 字、換行不拆詞",
-          "ok": true,
-          "detail": "{'lastChars': 11, 'bad': []}"
-        },
-        {
-          "name": "標題的數字與單位不拆成兩行",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "補充不拆詞、末行 >= 2 字",
-          "ok": true,
-          "detail": "{'lines': 2, 'bad': [], 'lastChars': 25}"
-        },
-        {
-          "name": "補充的數字與單位不拆成兩行",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "只有一組強調元素",
-          "ok": true,
-          "detail": "1"
-        },
-        {
-          "name": "系列標籤與系列檔的名稱完全相同",
-          "ok": true,
-          "detail": "['JEV 串接 Judge 系列']"
-        }
-      ]
-    },
-    {
-      "slide": 4,
-      "layout": "chart_sounding",
-      "checks": [
-        {
-          "name": "尺寸 1080x1350、無捲動溢出",
-          "ok": true,
-          "detail": "scroll=1080x1350"
-        },
-        {
-          "name": "字型已內嵌載入（Noto Sans CJK TC）",
-          "ok": true,
-          "detail": ""
-        },
-        {
-          "name": "文字左右邊界 >= 40px",
-          "ok": true,
-          "detail": "最小左=80, 最大右=1000"
-        },
-        {
-          "name": "文字框無橫向溢出",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "文字與圖形不超出版面下緣（至少留 20px）",
-          "ok": true,
-          "detail": "最低 1302px，版面 1350px"
-        },
-        {
-          "name": "文字與文字不重疊",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "最小字級 >= 28px",
-          "ok": true,
-          "detail": "最小 28px"
-        },
-        {
-          "name": "字級都在規定集合內",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
-          "ok": true,
-          "detail": "最低 5.0（JEV 串接 Judge 系列）"
-        },
-        {
-          "name": "標題最多 2 行",
-          "ok": true,
-          "detail": "2 行"
-        },
-        {
-          "name": "標題末行 >= 2 字、換行不拆詞",
-          "ok": true,
-          "detail": "{'lastChars': 13, 'bad': []}"
-        },
-        {
-          "name": "標題的數字與單位不拆成兩行",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "圖表版型補充最多五行、不拆詞",
-          "ok": true,
-          "detail": "{'lines': 1, 'bad': []}"
-        },
-        {
-          "name": "補充的數字與單位不拆成兩行",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "測深繩長與數值成正比（水面為 0）",
-          "ok": true,
-          "detail": "每單位 4.240~4.240px"
-        },
-        {
-          "name": "菱形中心落在繩端",
-          "ok": true,
-          "detail": ""
-        },
-        {
-          "name": "刻度等距且間距 = 單位 x 每單位像素",
-          "ok": true,
-          "detail": "間距 42.4px，預期 42.4px"
-        },
-        {
-          "name": "只有一組強調元素",
-          "ok": true,
-          "detail": "1"
-        },
-        {
-          "name": "系列標籤與系列檔的名稱完全相同",
-          "ok": true,
-          "detail": "['JEV 串接 Judge 系列']"
-        }
-      ]
-    },
-    {
-      "slide": 5,
       "layout": "table",
       "checks": [
         {
@@ -387,7 +190,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=899"
+          "detail": "最小左=80, 最大右=992"
         },
         {
           "name": "文字框無橫向溢出",
@@ -432,7 +235,7 @@
         {
           "name": "標題末行 >= 2 字、換行不拆詞",
           "ok": true,
-          "detail": "{'lastChars': 15, 'bad': []}"
+          "detail": "{'lastChars': 6, 'bad': []}"
         },
         {
           "name": "標題的數字與單位不拆成兩行",
@@ -442,7 +245,7 @@
         {
           "name": "圖表版型補充最多五行、不拆詞",
           "ok": true,
-          "detail": "{'lines': 1, 'bad': []}"
+          "detail": "{'lines': 3, 'bad': []}"
         },
         {
           "name": "補充的數字與單位不拆成兩行",
@@ -462,7 +265,7 @@
       ]
     },
     {
-      "slide": 6,
+      "slide": 4,
       "layout": "chart_bars",
       "checks": [
         {
@@ -478,7 +281,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=912"
+          "detail": "最小左=80, 最大右=905"
         },
         {
           "name": "文字框無橫向溢出",
@@ -523,7 +326,7 @@
         {
           "name": "標題末行 >= 2 字、換行不拆詞",
           "ok": true,
-          "detail": "{'lastChars': 15, 'bad': []}"
+          "detail": "{'lastChars': 18, 'bad': []}"
         },
         {
           "name": "標題的數字與單位不拆成兩行",
@@ -533,7 +336,7 @@
         {
           "name": "圖表版型補充最多五行、不拆詞",
           "ok": true,
-          "detail": "{'lines': 1, 'bad': []}"
+          "detail": "{'lines': 3, 'bad': []}"
         },
         {
           "name": "補充的數字與單位不拆成兩行",
@@ -543,7 +346,7 @@
         {
           "name": "橫條長度與數值成正比、軸從 0 起",
           "ok": true,
-          "detail": "每單位 335.079~335.080px"
+          "detail": "每單位 23.188~23.189px"
         },
         {
           "name": "只有一組強調元素",
@@ -558,8 +361,8 @@
       ]
     },
     {
-      "slide": 7,
-      "layout": "text",
+      "slide": 5,
+      "layout": "chart_bars",
       "checks": [
         {
           "name": "尺寸 1080x1350、無捲動溢出",
@@ -574,7 +377,103 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=1000"
+          "detail": "最小左=80, 最大右=928"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 5.0（JEV 串接 Judge 系列）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 12, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "圖表版型補充最多五行、不拆詞",
+          "ok": true,
+          "detail": "{'lines': 4, 'bad': []}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "橫條長度與數值成正比、軸從 0 起",
+          "ok": true,
+          "detail": "每單位 11.429~11.429px"
+        },
+        {
+          "name": "只有一組強調元素",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "['JEV 串接 Judge 系列']"
+        }
+      ]
+    },
+    {
+      "slide": 6,
+      "layout": "table",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=950"
         },
         {
           "name": "文字框無橫向溢出",
@@ -627,9 +526,9 @@
           "detail": "[]"
         },
         {
-          "name": "補充不拆詞、末行 >= 2 字",
+          "name": "圖表版型補充最多五行、不拆詞",
           "ok": true,
-          "detail": "{'lines': 3, 'bad': [], 'lastChars': 12}"
+          "detail": "{'lines': 3, 'bad': []}"
         },
         {
           "name": "補充的數字與單位不拆成兩行",
@@ -639,7 +538,7 @@
         {
           "name": "只有一組強調元素",
           "ok": true,
-          "detail": "1"
+          "detail": "0"
         },
         {
           "name": "系列標籤與系列檔的名稱完全相同",
@@ -649,8 +548,8 @@
       ]
     },
     {
-      "slide": 8,
-      "layout": "takeaway",
+      "slide": 7,
+      "layout": "chart_bars",
       "checks": [
         {
           "name": "尺寸 1080x1350、無捲動溢出",
@@ -665,7 +564,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=916"
+          "detail": "最小左=80, 最大右=956"
         },
         {
           "name": "文字框無橫向溢出",
@@ -700,7 +599,194 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 6.1（答案讀得出，又準又省；難任務，省）"
+          "detail": "最低 5.0（JEV 串接 Judge 系列）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 9, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "圖表版型補充最多五行、不拆詞",
+          "ok": true,
+          "detail": "{'lines': 4, 'bad': []}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "橫條長度與數值成正比、軸從 0 起",
+          "ok": true,
+          "detail": "每單位 640.000~640.000px"
+        },
+        {
+          "name": "只有一組強調元素",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "['JEV 串接 Judge 系列']"
+        }
+      ]
+    },
+    {
+      "slide": 8,
+      "layout": "table",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=983"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 5.0（JEV 串接 Judge 系列）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 8, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "圖表版型補充最多五行、不拆詞",
+          "ok": true,
+          "detail": "{'lines': 3, 'bad': []}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "只有一組強調元素",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "['JEV 串接 Judge 系列']"
+        }
+      ]
+    },
+    {
+      "slide": 9,
+      "layout": "takeaway",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=992"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 6.1（讀得出，便宜的 Judge 夠用）"
         },
         {
           "name": "標題最多 4 行",
@@ -710,7 +796,7 @@
         {
           "name": "標題末行 >= 2 字、換行不拆詞",
           "ok": true,
-          "detail": "{'lastChars': 3, 'bad': []}"
+          "detail": "{'lastChars': 12, 'bad': []}"
         },
         {
           "name": "標題的數字與單位不拆成兩行",
@@ -725,7 +811,7 @@
       ]
     },
     {
-      "slide": 9,
+      "slide": 10,
       "layout": "series_map",
       "checks": [
         {
@@ -741,7 +827,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=849"
+          "detail": "最小左=80, 最大右=854"
         },
         {
           "name": "文字框無橫向溢出",
