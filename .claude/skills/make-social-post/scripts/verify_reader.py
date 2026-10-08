@@ -50,7 +50,7 @@ def main(post: str, out: str, traps: list[int] | None) -> int:
     qs = d.get("post_only_questions", [])
     trap = set(traps or [len(qs)])
     for i, q in enumerate(qs, 1):
-        said_none = any(n in q.get("answer", "") for n in NONE)
+        said_none = q.get("answer", "").strip(" 　。，、：:").startswith(NONE)   # 只看開頭：答對了、後面補一句「貼文沒給個別數字」不算沒寫
         ok, _ = cites(q.get("citations"))
         if i in trap:
             if not said_none:

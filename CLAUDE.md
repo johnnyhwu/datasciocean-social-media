@@ -30,7 +30,7 @@ datasciocean-concept-wiki（Stage 1，submodule：concept-wiki/）
 3. **`pending_author_confirmation` 的主張一律不用；`author_confirmed` 的寫法取保守。**
 4. **審查者要獨立、要嚴格。** 每輪用全新的 subagent，審查者看不到撰寫者的推理；忠實者預設不通過、必須引用卡上原文；撰寫者不能反駁審查者，只能標「爭議」交給人。
 5. **能用程式強制的規則，就寫在程式裡，不靠 LLM。** 引用標記、數字比對、字數、座標軸從 0 起、重疊與對比度、用語、批次檢查、發布前檢查都在 `scripts/`。LLM 負責需要判斷的事。
-6. **每個數字都要有比較對象；錨點類型決定寫法。** 設計參數主詞要是方法名、官方宣稱主詞要是宣稱方、我的判斷要標「我的判斷」。
+6. **每個數字都要有比較對象；錨點類型決定寫法。** 設計參數主詞要是方法名、官方宣稱主詞要是宣稱方；部落格判斷可直接以作者口吻寫、不必標「我的判斷」（人決定，2026-10-08），但不得寫成卡上沒有的事實或比卡更強。
 7. **限定條件綁在主張上。** 用了某條主張，它的限定條件必須一起出現。
 8. **圖片由程式產生。** LLM 只產出內容規格 JSON；外觀由模板決定；數據圖與文字圖不用 AI 生圖。同一系列用同一份視覺哲學與同一套模板。
 9. **發布一定要經人確認；經確認後 IG 與 Threads 都用官方 API 發布。** `ig_publish.py`、`threads_publish.py` 預設是 dry-run，**只有人明確說「發」之後才加 `--confirm`**，不可在同一輪自己決定；已發布過的貼文不重複發；不用真實貼文做測試（測試用專用測試包與 `--no-record`，測完刪掉）。限時動態、精選集、置頂、回補由人手動（`references/publish-flow.md`）。
@@ -72,26 +72,35 @@ out/                                    發布包（程式產生）
         threads/post.md                     Threads 串文：正文、每則串文（附圖）、最後一則
         _build/                             機器用：spec.json（內容規格，唯一的真相來源）、checks-b.json、審查用文字…
 docs/                                   stage2-token-usage.md（token 用量與流程觀察）
-tests/                                  五份回歸測試 + fixtures/（舊的 jev-teardown 兩則貼文、系列檔與觀念卡，只給測試用）
+tests/                                  六份回歸測試（含 test_multicard.py：雙卡貼文與高密度版型）+ fixtures/（舊的 jev-teardown 兩則貼文、系列檔與觀念卡，只給測試用）
 ```
 
 **找東西的規則**：要發文，從 `out/README.md` 進去，打開貼文的 `README.md`；要改內容，改該貼文 `_build/spec.json`，然後依序重跑 `check_a.py` → `render.py` → `contact_sheet.py` → `build_package.py`（`contact_sheet.py` 要在 `build_package.py` 之前，README 才會有縮圖）。
 
 為什麼 `config/`、`series/`、`state/` 在根目錄而不在 skill 裡：這些是人會改、會審、會長期累積的資料與設定；`.claude/` 放的是「Claude 怎麼做事」的流程與腳本。
 
-## 目前狀態（2026-10-07）
+## 目前狀態（2026-10-08）
 
-- 系列 `jev-cascade`（JEV 串接 Judge 系列，5 張卡，來自文章 `jev-as-a-judge`；視覺哲學「潮線」；沿用上一輪的版型幾何）。系列標題（`planned_title`）是草案。
-- **`jev-cascade-overview`（第 1 則）已用 API 發到 IG 與 Threads**，兩個格式都是 `published`。其他 4 則（`judge-readable-vs-derive`、`confidence-three-metrics`、`cascade-complementary-errors`、`cascade-threshold-and-failure-mode`）還沒做，下一則預設是 `judge-readable-vs-derive`。存量（`ready`）0 則。
+- 系列 `jev-cascade`（JEV 串接 Judge 系列，來自文章 `jev-as-a-judge`；視覺哲學「潮線」）。系列標題（`planned_title`）是草案。**5 張卡現在是 4 則 post**：`judge-readable-vs-derive` 與 `confidence-three-metrics` 合成一則雙卡貼文（人決定，2026-10-08；系列檔成員的 `also`）。
+- **`jev-cascade-overview`（第 1 則）已用 API 發到 IG 與 Threads**，兩個格式都是 `published`。
+- **第 2 則（`judge-readable-vs-derive`＋併入 `confidence-three-metrics`，雙卡）已發布**（2026-10-08）：IG https://www.instagram.com/p/DeNyAsCGDTq/ 、Threads https://www.threads.com/@datasciocean/post/DeNyxyxmAFX ；兩個格式都是 `published`。其後 `cascade-complementary-errors`、`cascade-threshold-and-failure-mode` 還沒做，下一則預設是 `cascade-complementary-errors`。存量（`ready`）0 則。
+- **待人手動**：回補第 1 則（IG 改 caption 補第 2 則的連結、Threads 在原串文下加回覆；見 `state/backfill.md`）；第 2 則的限時動態、精選集、置頂。
+- 2026-10-08 版型改動（人的回饋：資訊密度低、文字太精簡、圖面沒用滿）：字數上限放寬；圖與表依補充行數自動往下讓位；脈絡張可放名詞表；表可 4 列、鍵可寫「主｜小字」、`key_w` 調鍵欄寬；圖 `subs_inline` 把副標籤接在名稱後面並拉開間距；帶走張 `question`；程式 B 新增「不超出版面下緣」；系列地圖菱形對齊。**模板 hash 變成 `6e5395b106e1`**；第 1 則已重渲（只有第 9 頁 PNG 與兩個機器紀錄檔有變，其他 PNG 逐位元相同；網路上已發布的 JPEG 沒動）。
 - 發布流程已用真實帳號實測過（IG 輪播與 Threads 串文）：照 `references/publish-flow.md`。已驗證的事實與還沒驗證的事項在 `instagram-publish.md`、`threads-publish.md`。
 - **待人決定**：圖要承載意義（光看圖就看懂方法，需要流程／分流圖版型與樣張，見 `design-series-visuals/references/principles.md` 八）；封面主標是否放寬成 3 行；`config/params.yaml` 的 `structure_text_max_chars` 與 `ai_tone_blacklist` 仍是初稿；Threads token 是否補上 `threads_delete` 權限（目前沒有，刪除只能手動）。
 
 ## 工作方式
 
-- **一張觀念卡 = 一則 post**；IG 輪播與 Threads 串文是同一則的兩種格式。同一篇文章的多張卡預設組成系列，`standalone_classic` 的卡預設獨立發文（`references/batch-and-publish.md` §1）。
+- **規劃與防呆**（2026-10-08 整理，目的是下一則一次就到位）：
+  - 做系列規劃時一定要**問人哪些卡要合併**（先跑 `series_deps.py` 當輔助；它不是偵測器，要用讀者角度逐則看）；成員定案後加 `members_locked: true`，**第 1 則發布前**就定案（IG 系列地圖發布後改不了）。
+  - 寫 spec 前先做**版型規劃**（每張選好版型、下半部放什麼、圖上術語在哪張定義；術語不能只在 Threads 定義），見 `ig-carousel.md` §0 與 `self-check.md` 第 10～16 項。
+  - `render.py`、`build_package.py` 對**已發布**的貼文預設拒絕（`--force` 才重做）；`build_package.py` 遇到不認得的投影片欄位會報錯（要新增欄位先讓它輸出並補測試）。
+- **貼文要口語、白話、資訊密度夠**（人的回饋，2026-10-08）：像在跟朋友解釋，不要像摘要或條列結論；術語第一次出現就用白話講；可以用生活化比喻（比喻只翻譯、不加卡上沒有的事實）；**每張圖都要用滿**（下半部是空海面就是浪費，改用對照表、橫條圖、名詞表）；不標「我的判斷」；準確度差距寫 %；帶走張先問問題再回答。細節見 `ig-carousel.md` §4。
+
+- **預設一張觀念卡 = 一則 post**；IG 輪播與 Threads 串文是同一則的兩種格式。兩張卡互相依賴、分開發都不好懂時，**由人決定**合成一則雙卡貼文（系列檔成員的 `also`；做法見 `spec-json.md`「雙卡貼文」）。同一篇文章的多張卡預設組成系列，`standalone_classic` 的卡預設獨立發文（`references/batch-and-publish.md` §1）。
 - **請人拍板的事，要用白話說清楚**：這是什麼、選了會怎樣、代價是什麼、我的建議；不要只丟一句簡短的選項。
 - **做完一個階段，主動列出人接下來要注意或完成的事**（要確認什麼、要手動做什麼、還沒決定什麼）。
 - skill 與 `references/` 是依實測整理出來的；細節有疑問時以它們為準，沒寫到的先問人，不要自己決定。
-- 修改任何程式檢查、審查或發布流程後，**重跑全部回歸測試**：`uv run python tests/test_check_a.py`、`test_state_and_batch.py`、`test_render_numunit.py`、`test_ig_publish.py`、`test_threads_publish.py`；新增檢查要加「故意做壞的版本」確認抓得到。
+- 修改任何程式檢查、審查或發布流程後，**重跑全部回歸測試**：`uv run python tests/test_check_a.py`、`test_state_and_batch.py`、`test_render_numunit.py`、`test_ig_publish.py`、`test_threads_publish.py`、`test_multicard.py`；新增檢查要加「故意做壞的版本」確認抓得到。
 - 整理 repo 或文件時，順便檢查：討論中得到的回饋是否已寫進 CLAUDE.md 或 skill、有沒有過時（legacy）內容可刪、哪些屬於 `.claude/`（Claude 怎麼做事）而不是資料與設定。
-- 範例資料：現行完整範例是 `out/jev-cascade/jev-cascade-overview/`（內容規格在 `_build/spec.json`）；`tests/fixtures/` 只給回歸測試用。
+- 範例資料：**品質基準是 `out/jev-cascade/judge-readable-vs-derive/`**（雙卡貼文；內容規格在 `_build/spec.json`；版型用滿、口語白話、先問再答、不標「我的判斷」）。下一則的口吻、密度、版型選擇都以它為準；`jev-cascade-overview` 是第一版，只當歷史參考。`tests/fixtures/` 只給回歸測試用。

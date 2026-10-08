@@ -56,7 +56,7 @@ def main(spec_path: str) -> int:
     sp = Path(spec_path)
     doc = json.loads(sp.read_text(encoding="utf-8"))
     card = W.parse_card(W.WIKI / "wiki" / "concepts" / f"{doc['concept']}.md")
-    claims = {c["id"]: c for c in card.claims}
+    claims = W.spec_claims(doc)   # 主卡裸 id；併入的卡「卡id:cN」
     series = yaml.safe_load(re.match(r"^---\n(.*?)\n---", W.series_file(doc["series"]).read_text(encoding="utf-8"), re.S).group(1))
     err, hint = [], []
     terms = (yaml.safe_load((W.ROOT / "config" / "terms.yaml").read_text(encoding="utf-8")) or {}).get("replace", {})
@@ -134,10 +134,11 @@ def main(spec_path: str) -> int:
                 err.append(f"{name}: AI 腔黑名單命中 {w!r}")
         if "podcast" in txt_all.lower():
             err.append(f"{name}: 出現 podcast")
-        # 我的判斷：引用部落格判斷的區塊要標出來（HINT，交忠實者）
-        if any(claims[r]["anchor_type"] == "部落格判斷" for r in refs) and "我的判斷" not in txt_all and sl is not None and sl["layout"] not in ("cover", "series_map"):
-            hint.append(f"{name}: 引用了部落格判斷，區塊內沒有「我的判斷」字樣（交忠實者確認寫法）")
 
+    # 併入的卡必須與系列檔裡這個成員的 also 一致
+    mem = next((m for m in series["members"] if m["concept"] == doc["concept"]), None)
+    if sorted(doc.get("also_concepts") or []) != sorted((mem or {}).get("also") or []):
+        err.append(f"also_concepts {doc.get('also_concepts') or []} 與系列檔成員的 also {(mem or {}).get('also') or []} 不一致")
     # 系列檔的 planned_title 會自動填進系列地圖與 Threads 最後一則，也要符合用語對照
     for m in series["members"]:
         for old, new in terms.items():
@@ -160,10 +161,10 @@ def main(spec_path: str) -> int:
         body = sl.get("body", "")
         if sl["layout"] in ("text",) and not (P["body_chars"][0] <= len(body) <= P["body_chars"][1]):
             err.append(f"slide{i:02d}: 補充 {len(body)} 字，不在 {P['body_chars']}")
-        if sl["layout"] in ("table", "chart_bars", "chart_sounding") and len(body) > 24:
-            err.append(f"slide{i:02d}: 圖表版型補充 {len(body)} 字，超過一行（24 字預檢）")
-        if sl["layout"] == "context" and len(body) > 90:
-            err.append(f"slide{i:02d}: 脈絡張補充 {len(body)} 字，超過 90（實作新增）")
+        if sl["layout"] in ("table", "chart_bars", "chart_sounding") and len(body) > P["chart_body_max_chars"]:
+            err.append(f"slide{i:02d}: 圖表版型補充 {len(body)} 字，超過 {P['chart_body_max_chars']}（補充行數預檢）")
+        if sl["layout"] == "context" and len(body) > P["context_body_max_chars"]:
+            err.append(f"slide{i:02d}: 脈絡張補充 {len(body)} 字，超過 {P['context_body_max_chars']}")
         lim = P["cover_title_precheck_chars"] if sl["layout"] == "cover" else P["title_precheck_chars"]
         if len(strip_marks(sl.get("title", ""))) > lim + 10:
             hint.append(f"slide{i:02d}: 主標 {len(strip_marks(sl.get('title','')))} 字，預檢上限 {lim}（以渲染行數為準）")

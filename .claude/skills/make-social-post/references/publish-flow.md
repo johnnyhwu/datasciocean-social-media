@@ -11,6 +11,7 @@ P=out/<系列>/<觀念>                              # 要發的發布包資料�
 
 | 前提 | 怎麼確認 |
 |---|---|
+| 系列成員已定案（`series.md` 有 `members_locked: true`；第 1 則發布前） | dry-run 的 `warnings` 沒有「成員清單還沒定案」 |
 | 貼文已做完並經人最後確認 | `state.py status` 該觀念兩個格式都是 `ready`；人已看過貼文的 `README.md`、`ig/post.md`、`threads/post.md` |
 | `.env` 有憑證 | 有 `IG_ACCESS_TOKEN`、`IG_USER_ID`、`THREADS_ACCESS_TOKEN`、`THREADS_USER_ID`（範本 `.env.example`）。**不要 `cat .env`，也不要請人貼 token**；只用下面的指令檢查 |
 | `.env` 不存在或缺欄位 | 停下來，請人照 `instagram-publish.md`「一次性設定」與 `threads-publish.md` 設定；token 由人自己貼進 `.env` |

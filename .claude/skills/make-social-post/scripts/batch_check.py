@@ -60,9 +60,9 @@ def main(specs: list[str]) -> int:
                     err.append(f"{a['concept']}：Threads 最後一則的同系列標題與 planned_title 不一致：{t!r}")
 
     ready = 0
-    for f in (W.ROOT / "state").glob("*.yaml"):
+    for f in W.STATE_DIR.glob("*.yaml"):
         s = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
-        if any((v or {}).get("status") == "ready" for v in (s.get("formats") or {}).values()):
+        if any((v or {}).get("status") == "ready" and not (v or {}).get("merged_into") for v in (s.get("formats") or {}).values()):
             ready += 1
     if ready == 0:
         warn.append("存量 0：沒有任何待發布的貼文，暫停發文（寧可跳過一天，也不降低審查標準）")

@@ -5,7 +5,9 @@ slides_max: 10
 title_max_lines: 2
 title_precheck_chars: 15            # 封面另設
 cover_title_precheck_chars: 16      # 實作新增
-body_chars: [40, 60]                # 文字張補充；圖表版型一行（check_a 另設 24 字預檢）
+body_chars: [40, 110]               # 文字張補充（2026-10-08 由 [40,60] 放寬：資訊密度太低，約 5 行）
+chart_body_max_chars: 110           # 圖表與對照表的補充（2026-10-08：圖與表會依補充行數往下讓位，最多約 5 行；原本 1 行 24 字）
+context_body_max_chars: 140         # 脈絡張補充（原本 90）
 caption_first_sentence_max_chars: 50   # 暫定，待手機預覽後調整
 caption_per_slide_summary: true
 caption_nav_line_mode: article_title   # 可改 search_term（見 references/threads-and-caption.md）

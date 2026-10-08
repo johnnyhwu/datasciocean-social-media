@@ -12,7 +12,8 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 1. `git submodule update --remote`（卡要是最新的）。第一次 clone 用 `git submodule update --init --remote`。
 2. `uv sync`；Chromium 在 repo 內，沒有就 `PLAYWRIGHT_BROWSERS_PATH=$PWD/.playwright-browsers uv run playwright install chromium`（細節見 `references/setup.md`）。腳本一律 `uv run python .claude/skills/make-social-post/scripts/<name>.py`。
 3. **看現況**：`state.py status`（每個觀念各格式是 `not_tried`／`ready`／`published`、存量），再看 `out/README.md`（待發布與各系列狀態）。
-4. **決定這次做哪一則**：照系列檔 `series/<id>/series.md` 的 `members` 順序，找第一個還是 `not_tried` 的觀念；這是預設，要不要照做由人決定。
+4. **（新系列／規劃時）** 跑 `series_deps.py <系列 id>` 並**一定要問人哪些卡要合併**（`references/batch-and-publish.md` §1）；成員定案後在 `series.md` 加 `members_locked: true`，再發第 1 則。
+4b. **決定這次做哪一則**：照系列檔 `series/<id>/series.md` 的 `members` 順序，找第一個還是 `not_tried` 的觀念；這是預設，要不要照做由人決定。
 5. 要做的觀念，**只讀它的卡**（`concept-wiki/wiki/concepts/<id>.md`），不讀 blog。同時讀 `concept-wiki/docs/card-format.md`（卡格式與 status 語意）。
 6. 如果這次要**發布**，先看 `references/publish-flow.md` 的「發文前的前提」。
 
@@ -31,7 +32,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 |---|---|---|
 | 1 | 選觀念、決定獨立或系列、系列檔 | `references/batch-and-publish.md` §1–3 |
 | 2 | 5～6 個大膽的 hook 候選（至少 3 種樣態），最多一次 haiku 讀者參考，**用 AskUserQuestion 讓人挑** | `references/hooks.md` |
-| 3 | 寫 `out/<series>/<concept>/_build/spec.json`：投影片、Threads、caption、每個區塊標引用的 claim id | `references/spec-json.md`、`references/ig-carousel.md`、`references/threads-and-caption.md`、`references/anchor-writing-rules.md` |
+| 3 | **先做版型規劃**（每張選好版型、圖上術語在哪張定義，`references/ig-carousel.md` §0），再寫 `out/<series>/<concept>/_build/spec.json`：投影片、Threads、caption、每個區塊標引用的 claim id | `references/spec-json.md`、`references/ig-carousel.md`、`references/threads-and-caption.md`、`references/anchor-writing-rules.md` |
 | 4 | `check_a.py <spec.json>`，ERROR 清零 | `references/program-a.md` |
 | 5 | `render.py <spec.json>`，程式 B 全過；`contact_sheet.py <發布包資料夾>` 拼縮圖；**自己看一次渲染後的 PNG** | `references/program-b.md` |
 | 6 | （在 `contact_sheet.py` 之後）`build_package.py <spec.json>`：產生人看的 `README.md`、`ig/post.md`、`threads/post.md`、審查用的 `_build/post-with-refs.md`／`post-reader.md`，並更新 `out/README.md` 索引 | `references/threads-and-caption.md` |
@@ -59,8 +60,11 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | `ig_publish.py`、`ig_api.py` | IG 官方 API 發佈：prepare／preflight／publish（dry-run 預設，`--confirm` 才發）、token 管理 |
 | `threads_publish.py`、`threads_api.py` | Threads 官方 API 發佈整串：publish／rollback／delete／token-info（dry-run 預設；中途失敗可續發） |
 | `publish_common.py`、`hosting.py` | 兩個平台共用：`.env` 讀寫、token 效期與自動 refresh、JPEG 驗證；圖片託管介面（GitHub raw 網址） |
+| `series_deps.py` | 系列規劃：列出該合併成一則的候選（輔助，不是偵測器；規劃時一定要問人） |
 | `state.py` | 各觀念各格式的狀態（`not_tried`／`ready`／`published`／`unsuitable`）、發布紀錄、回補清單（`state/`） |
 | `cardlib.py` | 共用：唯讀解析觀念卡、系列與發布包路徑、文字正規化與逐字比對 |
+
+`render.py`、`build_package.py` 對**已發布**的貼文預設拒絕，要重做才加 `--force`。
 
 改了任何腳本或審查流程，跑 `CLAUDE.md`「工作方式」列的全部回歸測試。
 

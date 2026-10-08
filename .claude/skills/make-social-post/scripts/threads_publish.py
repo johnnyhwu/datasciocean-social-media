@@ -268,6 +268,15 @@ def main(argv: list[str]) -> int:
         env = PC.load_env()
         client.token = env["THREADS_ACCESS_TOKEN"]
 
+    if a.cmd in ("preflight", "publish") and getattr(a, "pack", None):      # 系列成員清單要在第一則發布前定案
+        try:
+            _spec = json.loads((Path(a.pack).resolve() / "_build" / "spec.json").read_text(encoding="utf-8"))
+            _w = W.series_lock_warning(_spec.get("series"), _spec["concept"])
+            if _w:
+                warns.append(_w)
+        except (OSError, KeyError, ValueError):
+            pass
+
     if a.cmd == "whoami":
         try:
             me = client.me()

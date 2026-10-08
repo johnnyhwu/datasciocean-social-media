@@ -4,7 +4,8 @@
 外觀完全由模板決定；LLM 只給內容規格。
 
 用法（repo 根目錄；Chromium 在 repo 內 .playwright-browsers/，程式會自己設好路徑）：
-  uv run python .claude/skills/make-social-post/scripts/render.py out/<series>/<concept>/_build/spec.json [--only 3,5]
+  uv run python .claude/skills/make-social-post/scripts/render.py out/<series>/<concept>/_build/spec.json [--only 3,5] [--force]
+已發布的貼文預設拒絕（--force 才重渲）。
 結束碼：0 全部通過、1 有程式 B 檢查不通過。
 """
 from __future__ import annotations
@@ -106,6 +107,46 @@ def bob(x, y_end, col, v="", emph=False):
     return g
 
 
+def est_lines(txt: str, per_line: float) -> int:
+    """模擬 word-break: keep-all：只在標點或空白後斷行，其餘中文連續串不可拆。per_line = 一行容納的全形字數。"""
+    def width(t):
+        return sum(1 if ord(ch) > 127 else 0.55 for ch in t)
+    chunks = [c for c in re.split(r"(?<=[、，；,;。：:])|(?<=\s)", txt) if c]
+    lines, cur = 1, 0.0
+    for c in chunks:
+        w = width(c)
+        if cur + w > per_line and cur > 0:
+            lines, cur = lines + 1, 0.0
+        cur += w
+        while cur > per_line:
+            lines, cur = lines + 1, cur - per_line
+    return lines
+
+
+def body_end(body: str, size: int = 38, line_h: float = 1.6) -> float:
+    """補充文字（top=352）排完的底部 y；圖與表從這之下再留一點空白開始。"""
+    return 352 + est_lines(body, 920 / size - 0.5) * size * line_h
+
+
+def table_block(rows: list, y0: float, key_w: int = 300) -> tuple[str, str, float]:
+    """對照表的橫線與格子。鍵可以寫「主｜小字」，小字（例如指標名稱）排在主字下面。
+    key_w：鍵欄寬（預設 300px）；鍵很短、值很長時調小，值欄就變寬、列數變少。"""
+    vx = 80 + key_w + 20
+    vw = 1000 - vx
+    parts, cells, y = "", "", y0
+    for (k, v) in rows:
+        main, _, sub = k.partition("｜")
+        parts += f'<line class="g sep" x1="80" y1="{y}" x2="1000" y2="{y}" stroke="{DEEP}" stroke-width="2" opacity=".35"/>'
+        cells += f'<div class="t abs cell k" style="left:80px;top:{y + 28}px;width:{key_w}px">{esc(main)}</div>'
+        if sub:
+            cells += f'<div class="t abs cell ks" style="left:80px;top:{y + 28 + 57}px;width:{key_w}px">{esc(sub)}</div>'
+        cells += f'<div class="t abs cell" style="left:{vx}px;top:{y + 28}px;width:{vw}px">{esc(bind_nums(v))}</div>'
+        lines = max(est_lines(v, vw / 38 - 0.7), est_lines(main, key_w / 38 - 0.4) + (1 if sub else 0))
+        y += 56 + lines * 57 + 8
+    parts += f'<line class="g sep" x1="80" y1="{y}" x2="1000" y2="{y}" stroke="{DEEP}" stroke-width="2" opacity=".35"/>'
+    return parts, cells, y
+
+
 # ---------------------------------------------------------------- 各版型
 def build(spec: dict, series: dict, tag: str) -> dict:
     """回傳 {layout, html_body, ...}。HTML 片段以模板檔填入。"""
@@ -115,11 +156,17 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     sc = SERIES_COLORS.get(series.get("color"), MID)
     kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", "")))}
 
+    if lay in ("text", "table", "chart_bars", "chart_sounding"):   # 小標籤（例如「我的判斷」）：右上角
+        kw["LABEL"] = f'<div class="t abs chip">{esc(spec["label"])}</div>' if spec.get("label") else ""
     if lay == "cover":
         kw["SVG"] = svg_wrap(waves(1000, sc))
         kw["SUB_TOP"] = 560
     elif lay == "context":
-        pass
+        if spec.get("rows"):      # 脈絡張也可以在補充下面放對照表（名詞表）
+            parts, cells, _ = table_block(spec["rows"], max(520, body_end(spec.get("body", ""), 40, 1.6) + 44), spec.get("key_w", 300))
+            kw["SVG"], kw["CELLS"] = svg_wrap(parts), cells
+        else:
+            kw["SVG"], kw["CELLS"] = "", ""
     elif lay == "text":
         kw["SVG"] = svg_wrap(
             waves(760, sc)
@@ -127,32 +174,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
               f'<circle class="bg" cx="540" cy="1040" r="95" fill="url(#glow)"/>'
               f'<polygon class="g deco" data-e="1" points="540,1028 548,1040 540,1052 532,1040" fill="{GOLD}"/></g>')
     elif lay == "table":
-        rows = spec["rows"]
-        y0 = 500
-
-        def est_lines(txt, per_line):
-            # 模擬 word-break: keep-all：只在標點或空白後斷行，其餘中文連續串不可拆
-            def width(t):
-                return sum(1 if ord(ch) > 127 else 0.55 for ch in t)
-            chunks = [c for c in re.split(r"(?<=[、，；,;。：:])|(?<=\s)", txt) if c]
-            lines, cur = 1, 0.0
-            for c in chunks:
-                w = width(c)
-                if cur + w > per_line and cur > 0:
-                    lines, cur = lines + 1, 0.0
-                cur += w
-                while cur > per_line:
-                    lines, cur = lines + 1, cur - per_line
-            return lines
-
-        parts, cells, y = "", "", y0
-        for (k, v) in rows:
-            parts += f'<line class="g sep" x1="80" y1="{y}" x2="1000" y2="{y}" stroke="{DEEP}" stroke-width="2" opacity=".35"/>'
-            cells += (f'<div class="t abs cell k" style="left:80px;top:{y + 28}px;width:300px">{esc(k)}</div>'
-                      f'<div class="t abs cell" style="left:400px;top:{y + 28}px;width:600px">{esc(v)}</div>')
-            lines = max(est_lines(v, 15.0), est_lines(k, 7.5))
-            y += 56 + lines * 57 + 8
-        parts += f'<line class="g sep" x1="80" y1="{y}" x2="1000" y2="{y}" stroke="{DEEP}" stroke-width="2" opacity=".35"/>'
+        parts, cells, _ = table_block(spec["rows"], max(500, body_end(spec.get("body", "")) + 44), spec.get("key_w", 300))
         kw["SVG"] = svg_wrap(parts)
         kw["CELLS"] = cells
         kw["NOTE_BLOCK"] = (f'<div class="t abs note" style="left:80px;top:1196px">{esc(spec["note"])}</div>' if spec.get("note") else "")
@@ -160,15 +182,26 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         bars = spec["bars"]
         x0, maxlen = 72, 640
         s = maxlen / max(b["value"] for b in bars)
-        labels, svg, y = "", "", 500
+        y = max(500, body_end(spec.get("body", "")) + 44)   # 補充排成多行時，圖往下讓出空間
+        inline = bool(spec.get("subs_inline"))              # 副標籤接在名稱後面同一行（省 42px，長條才排得下）
+        labels, svg = "", ""
         top = y - 20
+        # 條數少、空間有剩時，拉開長條的間距，把圖面用滿（只對 subs_inline 的圖；舊圖維持原間距）
+        step = max(162.0, min(240.0, (1150 - y) / len(bars))) if inline else None
+        last_bottom = y
         for b in bars:
             subs = b.get("subs", [])
-            labels += f'<div class="t abs name" style="left:80px;top:{y}px">{esc(b["name"])}</div>'
-            ty = y + 54
-            for sline in subs:
-                labels += f'<div class="t abs sub" style="left:80px;top:{ty}px">{esc(sline)}</div>'
-                ty += 42
+            if inline:
+                si = "　".join(subs)
+                labels += (f'<div class="t abs name" style="left:80px;top:{y}px">{esc(b["name"])}'
+                           + (f'<span class="subi">　{esc(si)}</span>' if si else "") + '</div>')
+                ty = y + 54
+            else:
+                labels += f'<div class="t abs name" style="left:80px;top:{y}px">{esc(b["name"])}</div>'
+                ty = y + 54
+                for sline in subs:
+                    labels += f'<div class="t abs sub" style="left:80px;top:{ty}px">{esc(sline)}</div>'
+                    ty += 42
             by = ty + 14
             ln = b["value"] * s
             col = GOLD if b.get("emphasize") else TEAL
@@ -176,8 +209,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
                     f'width="{ln:.2f}" height="44" fill="{col}"/>')
             labels += (f'<div class="t abs num" style="left:{x0 + ln + 22:.1f}px;top:{by - 11}px;color:{DEEP}">'
                        f'{b["value"]:g}{esc(spec.get("unit", ""))}</div>')
-            y = by + 44 + 50
-        svg += f'<line class="g axis" x1="{x0}" y1="{top}" x2="{x0}" y2="{y - 40}" stroke="{DEEP}" stroke-width="3"/>'
+            last_bottom = by + 44
+            y = (y + step) if inline else (by + 44 + 50)
+        svg += f'<line class="g axis" x1="{x0}" y1="{top}" x2="{x0}" y2="{last_bottom + 10}" stroke="{DEEP}" stroke-width="3"/>'
         kw["SVG"] = svg_wrap(svg)
         kw["LABELS"] = labels
         kw["NOTE"] = esc(spec.get("note", ""))
@@ -218,6 +252,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["NOTE"] = esc(spec.get("note", ""))
         spec["_S"], spec["_unit_ticks"] = S, unit_ticks
     elif lay == "takeaway":
+        q = spec.get("question")        # 先問一個問題，再給答案（讀者才知道這句話在回答什麼）
+        kw["QUESTION"] = f'<div class="t abs take-q" style="top:320px">{esc(q)}</div>' if q else ""
+        kw["TAKE_STYLE"] = f"top:{320 + math.ceil(len(q) / 15.0) * 73 + 36}px" if q else ""
         lab = spec.get("label")
         kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
         lines = "".join(
@@ -232,10 +269,10 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         for i, t in enumerate(items):
             if i == cur:
                 svg += f'<rect class="bg" x="72" y="{y - 10}" width="936" height="84" rx="6" fill="{DEEP}"/>'
-                svg += f'<polygon class="g mark" data-e="1" points="100,{y + 32} 112,{y + 44} 100,{y + 56} 88,{y + 44}" fill="{GOLD}"/>'
+                svg += f'<polygon class="g mark" data-e="1" points="100,{y + 20} 112,{y + 32} 100,{y + 44} 88,{y + 32}" fill="{GOLD}"/>'
                 out += f'<div class="t abs item cur" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
             else:
-                svg += f'<polygon class="g mark" points="100,{y + 36} 108,{y + 44} 100,{y + 52} 92,{y + 44}" fill="{TEAL}"/>'
+                svg += f'<polygon class="g mark" points="100,{y + 24} 108,{y + 32} 100,{y + 40} 92,{y + 32}" fill="{TEAL}"/>'
                 out += f'<div class="t abs item" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
             y += 112
         kw["SVG"] = svg_wrap(svg)
@@ -317,6 +354,8 @@ def program_b(spec: dict, m: dict, img: Image.Image, series_name: str, tag_texts
     lo = min(t["r"]["l"] for t in m["ts"]); hi = max(t["r"]["r"] for t in m["ts"])
     chk(f"文字左右邊界 >= {SAFE_X}px", lo >= SAFE_X and hi <= WD - SAFE_X, f"最小左={lo:.0f}, 最大右={hi:.0f}")
     chk("文字框無橫向溢出", not any(t["ov"] for t in m["ts"]), [t["n"] for t in m["ts"] if t["ov"]])
+    low = max([t["r"]["b"] for t in m["ts"]] + [g["r"]["b"] for g in m["gs"]])
+    chk(f"文字與圖形不超出版面下緣（至少留 20px）", low <= HT - 20, f"最低 {low:.0f}px，版面 {HT}px")
     tt = [(a["n"], b["n"]) for i, a in enumerate(m["ts"]) for b in m["ts"][i + 1:] if inter(a["r"], b["r"])]
     chk("文字與文字不重疊", not tt, tt)
     tg = [(t["n"], g["n"]) for t in m["ts"] for g in m["gs"] if inter(t["r"], g["r"])]
@@ -342,7 +381,7 @@ def program_b(spec: dict, m: dict, img: Image.Image, series_name: str, tag_texts
     bo = m["chk"].get("body")
     if bo:
         if lay in ("table", "chart_bars", "chart_sounding"):
-            chk("圖表版型補充只有一行、不拆詞", bo["lines"] == 1 and not bo["bad"], {"lines": bo["lines"], "bad": bo["bad"]})
+            chk("圖表版型補充最多五行、不拆詞", bo["lines"] <= 5 and not bo["bad"], {"lines": bo["lines"], "bad": bo["bad"]})
         else:
             chk("補充不拆詞、末行 >= 2 字", not bo["bad"] and (bo["lines"] == 1 or bo["lastChars"] >= 2), {"lines": bo["lines"], "bad": bo["bad"], "lastChars": bo["lastChars"]})
     if bo:
@@ -366,8 +405,9 @@ def program_b(spec: dict, m: dict, img: Image.Image, series_name: str, tag_texts
     return res
 
 
-def render_all(spec_path: Path, only: set[int] | None = None) -> int:
+def render_all(spec_path: Path, only: set[int] | None = None, force: bool = False) -> int:
     doc = json.loads(spec_path.read_text(encoding="utf-8"))
+    W.guard_published(doc, force)
     series = load_series(doc["series"])
     series["id"] = series.get("id", doc["series"])
     tag = series["name"]
@@ -415,7 +455,7 @@ def render_all(spec_path: Path, only: set[int] | None = None) -> int:
             if sl["layout"] == "series_map":
                 alts[f"{i:02d}.png"] = plain(sl["title"]) + "。" + "、".join(m_["planned_title"] for m_ in series["members"])
             else:
-                alts[f"{i:02d}.png"] = (plain(sl.get("title", "")) + ("。" + body if body else ""))
+                alts[f"{i:02d}.png"] = ((sl["question"] + "　" if sl.get("question") else "") + plain(sl.get("title", "")) + ("。" + body if body else ""))
         b.close()
     (bld / "alt-text.json").write_text(json.dumps(alts, ensure_ascii=False, indent=2), encoding="utf-8")
     (bld / "checks-b.json").write_text(json.dumps({"template_hash": thash, "slides": report}, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -427,4 +467,4 @@ if __name__ == "__main__":
     only = None
     if "--only" in sys.argv:
         only = {int(x) for x in sys.argv[sys.argv.index("--only") + 1].split(",")}
-    sys.exit(render_all(Path(sys.argv[1]).resolve(), only))
+    sys.exit(render_all(Path(sys.argv[1]).resolve(), only, "--force" in sys.argv))

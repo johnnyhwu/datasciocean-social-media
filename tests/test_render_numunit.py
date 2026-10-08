@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RENDER = ROOT / ".claude/skills/make-social-post/scripts/render.py"
 CHECK = "標題的數字與單位不拆成兩行"
 SPEC = {
-    "series": "jev-cascade", "concept": "jev-cascade-overview", "lang": "zh-TW",
+    "series": "jev-cascade", "concept": "render-test", "lang": "zh-TW",
     "slides": [{
         "layout": "chart_bars", "title": "中位延遲：串接 1.87 秒，GPT-6 單獨 1.91 秒", "body": "前瞻實驗兩個任務合計",
         "unit": "秒", "note": "延遲單位：秒",
@@ -26,7 +26,7 @@ SPEC = {
 
 
 HYPHEN_SPEC = {
-    "series": "jev-cascade", "concept": "jev-cascade-overview", "lang": "zh-TW",
+    "series": "jev-cascade", "concept": "render-test", "lang": "zh-TW",
     "slides": [{"layout": "context", "title": "一個便宜又快，一個難題強但費用高",
                 "body": "JEV 是 TypeSafe AI 的託管模型，只輸出判決與機率，便宜、快；GPT-6 是推理型\u00a0Judge，難題上比較強，但費用高、速度慢。"}],
 }

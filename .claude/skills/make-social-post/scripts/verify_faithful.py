@@ -1,6 +1,6 @@
 """驗證忠實者輸出（references/review-loop.md）：引用必須逐字出現在觀念卡；依分級規則彙整。
 
-用法：uv run python .claude/skills/make-social-post/scripts/verify_faithful.py <card.md> <faithful.json>
+用法：uv run python .claude/skills/make-social-post/scripts/verify_faithful.py <card.md>[,<card2.md>] <faithful.json>
 分級同 verify_audit.py（references/review-loop.md「分級退回」）：
   擋下：不支持／找不到、引用捏造（審查者的錯，改列備註）、錯誤屬於
         範圍被放大、限定條件掉了、夾帶卡上沒有的判斷、數字對不上、因果說得比卡強、
@@ -23,11 +23,12 @@ VERDICTS = {"完全支持", "部分支持", "不支持", "找不到"}
 
 
 def main(card_path: str, out_path: str) -> int:
-    card = W.parse_card(Path(card_path))
+    # card_path 可以是多張卡，用逗號分隔（雙卡貼文）
+    claims = [c for p in card_path.split(",") for c in W.parse_card(Path(p.strip())).claims]
     card_norm = W.normalize(" ".join(
-        [c["text"] for c in card.claims]
-        + [q for c in card.claims for q in c.get("source_quotes", [])]
-        + [str(x.get("text", "")) + " " + str(x.get("source_quote", "")) for c in card.claims for x in c.get("qualifiers", [])]))
+        [c["text"] for c in claims]
+        + [q for c in claims for q in c.get("source_quotes", [])]
+        + [str(x.get("text", "")) + " " + str(x.get("source_quote", "")) for c in claims for x in c.get("qualifiers", [])]))
     data = json.loads(Path(out_path).read_text(encoding="utf-8"))
     blockers, notes = [], []
     for b in data.get("blocks", []):

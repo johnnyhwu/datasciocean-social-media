@@ -1,6 +1,7 @@
 """由 spec.json 產生發布包裡「人看的檔案」與「審查用的檔案」，並更新索引。
 
-用法：uv run python .claude/skills/make-social-post/scripts/build_package.py out/<series>/<concept>/_build/spec.json
+用法：uv run python .claude/skills/make-social-post/scripts/build_package.py out/<series>/<concept>/_build/spec.json [--force]
+已發布的貼文預設拒絕（--force 才重組）。
 
 輸出（發布包 out/<series>/<concept>/）：
   README.md              這則貼文的唯一入口：縮圖、檢查結果、要看哪些檔案、發布前後待辦
@@ -25,13 +26,25 @@ import yaml
 import cardlib as W
 
 CONTENT = {"text", "table", "chart_bars", "chart_sounding"}
+# 投影片欄位白名單：文字內容欄位都必須輸出到審查文字與 ig/post.md；版面參數不輸出。遇到不認得的欄位就報錯，
+# 避免「新增欄位、卻漏了輸出」（審查者與人都看不到那段內容）。
+CONTENT_KEYS = {"title", "body", "label", "question", "rows", "bars", "note", "nav"}
+LAYOUT_KEYS = {"layout", "refs", "quals", "unit", "key_w", "subs_inline", "current"}
+
+
+def check_fields(d: dict) -> None:
+    bad = [(i, k) for i, sl in enumerate(d["slides"], 1) for k in sl if k not in CONTENT_KEYS | LAYOUT_KEYS]
+    if bad:
+        raise ValueError(f"投影片有不認得的欄位（要新增欄位，請先讓 build_package 輸出它並加測試）：{bad}")
 LAYOUT_NAME = {"cover": "封面", "context": "脈絡", "text": "文字", "table": "對照表", "chart_bars": "橫條圖",
                "chart_sounding": "測深圖", "takeaway": "帶走", "series_map": "系列地圖"}
 mark = lambda s: re.sub(r"\[\[(.+?)\]\]", r"\1", s)
 
 
 def first_clause(s: str) -> str:
-    return re.split(r"[；。]", s)[0]
+    """補充的第一個子句；太長就不放（不截斷成「…」）。"""
+    c = re.split(r"[；。]", s)[0]
+    return c if len(c) <= 24 else ""
 
 
 def caption_text(d: dict) -> str:
@@ -39,7 +52,9 @@ def caption_text(d: dict) -> str:
     lines = [cap["first"], ""]
     for sl in d["slides"]:
         if sl["layout"] in CONTENT:
-            lines.append(f"・{mark(sl['title'])}（{first_clause(sl.get('body', ''))}）")
+            fc = first_clause(sl.get("body", ""))
+            lead = f"{sl['label']}：" if sl.get("label") else ""     # 部落格判斷要標「我的判斷」，caption 也一樣
+            lines.append(f"・{lead}{mark(sl['title'])}" + (f"（{fc}）" if fc else ""))
     lines += ["", cap["nav"], "", " ".join("#" + h for h in cap["hashtags"])]
     return "\n".join(lines)
 
@@ -49,13 +64,15 @@ def slide_lines(sl: dict, with_refs: bool) -> list[str]:
     out = [f"版型：{sl['layout']}"]
     if sl.get("label"):
         out.append(f"小標籤：{sl['label']}")
+    if sl.get("question"):
+        out.append(f"先問的問題：{sl['question']}")
     out.append(f"主標：{mark(sl.get('title', ''))}")
     if sl.get("body"):
         out.append(f"補充：{sl['body']}")
     for r in sl.get("rows", []):
         out.append(f"表列：{r[0]}｜{r[1]}")
     if sl.get("bars"):
-        out.append(f"圖表單位：{sl.get('unit', '')}（軸從 0 起；繩長或橫條長度與數值成正比）")
+        out.append(f"圖表單位：{sl.get('unit') or '無單位'}（軸從 0 起；繩長或橫條長度與數值成正比）")
         for b in sl["bars"]:
             out.append(f"圖表項目：{b['name']}｜{'／'.join(b.get('subs', []))}｜{b['value']:g} {sl.get('unit', '')}" + ("｜強調" if b.get("emphasize") else ""))
     if sl.get("note"):
@@ -104,10 +121,14 @@ def ig_md(d: dict, title: str, series_name: str | None, alts: dict) -> str:
         elif sl["layout"] == "takeaway":
             if sl.get("label"):
                 L.append(f"- **小標籤**：{sl['label']}")
+            if sl.get("question"):
+                L.append(f"- **先問的問題**：{sl['question']}")
             L.append(f"- **一句話**：{mark(sl['title'])}")
         elif sl["layout"] == "series_map":
             L += [f"- **主標**：{mark(sl['title'])}", f"- **導流行**：{sl.get('nav', '')}"]
         else:
+            if sl.get("label"):
+                L.append(f"- **小標籤**：{sl['label']}")
             L.append(f"- **主標**：{mark(sl['title'])}")
             if sl.get("body"):
                 L.append(f"- **補充**：{sl['body']}")
@@ -136,7 +157,7 @@ def threads_md(d: dict, title: str) -> str:
 
 
 def state_of(concept: str) -> dict:
-    f = W.ROOT / "state" / f"{concept}.yaml"
+    f = W.STATE_DIR / f"{concept}.yaml"
     d = (yaml.safe_load(f.read_text(encoding="utf-8")) if f.exists() else None) or {}
     return {k: (v or {}).get("status", "not_tried") for k, v in (d.get("formats") or {}).items()}
 
@@ -162,7 +183,7 @@ def readme_md(d: dict, title: str, series: dict | None, pack: Path, build: Path)
     L = [f"# {title}", "",
          "| 項目 | 內容 |", "|---|---|",
          f"| 系列 | {series['name'] if series else '（獨立貼文）'} |",
-         f"| 觀念 | `{d['concept']}`（卡：`concept-wiki/wiki/concepts/{d['concept']}.md`） |",
+         f"| 觀念 | `{d['concept']}`（卡：`concept-wiki/wiki/concepts/{d['concept']}.md`）" + "".join(f"；併入 `{o}`" for o in d.get("also_concepts") or []) + " |",
          f"| hook 樣態 | {d['hook']['style']} |",
          f"| IG 輪播 | {STATUS_ZH.get(st.get('ig_carousel', 'not_tried'), st.get('ig_carousel'))}（{len(d['slides'])} 張） |",
          f"| Threads 串文 | {STATUS_ZH.get(st.get('threads_thread', 'not_tried'), st.get('threads_thread'))}（{len(d['threads']['items']) + 2} 則） |", "",
@@ -206,7 +227,7 @@ def indexes() -> None:
             any_pack |= has
             link = f"[README]({c}/README.md)" if has else "（還沒做）"
             ig, th = (STATUS_ZH.get(st.get(f, "not_tried"), "?") for f in ("ig_carousel", "threads_thread"))
-            rows.append(f"| {i} | `{c}` | {m['planned_title']} | {ig} | {th} | {link} |")
+            rows.append(f"| {i} | `{c}`" + "".join(f"＋`{o}`" for o in m.get("also") or []) + f" | {m['planned_title']} | {ig} | {th} | {link} |")
             if "ready" in st.values():
                 ready_lines.append(f"- {s['name']} 第 {i} 則：[{m['planned_title']}]({sid}/{c}/README.md)")
         if any_pack:
@@ -217,8 +238,10 @@ def indexes() -> None:
     (out / "README.md").write_text("\n".join(top) + "\n", encoding="utf-8")
 
 
-def build(spec_path: Path) -> None:
+def build(spec_path: Path, force: bool = False) -> None:
     d = json.loads(spec_path.read_text(encoding="utf-8"))
+    W.guard_published(d, force)
+    check_fields(d)
     pack, bld = W.pack_dir(spec_path), W.build_dir(spec_path)
     card = W.parse_card(W.WIKI / "wiki" / "concepts" / f"{d['concept']}.md")
     series = load_series(d.get("series"))
@@ -239,4 +262,4 @@ def build(spec_path: Path) -> None:
 
 
 if __name__ == "__main__":
-    build(Path(sys.argv[1]).resolve())
+    build(Path(sys.argv[1]).resolve(), "--force" in sys.argv)

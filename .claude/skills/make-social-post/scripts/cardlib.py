@@ -30,6 +30,42 @@ WIKI = Path(os.environ.get("DSO_CONCEPT_WIKI") or ROOT / "concept-wiki")
 SERIES_DIR = Path(os.environ.get("DSO_SERIES_DIR") or ROOT / "series")
 
 
+# state/ 目錄；DSO_STATE_DIR 只給測試用
+STATE_DIR = Path(os.environ.get("DSO_STATE_DIR") or ROOT / "state")
+
+
+def published_formats(concept: str) -> list[str]:
+    """這個觀念已經發布的格式（state/<concept>.yaml）。併入別張卡的（merged_into）也算。"""
+    f = STATE_DIR / f"{concept}.yaml"
+    if not f.exists():
+        return []
+    d = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+    return [k for k, v in (d.get("formats") or {}).items() if (v or {}).get("status") == "published"]
+
+
+def guard_published(doc: dict, force: bool = False) -> None:
+    """已發布的貼文，渲染與組包預設拒絕（會覆寫已發布貼文在本機的圖與文字檔）；確定要重做才加 --force。"""
+    pub = published_formats(doc["concept"])
+    if pub and not force:
+        raise SystemExit(f"拒絕：{doc['concept']} 已發布（{', '.join(pub)}），重新渲染或組包會覆寫它在本機的圖與文字檔。"
+                         "確定要重做（例如改版型後讓 template hash 一致）請加 --force，並先確認只有預期的檔案會變。")
+
+
+def series_lock_warning(series_id: str | None, concept: str) -> str | None:
+    """系列的第一則發布前，成員清單（含合併）必須定案：IG 系列地圖發布後改不了。series.md 要有 members_locked: true。"""
+    if not series_id or not series_file(series_id).exists():
+        return None
+    m = re.match(r"^---\n(.*?)\n---", series_file(series_id).read_text(encoding="utf-8"), re.S)
+    s = yaml.safe_load(m.group(1)) or {}
+    if s.get("members_locked"):
+        return None
+    for mem in s.get("members") or []:
+        if published_formats(mem["concept"]):
+            return None      # 已有成員發布過（沒有鎖定欄位的舊系列），不再提醒
+    return (f"系列 {series_id} 的成員清單還沒定案：第一則發布後，IG 系列地圖的圖就改不了。"
+            "請先確認成員與合併都定案，並在 series/<id>/series.md 加 members_locked: true")
+
+
 def series_dir(sid: str) -> Path:
     """一個系列的所有東西都在 series/<id>/：series.md、philosophy.md、templates/。"""
     return SERIES_DIR / sid
@@ -144,6 +180,16 @@ def parse_card(path: Path) -> Card:
             found = True
             claims = data.get("claims") or []
     return Card(Path(path), front, claims, [] if found else ["找不到含 claims 的 ```yaml 區塊"])
+
+
+def spec_claims(doc: dict) -> dict[str, dict]:
+    """一則貼文引用得到的所有主張。主卡（doc["concept"]）用裸 id（c1）；併入的卡（doc["also_concepts"]）
+    用「卡id:cN」，例如 confidence-three-metrics:c3。限定條件標記也一樣加前綴（卡id:c3#1）。"""
+    out = {c["id"]: c for c in parse_card(WIKI / "wiki" / "concepts" / f"{doc['concept']}.md").claims}
+    for other in doc.get("also_concepts") or []:
+        for c in parse_card(WIKI / "wiki" / "concepts" / f"{other}.md").claims:
+            out[f"{other}:{c['id']}"] = c
+    return out
 
 
 def load_all_cards() -> list[Card]:

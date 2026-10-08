@@ -9,6 +9,14 @@
 | `bound_to_source`、`evidence_from_single_source` | 預設組成系列（同一篇文章的觀念） |
 | `standalone_classic` | 預設獨立 post |
 | 系列只剩一則 | 視為獨立 post |
+| 兩張卡互相依賴、分開發都不好懂 | **由人決定**合成一則（雙卡貼文，spec 與 state 的做法見 `spec-json.md`「雙卡貼文」）。例：`judge-readable-vs-derive` 後半要用到 AUROC，AUROC 在 `confidence-three-metrics` 才定義 |
+
+### 規劃系列時一定要問人：哪些卡要合併？（B1）
+
+做系列規劃（決定成員與發文順序）時，**一定要走這一步，不論腳本有沒有信號**：
+1. 跑 `uv run python .claude/skills/make-social-post/scripts/series_deps.py <系列 id>`，列出候選（重複的主張、用到對方主題術語…）。**它不是偵測器**：2026-10-08 實測，它挑不出我們後來合併的那一對，真正的理由靠讀者角度判斷。
+2. 用讀者的角度逐則看：這則的圖上會出現哪些術語？各在哪一則定義？只要有兩個以上的關鍵術語要靠別則才懂，或兩則的後半段在講同一件事，就是合併候選。
+3. 把候選與你的建議用白話交給人決定（合併、調整發文順序、維持分開）；合併做法見 `spec-json.md`「雙卡貼文」。
 
 ## 2. 系列檔 `series/<series-id>/series.md`（同資料夾還有 `philosophy.md`、`templates/`）
 
@@ -21,8 +29,11 @@ members:                         # 發文順序
   - concept: jev-cascade-overview
     planned_title: 便宜的 Judge 先判，沒把握才轉給 GPT-6
 hashtag: DSO_LLMJudge
+members_locked: true             # 第 1 則發布前定案（含合併）
 status: planning                 # planning | publishing | done
 ```
+
+**成員清單（含哪些卡合併）要在第 1 則發布前定案**，並加 `members_locked: true`：IG 系列地圖發布後改不了圖（2026-10-08 的教訓：第 1 則已發布才決定合併，第 1 則的系列地圖永遠列著舊的 5 則）。`ig_publish.py`、`threads_publish.py` 的 dry-run 會在還沒鎖定、也沒有成員發布過時警告。
 
 `planned_title` 在系列規劃時就定下，系列地圖與 Threads 最後一則都用它。獨立 post 沒有系列檔。系列檔、視覺哲學與模板都在本 repo；**觀念卡在 concept-wiki submodule，不得修改**。
 

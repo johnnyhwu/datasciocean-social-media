@@ -29,7 +29,7 @@ import yaml
 
 import cardlib as W
 
-STATE = W.ROOT / "state"
+STATE = W.STATE_DIR
 FORMATS = ["ig_carousel", "threads_thread"]
 STATUSES = {"not_tried", "ready", "published", "unsuitable"}
 BACKFILL_HOW = {
@@ -57,6 +57,16 @@ def save(d: dict) -> None:
     path_of(d["concept"]).write_text(yaml.safe_dump(d, allow_unicode=True, sort_keys=False), encoding="utf-8")
 
 
+def also_of(concept: str) -> list[str]:
+    """這個觀念的貼文併入了哪些其他卡（系列檔成員的 also）。併入的卡不單獨發文，狀態跟著主卡走。"""
+    for sf in W.SERIES_DIR.glob("*/series.md") if W.SERIES_DIR.exists() else []:
+        s = yaml.safe_load(re.match(r"^---\n(.*?)\n---", sf.read_text(encoding="utf-8"), re.S).group(1))
+        for m in s.get("members") or []:
+            if m["concept"] == concept:
+                return list(m.get("also") or [])
+    return []
+
+
 def concept_ids() -> list[str]:
     return [c.front["id"] for c in W.load_all_cards()]
 
@@ -68,9 +78,11 @@ def status() -> None:
     for cid, c in cards.items():
         d = load(cid)
         thesis = next(x["text"] for x in c.claims if x["role"] == "thesis")[:40]
-        cells = [(d["formats"].get(f) or {}).get("status", "not_tried") for f in FORMATS]
+        cells = [(d["formats"].get(f) or {}).get("status", "not_tried") + (
+            f"（併入 {d['formats'][f]['merged_into']}）" if (d["formats"].get(f) or {}).get("merged_into") else "") for f in FORMATS]
         print(f"| {cid} | {thesis} | " + " | ".join(cells) + " |")
-    ready = sum(1 for cid in cards if any((v or {}).get("status") == "ready" for v in load(cid)["formats"].values()))
+    ready = sum(1 for cid in cards if any((v or {}).get("status") == "ready" and not (v or {}).get("merged_into")
+                                          for v in load(cid)["formats"].values()))
     print(f"\n存量（ready）：{ready} 則")
 
 
@@ -80,6 +92,11 @@ def set_format(concept: str, fmt: str, **fields) -> None:
     d = load(concept)
     d["formats"][fmt] = fields
     save(d)
+    for other in also_of(concept):      # 併入的卡：狀態同步，標明併入哪一則（不計入存量）
+        assert other in concept_ids(), f"併入的觀念不存在：{other}"
+        o = load(other)
+        o["formats"][fmt] = {**fields, "merged_into": concept}
+        save(o)
 
 
 def record(concept: str, fmt: str, url: str, published_at: str, series_id: str | None, hook_type: str | None,
@@ -91,6 +108,10 @@ def record(concept: str, fmt: str, url: str, published_at: str, series_id: str |
                        "published_at": published_at, "hook_type": hook_type, "mentions": mentions, "backfilled": []})
     d["formats"][fmt] = {"status": "published"}
     save(d)
+    for other in also_of(concept):      # 併入的卡：標為已發布，但不另記一筆貼文（網址只記在主卡，回補清單才不會重複）
+        o = load(other)
+        o["formats"][fmt] = {"status": "published", "merged_into": concept}
+        save(o)
     backfill()
 
 
