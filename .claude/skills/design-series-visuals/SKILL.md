@@ -8,7 +8,7 @@ description: 設計 IG 輪播與 Threads 附圖的視覺：新系列的視覺哲
 日常做貼文時模板已經存在，直接用 `make-social-post`。只有下列情況才用這個 skill：
 
 - 開一個**新系列**（需要新的視覺哲學、系列色、模板與樣張）
-- 新增或改**版型／圖表類型**（例如折線圖、流程圖，目前只有橫條圖、測深圖、對照表、純文字版型）
+- 新增或改**版型／圖表類型**（例如折線圖、流程圖、堆疊條、散布圖；目前有橫條圖、成對橫條圖、測深圖、對照表、純文字、名詞表、帶走、系列地圖）。**選圖與評圖的想法在 `chart-thinking` skill**，新圖型先讀它再做
 - 調整品牌常數、字級、對比度規則
 
 ## 設計之前必讀
@@ -16,7 +16,7 @@ description: 設計 IG 輪播與 Threads 附圖的視覺：新系列的視覺哲
 1. `references/principles.md`：IG 圖片設計原則（先哲學後畫面、暗藏主題參照、文字是視覺元素、工藝感、不重疊不出框、最後一步只減不加、多張是同一哲學的變奏）。
 2. `references/brand-and-layouts.md`：畫布與邊界、品牌色與字型字級、對比度、八種版型、依內容選圖、測深圖。
 3. `references/series-philosophy-and-templates.md`：兩層視覺哲學、模板怎麼來、做新系列的步驟。
-4. 想看範例：現行的 `series/jev-cascade/`（`philosophy.md`「潮線」、`templates/`、`series.md`），以及 `out/jev-cascade/jev-cascade-overview/` 的成品。
+4. 想看範例：現行的 `series/jev-cascade/`（`philosophy.md`「潮線」、`templates/`、`series.md`），以及 `out/jev-cascade/cascade-complementary-errors/` 的成品（最新的品質基準）。
 5. 需要原始設計哲學時再讀 `references/canvas-design-original.md`（上游 skill 原文；授權見 `references/canvas-design-LICENSE.txt`）。
 
 ## 鐵則
@@ -31,5 +31,5 @@ description: 設計 IG 輪播與 Threads 附圖的視覺：新系列的視覺哲
 ## 做完要驗證什麼
 
 - 程式 B 全過（`make-social-post` 的 `render.py`；檢查項目見它的 `references/program-b.md`）。新增檢查要用「故意做壞的版本」確認抓得到。
-- 重渲既有發布包，PNG 的 md5 應與先前相同（除非你有意改版面）。
+- 重渲既有的**未發布**發布包，PNG 的 md5 應與先前相同（除非你有意改版面）。**已發布的貼文不要 `--force` 重渲到 repo**（會改本機的圖，和網路上對不上）；要驗證確定性，複製到暫存目錄再渲。
 - 用 `make-social-post/scripts/contact_sheet.py` 拼縮圖給人看。

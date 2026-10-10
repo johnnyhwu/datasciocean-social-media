@@ -23,6 +23,8 @@ P=out/<系列>/<觀念>                              # 要發的發布包資料�
 
 **每一個 `--confirm` 之前，都要先把 dry-run 的結果用白話給人看，等人明確說「發」。不可以在同一輪裡自己決定發。不可以用真實貼文做測試；測試用專用的測試包與 `--no-record`，測完把測試包刪掉。**
 
+**人一次授權整串（2026-10-10 人同意）**：人在同一則訊息明確說「prepare、push `ig/jpg/`、發佈到兩個平台」（或等義）時，視為已經說了「發」和同意 push，可以連續執行：前提檢查 → `prepare` → push `ig/jpg/`（只 add 這個資料夾）→ IG 預檢 → IG dry-run → IG `--confirm` → Threads dry-run → Threads `--confirm`。**每一個 dry-run 都還是要跑、要看**；只要出現 `problems`、`warnings`、圖片網址抓不到、額度不足，或內容和人確認的不一樣，就**停下來問人**。人只說「ready」或「準備發」不算授權發布。
+
 | # | 做什麼 | 指令 | 誰 |
 |---|---|---|---|
 | 1 | 把投影片轉成 IG 與 Threads 都能用的 JPEG，驗證官方限制 | `ig_publish.py prepare $P` | Claude |

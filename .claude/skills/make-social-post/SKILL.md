@@ -22,7 +22,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 ```
 [1] 選觀念、系列規劃 → [2] hook 候選（人挑）→ [3] 寫內容規格 spec.json
  → [4] 程式 A（check_a）→ [5] 渲染 + 程式 B（render）→ [6] 組發布文字（build_package）
- → [7] 自檢 + 審查：忠實者（嚴格）、工程師讀者、編輯（只給建議）→ [8] 批次層檢查（batch_check）
+ → [7] 自檢 + 審查：忠實者（嚴格）、讀者（預設一般讀者，要看圖）、編輯（只給建議，要看圖）→ [8] 批次層檢查（batch_check）
  → [9] 人最後確認 → [10] state.py ready → [11] 發布到 IG 與 Threads（人確認後）→ 寫回狀態
 ```
 
@@ -31,17 +31,17 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | 步驟 | 做什麼 | 細節 |
 |---|---|---|
 | 1 | 選觀念、決定獨立或系列、系列檔 | `references/batch-and-publish.md` §1–3 |
-| 2 | 5～6 個大膽的 hook 候選（至少 3 種樣態），最多一次 haiku 讀者參考，**用 AskUserQuestion 讓人挑** | `references/hooks.md` |
-| 3 | **先做版型規劃**（每張選好版型、圖上術語在哪張定義，`references/ig-carousel.md` §0），再寫 `out/<series>/<concept>/_build/spec.json`：投影片、Threads、caption、每個區塊標引用的 claim id | `references/spec-json.md`、`references/ig-carousel.md`、`references/threads-and-caption.md`、`references/anchor-writing-rules.md` |
+| 2 | 5～6 個大膽的 hook 候選（至少 3 種樣態），最多一次 haiku 讀者參考，**用純文字列出完整候選讓人挑（不用 AskUserQuestion）** | `references/hooks.md` |
+| 3 | **先做版型規劃**（每張選好版型、圖上術語在哪張定義，`references/ig-carousel.md` §0；**每張帶數字的圖先用 `chart-thinking` skill 想過：要比什麼、圖有沒有直接支撐主標**），再寫 `out/<series>/<concept>/_build/spec.json`：投影片、Threads、caption、每個區塊標引用的 claim id | `references/spec-json.md`、`references/ig-carousel.md`、`references/threads-and-caption.md`、`references/anchor-writing-rules.md` |
 | 4 | `check_a.py <spec.json>`，ERROR 清零 | `references/program-a.md` |
 | 5 | `render.py <spec.json>`，程式 B 全過；`contact_sheet.py <發布包資料夾>` 拼縮圖；**自己看一次渲染後的 PNG** | `references/program-b.md` |
 | 6 | （在 `contact_sheet.py` 之後）`build_package.py <spec.json>`：產生人看的 `README.md`、`ig/post.md`、`threads/post.md`、審查用的 `_build/post-with-refs.md`／`post-reader.md`，並更新 `out/README.md` 索引 | `references/threads-and-caption.md` |
-| 7 | **先照 `references/self-check.md` 自檢**，再派忠實者、工程師讀者、編輯；`verify_faithful.py`、`verify_reader.py` | `references/review-loop.md`、`references/self-check.md` |
+| 7 | **先照 `references/self-check.md` 自檢**，再派忠實者、讀者（一般讀者，附圖）、編輯（附圖）；`verify_faithful.py`、`verify_reader.py` | `references/review-loop.md`、`references/self-check.md` |
 | 8 | `batch_check.py <spec>...`（參數順序 = 預計發文順序） | `references/batch-and-publish.md` §4 |
 | 9–10 | 給人看貼文 `README.md`（含縮圖）、`ig/post.md`、`threads/post.md`，確認後 `state.py ready <觀念> <格式> <發布包>`（兩個格式各一次） | `references/batch-and-publish.md` §5–6 |
 | 11 | **發布**：`prepare` → push `ig/jpg/` → IG `preflight` → IG dry-run → 人說「發」→ `--confirm` → Threads dry-run → 人說「發」→ `--confirm`；成功後自動寫回 state | **`references/publish-flow.md`**（照做）、`references/instagram-publish.md`、`references/threads-publish.md` |
 
-第一次是新系列時，先用 `design-series-visuals` 把視覺哲學與六種版型的樣張做出來、**由人審過**才量產。系列已有模板就直接用，同一系列的所有貼文用同一版模板。
+第一次是新系列時，先用 `design-series-visuals` 把視覺哲學與各版型的樣張做出來、**由人審過**才量產。系列已有模板就直接用，同一系列的所有貼文用同一版模板。
 
 ## 新增格式（Reels、Shorts…）
 
@@ -55,7 +55,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | `render.py` | 渲染引擎與程式 B：spec.json + 系列模板 → 1080×1350 PNG，並做版面檢查，寫 `_build/checks-b.json`、`alt-text.json` |
 | `build_package.py` | 由 spec.json 產生人看的入口（`README.md`、`ig/post.md`、`threads/post.md`）、審查用貼文文字，並更新 `out/README.md` 與系列索引 |
 | `contact_sheet.py` | 把投影片拼成縮圖總覽 |
-| `verify_faithful.py`、`verify_reader.py` | 驗證忠實者／工程師讀者的 JSON：引用逐字出自卡或貼文、分級、陷阱題 |
+| `verify_faithful.py`、`verify_reader.py` | 驗證忠實者／讀者的 JSON：引用逐字出自卡或貼文、分級、陷阱題 |
 | `batch_check.py` | 批次層檢查：相鄰 hook 樣態、相鄰系列色、模板 hash、標題一致、存量 |
 | `ig_publish.py`、`ig_api.py` | IG 官方 API 發佈：prepare／preflight／publish（dry-run 預設，`--confirm` 才發）、token 管理 |
 | `threads_publish.py`、`threads_api.py` | Threads 官方 API 發佈整串：publish／rollback／delete／token-info（dry-run 預設；中途失敗可續發） |

@@ -1,6 +1,6 @@
 # 內容規格 JSON（`out/<series>/<concept>/_build/spec.json`）
 
-LLM 只產出這份 JSON；外觀完全由模板決定。範例：`out/jev-cascade/judge-readable-vs-derive/_build/spec.json`（現行品質基準：雙卡貼文，版型用滿、口語白話、先問再答；舊的 `jev-cascade-overview` 是第一版，只當歷史參考）。
+LLM 只產出這份 JSON；外觀完全由模板決定。範例：`out/jev-cascade/cascade-complementary-errors/_build/spec.json`（現行品質基準：雙卡貼文，口語白話、讀者不需要 AI 背景、成對橫條圖、「第一關／第二關」標籤；`judge-readable-vs-derive` 是前一個基準；`jev-cascade-overview` 的寫法已過時，不要參考）。
 `build_package.py` 有投影片欄位白名單：spec 出現不認得的欄位就報錯，避免新欄位漏了輸出。要新增欄位，先在 `build_package.py` 的 `CONTENT_KEYS`／`LAYOUT_KEYS` 加上、讓它輸出到審查文字與 `ig/post.md`，並補測試。
 
 ## 頂層
@@ -46,17 +46,18 @@ caption 第一句用 `first_refs`。`refs` 只證明「有對應」，不證明�
 
 ## slides[]
 
-共同欄位：`layout`、`title`（主標，結論句）、`body`（補充）、`refs`、`quals`。
+共同欄位：`layout`、`title`（主標，結論句）、`body`（補充）、`refs`、`quals`。`label`（右上角小標籤）除了「我的判斷」，也用來標分段（例如「第一關」「第二關」）；標題已經以同樣的詞開頭時，caption 逐張摘要不會重複前綴。
 
 | layout | 用途 | 專屬欄位 |
 |---|---|---|
 | `cover` | 第 1 張 | `title`（hook 主標）、`body`（hook 副標） |
-| `context` | 第 2 張，名詞表 | `body` 最多 140 字（`context_body_max_chars`）；選用 `rows`、`key_w`：補充下面放名詞對照表 |
+| `context` | 第 2 張，名詞表 | `body` 最多 140 字（`context_body_max_chars`）；選用 `rows`、`key_w`：補充下面放名詞對照表（補充 1 行時表從 y≈470 起，總共約 9～10 行文字放得下；要解釋的詞多於 3 個就要拆到別張或精簡）。圖上會出現的專有名詞（含 Judge、題庫名稱）要在這一張或更早的張定義 |
 | `text` | 機制、限制、評價 | `body` 40～110 字（`body_chars`，約 5 行）；選用 `label`（右上角小標籤，例如「我的判斷」） |
-| `table` | 兩欄對照（最多 3 列） | `rows: [["鍵","值"], …]`（最多 4 列；鍵最多約 7 個字，否則溢出；鍵可寫「主｜小字」把指標名稱排在下面；`key_w` 調鍵欄寬，預設 300）、`note`（選用，圖註）；`body` 最多 2 行（46 字內，`chart_body_max_chars`）；選用 `label` |
+| `table` | 兩欄對照（最多 4 列） | `rows: [["鍵","值"], …]`（鍵最多約 7 個字，否則換行；鍵可寫「主｜小字」把指標名稱排在下面；`key_w` 調鍵欄寬，預設 300；值很長時把 `key_w` 調小、值欄變寬）、`note`（選用，圖註，單行約 32 字內）；`body` 最多 110 字（`chart_body_max_chars`，約 5 行；表會往下讓位，總高度要放得下，不然程式 B 的「不超出版面下緣」會擋）；選用 `label` |
 | `chart_bars` | 橫條圖（米色底） | `unit`、`bars`、`note`；`body` 可到約 4 行（圖會往下讓位）；選用 `label`；`subs_inline: true` 把副標籤接在名稱後面同一行（3 條時間距自動拉開；4 條橫條不要用 subs 或要用 inline） |
+| `chart_bars`（**成對橫條圖**） | 同一批對象的兩個量一起看（同單位，例如每個任務的「轉出比例」與「費用」） | 每個 bar 多一個 `value2`；spec 多 `legend: ["第一個量","第二個量"]`（圖上方的圖例）、選用 `axis_max`（比例尺的滿格，例如 100）。兩個量共用同一個 0 起點與比例尺，不用雙軸；第一個量 MID、第二個量深海色，**不用金色**；`bars[].subs` 是名稱下面的小字（例如該任務的準確度），每組最多 1 行；`body` 最多 3 行、4 組，不然放不下。`emphasize` 在這個版型不用 |
 | `chart_sounding` | 測深圖（深色海面面板，最多 3 條繩） | `unit`、`bars`、`note`；`body` 最多 2 行；選用 `label` |
-| `takeaway` | 倒數第二張，深海底金色字，一句話 | `title`（一句話，字最大）、`question`（選用：先問的問題，較小的米色字，約 2 行內）、`label`（選用小字） |
+| `takeaway` | 倒數第二張，深海底金色字，一句話 | `title`（一句話，字最大；內含 `\n` 會換行，適合「第一關／第二關」這類並列結論，最多 4 行）、`question`（選用：先問的問題，較小的米色字，約 2 行內）、`label`（選用小字） |
 | `series_map` | 最後一張（獨立 post 為「延伸閱讀」） | `current`（本則的 concept id）、`nav`（導流行）；標題清單由系列檔的 `planned_title` 自動填，不要自己寫 |
 
 `bars[]` 的每一項：`{"name": "官網頭條", "subs": ["速度，最佳案例", "對比前沿大模型"], "value": 193.6, "emphasize": true}`。`emphasize` 全圖只能有一個；圖上所有名稱與數字都要被引用的主張涵蓋；軸從 0 起，長度與數值成正比（由程式計算）。

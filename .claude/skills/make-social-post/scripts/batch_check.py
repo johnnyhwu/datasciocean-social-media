@@ -5,7 +5,7 @@
 檢查（references/batch-and-publish.md §4）：
   1. 相鄰兩則的 hook 樣態不同
   2. 相鄰兩則若屬不同系列，系列封面色不同
-  3. 同一系列的貼文用同一版模板（template_hash 相同；讀各貼文 _build/ 裡的 checks-b.json）
+  3. 同一系列「還沒發布」的貼文用同一版模板（template_hash 相同；讀各貼文 _build/ 裡的 checks-b.json）；已發布的貼文不比對
   4. Threads 最後一則與系列地圖裡出現的「同系列：…」標題，必須等於該系列某個成員的 planned_title
   5. 存量：已有發布包（state 為 ready）的觀念數量低於 min_stock 就提醒；為 0 就暫停發文
 結束碼：1 有 ERROR；存量提醒是 WARN，不影響結束碼（存量不夠時是「暫停」而不是「失敗」）。
@@ -42,6 +42,8 @@ def main(specs: list[str]) -> int:
 
     by_series: dict[str, set] = {}
     for pa, a in docs:
+        if W.published_formats(a["concept"]):      # 已發布的貼文不重渲（網路上的圖已定），它記的模板版本是當時的，不比對
+            continue
         cb = pa.parent / "checks-b.json"
         if not cb.exists():
             err.append(f"{a['concept']}：沒有 checks-b.json（還沒渲染或程式 B 沒跑）")

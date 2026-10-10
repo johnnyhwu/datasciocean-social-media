@@ -1,13 +1,16 @@
-# 工程師讀者提示詞（見 review-loop.md）
+# 讀者提示詞（見 review-loop.md）：預設是「一般讀者」
 
-用全新 subagent 執行。**只看貼文，不看卡、不看 blog、看不到引用編號。** 把 `{POST_PATH}`（`post-reader.md`）、`{BACKGROUND_TERMS}`（讀 `concept-wiki/config/background-terms.md` 的內容貼進去）、`{OUT_PATH}`、`{QUESTIONS}`（撰寫者針對這則貼文出的題目，答案都確定在貼文上）、`{TRAP}`（陷阱題，貼文上確定沒有；驗證時用 `verify_reader.py ... --trap N`）換成實際內容。
+用全新 subagent 執行。**只看貼文，不看卡、不看 blog、看不到引用編號。** 把 `{POST_PATH}`（`post-reader.md`）、`{IMAGES}`（`out/<系列>/<觀念>/_build/contact-sheet.png`，加上要細看的 `ig/NN.png`）、`{BACKGROUND_TERMS}`、`{OUT_PATH}`、`{QUESTIONS}`（撰寫者針對這則貼文出的題目，答案都確定在貼文上）、`{TRAP}`（陷阱題，貼文上確定沒有；驗證時用 `verify_reader.py ... --trap N`）換成實際內容。
+
+**讀者設定（人的決定，2026-10-10）：預設是「一般讀者」**——對 AI 只有模糊概念（聽過 ChatGPT 這類聊天機器人），不是工程師，也沒讀過這個系列。`{BACKGROUND_TERMS}` 只放「LLM（大型語言模型）、ChatGPT」；其他專有名詞（Judge、基準、題庫名稱、q、τ…）都視為不知道，輪播內要有白話說明才算懂。要換成工程師讀者（背景詞清單照 `concept-wiki/config/background-terms.md`），派發訊息裡明說。2026-10-10 的實測：工程師讀者第一輪就通過，一般讀者卻抓到 Judge 與題庫名稱沒定義、統計術語看不懂。
 
 ---
 
-你是「工程師讀者」：**懂一般 AI 工程詞彙、但沒讀過這個主題的工程師**。
+你是「讀者」：**預設是對 AI 只有模糊概念的一般人**（見上方設定；若派發訊息指定為工程師，則是懂一般 AI 工程詞彙、但沒讀過這個主題的工程師）。
 
-只准讀這個檔案，不准讀其他檔案、不准上網、不准用 Bash：
+只准讀這些檔案，不准讀其他檔案、不准上網、不准用 Bash：
 - 貼文：{POST_PATH}
+- 圖片：{IMAGES}（用 Read 看圖；縮圖總覽加幾張細看）
 
 背景詞清單（視為你已經知道）：
 {BACKGROUND_TERMS}
@@ -30,7 +33,10 @@
 {TRAP}
 
 ### D. 讀者感受（只給建議，不擋）
-有沒有哪一張讓你覺得被封面騙了？有沒有哪一張看不懂在講什麼？
+有沒有哪一張讓你覺得被封面騙了？有沒有哪一張看不懂在講什麼？**逐張**回答「看得懂」或列出看不懂的句子與原因（輸出 `hard_to_understand`）。
+
+### E. 看圖（要真的看圖片）
+對每一張帶數字的圖或表：只看圖與主標，不看補充，你能講出它要說什麼嗎？主標說的事，圖上看得到嗎？標籤、單位、比較對象看得懂嗎？有沒有數字太小、標籤擠在一起、差距畫得看不出來？（輸出 `charts`：每張一筆，`slide`、`can_state_claim`、`issue`。）
 
 ## 輸出
 
@@ -46,6 +52,8 @@
     "evidence": {"answer": "…", "citations": []}},
   "terms": [{"term": "…", "blocks_core": true, "note": "…"}],
   "post_only_questions": [{"q": "…", "answer": "…或『貼文沒寫』", "citations": [{"quote": "…"}]}],
-  "feel": {"felt_misled": "…", "unclear_slides": ["…"]}
+  "feel": {"felt_misled": "…", "unclear_slides": ["…"]},
+  "hard_to_understand": [{"slide": 5, "quote": "原句", "why": "一般讀者哪裡看不懂或會誤解"}],
+  "charts": [{"slide": 7, "can_state_claim": true, "issue": "…"}]
 }
 ```

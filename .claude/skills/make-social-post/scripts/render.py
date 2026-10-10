@@ -64,6 +64,7 @@ def bind_nums(s: str) -> str:
     只在渲染時處理，spec 與 alt-text 保持原文。DSO_NO_NUMBIND=1 只給測試用（驗證程式 B 抓得到拆行）。"""
     if os.environ.get("DSO_NO_NUMBIND"):
         return s
+    s = re.sub(r"(?<=[A-Za-z0-9])-(?=[A-Za-z0-9])", "-⁠", s)     # GPT-6、GPT-5.6：連字號後不斷行（不然會拆成「GPT-／6」）
     s = re.sub(r"(?<=[0-9%]) +(?=[\u4e00-\u9fff])", "\u00a0", s)      # 27% 的、GPT-6 單獨、1.87 秒
     return re.sub(r"(?<=[\u4e00-\u9fff]) +(?=[0-9])", "\u00a0", s)    # 只轉 25%、費用 27%
 
@@ -110,8 +111,8 @@ def bob(x, y_end, col, v="", emph=False):
 def est_lines(txt: str, per_line: float) -> int:
     """模擬 word-break: keep-all：只在標點或空白後斷行，其餘中文連續串不可拆。per_line = 一行容納的全形字數。"""
     def width(t):
-        return sum(1 if ord(ch) > 127 else 0.55 for ch in t)
-    chunks = [c for c in re.split(r"(?<=[、，；,;。：:])|(?<=\s)", txt) if c]
+        return sum(0 if ch == "\u2060" else 0.35 if ch == "\u00a0" else 1 if ord(ch) > 127 else 0.55 for ch in t)
+    chunks = [c for c in re.split(r"(?<=[、，；,;。：:」』）])|(?<= )", txt) if c]
     lines, cur = 1, 0.0
     for c in chunks:
         w = width(c)
@@ -141,7 +142,7 @@ def table_block(rows: list, y0: float, key_w: int = 300) -> tuple[str, str, floa
         if sub:
             cells += f'<div class="t abs cell ks" style="left:80px;top:{y + 28 + 57}px;width:{key_w}px">{esc(sub)}</div>'
         cells += f'<div class="t abs cell" style="left:{vx}px;top:{y + 28}px;width:{vw}px">{esc(bind_nums(v))}</div>'
-        lines = max(est_lines(v, vw / 38 - 0.7), est_lines(main, key_w / 38 - 0.4) + (1 if sub else 0))
+        lines = max(est_lines(bind_nums(v), vw / 38 - 0.7), est_lines(main, key_w / 38 - 0.4) + (1 if sub else 0))   # 用綁定後的文字估：不斷行空格不能斷行
         y += 56 + lines * 57 + 8
     parts += f'<line class="g sep" x1="80" y1="{y}" x2="1000" y2="{y}" stroke="{DEEP}" stroke-width="2" opacity=".35"/>'
     return parts, cells, y
@@ -161,9 +162,10 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     if lay == "cover":
         kw["SVG"] = svg_wrap(waves(1000, sc))
         kw["SUB_TOP"] = 560
+        kw["BODY"] = kw["BODY"].replace("\n", "<br>")      # 副標可以用換行分成幾條
     elif lay == "context":
         if spec.get("rows"):      # 脈絡張也可以在補充下面放對照表（名詞表）
-            parts, cells, _ = table_block(spec["rows"], max(520, body_end(spec.get("body", ""), 40, 1.6) + 44), spec.get("key_w", 300))
+            parts, cells, _ = table_block(spec["rows"], max(470, body_end(spec.get("body", ""), 40, 1.6) + 44), spec.get("key_w", 300))
             kw["SVG"], kw["CELLS"] = svg_wrap(parts), cells
         else:
             kw["SVG"], kw["CELLS"] = "", ""
@@ -178,6 +180,40 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["SVG"] = svg_wrap(parts)
         kw["CELLS"] = cells
         kw["NOTE_BLOCK"] = (f'<div class="t abs note" style="left:80px;top:1196px">{esc(spec["note"])}</div>' if spec.get("note") else "")
+    elif lay == "chart_bars" and any("value2" in b for b in spec["bars"]):
+        # 成對橫條圖：每組（例如每個任務）兩條橫條，同一個 0 起點、同一個比例尺，用來看兩個量一起怎麼變
+        # （2026-10-10：「轉出比例」與「費用」要放在一起看，單一橫條圖看不出它們同步變動）。
+        bars = spec["bars"]
+        x0, maxlen = 430, 400
+        s = maxlen / spec.get("axis_max", max(max(b["value"], b["value2"]) for b in bars))
+        l1, l2 = spec["legend"]
+        y0 = max(500, body_end(spec.get("body", "")) + 44)
+        x2 = 120 + len(l1) * 28 + 60
+        svg = (f'<rect class="g deco" x="80" y="{y0 + 9}" width="28" height="28" fill="{MID}"/>'
+               f'<rect class="g deco" x="{x2}" y="{y0 + 9}" width="28" height="28" fill="{DEEP}"/>')
+        labels = (f'<div class="t abs legend" style="left:120px;top:{y0}px">{esc(l1)}</div>'
+                  f'<div class="t abs legend" style="left:{x2 + 40}px;top:{y0}px">{esc(l2)}</div>')
+        gy = y0 + 62
+        step = max(140.0, min(190.0, (1150 - gy) / len(bars)))
+        top, last_bottom = gy - 14, gy
+        for b in bars:
+            subs = b.get("subs", [])           # 名稱下面的小字（例如這個任務的準確度）；有小字時名稱上移
+            ny = gy + (2 if subs else 22)
+            labels += f'<div class="t abs name" style="left:80px;top:{ny}px">{esc(b["name"])}</div>'
+            for k_, sline in enumerate(subs):
+                labels += f'<div class="t abs sub" style="left:80px;top:{ny + 51 + k_ * 42}px">{esc(bind_nums(sline))}</div>'
+            for j, (v, col) in enumerate(((b["value"], MID), (b["value2"], DEEP))):
+                by = gy + j * 60
+                ln = v * s
+                svg += (f'<rect class="g bar" data-v="{v}" data-e="0" x="{x0}" y="{by}" width="{ln:.2f}" height="44" fill="{col}"/>')
+                labels += (f'<div class="t abs num2" style="left:{x0 + ln + 18:.1f}px;top:{by - 2}px;color:{DEEP}">'
+                           f'{v:g}{esc(spec.get("unit", ""))}</div>')
+                last_bottom = by + 44
+            gy += step
+        svg += f'<line class="g axis" x1="{x0}" y1="{top}" x2="{x0}" y2="{last_bottom + 10}" stroke="{DEEP}" stroke-width="3"/>'
+        kw["SVG"] = svg_wrap(svg)
+        kw["LABELS"] = labels
+        kw["NOTE"] = esc(spec.get("note", ""))
     elif lay == "chart_bars":
         bars = spec["bars"]
         x0, maxlen = 72, 640
@@ -252,6 +288,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["NOTE"] = esc(spec.get("note", ""))
         spec["_S"], spec["_unit_ticks"] = S, unit_ticks
     elif lay == "takeaway":
+        kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")      # 兩關這類並列的結論，可以用換行分成幾條
         q = spec.get("question")        # 先問一個問題，再給答案（讀者才知道這句話在回答什麼）
         kw["QUESTION"] = f'<div class="t abs take-q" style="top:320px">{esc(q)}</div>' if q else ""
         kw["TAKE_STYLE"] = f"top:{320 + math.ceil(len(q) / 15.0) * 73 + 36}px" if q else ""

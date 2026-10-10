@@ -1,4 +1,4 @@
-"""驗證工程師讀者輸出（references/review-loop.md）：引用必須逐字出現在貼文。
+"""驗證讀者輸出（預設一般讀者；多出來的欄位 hard_to_understand、charts 只當備註）（references/review-loop.md）：引用必須逐字出現在貼文。
 
 用法：uv run python .claude/skills/make-social-post/scripts/verify_reader.py <post-reader.md> <reader.json> [--trap N ...]
 - 快滑：必須講得出結論，且有有效引用（只看封面與主標）。
@@ -65,7 +65,7 @@ def main(post: str, out: str, traps: list[int] | None) -> int:
         notes.append(f"讀者感受（被封面騙？）：{str(feel['felt_misled'])[:80]}")
     for u in feel.get("unclear_slides", []) or []:
         notes.append(f"讀者感受（看不懂）：{str(u)[:60]}")
-    print(f"== 工程師讀者 {d.get('post','')}: {'退回' if rej else '通過'}（退回 {len(rej)}，備註 {len(notes)}）")
+    print(f"== 讀者 {d.get('post','')}: {'退回' if rej else '通過'}（退回 {len(rej)}，備註 {len(notes)}）")
     for r in rej:
         print("  退回", r)
     for n in notes:

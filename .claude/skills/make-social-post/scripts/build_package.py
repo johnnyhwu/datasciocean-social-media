@@ -28,8 +28,8 @@ import cardlib as W
 CONTENT = {"text", "table", "chart_bars", "chart_sounding"}
 # 投影片欄位白名單：文字內容欄位都必須輸出到審查文字與 ig/post.md；版面參數不輸出。遇到不認得的欄位就報錯，
 # 避免「新增欄位、卻漏了輸出」（審查者與人都看不到那段內容）。
-CONTENT_KEYS = {"title", "body", "label", "question", "rows", "bars", "note", "nav"}
-LAYOUT_KEYS = {"layout", "refs", "quals", "unit", "key_w", "subs_inline", "current"}
+CONTENT_KEYS = {"title", "body", "label", "question", "rows", "bars", "note", "nav", "legend"}
+LAYOUT_KEYS = {"layout", "refs", "quals", "unit", "key_w", "subs_inline", "current", "axis_max"}
 
 
 def check_fields(d: dict) -> None:
@@ -53,7 +53,7 @@ def caption_text(d: dict) -> str:
     for sl in d["slides"]:
         if sl["layout"] in CONTENT:
             fc = first_clause(sl.get("body", ""))
-            lead = f"{sl['label']}：" if sl.get("label") else ""     # 部落格判斷要標「我的判斷」，caption 也一樣
+            lead = f"{sl['label']}：" if sl.get("label") and not mark(sl["title"]).startswith(sl["label"]) else ""     # 小標籤放在前面；標題已經以同樣的詞開頭就不重複（「第一關：第一關：」）
             lines.append(f"・{lead}{mark(sl['title'])}" + (f"（{fc}）" if fc else ""))
     lines += ["", cap["nav"], "", " ".join("#" + h for h in cap["hashtags"])]
     return "\n".join(lines)
@@ -74,7 +74,8 @@ def slide_lines(sl: dict, with_refs: bool) -> list[str]:
     if sl.get("bars"):
         out.append(f"圖表單位：{sl.get('unit') or '無單位'}（軸從 0 起；繩長或橫條長度與數值成正比）")
         for b in sl["bars"]:
-            out.append(f"圖表項目：{b['name']}｜{'／'.join(b.get('subs', []))}｜{b['value']:g} {sl.get('unit', '')}" + ("｜強調" if b.get("emphasize") else ""))
+            v2 = f"｜{sl['legend'][1]} {b['value2']:g} {sl.get('unit', '')}" if "value2" in b else ""
+            out.append(f"圖表項目：{b['name']}｜{'／'.join(b.get('subs', []))}｜{(sl['legend'][0] + ' ') if v2 else ''}{b['value']:g} {sl.get('unit', '')}{v2}" + ("｜強調" if b.get("emphasize") else ""))
     if sl.get("note"):
         out.append(f"圖註：{sl['note']}")
     if sl.get("nav"):
@@ -135,7 +136,8 @@ def ig_md(d: dict, title: str, series_name: str | None, alts: dict) -> str:
             for r in sl.get("rows", []):
                 L.append(f"- **表列**：{r[0]}｜{r[1]}")
             for b in sl.get("bars", []):
-                L.append(f"- **圖上項目**：{b['name']}（{'、'.join(b.get('subs', []))}）＝ {b['value']:g} {sl.get('unit', '')}" + ("　★強調" if b.get("emphasize") else ""))
+                v2 = f"；{sl['legend'][1]} {b['value2']:g} {sl.get('unit', '')}" if "value2" in b else ""
+                L.append(f"- **圖上項目**：{b['name']}（{'、'.join(b.get('subs', []))}）＝ {(sl['legend'][0] + ' ') if v2 else ''}{b['value']:g} {sl.get('unit', '')}{v2}" + ("　★強調" if b.get("emphasize") else ""))
             if sl.get("note"):
                 L.append(f"- **圖註**：{sl['note']}")
         if alts.get(png):

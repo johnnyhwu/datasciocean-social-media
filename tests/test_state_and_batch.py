@@ -65,6 +65,11 @@ rc, out = run_batch(tweak_b=lambda s: s["hook"].update(style=json.loads((A / "sp
 check("batch：相鄰 hook 樣態相同 → 擋下", rc == 1 and "hook 樣態相同" in out)
 rc, out = run_batch(hash_b="deadbeef0000")
 check("batch：同系列模板 hash 不同 → 擋下", rc == 1 and "不同版模板" in out)
+_orig_pf = BC.W.published_formats
+BC.W.published_formats = lambda c: ["ig_carousel", "threads_thread"] if c == json.loads((B / "spec.json").read_text(encoding="utf-8"))["concept"] else _orig_pf(c)
+rc, out = run_batch(hash_b="deadbeef0000")
+BC.W.published_formats = _orig_pf
+check("batch：已發布的貼文模板 hash 不同 → 不比對（不重渲已發布的貼文）", rc == 0 and "不同版模板" not in out, out)
 rc, out = run_batch(tweak_a=lambda s: s["threads"]["last"].update(text=s["threads"]["last"]["text"].replace("看效能對比數字之前，先問三個問題", "亂寫的標題")))
 check("batch：串文的同系列標題與 planned_title 不一致 → 擋下", rc == 1 and "planned_title" in out)
 

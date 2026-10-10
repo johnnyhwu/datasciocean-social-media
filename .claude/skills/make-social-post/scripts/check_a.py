@@ -49,6 +49,9 @@ def slide_texts(sl: dict) -> list[str]:
     for b in sl.get("bars", []):
         out.append(b["name"]); out += b.get("subs", [])
         out.append(f"{b['value']:g}")
+        if "value2" in b:
+            out.append(f"{b['value2']:g}")
+    out += list(sl.get("legend", []))
     return out
 
 
