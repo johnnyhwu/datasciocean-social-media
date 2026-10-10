@@ -35,20 +35,20 @@ P=out/<系列>/<觀念>                              # 要發的發布包資料�
 | 6 | **Threads dry-run**：列出每一則（通常 7 則）的完整文字、字數、附圖、連結預覽、額度。把完整文字給人 | `threads_publish.py publish $P` | Claude → 人看 |
 | 7 | 人說「發」→ **Threads 發佈**：依序發，每一則回覆前一則，每一則發完立刻記錄 id；整串約 4 到 5 分鐘；成功後自動寫回 state 與 `state/threads-publish-log.jsonl` | `threads_publish.py publish $P --confirm` | 人確認，Claude 執行 |
 | 8 | 驗證：`state.py status` 該觀念兩格式都是 `published`；`state/<觀念>.yaml` 有兩個網址；把網址給人 | | Claude |
-| 9 | 提醒人做**只能手動**的事（見下）；有回補清單項目就提醒 | `state/backfill.md` | 人 |
+| 9 | **Threads 回補**：`state/backfill.md` 有項目時，跑 dry-run，把每則回覆的完整文字給人看，人說「發」才 `--confirm`；成功後自動標記已回補。IG 與其他事項不做（見下） | `threads_publish.py backfill`（dry-run）→ `threads_publish.py backfill --confirm` | Claude；人確認 |
 | 10 | 把這次的 state 與發佈紀錄 commit（問人要不要 push） | | Claude，**先問人** |
 
 IG 與 Threads **可以各自獨立發**，順序由人決定（目前慣例是先 IG 再 Threads）。其中一個失敗不影響另一個。
 
-## 2. 只能由人手動做的事（API 做不到或規則不自動）
+## 2. 發布後：誰做什麼（人 2026-10-10 決定：人不做手動事項，所以「Claude 做」或「不做」，不當成待辦提醒人）
 
-| 事項 | 為什麼 |
+| 事項 | 做法 |
 |---|---|
-| **限時動態**（分享貼文並加連結貼紙指向文章） | 官方 API 發限時動態不支援貼紙，包含連結貼紙，見 `instagram-publish.md` |
-| 收進精選集、置頂（IG 概覽 post、Threads 最後一則回覆） | 不在 API 範圍 |
-| 系列其他則發布後的**回補**：IG 修改 caption 補延伸連結；Threads 在原串文下加回覆補連結 | 由 `state/backfill.md` 列出；做完在 `state/<觀念>.yaml` 的 `backfilled` 加上觀念 id |
+| **Threads 回補**（在原串文最後一則下接一則回覆，列出之後發布的同系列貼文與連結） | **Claude 做**：`threads_publish.py backfill`，dry-run 給人看、人說「發」才 `--confirm`（和發文一樣是公開動作）。成功後自動標記 `backfilled`、寫發佈紀錄 |
+| IG 回補（改 caption 補連結） | **不做**：API 不能改 caption，人也不手動做。已發布貼文的 IG 系列地圖維持原樣 |
+| 限時動態、精選集、置頂 | **不做**，也不提醒（限時動態的連結貼紙 API 不支援） |
 | 帳號設定、頭像、簡介、發文時段 | 不在本專案範圍 |
-| **刪除貼文**（IG 一律手動；Threads 需 `threads_delete` 權限，目前 token 沒有） | 見下 |
+| 刪除貼文（IG 沒有 API；Threads 需 `threads_delete` 權限，目前 token 沒有） | 發現錯誤時**只報告給人**，由人決定要不要處理；不列為待辦 |
 
 ## 3. 出錯怎麼辦
 

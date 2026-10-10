@@ -77,18 +77,25 @@ check("batch：串文的同系列標題與 planned_title 不一致 → 擋下", 
 with tempfile.TemporaryDirectory() as d:
     S.STATE = Path(d)
     with contextlib.redirect_stdout(io.StringIO()):
-        S.record("jev-overview", "ig_carousel", "https://ig/1", "2026-10-05T20:00", "jev-teardown", "情境痛點", ["confound-three-questions"])
+        S.record("jev-overview", "threads_thread", "https://ig/1", "2026-10-05T20:00", "jev-teardown", "情境痛點", ["confound-three-questions"])
     check("state：發布一則後，沒有更晚發布的相關貼文 → 沒有回補項目", "目前沒有待回補項目" in (Path(d) / "backfill.md").read_text(encoding="utf-8"))
     with contextlib.redirect_stdout(io.StringIO()):
-        S.record("confound-three-questions", "ig_carousel", "https://ig/2", "2026-10-06T20:00", "jev-teardown", "反直覺斷言", [])
+        S.record("confound-three-questions", "threads_thread", "https://ig/2", "2026-10-06T20:00", "jev-teardown", "反直覺斷言", [])
     text = (Path(d) / "backfill.md").read_text(encoding="utf-8")
-    check("state：後發布的同系列貼文 → 先發布的那則出現在回補清單", "jev-overview:ig_carousel" in text and "confound-three-questions" in text and "修改 caption" in text)
+    check("state：後發布的同系列貼文 → 先發布的那則 Threads 串文出現在回補清單", "jev-overview:threads_thread" in text and "confound-three-questions" in text and "修改 caption" not in text)
     y = S.load("jev-overview")
     y["posts"][0]["backfilled"] = ["confound-three-questions"]
     S.save(y)
     with contextlib.redirect_stdout(io.StringIO()):
         S.backfill()
     check("state：標記已回補後，從清單消失", "目前沒有待回補項目" in (Path(d) / "backfill.md").read_text(encoding="utf-8"))
+    with contextlib.redirect_stdout(io.StringIO()):
+        S.record("jev-overview", "ig_carousel", "https://ig/3", "2026-10-05T20:00", "jev-teardown", "情境痛點", [])
+        S.record("confound-three-questions", "ig_carousel", "https://ig/4", "2026-10-06T20:00", "jev-teardown", "反直覺斷言", [])
+    check("state：IG 貼文不列回補（API 不能改 caption，人也不手動做）", "ig_carousel" not in (Path(d) / "backfill.md").read_text(encoding="utf-8"))
+    with contextlib.redirect_stdout(io.StringIO()):
+        S.mark_backfilled("jev-overview", "threads_thread", ["confound-three-questions"])
+    check("state：mark_backfilled 之後清單消失", "目前沒有待回補項目" in (Path(d) / "backfill.md").read_text(encoding="utf-8"))
     p = S.load("jev-overview")["posts"][0]
     check("state：posts[] 記錄了全部識別碼", all(p.get(k) for k in ("post_id", "format", "series_id", "url", "published_at", "hook_type")) and "mentions" in p)
     check("state：發布後格式狀態是 published", S.load("jev-overview")["formats"]["ig_carousel"]["status"] == "published")

@@ -224,6 +224,48 @@ def main():
         check("debug_token：回傳 scopes 與到期時間（用同一顆 token 檢查自己）", info["scopes"] == ["threads_basic", "threads_content_publish"] and info["expires_at"] == 1792000000)
         c = TA.ThreadsClient(TOKEN, None, transport=Fake())
         check("沒有 user id 時用 /me 的別名", c._uid() == "me")
+
+    # ---------------------------------------------------------------- 回補（threads_publish.py backfill）
+    items = [{"post_id": "a:threads_thread", "concept": "a", "format": "threads_thread", "url": "https://t/a", "series_id": "s",
+              "target": "b", "target_published_at": "2026-10-08"},
+             {"post_id": "a:threads_thread", "concept": "a", "format": "threads_thread", "url": "https://t/a", "series_id": "s",
+              "target": "c", "target_published_at": "2026-10-10"},
+             {"post_id": "b:threads_thread", "concept": "b", "format": "threads_thread", "url": "https://t/b", "series_id": "s",
+              "target": "c", "target_published_at": "2026-10-10"}]
+    marked = []
+    TP.ST.backfill_items = lambda: [dict(i) for i in items if not any(i["concept"] == m[0] and i["target"] in m[1] for m in marked)]
+    TP.ST.series_info = lambda: ({}, {"b": "第 2 則標題", "c": "第 3 則標題"})
+    TP.ST.load = lambda c: {"posts": [{"format": "threads_thread", "url": f"https://t/{c}"}]}
+    TP.ST.mark_backfilled = lambda concept, fmt, targets: marked.append((concept, list(targets)))
+    TP.last_logged_ids = lambda concept, path=None: {"a": ["A1", "A2", "A3"], "b": ["B1", "B2"]}.get(concept, [])
+    logs.clear()
+    fk = Fake()
+    r = TP.backfill(False, client(fk))
+    check("回補 dry-run：沒有任何 POST；兩則串文各一則回覆，缺幾則就合成一則", r["ok"] and not [x for x in fk.calls if x[0] == "POST"] and len(r["replies"]) == 2 and r["replies"][0]["targets"] == ["b", "c"], r)
+    check("回補回覆的內容：每個後來發布的貼文有標題與連結、依發布先後排列",
+          r["replies"][0]["text"] == "同系列後來發布的貼文：\n・第 2 則標題\nhttps://t/b\n・第 3 則標題\nhttps://t/c", r["replies"][0]["text"])
+    fk, sl = Fake(), []
+    r = TP.backfill(True, client(fk, sl))
+    creates = [x for x in fk.calls if x[0] == "POST" and x[1].endswith("/threads")]
+    check("回補 --confirm：回覆接在各串文的最後一則（A3、B2），是純文字貼文", r["ok"] and [c[2]["reply_to_id"] for c in creates] == ["A3", "B2"] and all(c[2]["media_type"] == "TEXT" for c in creates), [c[2] for c in creates])
+    check("回補成功後標記已回補並寫發佈紀錄（format=threads_backfill）", marked == [("a", ["b", "c"]), ("b", ["c"])] and [l["format"] for l in logs] == ["threads_backfill"] * 2 and logs[0]["reply_to_id"] == "A3", (marked, logs))
+    r = TP.backfill(True, client(Fake()))
+    check("回補做完再執行：沒有待補，不重複發", r["ok"] and "沒有待回補" in r.get("note", "") and not r["replies"], r)
+    marked.clear(); logs.clear()
+    fk = Fake(fail_on_create=2)
+    r = TP.backfill(True, client(fk))
+    check("抓得到：第 2 則回覆失敗 → 第 1 則已標記、第 2 則沒標記，錯誤訊息不含 token", not r["ok"] and marked == [("a", ["b", "c"])] and TOKEN not in json.dumps(r, ensure_ascii=False), (r, marked))
+    fk = Fake()
+    r = TP.backfill(True, client(fk))
+    check("抓得到：失敗後再執行同一個指令，只補還沒做的那則（不重複補第 1 則）", r["ok"] and len([c for c in fk.calls if c[0] == "POST" and c[1].endswith("/threads")]) == 1, r)
+    marked.clear()
+    TP.last_logged_ids = lambda concept, path=None: []
+    fk = Fake()
+    r = TP.backfill(True, client(fk))
+    check("抓得到：發佈紀錄找不到串文 id → 不發", not r["ok"] and r["problems"] and not [x for x in fk.calls if x[0] == "POST"], r)
+    TP.last_logged_ids = lambda concept, path=None: ["X1"]
+    r = TP.backfill(True, None)
+    check("抓得到：--confirm 沒有 token → 不發", not r["ok"] and "token" in r.get("error", ""), r)
     print(f"\n{'全部通過' if not FAILS else f'{len(FAILS)} 項失敗'}")
     return 1 if FAILS else 0
 

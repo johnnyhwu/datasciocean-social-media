@@ -14,7 +14,7 @@
         --published-at 2026-10-05T20:00 [--series-id ID] [--hook-type 樣態] [--mentions a,b]
       寫回發布紀錄；狀態改為 published，並重算回補清單。API 發佈（--confirm）成功後會自動呼叫，只有人手動發布時才需要手動執行
   uv run python .claude/skills/make-social-post/scripts/state.py backfill
-      重新產生 state/backfill.md（程式產生，不手改）
+      重新產生 state/backfill.md（程式產生，不手改；只列 Threads，回補由 threads_publish.py backfill 做）
 
 狀態值：not_tried | ready | published | unsuitable。
 posts[] 必須記錄的識別碼（成效分析系統事後很難補）：觀念 id、系列 id、格式、網址、發布時間、hook 樣態、提及的觀念。
@@ -32,10 +32,9 @@ import cardlib as W
 STATE = W.STATE_DIR
 FORMATS = ["ig_carousel", "threads_thread"]
 STATUSES = {"not_tried", "ready", "published", "unsuitable"}
-BACKFILL_HOW = {
-    "ig_carousel": "IG：修改 caption，補一行延伸連結（投影片發布後不能新增或刪除）",
-    "threads_thread": "Threads：在原串文下新增一則回覆，補上完整連結（發文後可編輯的時間很短，不能靠編輯）",
-}
+# 回補只做 Threads（2026-10-10 人決定）：IG 的 API 不能改 caption、人也不手動做，所以 IG 不列回補；
+# 限時動態、精選集、置頂同樣不做。Threads 由 Claude 用 API 在原串文後面接一則回覆（threads_publish.py backfill）。
+BACKFILL_FORMATS = ["threads_thread"]
 
 
 def path_of(concept: str) -> Path:
@@ -115,36 +114,66 @@ def record(concept: str, fmt: str, url: str, published_at: str, series_id: str |
     backfill()
 
 
-def backfill() -> None:
-    """已發布、但缺少「之後才發布的同系列或提及觀念」連結的貼文。"""
-    series_members: dict[str, list[str]] = {}
+def series_info() -> tuple[dict[str, list[str]], dict[str, str]]:
+    """系列成員（發文順序）與各觀念的 planned_title。"""
+    members: dict[str, list[str]] = {}
+    titles: dict[str, str] = {}
     for f in W.SERIES_DIR.glob("*/series.md"):
         s = yaml.safe_load(re.match(r"^---\n(.*?)\n---", f.read_text(encoding="utf-8"), re.S).group(1))
-        series_members[s["id"]] = [m["concept"] for m in s["members"]]
+        members[s["id"]] = [m["concept"] for m in s["members"]]
+        for m in s["members"]:
+            titles[m["concept"]] = m.get("planned_title", m["concept"])
+    return members, titles
+
+
+def backfill_items() -> list[dict]:
+    """已發布、但缺少「之後才發布的同系列或提及觀念」連結的貼文（只列 BACKFILL_FORMATS）。
+    每項：{post_id, concept, format, url, series_id, target, target_published_at}。"""
+    series_members, _ = series_info()
     states = {cid: load(cid) for cid in concept_ids()}
     first_pub: dict[str, str] = {}   # 觀念 -> 最早的發布時間
     for cid, d in states.items():
         times = [p["published_at"] for p in d["posts"]]
         if times:
             first_pub[cid] = min(times)
-    lines = ["# 待回補連結清單（程式產生，不手改）", "",
-             "已發布、但還沒補上「之後才發布的相關貼文」連結的貼文。做完回補後，在該貼文的 `state/<觀念>.yaml` 的 `backfilled` 加上被補的觀念 id。", ""]
-    n = 0
+    items = []
     for cid, d in states.items():
         for p in d["posts"]:
+            if p["format"] not in BACKFILL_FORMATS:
+                continue
             targets = set(p.get("mentions") or [])
             if p.get("series_id"):
                 targets |= set(series_members.get(p["series_id"], []))
             targets.discard(cid)
             for t in sorted(targets):
                 if t in first_pub and first_pub[t] > p["published_at"] and t not in (p.get("backfilled") or []):
-                    n += 1
-                    lines.append(f"- [ ] `{p['post_id']}`（{p['url']}）需補 → `{t}`（{first_pub[t]} 發布）｜{BACKFILL_HOW[p['format']]}")
-    if n == 0:
+                    items.append({"post_id": p["post_id"], "concept": cid, "format": p["format"], "url": p["url"],
+                                  "series_id": p.get("series_id"), "target": t, "target_published_at": first_pub[t]})
+    return items
+
+
+def mark_backfilled(concept: str, fmt: str, targets: list[str]) -> None:
+    """回補做完：在該貼文的 backfilled 加上被補的觀念 id，並重算清單。"""
+    d = load(concept)
+    for p in d["posts"]:
+        if p["format"] == fmt:
+            p["backfilled"] = sorted(set(p.get("backfilled") or []) | set(targets))
+    save(d)
+    backfill()
+
+
+def backfill() -> None:
+    lines = ["# 待回補連結清單（程式產生，不手改）", "",
+             "已發布、但還沒補上「之後才發布的相關貼文」連結的 Threads 串文。**由 Claude 做**：`threads_publish.py backfill`（dry-run）→ 人說「發」→ `--confirm`，"
+             "會在原串文最後一則下面接一則回覆，並自動標記已回補。IG 不回補（API 不能改 caption）；限時動態、精選集、置頂都不做。", ""]
+    items = backfill_items()
+    for it in items:
+        lines.append(f"- [ ] `{it['post_id']}`（{it['url']}）需補 → `{it['target']}`（{it['target_published_at']} 發布）")
+    if not items:
         lines.append("（目前沒有待回補項目）")
     STATE.mkdir(exist_ok=True)
     (STATE / "backfill.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"wrote state/backfill.md（{n} 項）")
+    print(f"wrote state/backfill.md（{len(items)} 項）")
 
 
 def main(a: list[str]) -> int:

@@ -14,6 +14,9 @@
   uv run python .claude/skills/make-social-post/scripts/threads_publish.py token-status | token-info [--write] | refresh-token | exchange-token
   uv run python .claude/skills/make-social-post/scripts/threads_publish.py publish out/<series>/<concept> [--confirm] [--no-record]
   uv run python .claude/skills/make-social-post/scripts/threads_publish.py rollback out/<series>/<concept> [--confirm]
+  uv run python .claude/skills/make-social-post/scripts/threads_publish.py backfill [--confirm]
+      回補（2026-10-10）：state/backfill.md 列的每則已發布串文，在它**最後一則**下面接一則回覆，列出之後才發布的同系列貼文（標題＋Threads 連結）；
+      一則串文缺幾則就合成一則回覆。預設 dry-run；--confirm 才發，成功後自動標記已回補（IG 不回補）
   uv run python .claude/skills/make-social-post/scripts/threads_publish.py delete <media_id> ... [--confirm]
 輸出一律是 JSON。
 """
@@ -227,6 +230,70 @@ def rollback(pack: Path, confirm: bool, client: TA.ThreadsClient | None, log_pat
     return result
 
 
+def plan_backfill(log_path: Path | None = None) -> dict:
+    """每則缺回補的已發布串文 → 一則回覆（接在該串文最後一則下面），內容是之後才發布的同系列貼文的標題與 Threads 連結。"""
+    _, titles = ST.series_info()
+    groups: dict[str, dict] = {}
+    problems: list[str] = []
+    for it in sorted(ST.backfill_items(), key=lambda x: x["target_published_at"]):
+        g = groups.setdefault(it["concept"], {"concept": it["concept"], "post_url": it["url"], "targets": []})
+        g["targets"].append(it["target"])
+    plans = []
+    for concept, g in groups.items():
+        ids = last_logged_ids(concept, log_path)
+        if not ids:
+            problems.append(f"{concept}：發佈紀錄裡找不到這則串文的 id，無法接回覆")
+            continue
+        lines = ["同系列後來發布的貼文："]
+        for t in g["targets"]:
+            url = next((p["url"] for p in ST.load(t)["posts"] if p["format"] == "threads_thread" and p.get("url")), None)
+            if not url:
+                problems.append(f"{concept}：要補的 {t} 沒有 Threads 網址")
+                continue
+            lines += [f"・{titles.get(t, t)}", url]
+        text = "\n".join(lines)
+        if threads_len(text) > 500:
+            problems.append(f"{concept}：回覆 {threads_len(text)} 字，超過 500")
+        plans.append({"concept": concept, "reply_to_id": ids[-1], "post_url": g["post_url"], "targets": g["targets"], "text": text})
+    return {"plans": plans, "problems": problems}
+
+
+def backfill(confirm: bool, client: TA.ThreadsClient | None, log_path: Path | None = None, now=None) -> dict:
+    now = now or dt.datetime.now(dt.timezone.utc)
+    pl = plan_backfill(log_path)
+    result = {"ok": False, "mode": "backfill" if confirm else "dry-run", "problems": pl["problems"],
+              "replies": [{"to": p["post_url"], "concept": p["concept"], "targets": p["targets"], "chars": threads_len(p["text"]), "text": p["text"]}
+                          for p in pl["plans"]]}
+    if not pl["plans"] and not pl["problems"]:
+        return result | {"ok": True, "note": "沒有待回補的 Threads 串文"}
+    if not confirm:
+        result["note"] = "dry-run：沒有送出任何回覆。要實際發佈請先經人確認，再加 --confirm。"
+        result["ok"] = not pl["problems"]
+        return result
+    if pl["problems"]:
+        result["error"] = "有問題，沒有發佈"
+        return result
+    if not client:
+        result["error"] = "沒有 token，無法發佈"
+        return result
+    done = []
+    try:
+        for p in pl["plans"]:
+            cid = client.create_post("TEXT", text=p["text"], reply_to_id=p["reply_to_id"])
+            client.wait_ready(cid)
+            rid = client.publish(cid)
+            log_publish({"time": now.isoformat(timespec="seconds"), "concept": p["concept"], "format": "threads_backfill",
+                         "reply_id": rid, "reply_to_id": p["reply_to_id"], "targets": p["targets"]}, **({"path": log_path} if log_path else {}))
+            with contextlib.redirect_stdout(sys.stderr):
+                ST.mark_backfilled(p["concept"], "threads_thread", p["targets"])
+            done.append({"concept": p["concept"], "reply_id": rid})
+    except ig_api.IGError as e:
+        result.update(error=str(e), done=done, hint="已完成的回覆已標記為已回補；修好後再執行同一個指令，只會補還沒做的")
+        return result
+    result.update(ok=True, done=done)
+    return result
+
+
 # ---------------------------------------------------------------- CLI
 def emit(obj: dict) -> int:
     print(json.dumps(obj, ensure_ascii=False, indent=2))
@@ -253,6 +320,8 @@ def main(argv: list[str]) -> int:
     pp.add_argument("pack"); pp.add_argument("--confirm", action="store_true"); pp.add_argument("--no-record", action="store_true")
     rb = sub.add_parser("rollback")
     rb.add_argument("pack"); rb.add_argument("--confirm", action="store_true")
+    bf = sub.add_parser("backfill")
+    bf.add_argument("--confirm", action="store_true")
     dl = sub.add_parser("delete")
     dl.add_argument("ids", nargs="+"); dl.add_argument("--confirm", action="store_true")
     a = ap.parse_args(argv)
@@ -263,7 +332,7 @@ def main(argv: list[str]) -> int:
     needs_token = a.cmd in ("whoami", "limit", "token-status", "token-info", "refresh-token", "exchange-token") or confirm
     client = make_client(env) if (env.get("THREADS_ACCESS_TOKEN") or needs_token) else None
     warns = []
-    if client and a.cmd not in ("token-status", "exchange-token") and (a.cmd != "publish" or confirm):
+    if client and a.cmd not in ("token-status", "exchange-token") and (a.cmd not in ("publish", "backfill") or confirm):
         warns = PC.ensure_token_fresh(client, env, token_key="THREADS_ACCESS_TOKEN", ts_key="THREADS_TOKEN_REFRESHED_AT")
         env = PC.load_env()
         client.token = env["THREADS_ACCESS_TOKEN"]
@@ -343,6 +412,8 @@ def main(argv: list[str]) -> int:
         return emit(publish_thread(Path(a.pack).resolve(), a.confirm, env, client, host, record=not a.no_record) | {"warnings": warns})
     if a.cmd == "rollback":
         return emit(rollback(Path(a.pack).resolve(), a.confirm, client))
+    if a.cmd == "backfill":
+        return emit(backfill(a.confirm, client) | {"warnings": warns})
     if a.cmd == "delete":
         res = {"ok": True, "mode": "delete" if a.confirm else "dry-run", "ids": a.ids, "deleted": []}
         if not a.confirm:

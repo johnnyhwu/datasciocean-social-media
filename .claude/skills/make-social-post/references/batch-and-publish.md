@@ -80,13 +80,8 @@ uv run python .claude/skills/make-social-post/scripts/state.py record <concept> 
 
 寫入 `state/<concept>.yaml` 的 `posts[]`（必須記錄：觀念 id、系列 id、格式、網址、發布時間、hook 樣態、提及的觀念；成效分析另做獨立系統，這些識別碼事後很難補），格式狀態改 `published`，並重算 `state/backfill.md`（已發布、但缺少「之後才發布的同系列或提及觀念」連結的貼文）。
 
-| 平台 | 回補方式 |
-|---|---|
-| IG | 修改 caption，補一行延伸連結。投影片發布後不能新增或刪除 |
-| Threads | 在原串文下新增一則回覆，補上完整連結（發文後可編輯的時間很短，不能靠編輯） |
+**回補只做 Threads，由 Claude 做**（人 2026-10-10 決定）：`threads_publish.py backfill`（dry-run）→ 人說「發」→ `--confirm`，會在原串文最後一則下面接一則回覆，列出之後才發布的同系列貼文（標題＋Threads 連結），成功後自動在 `state/<觀念>.yaml` 的 `backfilled` 加上觀念 id、清單就會消失。**IG 不回補**（API 不能改 caption，人也不手動做；已發布貼文的系列地圖維持原樣）。一則串文缺幾則就合成一則回覆。
 
-回補做完後，在該貼文的 `state/<觀念>.yaml` 的 `backfilled` 加上被補的觀念 id，清單就會消失。
-
-## 8. 未驗證事項（需要人手動驗證，結果影響參數，不影響產出內容）
+## 8. 未驗證事項（結果影響參數，不影響產出內容；人不做手動驗證，所以只在有機會順便看到時記錄）
 
 限時動態精選集的連結貼紙是否仍可點、Threads 最多置頂幾則回覆、系列 hashtag 頁面能否完整顯示、平台排程能不能排 IG 輪播與 Threads 多則串文、手機上 caption 中文大約在哪裡摺疊、blog 搜尋功能是否可用、手機實機顯示。數字參數（補充 40～110 字、10 張上限、重疊率 40%、caption 第一句 50 字）皆為判斷值，非實測。
