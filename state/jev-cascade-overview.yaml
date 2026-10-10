@@ -20,4 +20,6 @@ posts:
   published_at: 2026-10-07T10:10:54+0000
   hook_type: 反直覺斷言
   mentions: []
-  backfilled: []
+  backfilled:
+  - cascade-complementary-errors
+  - judge-readable-vs-derive
