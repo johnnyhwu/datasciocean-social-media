@@ -10,9 +10,8 @@ members:
     also: [confidence-three-metrics]   # 2026-10-08 人決定：這兩張卡合成一則 post（見 batch-and-publish.md §1）
     planned_title: Judge 能不能用，先問答案能不能讀出來或核對
   - concept: cascade-complementary-errors
-    planned_title: 串接的價值，來自兩個 Judge 錯在不同的題
-  - concept: cascade-threshold-and-failure-mode
-    planned_title: 門檻要隨 Judge 與任務重選
+    also: [cascade-threshold-and-failure-mode]   # 2026-10-10 人決定：這兩張卡合成一則 post（第 1、2 則已發布，其系列地圖仍列 4 則，改不了；回補時連到這一則）
+    planned_title: 串接為什麼成立，門檻選錯又會怎樣
 hashtag: DSO_LLMJudge
 members_locked: true   # 第 1 則發布前定案（含合併）；IG 系列地圖發布後改不了
 status: planning

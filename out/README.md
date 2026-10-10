@@ -4,14 +4,13 @@
 
 ## 待發布
 
-（目前沒有）
+- JEV 串接 Judge 系列 第 3 則：[串接為什麼成立，門檻選錯又會怎樣](jev-cascade/cascade-complementary-errors/README.md)
 
 ## JEV 串接 Judge 系列（`jev-cascade`）
 
 | 發文順序 | 觀念 | 標題（planned_title） | IG | Threads | 打開 |
 |---|---|---|---|---|---|
 | 1 | `jev-cascade-overview` | 便宜的 Judge 先判，沒把握才轉給 GPT-6 | 已發布 | 已發布 | [README](jev-cascade-overview/README.md) |
-| 2 | `judge-readable-vs-derive`＋`confidence-three-metrics` | Judge 能不能用，先問答案能不能讀出來或核對 | 未做 | 未做 | [README](judge-readable-vs-derive/README.md) |
-| 3 | `cascade-complementary-errors` | 串接的價值，來自兩個 Judge 錯在不同的題 | 未做 | 未做 | （還沒做） |
-| 4 | `cascade-threshold-and-failure-mode` | 門檻要隨 Judge 與任務重選 | 未做 | 未做 | （還沒做） |
+| 2 | `judge-readable-vs-derive`＋`confidence-three-metrics` | Judge 能不能用，先問答案能不能讀出來或核對 | 已發布 | 已發布 | [README](judge-readable-vs-derive/README.md) |
+| 3 | `cascade-complementary-errors`＋`cascade-threshold-and-failure-mode` | 串接為什麼成立，門檻選錯又會怎樣 | 待發布 | 待發布 | [README](cascade-complementary-errors/README.md) |
 

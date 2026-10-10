@@ -1,0 +1,23 @@
+concept: cascade-complementary-errors
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: cascade-complementary-errors:ig_carousel
+  format: ig_carousel
+  series_id: jev-cascade
+  url: https://www.instagram.com/p/DeTsWaOD3Pd/
+  published_at: 2026-10-10T08:50:02+0000
+  hook_type: 情境痛點
+  mentions: []
+  backfilled: []
+- post_id: cascade-complementary-errors:threads_thread
+  format: threads_thread
+  series_id: jev-cascade
+  url: https://www.threads.com/@datasciocean/post/DeTsbyVjw9E
+  published_at: 2026-10-10T08:50:55+0000
+  hook_type: 情境痛點
+  mentions: []
+  backfilled: []

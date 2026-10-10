@@ -1,0 +1,9 @@
+concept: cascade-threshold-and-failure-mode
+formats:
+  ig_carousel:
+    status: published
+    merged_into: cascade-complementary-errors
+  threads_thread:
+    status: published
+    merged_into: cascade-complementary-errors
+posts: []
