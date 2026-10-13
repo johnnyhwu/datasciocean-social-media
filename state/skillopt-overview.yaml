@@ -20,4 +20,5 @@ posts:
   published_at: 2026-10-12T06:56:03+0000
   hook_type: 讀者疑問
   mentions: []
-  backfilled: []
+  backfilled:
+  - skillopt-batch-evidence-minibatch
