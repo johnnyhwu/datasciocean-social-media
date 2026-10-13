@@ -24,6 +24,7 @@ from PIL import Image
 from playwright.sync_api import sync_playwright
 
 import cardlib as W
+import diagrams as D
 
 ROOT = W.ROOT
 os.environ.setdefault("PLAYWRIGHT_BROWSERS_PATH", str(ROOT / ".playwright-browsers"))
@@ -32,7 +33,7 @@ RP = PARAMS["render"]
 WD, HT, SAFE_X, PAD_X = RP["width"], RP["height"], RP["safe_x"], RP["pad_x"]
 CREAM, TEAL, DEEP, GOLD = "#F2E0C0", "#076876", "#01353F", "#DDA642"
 MID, LIGHT, ABYSS = "#1F8A8D", "#69B4AA", "#032027"
-SERIES_COLORS = {"teal-mid": MID}
+SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT}
 ALLOWED_FONT_PX = {28, 34, 38, 40, 56, 72, 76}
 ZERO_Y = 706          # 測深圖水面（0）
 
@@ -101,6 +102,59 @@ def svg_wrap(inner):
             f'xmlns="http://www.w3.org/2000/svg">{defs()}{inner}</svg>')
 
 
+# ---------------------------------------------------------------- 等深線系列（style: contour）的 SVG 元件
+# 都用 class "bg"（背景層，不進程式 B 的文字與圖形重疊檢查），所以排版時要自己確保不壓到文字（看圖確認）。
+def ring(cx, cy, r, seed, n=120, wob=0.10):
+    """不規則閉合等深線：半徑隨角度起伏（幾個低頻諧波疊加），seed 決定相位；橫向略寬。"""
+    pts = []
+    for i in range(n + 1):
+        a = 2 * math.pi * i / n
+        k = 1 + wob * (math.sin(2 * a + seed) * .6 + math.sin(3 * a + seed * 1.7) * .3 + math.sin(5 * a + seed * .4) * .1)
+        pts.append((cx + r * k * 1.18 * math.cos(a), cy + r * k * math.sin(a)))
+    return "M" + " L".join(f"{x:.1f},{y:.1f}" for x, y in pts) + " Z"
+
+
+def contours(cx, cy, radii, color, op, sw=3, seed0=0.0):
+    return "".join(f'<path class="bg" d="{ring(cx, cy, r, seed0 + i * .35)}" fill="none" stroke="{color}" '
+                   f'stroke-opacity="{op}" stroke-width="{sw}"/>' for i, r in enumerate(radii))
+
+
+def step_path(points, color, rejected=()):
+    """步距遞減的路徑：點是每一步的落點，最後一點是目前的位置（金色，外圈淡光）；虛線小圓是被拒的落點。"""
+    s = ""
+    for (x0, y0), (x1, y1) in zip(points, points[1:]):
+        s += f'<line class="bg" x1="{x0}" y1="{y0}" x2="{x1}" y2="{y1}" stroke="{color}" stroke-width="4" stroke-linecap="round"/>'
+    for x, y in points[:-1]:
+        s += f'<circle class="bg" cx="{x}" cy="{y}" r="9" fill="{color}"/>'
+    for x, y in rejected:
+        s += f'<circle class="bg" cx="{x}" cy="{y}" r="9" fill="none" stroke="{color}" stroke-width="3" stroke-dasharray="4 4"/>'
+    x, y = points[-1]
+    return s + (f'<circle class="bg" cx="{x}" cy="{y}" r="60" fill="{GOLD}" fill-opacity=".30"/>'
+                f'<circle class="bg" cx="{x}" cy="{y}" r="15" fill="{GOLD}"/>')
+
+
+# 完整的一條路徑（7 個落點，步距遞減，向谷底 (800,1010) 收攏）；封面與文字張只畫前 k 個。
+COVER_PATH = [(250, 1060), (400, 1110), (505, 1075), (585, 1022), (650, 1003), (705, 1002), (760, 1008)]
+COVER_RADII = [60, 130, 205, 285, 370, 460, 555, 655, 760]
+
+
+def progress_dots(idx, n, dark=False):
+    """內頁右下角的一排小點：點數 = 這則的張數，金色是現在這一張，已看過的實心、還沒看的空心。"""
+    col = LIGHT if dark else TEAL
+    gap = 30
+    x0 = 1000 - (n - 1) * gap
+    s = ""
+    for k in range(1, n + 1):
+        x = x0 + (k - 1) * gap
+        if k == idx:
+            s += f'<circle class="bg" cx="{x}" cy="1282" r="10" fill="{GOLD}"/>'
+        elif k < idx:
+            s += f'<circle class="bg" cx="{x}" cy="1282" r="6" fill="{col}"/>'
+        else:
+            s += f'<circle class="bg" cx="{x}" cy="1282" r="6" fill="none" stroke="{col}" stroke-width="3"/>'
+    return s
+
+
 def bob(x, y_end, col, v="", emph=False):
     g = ""
     if emph:
@@ -155,11 +209,19 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     tdir = template_dir(series["id"])
     tpl = (tdir / f"{lay}.html").read_text(encoding="utf-8")
     sc = SERIES_COLORS.get(series.get("color"), MID)
+    contour = series.get("style") == "contour"
+    idx, n_sl = spec.get("_idx", 1), spec.get("_n", 1)          # 第幾張／共幾張（render_all 填入）
+    mi, mn = spec.get("_mi", 0), spec.get("_mn", 1)            # 這則是系列的第幾則／共幾則
     kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", "")))}
 
-    if lay in ("text", "table", "chart_bars", "chart_sounding"):   # 小標籤（例如「我的判斷」）：右上角
+    if lay in ("text", "table", "chart_bars", "chart_sounding", "diagram"):   # 小標籤（例如「我的判斷」）：右上角
         kw["LABEL"] = f'<div class="t abs chip">{esc(spec["label"])}</div>' if spec.get("label") else ""
-    if lay == "cover":
+    if lay == "cover" and contour:
+        k = 4 + round(3 * mi / max(mn - 1, 1))                  # 越後面的一則，金點越靠近谷底
+        kw["SVG"] = svg_wrap(contours(800, 1010, COVER_RADII, sc, .38) + step_path(COVER_PATH[:k], sc, rejected=[(610, 1090)]))
+        kw["SUB_TOP"] = 560
+        kw["BODY"] = kw["BODY"].replace("\n", "<br>")
+    elif lay == "cover":
         kw["SVG"] = svg_wrap(waves(1000, sc))
         kw["SUB_TOP"] = 560
         kw["BODY"] = kw["BODY"].replace("\n", "<br>")      # 副標可以用換行分成幾條
@@ -169,6 +231,11 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             kw["SVG"], kw["CELLS"] = svg_wrap(parts), cells
         else:
             kw["SVG"], kw["CELLS"] = "", ""
+    elif lay == "text" and contour:
+        k = 3 + round(3 * idx / max(n_sl, 1))                   # 同一則裡越後面的一張，路徑走得越遠
+        # 最外圈的頂端要低於補充文字（最多 5 行，約到 y=690）：半徑上限 295 → 頂端約 y=795
+        kw["SVG"] = svg_wrap(contours(620, 1120, [45, 100, 160, 225, 295], MID, .45, seed0=idx * .5)
+                             + step_path([(x - 150, y + 110) for (x, y) in COVER_PATH[:k]], TEAL))
     elif lay == "text":
         kw["SVG"] = svg_wrap(
             waves(760, sc)
@@ -179,6 +246,11 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         parts, cells, _ = table_block(spec["rows"], max(500, body_end(spec.get("body", "")) + 44), spec.get("key_w", 300))
         kw["SVG"] = svg_wrap(parts)
         kw["CELLS"] = cells
+        kw["NOTE_BLOCK"] = (f'<div class="t abs note" style="left:80px;top:1196px">{esc(spec["note"])}</div>' if spec.get("note") else "")
+    elif lay == "diagram":
+        y0 = max(480, body_end(spec.get("body", "")) + 36)
+        svg, labels, bottom = D.build(spec, y0, D.Ctx(est_lines, bind_nums, esc))
+        kw["SVG"], kw["LABELS"] = svg_wrap(svg), labels
         kw["NOTE_BLOCK"] = (f'<div class="t abs note" style="left:80px;top:1196px">{esc(spec["note"])}</div>' if spec.get("note") else "")
     elif lay == "chart_bars" and any("value2" in b for b in spec["bars"]):
         # 成對橫條圖：每組（例如每個任務）兩條橫條，同一個 0 起點、同一個比例尺，用來看兩個量一起怎麼變
@@ -287,6 +359,15 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["LEGEND"] = f'刻度每格 {unit_ticks:g} {esc(spec.get("unit", ""))}'
         kw["NOTE"] = esc(spec.get("note", ""))
         spec["_S"], spec["_unit_ticks"] = S, unit_ticks
+    elif lay == "takeaway" and contour:
+        kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
+        q = spec.get("question")
+        kw["QUESTION"] = f'<div class="t abs take-q" style="top:320px">{esc(q)}</div>' if q else ""
+        kw["TAKE_STYLE"] = f"top:{320 + math.ceil(len(q) / 15.0) * 73 + 36}px" if q else ""
+        lab = spec.get("label")
+        kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
+        kw["SVG"] = svg_wrap(contours(800, 1200, [60, 130, 205, 285, 370, 460], LIGHT, .30)
+                             + step_path(COVER_PATH, LIGHT))
     elif lay == "takeaway":
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")      # 兩關這類並列的結論，可以用換行分成幾條
         q = spec.get("question")        # 先問一個問題，再給答案（讀者才知道這句話在回答什麼）
@@ -304,7 +385,14 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         cur = [m["concept"] for m in series["members"]].index(spec["current"])
         y, svg, out = 330, "", ""
         for i, t in enumerate(items):
-            if i == cur:
+            if contour and i == cur:
+                svg += f'<rect class="bg" x="72" y="{y - 10}" width="936" height="84" rx="6" fill="{DEEP}"/>'
+                svg += f'<circle class="g mark" data-e="1" cx="100" cy="{y + 32}" r="12" fill="{GOLD}"/>'
+                out += f'<div class="t abs item cur" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
+            elif contour:
+                svg += f'<circle class="g mark" cx="100" cy="{y + 32}" r="8" fill="{TEAL}"/>'
+                out += f'<div class="t abs item" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
+            elif i == cur:
                 svg += f'<rect class="bg" x="72" y="{y - 10}" width="936" height="84" rx="6" fill="{DEEP}"/>'
                 svg += f'<polygon class="g mark" data-e="1" points="100,{y + 20} 112,{y + 32} 100,{y + 44} 88,{y + 32}" fill="{GOLD}"/>'
                 out += f'<div class="t abs item cur" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
@@ -312,11 +400,39 @@ def build(spec: dict, series: dict, tag: str) -> dict:
                 svg += f'<polygon class="g mark" points="100,{y + 24} 108,{y + 32} 100,{y + 40} 92,{y + 32}" fill="{TEAL}"/>'
                 out += f'<div class="t abs item" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
             y += 112
+        if contour:      # 下半部：粗一點的等深線，一條朝圓心收斂的路徑；每一則是路徑上的一個節點（目前這則金色），最後一則落在最內圈裡
+            cx, cy = 790, 935
+            svg += contours(cx, cy, [55, 115, 180, 250, 320], MID, .55, sw=4)
+            S_, T_ = (150.0, 1060.0), (float(cx), float(cy))
+            nx_, ny_ = (T_[1] - S_[1]), -(T_[0] - S_[0])
+            nl_ = math.hypot(nx_, ny_); nx_, ny_ = nx_ / nl_, ny_ / nl_
+            N_ = 12
+            pts_ = []
+            for i_ in range(N_ + 1):
+                t_ = i_ / N_
+                off_ = (1 if i_ % 2 else -1) * 70 * (1 - t_) ** 1.5 * (1 if i_ else 0)
+                pts_.append((S_[0] + (T_[0] - S_[0]) * t_ + nx_ * off_, S_[1] + (T_[1] - S_[1]) * t_ + ny_ * off_))
+            svg += f'<polyline class="bg" points="{" ".join(f"{x_:.1f},{y_:.1f}" for x_, y_ in pts_)}" fill="none" stroke="{TEAL}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>'
+            marks_ = {round((k_ + 1) / mn * N_) for k_ in range(mn)}
+            for i_, (x_, y_) in enumerate(pts_):
+                if i_ not in marks_:
+                    svg += f'<circle class="bg" cx="{x_:.1f}" cy="{y_:.1f}" r="7" fill="{TEAL}"/>'
+            for k_ in range(mn):
+                x_, y_ = pts_[round((k_ + 1) / mn * N_)]
+                if k_ == mi:
+                    svg += (f'<circle class="bg" cx="{x_:.1f}" cy="{y_:.1f}" r="52" fill="{GOLD}" fill-opacity=".30"/>'
+                            f'<circle class="bg" cx="{x_:.1f}" cy="{y_:.1f}" r="22" fill="{GOLD}"/>')
+                else:
+                    svg += f'<circle class="bg" cx="{x_:.1f}" cy="{y_:.1f}" r="16" fill="{CREAM}" stroke="{TEAL}" stroke-width="6"/>'
         kw["SVG"] = svg_wrap(svg)
         kw["ITEMS"] = out
         kw["NAV"] = esc(spec.get("nav", ""))
     else:
         raise ValueError(f"未知版型 {lay}")
+
+    if contour and lay not in ("cover", "takeaway"):
+        dots = progress_dots(idx, n_sl)
+        kw["SVG"] = kw["SVG"].replace("</svg>", dots + "</svg>") if kw.get("SVG") else svg_wrap(dots)
 
     # 模板填入
     for k, v in kw.items():
@@ -340,6 +456,11 @@ MEASURE_JS = r"""
   const bars=[...document.querySelectorAll('.bar')].map(e=>({v:+e.dataset.v,len:e.width.baseVal.value,x:e.x.baseVal.value}));
   const axis=[...document.querySelectorAll('.axis')].map(e=>e.x1.baseVal.value);
   const ticks=[...document.querySelectorAll('.tick')].filter(e=>e.x1.baseVal.value===0).map(e=>e.y1.baseVal.value);
+  const inbox=[...document.querySelectorAll('[data-box]')].map(e=>{const [l,t,w,h]=e.dataset.box.split(',').map(Number);
+    const rg=tight(e); return {n:e.textContent.trim().slice(0,14),out:rg.l<l-1||rg.r>l+w+1||rg.t<t-1||rg.b>t+h+1}});
+  const rbars=[...document.querySelectorAll('.rbar')].map(e=>({lo:+e.dataset.lo,hi:+e.dataset.hi,s:+e.dataset.s,x0:+e.dataset.x0,
+    x:e.tagName==='rect'?e.x.baseVal.value:null,w:e.tagName==='rect'?e.width.baseVal.value:null}));
+  const dpts=[...document.querySelectorAll('.dpt')].map(e=>({v:+e.dataset.v,s:+e.dataset.s,x0:+e.dataset.x0,cx:e.cx.baseVal.value}));
   const emph=document.querySelectorAll('[data-e="1"]').length;
   function lines(el){
     const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT); const chars=[]; let n;
@@ -360,7 +481,7 @@ MEASURE_JS = r"""
     return {lines:cl.length,lastChars,bad,badNum,text};
   }
   const chk={}; document.querySelectorAll('.chk').forEach(e=>chk[e.id]=lines(e));
-  return {ts,gs,ropes,bobs,bars,axis,ticks,emph,chk,
+  return {ts,gs,ropes,bobs,bars,axis,ticks,emph,chk,inbox,rbars,dpts,
     pageH:document.documentElement.scrollHeight,pageW:document.documentElement.scrollWidth,
     fontOk:document.fonts.check('700 40px DSO')&&document.fonts.check('400 40px DSO')};
 }
@@ -417,7 +538,7 @@ def program_b(spec: dict, m: dict, img: Image.Image, series_name: str, tag_texts
         chk("標題的數字與單位不拆成兩行", not ti["badNum"], ti["badNum"])
     bo = m["chk"].get("body")
     if bo:
-        if lay in ("table", "chart_bars", "chart_sounding"):
+        if lay in ("table", "chart_bars", "chart_sounding", "diagram"):
             chk("圖表版型補充最多五行、不拆詞", bo["lines"] <= 5 and not bo["bad"], {"lines": bo["lines"], "bad": bo["bad"]})
         else:
             chk("補充不拆詞、末行 >= 2 字", not bo["bad"] and (bo["lines"] == 1 or bo["lastChars"] >= 2), {"lines": bo["lines"], "bad": bo["bad"], "lastChars": bo["lastChars"]})
@@ -436,6 +557,14 @@ def program_b(spec: dict, m: dict, img: Image.Image, series_name: str, tag_texts
         rat = [b["len"] / b["v"] for b in m["bars"]]
         chk("橫條長度與數值成正比、軸從 0 起", max(rat) / min(rat) < 1.01 and all(abs(b["x"] - m["axis"][0]) <= 1 for b in m["bars"]),
             f"每單位 {min(rat):.3f}~{max(rat):.3f}px")
+    if m["inbox"]:
+        bad = [b["n"] for b in m["inbox"] if b["out"]]
+        chk("框內文字不超出框（示意圖）", not bad, bad)
+    if m["rbars"]:
+        ok = all((abs(r["x"] - (r["x0"] + r["lo"] * r["s"])) < 1 and abs(r["w"] - (r["hi"] - r["lo"]) * r["s"]) < 1) for r in m["rbars"] if r["x"] is not None)
+        chk("區間條的位置與長度和數值成正比（軸從 0 起）", ok, [(r["lo"], r["hi"]) for r in m["rbars"]])
+    if m["dpts"]:
+        chk("前後對比的點落在數值對應的位置（軸從 0 起）", all(abs(p["cx"] - (p["x0"] + p["v"] * p["s"])) < 1 for p in m["dpts"]), [p["v"] for p in m["dpts"]])
     if lay not in ("cover", "context", "takeaway"):
         chk("只有一組強調元素", m["emph"] <= 1, m["emph"])
     chk("系列標籤與系列檔的名稱完全相同", all(t == series_name for t in tag_texts), tag_texts)
@@ -464,6 +593,9 @@ def render_all(spec_path: Path, only: set[int] | None = None, force: bool = Fals
             if only and i not in only:
                 continue
             sl = dict(sl)
+            sl["_idx"], sl["_n"] = i, len(doc["slides"])
+            mids = [m_["concept"] for m_ in series["members"]]
+            sl["_mi"], sl["_mn"] = (mids.index(doc["concept"]) if doc["concept"] in mids else 0), len(mids)
             built = build(sl, series, tag)
             page = (f'<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><style>{css}</style></head>'
                     f'<body>{built["body"]}</body></html>')
@@ -492,7 +624,8 @@ def render_all(spec_path: Path, only: set[int] | None = None, force: bool = Fals
             if sl["layout"] == "series_map":
                 alts[f"{i:02d}.png"] = plain(sl["title"]) + "。" + "、".join(m_["planned_title"] for m_ in series["members"])
             else:
-                alts[f"{i:02d}.png"] = ((sl["question"] + "　" if sl.get("question") else "") + plain(sl.get("title", "")) + ("。" + body if body else ""))
+                alts[f"{i:02d}.png"] = ((sl["question"] + "　" if sl.get("question") else "") + plain(sl.get("title", "")) + ("。" + body if body else "")
+                                        + ("。圖上寫：" + "、".join(D.texts(sl)) if sl["layout"] == "diagram" else ""))
         b.close()
     (bld / "alt-text.json").write_text(json.dumps(alts, ensure_ascii=False, indent=2), encoding="utf-8")
     (bld / "checks-b.json").write_text(json.dumps({"template_hash": thash, "slides": report}, ensure_ascii=False, indent=2), encoding="utf-8")

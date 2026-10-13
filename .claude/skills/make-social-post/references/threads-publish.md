@@ -23,6 +23,8 @@
 
 ## 流程
 
+**預設是輪播模式**（2026-10-12 起；下面的流程圖寫的是舊的逐張串文，輪播模式的做法見這節後面的「輪播模式」段落：兩則發佈）。
+
 ```
 （圖要先 prepare 並 push：Threads 沿用 IG 的 ig/jpg/NN.jpg，公開網址是這個 repo 的 raw 網址）
 publish  → dry-run：列出每一則的文字、字數、圖片網址、將送出的請求，檢查網址公開可抓、有沒有發布過
@@ -40,6 +42,8 @@ publish --confirm → 依序發 N 則：
 - **撤掉整串**：`rollback --confirm`（`DELETE /{id}`，由後往前刪；需要 `threads_delete` 權限，每天 100 次）。
 - 與 IG 不同：Threads 的串文**無法預檢**（回覆需要前一則「已發佈」的 id），所以沒有 preflight；風險由 dry-run、進度檔、rollback 承擔。
 - 第一次實測用 `--no-record`，並用 `rollback` 或 `delete` 清掉測試串文。
+
+**輪播模式**（`threads.mode: carousel`，2026-10-12 加入）：根貼文是 `media_type=CAROUSEL`——先為每張圖建一個子項 container（`media_type=IMAGE`、`image_url`、`is_carousel_item=true`，不放文字、不單獨發佈），再建輪播本體（`children=<子項 id，逗號分隔>`、`text`=正文），確認完成後 `threads_publish`；最後一則 TEXT（帶 `link_attachment`）`reply_to_id` 回覆根貼文。共 2 則發佈。官方：輪播 2～20 個子項。**2026-10-12 用真實帳號發了 19 張輪播＋1 則回覆（`skillopt-overview`），API 全程成功**；圖片張數與順序由人在 Threads 上確認；官方參數表沒有圖片 `alt_text`，輪播圖沒有替代文字。
 
 ## 官方限制（已查證；來源是官方文件）
 

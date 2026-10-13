@@ -18,6 +18,7 @@ INITIAL_WAIT_S = 30        # 官方：建好 container 後平均約等 30 秒再
 POLL_INTERVAL_S = 10
 POLL_MAX_ATTEMPTS = 12
 TEXT_MAX = 500
+CAROUSEL_MIN, CAROUSEL_MAX = 2, 20     # 官方：Threads 輪播 2～20 個子項
 
 
 class ThreadsClient(ig_api.IGClient):
@@ -37,12 +38,17 @@ class ThreadsClient(ig_api.IGClient):
                           {"fields": "quota_usage,config,reply_quota_usage,reply_config"})
 
     def create_post(self, media_type: str, text: str | None = None, image_url: str | None = None,
-                    link_attachment: str | None = None, reply_to_id: str | None = None) -> str:
+                    link_attachment: str | None = None, reply_to_id: str | None = None,
+                    children: list[str] | None = None, carousel_item: bool = False) -> str:
         p: dict = {"media_type": media_type}
         if text:
             p["text"] = text
         if image_url:
             p["image_url"] = image_url
+        if carousel_item:                                  # 輪播的子項：只放圖，不發佈，也不放文字
+            p["is_carousel_item"] = "true"
+        if children:                                       # 輪播本體：media_type=CAROUSEL，children 是子項 container id
+            p["children"] = ",".join(children)
         if link_attachment and media_type == "TEXT":      # link_attachment 只限純文字貼文
             p["link_attachment"] = link_attachment
         if reply_to_id:

@@ -17,6 +17,8 @@ FX = Path(__file__).resolve().parent / "fixtures"
 os.environ["DSO_CONCEPT_WIKI"] = str(FX / "concept-wiki")
 os.environ["DSO_SERIES_DIR"] = str(FX / "series")
 SCRIPT = ROOT / ".claude/skills/make-social-post/scripts/check_a.py"
+import yaml
+SLIDES_MAX = yaml.safe_load((ROOT / "config" / "params.yaml").read_text(encoding="utf-8"))["slides_max"]
 GOOD_A = json.loads((FX / "out/jev-teardown/jev-overview/spec.json").read_text(encoding="utf-8"))
 GOOD_B = json.loads((FX / "out/jev-teardown/confound-three-questions/spec.json").read_text(encoding="utf-8"))
 
@@ -55,15 +57,18 @@ CASES = [  # (名稱, 基底, 修改, 預期錯誤中要出現的字串)
     ("AI 腔黑名單", GOOD_A, lambda s: s["slides"][6].update(body="總而言之，需要注意到主張不成立、反覆推敲的深思型判斷，Jev 在這類判斷上會漏掉。"), "AI 腔"),
     ("脈絡張沒引用 context 主張", GOOD_A, lambda s: s["slides"][1].update(refs=["c11"]), "脈絡張"),
     ("補充字數不在 40 到 60", GOOD_A, lambda s: s["slides"][6].update(body="Jev 會漏掉。"), "補充"),
-    ("投影片超過 10 張", GOOD_A, lambda s: s["slides"].extend([copy.deepcopy(s["slides"][2]) for _ in range(2)]), "超過 10"),
+    ("投影片超過上限張數（slides_max）", GOOD_A, lambda s: s["slides"].extend([copy.deepcopy(s["slides"][2]) for _ in range(SLIDES_MAX)]), "超過 %d" % SLIDES_MAX),
     ("用語：貼文寫了「判官」而不是 Judge", GOOD_A, lambda s: s["threads"]["items"][0].update(text=s["threads"]["items"][0]["text"] + "這個判官很快。"), "用語"),
+    ("Threads 輪播模式卻還有逐張 items", GOOD_A, lambda s: s["threads"].update(mode="carousel"), "不該有 items"),
+    ("Threads 輪播超過 20 張", GOOD_A, lambda s: (s["threads"].update(mode="carousel", items=[]), s["slides"].extend([copy.deepcopy(s["slides"][2]) for _ in range(20)])), "輪播要 2～20 張"),
     ("caption 第一句太長", GOOD_A, lambda s: s["caption"].update(first="很長" * 30), "第一句"),
 ]
 
 
 def main():
     fails = 0
-    for base, name in ((GOOD_A, "正確的貼文 A（必須通過）"), (GOOD_B, "正確的貼文 B（必須通過）")):
+    carousel_ok = mut(GOOD_A, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items")))
+    for base, name in ((GOOD_A, "正確的貼文 A（必須通過）"), (GOOD_B, "正確的貼文 B（必須通過）"), (carousel_ok, "正確的貼文 A 改成 Threads 輪播模式（必須通過，測誤殺）")):
         code, out = run(base)
         ok = code == 0
         fails += not ok

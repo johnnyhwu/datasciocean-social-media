@@ -93,6 +93,22 @@ def fake_pack(base: Path, slides=(3, 4), text="正文"):
     return pack
 
 
+def fake_carousel_pack(base: Path, n=3):
+    """輪播模式：spec 的 threads.mode 是 carousel、沒有 items；每張投影片一張 JPEG。"""
+    pack = base / "out" / "s" / "fake-carousel"
+    (pack / "_build").mkdir(parents=True)
+    (pack / "ig" / "jpg").mkdir(parents=True)
+    spec = {"concept": "fake-carousel", "series": "s", "lang": "zh-TW", "hook": {"style": "讀者疑問"},
+            "slides": [{"layout": "text"} for _ in range(n)],
+            "threads": {"mode": "carousel", "body": {"text": "輪播正文", "refs": ["結構"]},
+                        "last": {"text": "最後一則\n文章：example.com", "refs": ["結構"], "link": "https://example.com/post/"}},
+            "caption": {"first": "x", "nav": "y", "hashtags": []}}
+    (pack / "_build" / "spec.json").write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
+    for i in range(1, n + 1):
+        Image.new("RGB", (1080, 1350), (240, 224, 192)).save(pack / "ig" / "jpg" / f"{i:02d}.jpg", "JPEG", quality=90)
+    return pack
+
+
 def kinds(fk):
     return [("create" if x[1].endswith("/threads") else "publish") for x in fk.calls if x[0] == "POST"]
 
@@ -196,6 +212,31 @@ def main():
         (pack / "ig" / "jpg" / "04.jpg").unlink()
         r = TP.publish_thread(pack, False, env, None, H(), fetch=opener_ok)
         check("抓得到：缺少某張 JPEG → 列為問題", not r["ok"] and any("JPEG 不存在" in p for p in r["problems"]))
+
+        # 輪播模式（2026-10-12）：一則輪播貼文（全部投影片）＋最後一則回覆
+        pack = fake_carousel_pack(tmp / "c", 3)
+        plan = TP.plan_thread(pack, H())
+        check("輪播計畫：CAROUSEL（3 個子項）→ TEXT 附連結，沒有問題",
+              [p["media_type"] for p in plan["posts"]] == ["CAROUSEL", "TEXT"] and len(plan["posts"][0]["children"]) == 3 and not plan["problems"], plan["problems"])
+        fk, sl = Fake(), []
+        r = TP.publish_thread(pack, True, env, client(fk, sl), H(), fetch=opener_ok)
+        posts = [x for x in fk.calls if x[0] == "POST"]
+        creates = [x for x in posts if x[1].endswith("/threads")]
+        check("輪播 --confirm：3 個子項 container → 輪播本體 → 發佈 → 回覆 → 發佈（子項不單獨發佈）",
+              r["ok"] and kinds(fk) == ["create"] * 4 + ["publish", "create", "publish"], (kinds(fk), r.get("error")))
+        check("子項是 IMAGE + is_carousel_item、沒有文字；輪播本體 children 是三個子項 id、帶正文",
+              all(c[2]["media_type"] == "IMAGE" and c[2]["is_carousel_item"] == "true" and "text" not in c[2] for c in creates[:3])
+              and creates[3][2]["media_type"] == "CAROUSEL" and creates[3][2]["children"] == "C1,C2,C3" and creates[3][2]["text"] == "輪播正文", [c[2] for c in creates])
+        check("最後一則回覆根貼文（P1）、純文字附連結預覽", creates[4][2]["reply_to_id"] == "P1" and creates[4][2]["link_attachment"] == "https://example.com/post/" and r["post_ids"] == ["P1", "P2"], creates[4][2])
+        check("輪播 dry-run 輸出列出子項、不含 token", TOKEN not in json.dumps(TP.publish_thread(fake_carousel_pack(tmp / "c2", 3), False, env, client(Fake()), H(), fetch=opener_ok), ensure_ascii=False))
+        r = TP.publish_thread(fake_carousel_pack(tmp / "c3", 1), False, env, None, H(), fetch=opener_ok)
+        check("抓得到：輪播只有 1 張 → 問題", not r["ok"] and any("輪播要" in p for p in r["problems"]), r["problems"])
+        r = TP.publish_thread(fake_carousel_pack(tmp / "c4", 21), False, env, None, H(), fetch=opener_ok)
+        check("抓得到：輪播 21 張 → 問題", not r["ok"] and any("輪播要" in p for p in r["problems"]), r["problems"])
+        pk = fake_carousel_pack(tmp / "c5", 3)
+        (pk / "ig" / "jpg" / "02.jpg").unlink()
+        r = TP.publish_thread(pk, False, env, None, H(), fetch=opener_ok)
+        check("抓得到：輪播缺一張 JPEG → 問題", not r["ok"] and any("JPEG 不存在" in p for p in r["problems"]), r["problems"])
 
         # 客戶端
         c = client(Fake(statuses=["IN_PROGRESS", "FINISHED"]), [])

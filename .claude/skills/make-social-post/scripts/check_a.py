@@ -9,7 +9,7 @@
 spec.json 欄位：
   slides[].refs        引用的 claim id 或 ["結構"]
   slides[].quals       這個區塊帶出的限定條件，格式 "c3#1"（c3 的第 1 條 qualifiers）
-  threads.body / threads.items[] / threads.last   各有 text、refs、quals（items 另有 slide）
+  threads.body / threads.items[] / threads.last   各有 text、refs、quals（items 另有 slide；threads.mode 是 carousel 時沒有 items）
   caption.first / caption.nav / caption.hashtags / caption.nav_refs
 """
 from __future__ import annotations
@@ -22,12 +22,13 @@ from pathlib import Path
 import yaml
 
 import cardlib as W
+import diagrams as D
 
 P = W.load_params()
 OK_STATUS = {"normal", "author_confirmed"}
 BIGRAM = lambda s: {s[i:i + 2] for i in range(len(s) - 1)}
 NUM = re.compile(r"\d+(?:\.\d+)?")
-CONTENT_LAYOUTS = {"text", "table", "chart_bars", "chart_sounding"}
+CONTENT_LAYOUTS = {"text", "table", "chart_bars", "chart_sounding", "diagram"}
 
 
 def strip_marks(s: str) -> str:
@@ -52,6 +53,8 @@ def slide_texts(sl: dict) -> list[str]:
         if "value2" in b:
             out.append(f"{b['value2']:g}")
     out += list(sl.get("legend", []))
+    if sl.get("layout") == "diagram":
+        out += D.texts(sl)
     return out
 
 
@@ -73,7 +76,7 @@ def main(spec_path: str) -> int:
         blocks.append((f"slide{i:02d}({sl['layout']})", slide_texts(sl), sl.get("refs"), sl.get("quals", []), sl))
     th = doc["threads"]
     blocks.append(("threads.body", [th["body"]["text"]], th["body"].get("refs"), th["body"].get("quals", []), None))
-    for j, it in enumerate(th["items"], 1):
+    for j, it in enumerate(th.get("items", []), 1):
         blocks.append((f"threads.item{j}(slide{it['slide']})", [it["text"]], it.get("refs"), it.get("quals", []), None))
     blocks.append(("threads.last", [th["last"]["text"]], th["last"].get("refs"), th["last"].get("quals", []), None))
     cap = doc["caption"]
@@ -121,6 +124,10 @@ def main(spec_path: str) -> int:
                 for tok in re.findall(r"[A-Za-z][A-Za-z0-9.\-]*", b["name"] + " " + " ".join(b.get("subs", []))):
                     if tok.lower() not in ref_text.lower():
                         err.append(f"{name}: 圖上名稱 {tok!r} 沒有被引用的主張涵蓋")
+        if sl and sl["layout"] == "diagram":
+            for tok in re.findall(r"[A-Za-z][A-Za-z0-9.\-]*", " ".join(D.texts(sl))):
+                if tok.lower() not in ref_text.lower() and tok not in P.get("latin_allow", []):
+                    err.append(f"{name}: 圖上名稱 {tok!r} 沒有被引用的主張涵蓋")
         # 9. 比較詞與全稱詞
         for w in P["comparative_words"]:
             for f in fields:
@@ -164,6 +171,8 @@ def main(spec_path: str) -> int:
         body = sl.get("body", "")
         if sl["layout"] in ("text",) and not (P["body_chars"][0] <= len(body) <= P["body_chars"][1]):
             err.append(f"slide{i:02d}: 補充 {len(body)} 字，不在 {P['body_chars']}")
+        if sl["layout"] == "diagram" and len(body) > P["diagram_body_max_chars"]:
+            err.append(f"slide{i:02d}: 示意圖補充 {len(body)} 字，超過 {P['diagram_body_max_chars']}（補充行數預檢）")
         if sl["layout"] in ("table", "chart_bars", "chart_sounding") and len(body) > P["chart_body_max_chars"]:
             err.append(f"slide{i:02d}: 圖表版型補充 {len(body)} 字，超過 {P['chart_body_max_chars']}（補充行數預檢）")
         if sl["layout"] == "context" and len(body) > P["context_body_max_chars"]:
@@ -174,12 +183,18 @@ def main(spec_path: str) -> int:
     # Threads
     if len(th["body"]["text"]) > P["thread_body_max_chars"]:
         err.append(f"Threads 正文 {len(th['body']['text'])} 字，超過 {P['thread_body_max_chars']}")
-    if re.search(r"https?://|datasciocean\.com", th["body"]["text"]) or any(re.search(r"https?://|datasciocean\.com", it["text"]) for it in th["items"]):
+    if re.search(r"https?://|datasciocean\.com", th["body"]["text"]) or any(re.search(r"https?://|datasciocean\.com", it["text"]) for it in th.get("items", [])):
         err.append("Threads：連結只能放在最後一則")
+    carousel = th.get("mode") == "carousel"
+    if carousel:     # 一則輪播貼文（全部投影片）＋最後一則回覆；不逐張寫串文
+        if th.get("items"):
+            err.append("Threads 輪播模式（mode: carousel）不該有 items（圖片都在同一則貼文裡）")
+        if not 2 <= len(doc["slides"]) <= 20:
+            err.append(f"Threads 輪播要 2～20 張，目前 {len(doc['slides'])} 張")
     content_idx = [i for i, s in enumerate(doc["slides"], 1) if s["layout"] in CONTENT_LAYOUTS]
-    if sorted(it["slide"] for it in th["items"]) != content_idx:
+    if not carousel and sorted(it["slide"] for it in th["items"]) != content_idx:
         err.append(f"Threads 串文與內容投影片不是一對一：串文 {sorted(it['slide'] for it in th['items'])}，內容張 {content_idx}")
-    for j, it in enumerate(th["items"], 1):
+    for j, it in enumerate(th.get("items", []), 1):
         sl = doc["slides"][it["slide"] - 1]
         img = re.sub(r"\s+", "", " ".join(slide_texts(sl)))
         d = re.sub(r"\s+", "", it["text"])

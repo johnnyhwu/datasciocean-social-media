@@ -1,6 +1,6 @@
 # 內容規格 JSON（`out/<series>/<concept>/_build/spec.json`）
 
-LLM 只產出這份 JSON；外觀完全由模板決定。範例：`out/jev-cascade/cascade-complementary-errors/_build/spec.json`（現行品質基準：雙卡貼文，口語白話、讀者不需要 AI 背景、成對橫條圖、「第一關／第二關」標籤；`judge-readable-vs-derive` 是前一個基準；`jev-cascade-overview` 的寫法已過時，不要參考）。
+LLM 只產出這份 JSON；外觀完全由模板決定。範例：`out/skillopt/skillopt-batch-evidence-minibatch/_build/spec.json` 與 `out/skillopt/skillopt-blind-acceptance-gate/_build/spec.json`（現行品質基準：雙卡貼文、17 張、多種示意圖、口語白話、Threads 輪播）；`skillopt-overview` 是單卡＋示意圖的範例；`cascade-complementary-errors` 是成對橫條圖的舊基準；`jev-cascade-overview` 的寫法已過時，不要參考。
 `build_package.py` 有投影片欄位白名單：spec 出現不認得的欄位就報錯，避免新欄位漏了輸出。要新增欄位，先在 `build_package.py` 的 `CONTENT_KEYS`／`LAYOUT_KEYS` 加上、讓它輸出到審查文字與 `ig/post.md`，並補測試。
 
 ## 頂層
@@ -56,6 +56,7 @@ caption 第一句用 `first_refs`。`refs` 只證明「有對應」，不證明�
 | `table` | 兩欄對照（最多 4 列） | `rows: [["鍵","值"], …]`（鍵最多約 7 個字，否則換行；鍵可寫「主｜小字」把指標名稱排在下面；`key_w` 調鍵欄寬，預設 300；值很長時把 `key_w` 調小、值欄變寬）、`note`（選用，圖註，單行約 32 字內）；`body` 最多 110 字（`chart_body_max_chars`，約 5 行；表會往下讓位，總高度要放得下，不然程式 B 的「不超出版面下緣」會擋）；選用 `label` |
 | `chart_bars` | 橫條圖（米色底） | `unit`、`bars`、`note`；`body` 可到約 4 行（圖會往下讓位）；選用 `label`；`subs_inline: true` 把副標籤接在名稱後面同一行（3 條時間距自動拉開；4 條橫條不要用 subs 或要用 inline） |
 | `chart_bars`（**成對橫條圖**） | 同一批對象的兩個量一起看（同單位，例如每個任務的「轉出比例」與「費用」） | 每個 bar 多一個 `value2`；spec 多 `legend: ["第一個量","第二個量"]`（圖上方的圖例）、選用 `axis_max`（比例尺的滿格，例如 100）。兩個量共用同一個 0 起點與比例尺，不用雙軸；第一個量 MID、第二個量深海色，**不用金色**；`bars[].subs` 是名稱下面的小字（例如該任務的準確度），每組最多 1 行；`body` 最多 3 行、4 組，不然放不下。`emphasize` 在這個版型不用 |
+| `diagram` | **示意圖**（2026-10-11 新增，只有 `style: contour` 的系列有模板）。`kind` 決定畫法：`flow`（`nodes`、選用 `outcomes`／`loop`）、`compare`（`columns[{head, items[{text, sub?, gone?, muted?, emph?}]}]`）、`pairs`（`heads`、`pairs`）、`samples`／`paths`（`nodes` 兩個）、`epochs`（`nodes` 兩個圖例）、`dotgrid`（`count`、`nodes` 圖例，第一個實心、第二個空心）、`dumbbell`（`points`、`ref`、`unit`、`axis_max`）、`range`（`ranges[{name, sub?, lo, hi, emph?}]`、`unit`、`axis_max`）、`funnel`（`nodes`）、`batches`（`count`、`group`、`nodes` 兩個）、`decay`（`start`、`end`、`unit`、`axis_max`、`nodes` 兩個）、`stops`（`nodes`、選用 `heads`）、`fan`（`heads` 2～4 個、`nodes` 兩個：說明＋匯整結果）、`peaks`（`nodes` 三個：兩條線＋重合標籤，純示意）、`quad`（`nodes` 四格）、`locked`（`heads` 兩個、`nodes` 兩個：文件名＋受保護區塊） | `body` 最多 130 字（`diagram_body_max_chars`），圖依補充行數往下讓位，放不下會直接報錯（縮短補充或圖上的字）；選用 `note`（圖註，有圖註時圖會在 y=1180 前結束）。圖上的文字與數字都要被引用的主張涵蓋（程式 A 檢查）；純示意的圖（`samples`、`paths`、`epochs`）圖上標「示意」，不得畫成實驗數據。幾何在 `scripts/diagrams.py` |
 | `chart_sounding` | 測深圖（深色海面面板，最多 3 條繩） | `unit`、`bars`、`note`；`body` 最多 2 行；選用 `label` |
 | `takeaway` | 倒數第二張，深海底金色字，一句話 | `title`（一句話，字最大；內含 `\n` 會換行，適合「第一關／第二關」這類並列結論，最多 4 行）、`question`（選用：先問的問題，較小的米色字，約 2 行內）、`label`（選用小字） |
 | `series_map` | 最後一張（獨立 post 為「延伸閱讀」） | `current`（本則的 concept id）、`nav`（導流行）；標題清單由系列檔的 `planned_title` 自動填，不要自己寫 |
@@ -72,6 +73,8 @@ caption 第一句用 `first_refs`。`refs` 只證明「有對應」，不證明�
              "refs": ["c1", "c2"], "link": "https://datasciocean.com/ai-concept/<slug>/" }
 }
 ```
+
+**輪播模式（2026-10-12 起是預設；新貼文一律用，skillopt 三則都是）**：加 `"mode": "carousel"`、**不寫 `items`**。Threads 發成**一則輪播貼文**（`body` 當正文，附**全部投影片**，順序與 IG 相同，2～20 張）＋**一則回覆**（`last`，帶連結預覽與系列）；沒有逐張串文，所以正文要自己撐起重點與限定條件。沒寫 `mode` 是舊的逐張串文（legacy，只留給已發布的三則 jev-cascade 與測試；新貼文不要用）。
 
 ## caption
 

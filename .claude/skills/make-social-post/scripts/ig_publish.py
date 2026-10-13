@@ -34,6 +34,7 @@ from publish_common import (ENV_PATH, MAX_BYTES, TOKEN_LIFETIME_DAYS, WARN_DAYS,
                             set_env, token_days_left, validate_jpeg)
 
 PUBLISH_LOG = W.ROOT / "state" / "ig-publish-log.jsonl"
+CAROUSEL_MAX = 20     # 官方文件寫 10 張，但 2026-10-12 實測：建立 11、15、20 個子項的 carousel container 都成功（見 references/instagram-publish.md）
 
 
 # ---------------------------------------------------------------- .env 與 token
@@ -76,8 +77,8 @@ def plan_carousel(pack: Path, host: hosting.Host, env: dict) -> dict:
     problems = []
     if len(jpgs) != n_slides:
         problems.append(f"JPEG {len(jpgs)} 張，投影片 {n_slides} 張：先執行 prepare")
-    if not (2 <= len(jpgs) <= 10):
-        problems.append(f"輪播需要 2 到 10 張，現在 {len(jpgs)} 張")
+    if not (2 <= len(jpgs) <= CAROUSEL_MAX):
+        problems.append(f"輪播需要 2 到 {CAROUSEL_MAX} 張，現在 {len(jpgs)} 張")
     for j in jpgs:
         problems += validate_jpeg(j)
     urls = [host.upload(j) for j in jpgs]

@@ -4,9 +4,11 @@
 憑證只放 .env：THREADS_ACCESS_TOKEN、THREADS_USER_ID（可由 whoami 取得）；token 不會出現在任何輸出。
 設定與限制見 references/threads-publish.md。
 
-串文做法：正文是根貼文，之後每一則都用 reply_to_id 回覆**前一則**（就是 app 裡的「新增到串文」）。
+串文做法（spec 的 threads.mode 沒寫或是 chain）：正文是根貼文，之後每一則都用 reply_to_id 回覆**前一則**（就是 app 裡的「新增到串文」）。
 每一則發完就把 id 寫進 _build/threads-progress.json；中途失敗，修好後再執行同一個指令會從下一則繼續，
-不會重複發。想整串撤掉：rollback --confirm（用 DELETE /{id}，需要 threads_delete 權限）。
+不會重複發。
+輪播做法（threads.mode: carousel，2026-10-12）：根貼文是一則輪播（正文＋全部投影片，與 IG 同順序，最多 20 張），
+最後一則文字回覆它（帶連結預覽、系列其他則）；只有 2 則，沒有逐張串文。想整串撤掉：rollback --confirm（用 DELETE /{id}，需要 threads_delete 權限）。
 
 用法（repo 根目錄）：
   uv run python .claude/skills/make-social-post/scripts/threads_publish.py whoami [--no-write]
@@ -50,8 +52,24 @@ def threads_len(text: str) -> int:
 def plan_thread(pack: Path, host: hosting.Host) -> dict:
     d = json.loads((pack / "_build" / "spec.json").read_text(encoding="utf-8"))
     th = d["threads"]
-    posts = [{"kind": "root", "media_type": "TEXT", "text": th["body"]["text"]}]
     problems = []
+    if th.get("mode") == "carousel":
+        # 一則輪播貼文（正文＋全部投影片，順序與 IG 相同），最後一則回覆放連結與系列
+        children = []
+        for n in range(1, len(d["slides"]) + 1):
+            jpg = pack / "ig" / "jpg" / f"{n:02d}.jpg"
+            if not jpg.exists():
+                problems.append(f"第 {n} 張的 JPEG 不存在：先對這個發布包執行 ig_publish.py prepare 並 push")
+                continue
+            problems += PC.validate_jpeg(jpg)
+            children.append({"slide": n, "image_url": host.upload(jpg), "jpg": str(jpg)})
+        if not TA.CAROUSEL_MIN <= len(children) <= TA.CAROUSEL_MAX and not problems:
+            problems.append(f"輪播要 {TA.CAROUSEL_MIN}～{TA.CAROUSEL_MAX} 張，目前 {len(children)} 張")
+        posts = [{"kind": "root-carousel", "media_type": "CAROUSEL", "text": th["body"]["text"], "children": children}]
+        last = th["last"]
+        posts.append({"kind": "last", "media_type": "TEXT", "text": last["text"], "link_attachment": last.get("link")})
+        return _finish_plan(d, posts, problems)
+    posts = [{"kind": "root", "media_type": "TEXT", "text": th["body"]["text"]}]
     for it in th["items"]:
         n = it["slide"]
         jpg = pack / "ig" / "jpg" / f"{n:02d}.jpg"
@@ -62,6 +80,10 @@ def plan_thread(pack: Path, host: hosting.Host) -> dict:
         posts.append({"kind": f"item-slide{n}", "media_type": "IMAGE", "text": it["text"], "image_url": host.upload(jpg), "jpg": str(jpg)})
     last = th["last"]
     posts.append({"kind": "last", "media_type": "TEXT", "text": last["text"], "link_attachment": last.get("link")})
+    return _finish_plan(d, posts, problems)
+
+
+def _finish_plan(d: dict, posts: list[dict], problems: list[str]) -> dict:
     for i, p in enumerate(posts, 1):
         n = threads_len(p["text"])
         if n > TA.TEXT_MAX:
@@ -74,9 +96,11 @@ def plan_thread(pack: Path, host: hosting.Host) -> dict:
 def fingerprint(plan: dict, version: str, user_id: str | None) -> str:
     h = hashlib.sha256()
     for p in plan["posts"]:
-        if p.get("jpg"):
-            h.update(Path(p["jpg"]).read_bytes())
-    h.update(json.dumps([[p["kind"], p["media_type"], p["text"], p.get("image_url"), p.get("link_attachment")] for p in plan["posts"]],
+        for j in [p] + p.get("children", []):
+            if j.get("jpg"):
+                h.update(Path(j["jpg"]).read_bytes())
+    h.update(json.dumps([[p["kind"], p["media_type"], p["text"], p.get("image_url"), p.get("link_attachment"),
+                          [c["image_url"] for c in p.get("children", [])]] for p in plan["posts"]],
                         ensure_ascii=False).encode())
     h.update(json.dumps([version, user_id]).encode())
     return h.hexdigest()[:16]
@@ -97,6 +121,8 @@ def describe(plan: dict, version: str) -> list[dict]:
         params = {"media_type": p["media_type"], "text": p["text"]}
         if p.get("image_url"):
             params["image_url"] = p["image_url"]
+        if p.get("children"):
+            params["children"] = [f"<子項 container：第 {c['slide']} 張 {c['image_url']}>" for c in p["children"]]
         if p.get("link_attachment"):
             params["link_attachment"] = p["link_attachment"]
         if i > 1:
@@ -121,11 +147,12 @@ def publish_thread(pack: Path, confirm: bool, env: dict, client: TA.ThreadsClien
     problems = list(plan["problems"])
     url_checks = []
     for p in plan["posts"]:
-        if p.get("image_url"):
-            ok, why = hosting.check_public(p["image_url"], opener=fetch)
-            url_checks.append({"url": p["image_url"], "ok": ok, "detail": why})
-            if not ok:
-                problems.append(f"圖片網址不能用：{p['image_url']}｜{why}")
+        for j in [p] + p.get("children", []):
+            if j.get("image_url"):
+                ok, why = hosting.check_public(j["image_url"], opener=fetch)
+                url_checks.append({"url": j["image_url"], "ok": ok, "detail": why})
+                if not ok:
+                    problems.append(f"圖片網址不能用：{j['image_url']}｜{why}")
     if ST.load(plan["concept"])["formats"].get("threads_thread", {}).get("status") == "published":
         problems.append("state 顯示這則的 Threads 串文已發布過；不重複發佈")
     fp = fingerprint(plan, version, client.user_id if client else env.get("THREADS_USER_ID"))
@@ -160,8 +187,15 @@ def publish_thread(pack: Path, confirm: bool, env: dict, client: TA.ThreadsClien
         for i in range(len(prog["published"]), len(plan["posts"])):
             p = plan["posts"][i]
             prev = prog["published"][-1] if prog["published"] else None
+            kids = None
+            if p.get("children"):                          # 輪播：先建每一張的子項 container（不發佈），再建輪播本體
+                kids = []
+                for c in p["children"]:
+                    k = client.create_post("IMAGE", image_url=c["image_url"], carousel_item=True)
+                    client.wait_ready(k, initial_wait=0, interval=3)
+                    kids.append(k)
             cid = client.create_post(p["media_type"], text=p["text"], image_url=p.get("image_url"),
-                                     link_attachment=p.get("link_attachment"), reply_to_id=prev)
+                                     link_attachment=p.get("link_attachment"), reply_to_id=prev, children=kids)
             client.wait_ready(cid)
             prog["published"].append(client.publish(cid))
             save_progress(pack, prog)

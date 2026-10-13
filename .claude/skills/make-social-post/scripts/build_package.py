@@ -24,12 +24,14 @@ from pathlib import Path
 import yaml
 
 import cardlib as W
+import diagrams as D
 
-CONTENT = {"text", "table", "chart_bars", "chart_sounding"}
+CONTENT = {"text", "table", "chart_bars", "chart_sounding", "diagram"}
 # 投影片欄位白名單：文字內容欄位都必須輸出到審查文字與 ig/post.md；版面參數不輸出。遇到不認得的欄位就報錯，
 # 避免「新增欄位、卻漏了輸出」（審查者與人都看不到那段內容）。
-CONTENT_KEYS = {"title", "body", "label", "question", "rows", "bars", "note", "nav", "legend"}
-LAYOUT_KEYS = {"layout", "refs", "quals", "unit", "key_w", "subs_inline", "current", "axis_max"}
+CONTENT_KEYS = {"title", "body", "label", "question", "rows", "bars", "note", "nav", "legend",
+                "nodes", "outcomes", "loop", "columns", "heads", "pairs", "count", "points", "ref", "ranges", "group", "start", "end"}
+LAYOUT_KEYS = {"layout", "refs", "quals", "unit", "key_w", "subs_inline", "current", "axis_max", "kind"}
 
 
 def check_fields(d: dict) -> None:
@@ -37,7 +39,7 @@ def check_fields(d: dict) -> None:
     if bad:
         raise ValueError(f"投影片有不認得的欄位（要新增欄位，請先讓 build_package 輸出它並加測試）：{bad}")
 LAYOUT_NAME = {"cover": "封面", "context": "脈絡", "text": "文字", "table": "對照表", "chart_bars": "橫條圖",
-               "chart_sounding": "測深圖", "takeaway": "帶走", "series_map": "系列地圖"}
+               "chart_sounding": "測深圖", "diagram": "示意圖", "takeaway": "帶走", "series_map": "系列地圖"}
 mark = lambda s: re.sub(r"\[\[(.+?)\]\]", r"\1", s)
 
 
@@ -76,6 +78,8 @@ def slide_lines(sl: dict, with_refs: bool) -> list[str]:
         for b in sl["bars"]:
             v2 = f"｜{sl['legend'][1]} {b['value2']:g} {sl.get('unit', '')}" if "value2" in b else ""
             out.append(f"圖表項目：{b['name']}｜{'／'.join(b.get('subs', []))}｜{(sl['legend'][0] + ' ') if v2 else ''}{b['value']:g} {sl.get('unit', '')}{v2}" + ("｜強調" if b.get("emphasize") else ""))
+    if sl["layout"] == "diagram":
+        out.append(f"示意圖（{sl['kind']}）上的文字與數字：" + "｜".join(D.texts(sl)))
     if sl.get("note"):
         out.append(f"圖註：{sl['note']}")
     if sl.get("nav"):
@@ -94,7 +98,9 @@ def review_files(d: dict, build: Path) -> None:
         L += ["", "## Threads 串文", "", "### 正文", th["body"]["text"]]
         if with_refs:
             L.append(f"引用：{', '.join(th['body']['refs'])}" + (f"｜帶出限定條件：{', '.join(th['body'].get('quals', []))}" if th['body'].get("quals") else ""))
-        for j, it in enumerate(th["items"], 1):
+        if th.get("mode") == "carousel":
+            L += ["", f"（Threads 這則是輪播：正文下附與 IG 相同順序的全部 {len(d['slides'])} 張圖，沒有逐張串文）"]
+        for j, it in enumerate(th.get("items", []), 1):
             L += ["", f"### 串文 {j}（配第 {it['slide']} 張圖）", it["text"]]
             if with_refs:
                 L.append(f"引用：{', '.join(it['refs'])}")
@@ -135,6 +141,8 @@ def ig_md(d: dict, title: str, series_name: str | None, alts: dict) -> str:
                 L.append(f"- **補充**：{sl['body']}")
             for r in sl.get("rows", []):
                 L.append(f"- **表列**：{r[0]}｜{r[1]}")
+            if sl["layout"] == "diagram":
+                L.append(f"- **示意圖（{sl['kind']}）上的文字與數字**：" + "｜".join(D.texts(sl)))
             for b in sl.get("bars", []):
                 v2 = f"；{sl['legend'][1]} {b['value2']:g} {sl.get('unit', '')}" if "value2" in b else ""
                 L.append(f"- **圖上項目**：{b['name']}（{'、'.join(b.get('subs', []))}）＝ {(sl['legend'][0] + ' ') if v2 else ''}{b['value']:g} {sl.get('unit', '')}{v2}" + ("　★強調" if b.get("emphasize") else ""))
@@ -149,6 +157,14 @@ def ig_md(d: dict, title: str, series_name: str | None, alts: dict) -> str:
 
 def threads_md(d: dict, title: str) -> str:
     th = d["threads"]
+    if th.get("mode") == "carousel":
+        n = len(d["slides"])
+        L = [f"# Threads：{title}", "",
+             f"- 發文方式：**一則輪播貼文**（正文＋全部 {n} 張圖，順序與 IG 相同），再用一則回覆放連結與系列（連結只放那則回覆）",
+             "- 圖檔在 `../ig/`（與 IG 輪播共用同一套）", "", "## 貼文正文（附下方全部圖片）", ""] + fence(th["body"]["text"]) + [""]
+        L += ["## 附圖（依序）", ""] + [f"![第 {i} 頁](../ig/{i:02d}.png)" for i in range(1, n + 1)] + [""]
+        L += ["## 回覆：連結與系列", ""] + fence(th["last"]["text"]) + [""]
+        return "\n".join(L)
     L = [f"# Threads 串文：{title}", "",
          "- 發文方式：正文用「新增到串文」**一次發出**，每則串文附下方標註的圖；**連結只放最後一則**（置頂）",
          "- 圖檔在 `../ig/`（與 IG 輪播共用同一套）", "", "## 正文", ""] + fence(th["body"]["text"]) + [""]
@@ -188,11 +204,11 @@ def readme_md(d: dict, title: str, series: dict | None, pack: Path, build: Path)
          f"| 觀念 | `{d['concept']}`（卡：`concept-wiki/wiki/concepts/{d['concept']}.md`）" + "".join(f"；併入 `{o}`" for o in d.get("also_concepts") or []) + " |",
          f"| hook 樣態 | {d['hook']['style']} |",
          f"| IG 輪播 | {STATUS_ZH.get(st.get('ig_carousel', 'not_tried'), st.get('ig_carousel'))}（{len(d['slides'])} 張） |",
-         f"| Threads 串文 | {STATUS_ZH.get(st.get('threads_thread', 'not_tried'), st.get('threads_thread'))}（{len(d['threads']['items']) + 2} 則） |", "",
+         f"| Threads 串文 | {STATUS_ZH.get(st.get('threads_thread', 'not_tried'), st.get('threads_thread'))}（{2 if d['threads'].get('mode') == 'carousel' else len(d['threads']['items']) + 2} 則） |", "",
          "## 要看／要發的檔案", "",
          "| 要做什麼 | 打開哪個檔案 |", "|---|---|",
          "| 看 IG 每一頁的圖與文字、複製 caption | [`ig/post.md`](ig/post.md)（圖在 `ig/01.png` …） |",
-         "| 看 Threads 串文（正文、每則附圖、最後一則） | [`threads/post.md`](threads/post.md) |",
+         "| 看 Threads（正文與附圖、最後一則回覆；舊格式是逐張串文） | [`threads/post.md`](threads/post.md) |",
          "| 一眼看全部縮圖 | 下方縮圖，或 [`_build/contact-sheet.png`](_build/contact-sheet.png) |", ""]
     if (build / "contact-sheet.png").exists():
         L += ["![縮圖總覽](_build/contact-sheet.png)", ""]

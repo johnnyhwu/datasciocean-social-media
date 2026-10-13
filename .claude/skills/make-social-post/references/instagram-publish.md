@@ -46,7 +46,7 @@ publish --confirm → 預檢在 23 小時內、內容指紋沒變、container �
 |---|---|
 | 圖片 | 只支援 **JPEG**（MPO、JPS 不支援）；8 MB 以內；寬 320～1440；比例 4:5～1.91:1；sRGB。我們的 1080×1350 剛好是 4:5 下限 |
 | 圖片網址 | 必須是公開、不需登入、可直接下載、**不帶 query 參數**；Meta 自己去抓。**圖片沒有「直接上傳本機檔案」的方式**（`rupload` 只文件化了影片） |
-| 輪播 | 最多 10 張（實測 4:5 不會被裁）；`is_carousel_item=true` 的子項各建一個 container，再建 `media_type=CAROUSEL`、`children=…` 的 container；**caption 只放在 carousel container**，子項不支援 |
+| 輪播 | 官方文件寫最多 10 張，**但 2026-10-12 實測：建立 11、15、20 個子項的 carousel container 都成功（只建 container、沒呼叫 media_publish）**，所以 `ig_publish.py` 的上限放寬到 20；**2026-10-12 實發 19 張成功**（`skillopt-overview`，預檢沿用、`media_publish` 沒被拒；API 回報成功，張數與順序由人在 IG 上確認）；實測 4:5 不會被裁；`is_carousel_item=true` 的子項各建一個 container，再建 `media_type=CAROUSEL`、`children=…` 的 container；**caption 只放在 carousel container**，子項不支援 |
 | alt_text | 單圖與輪播每張圖都支援 `alt_text` |
 | is_ai_generated | 輪播只能設在 carousel container，子項會報錯。專案規則 10：預設不加（`IG_AI_GENERATED=false`） |
 | caption | 最多 2200 字元、30 個 hashtag、20 個 @tag |
@@ -63,6 +63,8 @@ publish --confirm → 預檢在 23 小時內、內容指紋沒變、container �
 4. 預檢建的 container 可以直接沿用於 `media_publish`，只送一個請求。
 
 ## 還沒驗證
+
+0. ~~超過 10 張的輪播能不能真的 `media_publish`~~：**已驗證（2026-10-12，19 張）**，API 沒有拒絕；上限仍以 `ig_publish.py` 的 20 張為準（20 張的實發還沒做過）。
 
 1. API 能不能刪除或封存貼文：官方文件沒寫；發現錯誤時只報告給人，由人決定要不要處理（測試貼文曾由人手動封存）。
 2. 官方各頁對發文上限的說法不一致；實際帳號 `content_publishing_limit` 回報上限 100／24 小時，用量 0。
