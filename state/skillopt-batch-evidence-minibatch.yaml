@@ -1,0 +1,23 @@
+concept: skillopt-batch-evidence-minibatch
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: skillopt-batch-evidence-minibatch:ig_carousel
+  format: ig_carousel
+  series_id: skillopt
+  url: https://www.instagram.com/p/Dea5IgXIBKS/
+  published_at: 2026-10-13T04:00:22+0000
+  hook_type: 並列重點
+  mentions: []
+  backfilled: []
+- post_id: skillopt-batch-evidence-minibatch:threads_thread
+  format: threads_thread
+  series_id: skillopt
+  url: https://www.threads.com/@datasciocean/post/Dea6HxFICya
+  published_at: 2026-10-13T04:05:13+0000
+  hook_type: 並列重點
+  mentions: []
+  backfilled: []

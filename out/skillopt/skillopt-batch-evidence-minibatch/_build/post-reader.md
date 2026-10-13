@@ -131,6 +131,7 @@ SkillOpt 讓一個 AI 教練讀目標 Agent 的執行紀錄，提出怎麼改 Sk
 提出的修改真的有變好嗎？下一則看盲測怎麼檢查。
 文章：datasciocean.com/paper-intro/skillopt
 同系列：Skill 怎麼調才有效？讓 AI 照紀律自己調
+https://www.threads.com/@datasciocean/post/DeYo4JSIGcl
 同系列：改完真的有變好嗎？拿沒看過的題目測試它（尚未發布）
 
 ## IG caption
