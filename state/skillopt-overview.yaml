@@ -1,0 +1,23 @@
+concept: skillopt-overview
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: skillopt-overview:ig_carousel
+  format: ig_carousel
+  series_id: skillopt
+  url: https://www.instagram.com/p/DeYn1j2oCAP/
+  published_at: 2026-10-12T06:50:23+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []
+- post_id: skillopt-overview:threads_thread
+  format: threads_thread
+  series_id: skillopt
+  url: https://www.threads.com/@datasciocean/post/DeYo4JSIGcl
+  published_at: 2026-10-12T06:56:03+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []

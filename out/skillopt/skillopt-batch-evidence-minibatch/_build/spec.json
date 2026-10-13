@@ -1,0 +1,512 @@
+{
+  "series": "skillopt",
+  "concept": "skillopt-batch-evidence-minibatch",
+  "also_concepts": [
+    "skillopt-bounded-edit-budget"
+  ],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "並列重點",
+    "title": "讓 AI 改 Skill [[不亂改]]，靠這兩招！",
+    "subtitle": "SkillOpt 讓 AI 教練改 Agent Skill 時：\n第一招 → 先收一批紀錄，不被單一失敗牽著走\n第二招 → 設編輯預算，限制每一步改幾處",
+    "refs": [
+      "c1",
+      "skillopt-bounded-edit-budget:c1"
+    ],
+    "candidate": "D"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "讓 AI 改 Skill [[不亂改]]，靠這兩招！",
+      "body": "SkillOpt 讓 AI 教練改 Agent Skill 時：\n第一招 → 先收一批紀錄，不被單一失敗牽著走\n第二招 → 設編輯預算，限制每一步改幾處",
+      "refs": [
+        "c1",
+        "skillopt-bounded-edit-budget:c1"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "先複習：誰在改？改的是什麼？",
+      "body": "這一則看教練怎麼提出修改。先認識三個角色：",
+      "rows": [
+        [
+          "目標 Agent",
+          "執行任務的 Agent。模型本身（權重）在訓練時凍結不動，只有它用的 Skill 會變。"
+        ],
+        [
+          "優化器",
+          "訓練時才出現的教練，讀執行紀錄與分數，提出怎麼改 Skill。也可以由跟目標 Agent 同款的模型來當。"
+        ],
+        [
+          "Skill",
+          "給 Agent 參考的技能文件，是整個訓練裡唯一被改的東西。"
+        ]
+      ],
+      "key_w": 170,
+      "refs": [
+        "c2"
+      ],
+      "quals": [
+        "c2#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "只看一次失敗，容易被偶發的雜訊牽著走",
+      "body": "SkillOpt 刻意用大批次，一批 40 個任務。份量夠，教練才分辨得出哪些是「系統性的弱點」、哪些只是「單一的偶發狀況」。",
+      "columns": [
+        {
+          "head": "只看單次失敗",
+          "items": [
+            {
+              "text": "一次網路延遲、一個措辭怪的輸入",
+              "sub": "屬於偶發的雜訊",
+              "muted": true
+            },
+            {
+              "text": "往往針對雜訊去改",
+              "sub": "專業說法叫過度擬合",
+              "muted": true
+            }
+          ]
+        },
+        {
+          "head": "看一批 40 個任務",
+          "items": [
+            {
+              "text": "統計份量夠",
+              "sub": "一批任務的結果一起看",
+              "emph": true
+            },
+            {
+              "text": "分辨弱點是否反覆出現",
+              "sub": "系統性的弱點和偶發狀況",
+              "emph": true
+            }
+          ]
+        }
+      ],
+      "refs": [
+        "c1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "title": "每一步訓練，先讓 Agent 跑一批任務",
+      "body": "Rollout（前向執行）就是帶著目前的 Skill 實際跑一遍。SkillOpt 每一步抽 40 個任務來跑。",
+      "nodes": [
+        {
+          "text": "目標 Agent 帶著目前的 Skill，跑一批 40 個任務"
+        },
+        {
+          "text": "每個任務留下執行紀錄和分數"
+        },
+        {
+          "text": "依分數分成兩個池子",
+          "sub": "兩個池子需要不同種類的修改"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "失敗池"
+        },
+        {
+          "text": "成功池"
+        }
+      ],
+      "refs": [
+        "c3",
+        "c4"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "兩個池子，要找的東西不一樣",
+      "body": "失敗池找「可以糾正的修復」；成功池找「已經做對、卻還沒寫進 Skill 的好習慣」。",
+      "columns": [
+        {
+          "head": "失敗池",
+          "items": [
+            {
+              "text": "什麼壞掉了、怎麼補",
+              "sub": "找可以糾正的修復"
+            },
+            {
+              "text": "目的：修復",
+              "emph": true
+            }
+          ]
+        },
+        {
+          "head": "成功池",
+          "items": [
+            {
+              "text": "哪些好習慣還沒寫進 Skill",
+              "sub": "沒被記下來，下次未必還能靠運氣重現"
+            },
+            {
+              "text": "目的：強化",
+              "sub": "已經寫得夠清楚的，不重複強化",
+              "emph": true
+            }
+          ]
+        }
+      ],
+      "refs": [
+        "c4",
+        "c5",
+        "c10"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "batches",
+      "title": "每個池子切成 8 個一組，各自診斷",
+      "body": "一池大約 20 個失敗案例一次全塞給教練，會超出有用的範圍，還可能碰上 lost-in-the-middle（提示詞越長，這問題越嚴重）。",
+      "count": 20,
+      "group": 8,
+      "nodes": [
+        {
+          "text": "一個池子，以大約 20 個失敗案例為例"
+        },
+        {
+          "text": "切成 Minibatch（小批次），每組各自同時請教練診斷"
+        }
+      ],
+      "note": "示意：池子大小不固定，這裡以大約 20 個為例",
+      "refs": [
+        "c6"
+      ],
+      "quals": [
+        "c6#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "stops",
+      "title": "一組為什麼是 8 個？",
+      "body": "這是刻意折衷：訂成 1 或整池全塞，各有問題；8 剛好逼教練橫向比較，找出多個任務共同的失敗模式。",
+      "heads": [
+        "太小",
+        "太大"
+      ],
+      "nodes": [
+        {
+          "text": "1 個一組",
+          "sub": "又變回只看單一失敗，重蹈過度擬合"
+        },
+        {
+          "text": "8 個一組",
+          "sub": "小到一次讀得完，又大到逼教練橫向比較",
+          "emph": true
+        },
+        {
+          "text": "整池全塞",
+          "sub": "一次太多，超出有用的範圍"
+        }
+      ],
+      "refs": [
+        "c8",
+        "c6",
+        "c1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "fan",
+      "title": "各組同時診斷，再把建議彙整起來",
+      "body": "分頭同時診斷、再彙整，這個形狀就是 MapReduce。每一組交給一位分析師（負責診斷的角色）：失敗池找共同的失敗模式，成功池找還沒寫下的好習慣。",
+      "heads": [
+        "第一組",
+        "第二組",
+        "第三組"
+      ],
+      "nodes": [
+        {
+          "text": "每一組各自獨立診斷，同時進行（Map）"
+        },
+        {
+          "text": "診斷完的建議，彙整成一份（Reduce）",
+          "sub": "最多同時跑 16 個呼叫，不必排成一長串"
+        }
+      ],
+      "refs": [
+        "c7",
+        "c9",
+        "c10",
+        "c6"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "pairs",
+      "title": "多份建議可能重疊、互相矛盾，要先合併",
+      "body": "池子裡的提案超過八份時，就會做樹狀合併。",
+      "heads": [
+        "合併前",
+        "合併後"
+      ],
+      "pairs": [
+        [
+          "分析師交回的建議，可能重疊或矛盾",
+          "收斂成一份統一的清單"
+        ],
+        [
+          "重複的建議",
+          "收斂成措辭最通用的一版，附上有幾位分析師提過"
+        ],
+        [
+          "同一位置、做法互不相容的提案",
+          "在這一步就解決，不留到之後才衝突"
+        ]
+      ],
+      "refs": [
+        "skillopt-bounded-edit-budget:c3",
+        "skillopt-bounded-edit-budget:c5",
+        "skillopt-bounded-edit-budget:c6"
+      ],
+      "quals": [
+        "skillopt-bounded-edit-budget:c5#1",
+        "skillopt-bounded-edit-budget:c6#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "兩邊撞到同一個位置，修復失敗永遠優先",
+      "body": "失敗池與成功池各自的清單，最後再合成一份。如果兩邊的修改鎖定 Skill 裡的同一個位置，就看誰優先。",
+      "columns": [
+        {
+          "head": "失敗池的修改",
+          "items": [
+            {
+              "text": "撞到同一個位置",
+              "sub": "保留這邊的版本，沒有例外",
+              "emph": true
+            },
+            {
+              "text": "修復壞掉的東西",
+              "sub": "嚴格優先於強化運作良好的"
+            }
+          ]
+        },
+        {
+          "head": "成功池的修改",
+          "items": [
+            {
+              "text": "撞到同一個位置",
+              "sub": "被擋下",
+              "gone": true
+            },
+            {
+              "text": "只有不撞位置的強化修改",
+              "sub": "才能進入下一階段"
+            }
+          ]
+        }
+      ],
+      "refs": [
+        "skillopt-bounded-edit-budget:c7",
+        "skillopt-bounded-edit-budget:c8"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "pairs",
+      "title": "合併完還是太多？用「編輯預算」限流",
+      "body": "合併後的修改數量，可能遠超過一次能安全套用的上限。編輯預算限制每一步能套用幾處，相當於文字版的學習率（訓練時控制一步走多大）。",
+      "heads": [
+        "套用太多修改",
+        "有編輯預算"
+      ],
+      "pairs": [
+        [
+          "一次套用太多修改，像訓練模型時，步伐踩太大",
+          "每一步只套用預算內的幾處"
+        ],
+        [
+          "Skill 可能變得不穩定，丟掉先前累積的教訓",
+          "限制每一步的步伐"
+        ]
+      ],
+      "refs": [
+        "skillopt-bounded-edit-budget:c1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "decay",
+      "title": "預算慢慢縮小：一開始大步，後來小步",
+      "body": "預算就是每一步能套用的修改數，通常從 4 處慢慢降到 2 處。",
+      "start": 4,
+      "end": 2,
+      "unit": "處",
+      "axis_max": 5,
+      "nodes": [
+        {
+          "text": "初期：文件還很空，大改安全有用"
+        },
+        {
+          "text": "後期：已有內容，只讓小幅微調通過"
+        }
+      ],
+      "note": "曲線形狀只是示意；4 與 2 是通常的起點與終點",
+      "refs": [
+        "skillopt-bounded-edit-budget:c9",
+        "skillopt-bounded-edit-budget:c10"
+      ],
+      "quals": [
+        "skillopt-bounded-edit-budget:c9#1"
+      ]
+    },
+    {
+      "layout": "table",
+      "title": "哪些修改能進預算？[[另一個排序步驟]]來排名",
+      "body": "專門負責排序的是另一個獨立步驟：它照這四項標準、嚴格按優先順序，替每一項合併後的候選修改排名。",
+      "rows": [
+        [
+          "修復多少",
+          "能修復多少條執行紀錄的問題（跟有幾位分析師提過直接相關）"
+        ],
+        [
+          "補缺口",
+          "真的補上缺口，不是重複文件裡已有的內容"
+        ],
+        [
+          "夠通用",
+          "讀起來像普遍適用的規則，不是寫死某個任務的細節"
+        ],
+        [
+          "能照做",
+          "夠具體、可操作，不是空泛的建議"
+        ]
+      ],
+      "key_w": 190,
+      "refs": [
+        "skillopt-bounded-edit-budget:c11"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "funnel",
+      "title": "排名靠前的才進候選，還要通過盲測",
+      "body": "看起來合理還不夠：候選 Skill 要在教練沒看過的題目上盲測，分數嚴格大於現在的，才寫入。整套做法仰賴便宜、可靠、自動化的評分。",
+      "nodes": [
+        {
+          "text": "合併後的候選修改",
+          "sub": "已依四項標準排好名"
+        },
+        {
+          "text": "排名在預算內的修改",
+          "sub": "進入候選 Skill"
+        },
+        {
+          "text": "盲測分數要過關",
+          "sub": "嚴格大於現在的，才寫入，成為新的 Skill"
+        }
+      ],
+      "note": "系列後面會細講：改完真的有變好嗎？拿沒看過的題目測試它",
+      "refs": [
+        "skillopt-bounded-edit-budget:c12"
+      ],
+      "quals": [
+        "skillopt-bounded-edit-budget:c12#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "title": "串起來：一步訓練的修改流程",
+      "body": "把前面每一關，照順序串成一個訓練步驟。",
+      "nodes": [
+        {
+          "text": "跑一批 40 個任務，分成失敗池與成功池"
+        },
+        {
+          "text": "每池切成 8 個一組，同時診斷"
+        },
+        {
+          "text": "把建議合併成一份，撞位置時失敗池優先"
+        },
+        {
+          "text": "照四項標準排序，只留預算內的幾處"
+        },
+        {
+          "text": "候選 Skill 交給下一關：盲測驗證"
+        }
+      ],
+      "refs": [
+        "c3",
+        "c4",
+        "c6",
+        "c7",
+        "skillopt-bounded-edit-budget:c7",
+        "skillopt-bounded-edit-budget:c11",
+        "skillopt-bounded-edit-budget:c12"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "讓 AI 改 Skill 不亂改，靠哪兩招？",
+      "title": "第一招：先收一批，別看單次失敗\n第二招：設編輯預算，一步改幾處",
+      "refs": [
+        "c1",
+        "skillopt-bounded-edit-budget:c1"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "一次看完這個系列",
+      "current": "skillopt-batch-evidence-minibatch",
+      "nav": "完整文章：datasciocean.com/paper-intro/skillopt",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "讓 AI 改 Skill 不亂改，靠這兩招！\n\nSkillOpt 讓一個 AI 教練讀目標 Agent 的執行紀錄，提出怎麼改 Skill。\n\n第一招：不被單一失敗牽著走。先收一批 40 個任務的紀錄，分成失敗池與成功池，再切成 8 個一組各自診斷。\n\n第二招：用編輯預算限流，一步只套用幾處修改，通常從 4 處慢慢降到 2 處。\n\n提出的修改還要通過下一關的盲測，後面一則會細講。這是系列第 2 則。",
+      "refs": [
+        "c1",
+        "c3",
+        "c4",
+        "c6",
+        "skillopt-bounded-edit-budget:c1",
+        "skillopt-bounded-edit-budget:c9",
+        "skillopt-bounded-edit-budget:c12"
+      ],
+      "quals": [
+        "c6#1",
+        "skillopt-bounded-edit-budget:c9#1"
+      ]
+    },
+    "last": {
+      "text": "提出的修改真的有變好嗎？下一則看盲測怎麼檢查。\n文章：datasciocean.com/paper-intro/skillopt\n同系列：Skill 怎麼調才有效？讓 AI 照紀律自己調\n同系列：改完真的有變好嗎？拿沒看過的題目測試它（尚未發布）",
+      "refs": [
+        "skillopt-bounded-edit-budget:c12"
+      ],
+      "link": "https://datasciocean.com/paper-intro/skillopt/"
+    }
+  },
+  "caption": {
+    "first": "SkillOpt 怎麼讓 AI 改 Agent Skill 不亂改：先收一批紀錄，再設編輯預算。",
+    "first_refs": [
+      "c1",
+      "skillopt-bounded-edit-budget:c1"
+    ],
+    "nav": "完整文章請在 datasciocean.com 搜尋「SkillOpt：把 AI Agent 的技能文件當成可訓練的權重來優化，不用碰模型本身」",
+    "hashtags": [
+      "DSO_SkillOpt",
+      "SkillOpt",
+      "AgentSkill",
+      "AIAgent"
+    ]
+  }
+}
