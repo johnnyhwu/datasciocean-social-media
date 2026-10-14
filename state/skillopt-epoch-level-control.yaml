@@ -1,0 +1,9 @@
+concept: skillopt-epoch-level-control
+formats:
+  ig_carousel:
+    status: published
+    merged_into: skillopt-blind-acceptance-gate
+  threads_thread:
+    status: published
+    merged_into: skillopt-blind-acceptance-gate
+posts: []

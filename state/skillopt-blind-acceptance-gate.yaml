@@ -1,0 +1,23 @@
+concept: skillopt-blind-acceptance-gate
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: skillopt-blind-acceptance-gate:ig_carousel
+  format: ig_carousel
+  series_id: skillopt
+  url: https://www.instagram.com/p/DedaYcgk8zR/
+  published_at: 2026-10-14T03:29:36+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []
+- post_id: skillopt-blind-acceptance-gate:threads_thread
+  format: threads_thread
+  series_id: skillopt
+  url: https://www.threads.com/@datasciocean/post/Dedbc--IMBp
+  published_at: 2026-10-14T03:34:58+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []

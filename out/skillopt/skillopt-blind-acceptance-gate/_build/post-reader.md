@@ -125,7 +125,9 @@ SkillOpt 讓教練完全看不到驗收用的題目：資料切成三份，教�
 SkillOpt 改完怎麼確認有變好？每一步用沒看過的題目盲測，每一輪再 A/B 對照。
 文章：datasciocean.com/paper-intro/skillopt
 同系列：Skill 怎麼調才有效？讓 AI 照紀律自己調
+https://www.threads.com/@datasciocean/post/DeYo4JSIGcl
 同系列：該改哪裡、改多少？別被一次失敗牽著走
+https://www.threads.com/@datasciocean/post/Dea6HxFICya
 
 ## IG caption
 

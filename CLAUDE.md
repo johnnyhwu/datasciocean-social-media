@@ -81,15 +81,15 @@ tests/                                  七份回歸測試（含 test_multicard.
 
 為什麼 `config/`、`series/`、`state/` 在根目錄而不在 skill 裡：這些是人會改、會審、會長期累積的資料與設定；`.claude/` 放的是「Claude 怎麼做事」的流程與腳本。
 
-## 目前狀態（2026-10-12）
+## 目前狀態（2026-10-14）
 
 **進行中：系列 `skillopt`**（SkillOpt: 自動優化你的 Agent Skill；視覺「等深線」；`members_locked: true`；Threads 用輪播）。5 張卡做成 3 則：
 
 1. `skillopt-overview`（19 張）：**已發布（2026-10-12）**，IG https://www.instagram.com/p/DeYn1j2oCAP/ 、Threads https://www.threads.com/@datasciocean/post/DeYo4JSIGcl 。
 2. `skillopt-batch-evidence-minibatch`＋`skillopt-bounded-edit-budget`（雙卡，17 張）：**已發布（2026-10-13）**，IG https://www.instagram.com/p/Dea5IgXIBKS/ 、Threads https://www.threads.com/@datasciocean/post/Dea6HxFICya 。
-3. `skillopt-blind-acceptance-gate`＋`skillopt-epoch-level-control`（雙卡，17 張）：同上。
+3. `skillopt-blind-acceptance-gate`＋`skillopt-epoch-level-control`（雙卡，17 張）：**已發布（2026-10-14）**，IG https://www.instagram.com/p/DedaYcgk8zR/ 、Threads https://www.threads.com/@datasciocean/post/Dedbc--IMBp 。
 
-第 3 則何時發由人決定。**發它之前：** 最後一則回覆的「同系列」要補上第 1、2 則的 Threads 網址；**每發一則後：** 跑 `threads_publish.py backfill`（dry-run 給人看、人說「發」才發）補前面各則的連結（第 2 則發布後，第 1 則的回補還待做）。第 1 則 IG 的系列地圖列 3 則（已鎖定，不再改）。
+系列 3 則都已發完。**待做：** 第 1、2 則 Threads 的回補（補上第 3 則連結）：`threads_publish.py backfill`（dry-run 給人看、人說「發」才 `--confirm`）；清單在 `state/backfill.md`。第 1 則 IG 的系列地圖列 3 則（已鎖定）。
 
 存量（`ready`）：0 則。其他系列：`jev-cascade` 三則都已發完，細節在 `docs/status.md`。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。發布流程用真實帳號跑過四次（含 IG 19 張、Threads 輪播），照 `references/publish-flow.md`。
 
