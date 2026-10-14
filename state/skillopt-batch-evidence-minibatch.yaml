@@ -20,4 +20,5 @@ posts:
   published_at: 2026-10-13T04:05:13+0000
   hook_type: 並列重點
   mentions: []
-  backfilled: []
+  backfilled:
+  - skillopt-blind-acceptance-gate

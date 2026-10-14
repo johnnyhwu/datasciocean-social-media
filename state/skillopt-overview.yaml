@@ -22,3 +22,4 @@ posts:
   mentions: []
   backfilled:
   - skillopt-batch-evidence-minibatch
+  - skillopt-blind-acceptance-gate
