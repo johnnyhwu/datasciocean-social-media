@@ -1,0 +1,431 @@
+{
+  "series": "persona-aware-d2s",
+  "concept": "persona-d2s-training-design-flaws",
+  "also_concepts": [],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "並列重點",
+    "title": "[[三個疑點]]：資料少、沒驗證、難擴展",
+    "subtitle": "簡報生成論文的訓練設計：\n①大綱只用 80 筆樣本，\n②reward model 沒驗證容量，\n③一種條件各訓一個模型。",
+    "refs": [
+      "c1",
+      "c3",
+      "c10",
+      "c11"
+    ],
+    "candidate": "2"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "[[三個疑點]]：資料少、沒驗證、難擴展",
+      "body": "簡報生成論文的訓練設計：\n①大綱只用 80 筆樣本，\n②reward model 沒驗證容量，\n③一種條件各訓一個模型。",
+      "refs": [
+        "c1",
+        "c3",
+        "c10",
+        "c11"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "先認識這則會用到的四個詞",
+      "body": "整體流程，在此系列的上一則 post 講過。先認識四個詞：",
+      "rows": [
+        [
+          "大綱生成",
+          "Persona-Aware-D2S 的第一階段，生成投影片的大綱；persona 是受眾加簡報長度的組合，共四種。"
+        ],
+        [
+          "監督微調",
+          "用標準答案教模型：讓生成的標題，越接近標準答案越好。"
+        ],
+        [
+          "偏好微調",
+          "監督微調之後，再根據人類的偏好，繼續訓練一次。"
+        ],
+        [
+          "reward model",
+          "給候選大綱打分數的模型，偏好微調要用到它。"
+        ]
+      ],
+      "key_w": 250,
+      "refs": [
+        "c2",
+        "c3",
+        "c7"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "偏好微調，是為了處理「一對多」",
+      "body": "Persona-Aware-D2S 的偏好微調，是為了處理單一標準答案撐不起多元偏好的問題。一般的訓練（最大概似，MLE）叫模型越像標準答案越好，跟 persona 問題直接衝突。",
+      "columns": [
+        {
+          "head": "MLE 訓練的預設",
+          "items": [
+            {
+              "text": "只有一種正確答案",
+              "sub": "目標：跟單一標準答案越像越好",
+              "muted": true
+            }
+          ]
+        },
+        {
+          "head": "persona 問題本質上",
+          "items": [
+            {
+              "text": "一對多",
+              "sub": "同一份文件，有多種合理的簡報",
+              "emph": true
+            }
+          ]
+        }
+      ],
+      "refs": [
+        "c1",
+        "c4"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "title": "第一段：先請人來排序",
+      "body": "Persona-Aware-D2S 的偏好微調分三段。第一段是收集人類偏好資料：四種 persona 各有一個監督微調後的模型，各自生成 5 組候選大綱，再請專家和非專家比較。",
+      "nodes": [
+        {
+          "text": "3 位專家、3 位非專家，成對排序",
+          "sub": "兩份大綱比一比，排出哪份好；專家比專家版的長、短兩種大綱，非專家比非專家版的"
+        },
+        {
+          "text": "兩個評分準則",
+          "sub": "對目標受眾的可理解度，以及長度上的滿意度"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "多數決有共識的樣本",
+          "sub": "保留",
+          "tone": "good"
+        },
+        {
+          "text": "沒有共識的樣本",
+          "sub": "直接丟掉"
+        }
+      ],
+      "refs": [
+        "c1",
+        "c3",
+        "c5",
+        "c6"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "quad",
+      "title": "第二段：訓練出四個 reward model",
+      "body": "第二段是訓練 reward model（給候選輸出打分的模型），用的是 Bradley-Terry loss（從成對比較學出分數的做法）。評分準則有兩個、受眾有兩種，最後會得到四個。",
+      "nodes": [
+        {
+          "text": "專家 · 可理解度",
+          "sub": "打分：專家看得懂嗎"
+        },
+        {
+          "text": "專家 · 長度",
+          "sub": "打分：長度滿不滿意"
+        },
+        {
+          "text": "非專家 · 可理解度",
+          "sub": "打分：非專家看得懂嗎"
+        },
+        {
+          "text": "非專家 · 長度",
+          "sub": "打分：長度滿不滿意"
+        }
+      ],
+      "refs": [
+        "c1",
+        "c6",
+        "c7"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "title": "第三段：把評分塞進輸入再微調",
+      "body": "最終的偏好微調，借用 Decision Transformer 的 reward-conditioning：輸入多塞一個 reward（評分）當條件，本質上仍是監督學習。",
+      "nodes": [
+        {
+          "text": "從訓練資料抽 prompt，生成 5 組大綱",
+          "sub": "prompt 是給模型的輸入"
+        },
+        {
+          "text": "reward model 給每組大綱打分",
+          "sub": "得到「(prompt, reward) → 大綱」的訓練配對"
+        },
+        {
+          "text": "拿這批配對，去微調 LLM",
+          "sub": "輸入裡多一個 reward 當條件"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "使用時，直接餵「最大 reward 值」",
+          "sub": "讓模型生成對應高分的大綱",
+          "tone": "good"
+        }
+      ],
+      "refs": [
+        "c1",
+        "c7",
+        "c8"
+      ]
+    },
+    {
+      "layout": "table",
+      "title": "偏好微調本身：兩個地方沒交代",
+      "body": "Persona-Aware-D2S 在偏好微調這一步，略過了兩個細節：",
+      "rows": [
+        [
+          "最大值",
+          "使用時要餵「最大 reward 值」，數字怎麼來？是資料裡的最大分數，還是手動設的常數？"
+        ],
+        [
+          "兩個分數",
+          "可理解度與長度各有一個分數：是合併成一個，還是兩個都放進 prompt？"
+        ],
+        [
+          "後果",
+          "缺了這些，別人想重做一遍（複現），會很痛苦。"
+        ]
+      ],
+      "key_w": 180,
+      "refs": [
+        "c1",
+        "c9"
+      ]
+    },
+    {
+      "layout": "chart_bars",
+      "title": "偏好微調本身：不是無條件的提升",
+      "body": "兩種微調版本全面壓過不微調的對照組；加偏好微調的在多數配置勝出，專家短版例外。論文解讀為純監督微調在「為專家做精簡摘要」上表現更好；不管解讀對不對，這至少說明偏好微調不是無條件的提升。",
+      "subs_inline": true,
+      "unit": "",
+      "bars": [
+        {
+          "name": "純監督微調",
+          "subs": [
+            "專家 × 短版"
+          ],
+          "value": 0.17,
+          "emphasize": true
+        },
+        {
+          "name": "加偏好微調",
+          "subs": [
+            "專家 × 短版"
+          ],
+          "value": 0.13
+        }
+      ],
+      "note": "端到端評測的 R-1：生成結果與參考答案的單字重疊程度，越大越接近",
+      "refs": [
+        "c1",
+        "c14"
+      ],
+      "quals": [
+        "c14#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "equation",
+      "label": "疑點一",
+      "title": "大綱生成，只有 80 筆訓練樣本",
+      "body": "大綱生成的訓練資料很袖珍。筆數太少，模型很容易 overfit（只記住這批資料的特徵）到這批論文的寫作風格，換個領域（domain），泛化能力存疑。",
+      "nodes": [
+        {
+          "text": "20",
+          "sub": "篇論文",
+          "sub2": "訓練資料集"
+        },
+        {
+          "text": "4",
+          "sub": "種 persona"
+        },
+        {
+          "text": "80",
+          "sub": "筆訓練樣本",
+          "sub2": "拿去微調 GPT-3.5-turbo",
+          "emph": true
+        }
+      ],
+      "refs": [
+        "c1",
+        "c11",
+        "c12"
+      ],
+      "outcomes": [
+        {
+          "text": "驗證資料集：僅 5 篇論文"
+        }
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "label": "疑點二",
+      "title": "reward model 夠不夠大，沒驗證",
+      "body": "Persona-Aware-D2S 的 reward model，替候選大綱打分。",
+      "nodes": [
+        {
+          "text": "reward model 是個小模型",
+          "sub": "約 66M 參數的小型 encoder（把文字轉成向量的模型）"
+        },
+        {
+          "text": "它要判斷的，相當吃語意理解",
+          "sub": "「這段大綱，對非專家好不好懂」"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "這樣的容量（模型大小）夠不夠？沒驗證",
+          "sub": "論文沒有換不同容量的 reward model 來比較"
+        }
+      ],
+      "refs": [
+        "c1",
+        "c7",
+        "c10"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "label": "疑點三",
+      "title": "四個獨立模型，加一個維度就乘法成長",
+      "body": "四個獨立模型這個選擇，在效果上也許更乾淨，但代價很大：每種 persona 組合，要各訓練一個。",
+      "columns": [
+        {
+          "head": "現在：四種 persona",
+          "items": [
+            {
+              "text": "4 個獨立的模型",
+              "sub": "用監督微調訓練"
+            },
+            {
+              "text": "4 組 reward model"
+            }
+          ]
+        },
+        {
+          "head": "再加一個維度",
+          "items": [
+            {
+              "text": "模型數量乘法成長",
+              "sub": "例如再加角色：PM／工程師／主管",
+              "emph": true
+            },
+            {
+              "text": "無法隨維度擴展",
+              "muted": true
+            }
+          ]
+        }
+      ],
+      "refs": [
+        "c1",
+        "c3",
+        "c13"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "pairs",
+      "title": "補充：小樣本微調，要看教什麼",
+      "body": "用很少的資料微調模型（小樣本微調），本身風險也偏高：教模型輸出格式或風格，小樣本有機會；教新知識，很難。",
+      "heads": [
+        "小樣本微調，教模型",
+        "結果"
+      ],
+      "pairs": [
+        [
+          "輸出格式或風格",
+          "有機會"
+        ],
+        [
+          "新知識",
+          "基本無望"
+        ]
+      ],
+      "note": "不用訓練就能借鑑的部分，會在此系列的後續 post 中細講",
+      "refs": [
+        "c1",
+        "c16"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "這套訓練，哪裡別照著做？",
+      "title": "一條件一模型，\n不建議複現；\n小樣本微調，\n風險也偏高",
+      "refs": [
+        "c1",
+        "c16"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "一次看完這個系列",
+      "current": "persona-d2s-training-design-flaws",
+      "nav": "完整文章：datasciocean.com/paper-intro/persona-aware-d2s",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "三個疑點：資料少、沒驗證、難擴展\n\n這是 Persona-Aware-D2S（簡報生成論文）訓練設計的三個疑點：大綱生成只有 80 筆訓練樣本（20 篇論文乘上 4 種配置），拿去微調 GPT-3.5-turbo；reward model（給候選大綱打分的模型）約 66M 參數，沒做容量消融；每種受眾與長度組合各訓一個獨立模型，加一個維度，數量就乘法成長。\n\n偏好微調本身也不是無條件的提升：端到端評測裡，專家短版這個配置，純監督微調的 R-1 是 0.17，加偏好微調是 0.13。論文把這個差異解讀為純監督微調在「為專家做精簡摘要」上表現更好；不管解讀對不對，這至少說明偏好微調不是無條件的提升。\n\n這是此系列的第 2 則，不用訓練就能借鑑的部分，會在此系列的後續 post 中細講。",
+      "refs": [
+        "c1",
+        "c3",
+        "c7",
+        "c10",
+        "c11",
+        "c13",
+        "c14"
+      ],
+      "quals": [
+        "c14#1"
+      ]
+    },
+    "last": {
+      "text": "Persona-Aware-D2S 的訓練設計，有哪三個疑點？大綱生成只有 80 筆樣本、reward model 沒驗證容量、每種條件各訓一個模型，難以擴展。\n文章：datasciocean.com/paper-intro/persona-aware-d2s\n同系列：同一份文件，怎麼長出四種簡報？（尚未發布）\n同系列：不用訓練就能抄的兩招，各有什麼代價？（尚未發布）",
+      "refs": [
+        "c1",
+        "c10",
+        "c11",
+        "c13"
+      ],
+      "link": "https://datasciocean.com/paper-intro/persona-aware-d2s/"
+    }
+  },
+  "caption": {
+    "first": "Persona-Aware-D2S 訓練：大綱 80 筆樣本、reward model 沒驗證容量。",
+    "first_refs": [
+      "c1",
+      "c10",
+      "c11"
+    ],
+    "nav": "完整文章請在 datasciocean.com 搜尋「拆解 Persona-Aware-D2S：同一份文件，怎麼依受眾和長度長出不同簡報」",
+    "hashtags": [
+      "DSO_PersonaD2S",
+      "簡報生成",
+      "微調",
+      "LLM"
+    ]
+  }
+}

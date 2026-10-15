@@ -1,0 +1,23 @@
+concept: persona-d2s-task-and-pipeline
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: persona-d2s-task-and-pipeline:ig_carousel
+  format: ig_carousel
+  series_id: persona-aware-d2s
+  url: https://www.instagram.com/p/DefqxZOH0Ot/
+  published_at: 2026-10-15T00:27:33+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []
+- post_id: persona-d2s-task-and-pipeline:threads_thread
+  format: threads_thread
+  series_id: persona-aware-d2s
+  url: https://www.threads.com/@datasciocean/post/DefrJYsH5nk
+  published_at: 2026-10-15T00:30:34+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []

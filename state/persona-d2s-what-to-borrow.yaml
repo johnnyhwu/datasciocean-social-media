@@ -1,0 +1,9 @@
+concept: persona-d2s-what-to-borrow
+formats:
+  ig_carousel:
+    status: ready
+    pack: out/persona-aware-d2s/persona-d2s-what-to-borrow
+  threads_thread:
+    status: ready
+    pack: out/persona-aware-d2s/persona-d2s-what-to-borrow
+posts: []

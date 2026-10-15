@@ -1,0 +1,443 @@
+{
+  "series": "persona-aware-d2s",
+  "concept": "persona-d2s-task-and-pipeline",
+  "also_concepts": [],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "讀者疑問",
+    "title": "同一份文件，怎麼長出[[四種]]簡報？",
+    "subtitle": "回顧 2024 年 EACL 論文，如何依受眾和長度，訓練模型，長出四種版本的簡報內容。",
+    "refs": [
+      "c1",
+      "c3"
+    ],
+    "candidate": "人自擬（原稿主標「怎麼長出四種簡報嗎？」，副標「訓練模型長出」）"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "同一份文件，怎麼長出[[四種]]簡報？",
+      "body": "回顧 2024 年 EACL 論文，如何依受眾和長度，訓練模型，長出四種版本的簡報內容。",
+      "refs": [
+        "c1",
+        "c3"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "先認識這篇論文的三個詞",
+      "body": "這個系列是在了解，早期的簡報生成怎麼做。先認識三個詞：",
+      "rows": [
+        [
+          "D2S",
+          "document-to-slides 的簡稱，也就是把一份文件轉成投影片。市面上的系統幾乎都是單一輸出，同一份文件永遠吐出同一份大綱。"
+        ],
+        [
+          "persona",
+          "受眾（專家或非專家）加上簡報長度（長或短）的組合，這篇論文稱為 persona，共四種。"
+        ],
+        [
+          "EACL 2024",
+          "這篇論文（Persona-Aware-D2S）發表的場合。"
+        ]
+      ],
+      "key_w": 210,
+      "refs": [
+        "c2",
+        "c3"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "quad",
+      "title": "兩個條件，組成四種 persona",
+      "body": "專家或非專家，乘上長版或短版，同一份文件，長出四份不同的投影片內容。",
+      "nodes": [
+        {
+          "text": "專家 × 長版",
+          "bars": 5
+        },
+        {
+          "text": "專家 × 短版",
+          "bars": 2
+        },
+        {
+          "text": "非專家 × 長版",
+          "bars": 5
+        },
+        {
+          "text": "非專家 × 短版",
+          "bars": 3
+        }
+      ],
+      "refs": [
+        "c1",
+        "c3"
+      ]
+    },
+    {
+      "layout": "text",
+      "title": "講給誰聽，簡報重點就不同",
+      "body": "舉個假設的例子：同一份研究，講給同領域的研究者聽，會直接跳進模型架構；講給業務主管聽，得先講清楚，這東西能解決什麼問題，架構細節反而是干擾。",
+      "refs": [
+        "c4"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "四種版本，是四個獨立的模型",
+      "body": "Persona-Aware-D2S 實作上，是為四種 persona 組合各訓練一個獨立模型，而不是訓練單一條件式模型（用一個模型，靠輸入的條件切換四種版本）。",
+      "columns": [
+        {
+          "head": "不是這樣做",
+          "items": [
+            {
+              "text": "單一條件式模型",
+              "sub": "一個模型，靠輸入的條件切換",
+              "gone": true
+            }
+          ]
+        },
+        {
+          "head": "論文實際的做法",
+          "items": [
+            {
+              "text": "四個獨立模型",
+              "sub": "每種 persona 組合，各訓練一個",
+              "emph": true
+            }
+          ]
+        }
+      ],
+      "refs": [
+        "c1",
+        "c3"
+      ],
+      "quals": [
+        "c1#1",
+        "c3#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "stops",
+      "title": "三階段：大綱、抽內容、重排",
+      "body": "Persona-Aware-D2S 的方法是三階段流水線：先列大綱，再抽內容，最後整理。前兩階段用監督微調（用標準答案教模型），加上輕量偏好微調（接下來兩張會講）。",
+      "nodes": [
+        {
+          "text": "第一階段：大綱生成",
+          "sub": "給論文內容和 persona，生成投影片的標題序列"
+        },
+        {
+          "text": "第二階段：內容抽取",
+          "sub": "為每個標題，找出對應的句子和圖表 caption"
+        },
+        {
+          "text": "第三階段：摘要與重排",
+          "sub": "把零散的片段，整理成連貫的輸出"
+        }
+      ],
+      "refs": [
+        "c5",
+        "c8",
+        "c9",
+        "c10"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "title": "大綱階段：先監督微調，再偏好微調",
+      "body": "Persona-Aware-D2S 的第一階段，要給定論文內容和 persona，生成投影片的標題序列，也就是大綱。做法分兩步。",
+      "nodes": [
+        {
+          "text": "第一步：監督微調",
+          "sub": "人工標註的標題是標準答案，模型生成的標題越接近越好"
+        },
+        {
+          "text": "第二步：偏好微調",
+          "sub": "輸入多附一個評分（reward）當條件，一樣用監督學習訓練"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "只做第一步：純監督微調的版本"
+        },
+        {
+          "text": "兩步做完：加偏好微調的版本"
+        }
+      ],
+      "note": "訓練的細節，會在此系列的後續 post 中細講",
+      "refs": [
+        "c3",
+        "c6",
+        "c7",
+        "c8"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "pairs",
+      "title": "偏好微調的做法：輸入多附一個評分",
+      "body": "Persona-Aware-D2S 的偏好微調，借用 reward-conditioning：把 reward（評分）當條件塞進輸入，用監督學習訓練，繞開 PPO（RLHF 主流的強化學習演算法，基礎設施複雜）。這是不完整的借用，下一張說明。",
+      "heads": [
+        "一般的監督微調",
+        "加上 reward-conditioning"
+      ],
+      "pairs": [
+        [
+          "輸入：論文內容和 persona",
+          "輸入：再多附一個評分（reward）"
+        ],
+        [
+          "用標準答案教模型",
+          "一樣用監督學習訓練"
+        ]
+      ],
+      "note": "評分怎麼來，會在此系列的後續 post 中細講",
+      "refs": [
+        "c3",
+        "c5",
+        "c6",
+        "c8"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "偏好微調：只借了表層技巧",
+      "body": "Decision Transformer 真正擅長的，是處理多步驟、前後有因果關係的序列決策；Persona-Aware-D2S 只借了它的 reward-conditioning 這個訓練技巧，任務卻是單次生成。",
+      "columns": [
+        {
+          "head": "借來的",
+          "items": [
+            {
+              "text": "reward-conditioning",
+              "sub": "把評分當條件塞進輸入，用監督學習訓練",
+              "emph": true
+            }
+          ]
+        },
+        {
+          "head": "沒借到的",
+          "items": [
+            {
+              "text": "一連串前後相關的決策",
+              "sub": "每一步的選擇，影響下一步；這才是 Decision Transformer 真正的威力",
+              "muted": true
+            },
+            {
+              "text": "這篇的任務：單次生成",
+              "sub": "沒有多步驟決策結構",
+              "muted": true
+            }
+          ]
+        }
+      ],
+      "note": "怎麼做、有什麼問題，會在此系列的後續 post 中細講",
+      "refs": [
+        "c3",
+        "c5",
+        "c6",
+        "c16"
+      ],
+      "quals": [
+        "c6#1",
+        "c16#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "funnel",
+      "title": "抽取內容分兩步：先縮小，再挑",
+      "body": "有了大綱，Persona-Aware-D2S 的第二階段，要為每個標題找出對應的句子和圖表 caption（圖表的說明文字）。分兩步：先用便宜的方式縮小範圍，再由訓練過的模型挑。",
+      "nodes": [
+        {
+          "text": "文件裡的句子與圖表 caption"
+        },
+        {
+          "text": "先縮小候選範圍",
+          "sub": "用便宜的方式，先圈出可能相關的"
+        },
+        {
+          "text": "再挑內容",
+          "sub": "訓練過的模型，從候選裡挑"
+        }
+      ],
+      "refs": [
+        "c9"
+      ],
+      "note": "第一步怎麼縮小範圍，會在此系列的後續 post 中細講"
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "title": "重排：先摘要成條列，再排順序",
+      "body": "前兩階段抽出來的是零散片段，直接貼上投影片很難讀。Persona-Aware-D2S 的第三階段，做兩步驟的 prompting（用指令請 LLM 做事），整理成連貫的輸出。",
+      "nodes": [
+        {
+          "text": "零散的句子片段",
+          "sub": "前兩階段挑出來的原料，直接貼上會很難讀"
+        },
+        {
+          "text": "第一步：摘要成 bullet points",
+          "sub": "先把抽出的內容，濃縮成一條一條的要點"
+        },
+        {
+          "text": "第二步：丟回 LLM 重新排列",
+          "sub": "同一標題裡，或不同標題之間，重新調順序，更符合聽眾的理解節奏"
+        }
+      ],
+      "refs": [
+        "c3",
+        "c10"
+      ],
+      "note": "這一步怎麼用、有什麼代價，會在此系列的後續 post 中細講"
+    },
+    {
+      "layout": "table",
+      "title": "論文自己承認的三個限制",
+      "body": "論文的 Limitations（限制）章節列了五點，其中三點是：",
+      "rows": [
+        [
+          "術語",
+          "大部分技術術語，需要額外解釋才能讓非專家理解，但模型在這方面能力有限。"
+        ],
+        [
+          "圖表",
+          "完全依賴人類寫好的圖表 caption，不會生成原創圖表，也不理解圖片本身的內容。"
+        ],
+        [
+          "格式",
+          "只能產生 bullet-point 格式的文字摘要，不涉及任何排版設計。"
+        ]
+      ],
+      "key_w": 170,
+      "refs": [
+        "c14"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "輸出是文字大綱，不是現成簡報",
+      "body": "圖表與格式這兩點限制加起來，決定了這個系統的輸出，離「可以直接開場報告的投影片」還有很長一段距離。",
+      "columns": [
+        {
+          "head": "系統輸出的",
+          "items": [
+            {
+              "text": "結構化的文字大綱",
+              "sub": "bullet-point 格式的文字摘要",
+              "emph": true
+            }
+          ]
+        },
+        {
+          "head": "輸出裡沒有的",
+          "items": [
+            {
+              "text": "排版",
+              "gone": true
+            },
+            {
+              "text": "顏色",
+              "gone": true
+            },
+            {
+              "text": "字體",
+              "gone": true
+            }
+          ]
+        }
+      ],
+      "refs": [
+        "c14",
+        "c15"
+      ]
+    },
+    {
+      "layout": "table",
+      "title": "貢獻主要在任務定義，方法是現成拼裝",
+      "body": "這篇論文的價值在哪裡、方法又是什麼？分開來看：",
+      "rows": [
+        [
+          "任務",
+          "把「同一份文件，依受眾和長度生成四種投影片內容」，定義成清楚的任務，並建立平行資料集。這個問題定義本身很有價值，論文能上 EACL 2024 long paper，也主要吃在這裡。"
+        ],
+        [
+          "方法",
+          "是把前人兩個現成的技巧拼裝起來：Christiano 等人（2017）的 reward modeling，和 Chen 等人（2021）的 reward-conditioning；後者只借了表層技巧（單次生成，沒有多步驟決策）。"
+        ]
+      ],
+      "key_w": 150,
+      "refs": [
+        "c1",
+        "c16",
+        "c17"
+      ],
+      "quals": [
+        "c1#1",
+        "c16#1"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "這篇論文，值得參考什麼？",
+      "title": "更適合參考，\n它的問題定義，\n而不是解決方案",
+      "refs": [
+        "c17"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "一次看完這個系列",
+      "current": "persona-d2s-task-and-pipeline",
+      "nav": "完整文章：datasciocean.com/paper-intro/persona-aware-d2s",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "同一份文件，怎麼長出四種簡報？\n\n回顧 2024 年 EACL 的 Persona-Aware-D2S：把「受眾是專家還是非專家」「簡報要長還是短」變成模型的輸入條件，讓同一份文件長出四種版本的投影片內容。\n\n做法是三階段：大綱生成、內容抽取、摘要與重排。實作上，是為四種組合各訓練一個獨立模型，而不是訓練單一條件式模型。\n\n論文的貢獻主要在把任務定義清楚、建立對應的資料集，方法本身是現成技術的拼裝；輸出也只是結構化的文字大綱，不是能直接用的簡報。\n\n這個系列是在了解，早期的簡報生成怎麼做。這是系列第 1 則，後續兩則 post 會細講訓練設計和值得借鑑的地方。",
+      "refs": [
+        "c1",
+        "c3",
+        "c5",
+        "c15"
+      ],
+      "quals": [
+        "c1#1",
+        "c3#1"
+      ]
+    },
+    "last": {
+      "text": "Persona-Aware-D2S 怎麼讓同一份文件長出四種簡報？用受眾和長度當輸入條件，貢獻主要在任務與資料集，方法是現成技術的拼裝。\n文章：datasciocean.com/paper-intro/persona-aware-d2s\n同系列：80 筆資料訓出來的模型，能信嗎？（尚未發布）\n同系列：不用訓練就能抄的兩招，各有什麼代價？（尚未發布）",
+      "refs": [
+        "c1",
+        "c3",
+        "c17"
+      ],
+      "link": "https://datasciocean.com/paper-intro/persona-aware-d2s/"
+    }
+  },
+  "caption": {
+    "first": "簡報生成怎麼做？EACL 2024 論文依受眾與長度，讓同一份文件長出四種簡報。",
+    "first_refs": [
+      "c1",
+      "c3"
+    ],
+    "nav": "完整文章請在 datasciocean.com 搜尋「拆解 Persona-Aware-D2S：同一份文件，怎麼依受眾和長度長出不同簡報」",
+    "hashtags": [
+      "DSO_PersonaD2S",
+      "簡報生成",
+      "EACL2024",
+      "LLM"
+    ]
+  }
+}
