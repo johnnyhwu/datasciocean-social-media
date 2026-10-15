@@ -307,6 +307,13 @@ def main():
     TP.last_logged_ids = lambda concept, path=None: ["X1"]
     r = TP.backfill(True, None)
     check("抓得到：--confirm 沒有 token → 不發", not r["ok"] and "token" in r.get("error", ""), r)
+    import series_links as SL
+    txt = "帶走\n文章：x\n同系列：甲標題（尚未發布）\n同系列：乙標題（尚未發布）"
+    new, ch = SL.fill(txt, {"甲標題": "https://www.threads.com/@a/post/1"})
+    check("同系列：已發布的補成「標題＋下一行網址」，未發布的保持原樣",
+          ch == ["甲標題"] and "同系列：甲標題\nhttps://www.threads.com/@a/post/1\n同系列：乙標題（尚未發布）" in new, new)
+    new2, ch2 = SL.fill(new, {"甲標題": "https://www.threads.com/@a/post/1"})
+    check("同系列：補過的不會重複補", ch2 == [] and new2 == new)
     print(f"\n{'全部通過' if not FAILS else f'{len(FAILS)} 項失敗'}")
     return 1 if FAILS else 0
 

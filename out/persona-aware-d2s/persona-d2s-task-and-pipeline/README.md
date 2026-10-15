@@ -23,11 +23,10 @@
 - 程式 B：16/16 張通過（模板版本 `4c31eba78489`）
 - 程式 A、批次檢查、忠實者與讀者審查的結果不存在發布包裡（審查產出放暫存，不進 repo）；最後確認時由 Claude 在報告中說明
 
-## 發布前
+## 已發布
 
-- [ ] 人最後確認圖、文字、caption
-- [ ] IG（API）：`ig_publish.py prepare` → push `ig/jpg/` → `preflight` → `publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）
-- [ ] Threads（API）：`threads_publish.py publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）
+- IG：https://www.instagram.com/p/DefqxZOH0Ot/
+- Threads：https://www.threads.com/@datasciocean/post/DefrJYsH5nk
 
 ## 發布後
 

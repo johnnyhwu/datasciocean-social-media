@@ -46,6 +46,12 @@ for mi, c in enumerate(MEMBERS):
     code, out = render(DECK + [smap], c)
     expect(f"一式四份樣張（第 {mi + 1} 則）每個版型通過程式 B", code == 0 and "9/9 張通過" in out, out)
 
+# 沒有圖註的橫條圖：空的圖註框不能被程式 B 誤判（render.py 在填入後移除空框）
+nonote = [{"layout": "chart_bars", "title": "沒有圖註的橫條圖", "subs_inline": True, "body": "示範補充。", "unit": "%",
+           "bars": [{"name": "甲", "subs": ["對照"], "value": 30}, {"name": "乙", "subs": ["重點"], "value": 60, "emphasize": True}]}]
+code, out = render(nonote)
+expect("沒有圖註的橫條圖通過程式 B（空圖註框不誤判）", code == 0 and "1/1 張通過" in out, out)
+
 bad = [{"layout": "text", "title": "故意做壞", "body": "很長的補充文字，" * 40}]
 code, out = render(bad)
 expect("故意做壞：補充文字長到壓進小投影片區 → 抓得到", code != 0 and "FAIL" in out, out)

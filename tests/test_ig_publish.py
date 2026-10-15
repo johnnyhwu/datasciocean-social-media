@@ -274,6 +274,16 @@ def main():
         rt = RT(); c = ig_api.IGClient("old", "U1", transport=rt)
         w = P.ensure_token_fresh(c, {"IG_TOKEN_REFRESHED_AT": "2026-10-06T00:00:00+00:00"}, now, envf)
         check("效期充足 → 不 refresh", not rt.calls and not w)
+    # --summary：縮短版保留人要看的文字，丟掉每張圖的網址與請求細節
+    full = {"ok": True, "problems": [], "warnings": [], "image_count": 2,
+            "url_checks": [{"url": "u1", "ok": True}, {"url": "u2", "ok": False, "detail": "404"}],
+            "requests": [{"step": "建立第 1 張的 container", "POST": "/m", "params": {"image_url": "u1", "alt_text": "x"}},
+                         {"step": "建立 carousel container", "POST": "/m", "params": {"caption": "整段 caption", "children": ["a"]}}]}
+    c = PC.compact(full)
+    check("--summary：url_checks 只留數量與失敗的", c["url_checks"]["total"] == 2 and len(c["url_checks"]["failed"]) == 1)
+    check("--summary：留 caption、丟圖片請求", any(r.get("caption") == "整段 caption" for r in c["requests"]) and all("image_url" not in json.dumps(r) for r in c["requests"]) and c["request_count"] == 2)
+    check("--summary：problems／warnings 原樣保留", c["problems"] == [] and c["warnings"] == [])
+    check("發布後更新索引：沒有 spec.json 的資料夾不報錯", PC.refresh_index(Path(tempfile.gettempdir()) / "no-such-pack") is None)
     print(f"\n{'全部通過' if not FAILS else f'{len(FAILS)} 項失敗'}")
     return 1 if FAILS else 0
 

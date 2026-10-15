@@ -2,6 +2,8 @@
 
 用法：uv run python .claude/skills/make-social-post/scripts/build_package.py out/<series>/<concept>/_build/spec.json [--force]
 已發布的貼文預設拒絕（--force 才重組）。
+--refresh：只重寫這則的 README.md 與索引（發布後狀態與網址會變；不動 ig/post.md、threads/post.md、審查用文字，已發布也可用）。
+發布程式（ig_publish.py、threads_publish.py）成功發出後會自動呼叫它。
 
 輸出（發布包 out/<series>/<concept>/）：
   README.md              這則貼文的唯一入口：縮圖、檢查結果、要看哪些檔案、發布前後待辦
@@ -180,6 +182,12 @@ def state_of(concept: str) -> dict:
     return {k: (v or {}).get("status", "not_tried") for k, v in (d.get("formats") or {}).items()}
 
 
+def urls_of(concept: str) -> dict:
+    f = W.STATE_DIR / f"{concept}.yaml"
+    d = (yaml.safe_load(f.read_text(encoding="utf-8")) if f.exists() else None) or {}
+    return {p.get("format"): p.get("url") for p in d.get("posts") or [] if p.get("url")}
+
+
 def load_series(sid: str | None) -> dict | None:
     if not sid or not W.series_file(sid).exists():
         return None
@@ -188,6 +196,20 @@ def load_series(sid: str | None) -> dict | None:
 
 
 STATUS_ZH = {"not_tried": "未做", "ready": "待發布", "published": "已發布", "unsuitable": "不適合"}
+
+
+def before_publish_lines(concept: str, st: dict) -> list[str]:
+    """README 的「發布前」區段；兩個格式都已發布就改成列出網址（不再顯示過時的待辦）。"""
+    urls = urls_of(concept)
+    if st.get("ig_carousel") == "published" and st.get("threads_thread") == "published":
+        L = ["## 已發布", ""]
+        for f, label in (("ig_carousel", "IG"), ("threads_thread", "Threads")):
+            L.append(f"- {label}：{urls.get(f, '（網址見 `state/' + concept + '.yaml`）')}")
+        return L + [""]
+    return ["## 發布前", "",
+            "- [ ] 人最後確認圖、文字、caption",
+            "- [ ] IG（API）：`ig_publish.py prepare` → push `ig/jpg/` → `preflight` → `publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）",
+            "- [ ] Threads（API）：`threads_publish.py publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）", ""]
 
 
 def readme_md(d: dict, title: str, series: dict | None, pack: Path, build: Path) -> str:
@@ -214,10 +236,7 @@ def readme_md(d: dict, title: str, series: dict | None, pack: Path, build: Path)
         L += ["![縮圖總覽](_build/contact-sheet.png)", ""]
     L += ["## 檢查結果（程式產生）", "", f"- {chk or '（還沒渲染）'}",
           "- 程式 A、批次檢查、忠實者與讀者審查的結果不存在發布包裡（審查產出放暫存，不進 repo）；最後確認時由 Claude 在報告中說明", "",
-          "## 發布前", "",
-          "- [ ] 人最後確認圖、文字、caption",
-          "- [ ] IG（API）：`ig_publish.py prepare` → push `ig/jpg/` → `preflight` → `publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）",
-          "- [ ] Threads（API）：`threads_publish.py publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）", "",
+          ] + before_publish_lines(d["concept"], st) + [
           "## 發布後", "",
           "- 網址與時間由 `--confirm` 自動寫回 `state/`，不用另外記錄",
           "- [ ] 系列其他則發布後，Threads 回補由 Claude 做：`threads_publish.py backfill`（見 `state/backfill.md`）；IG 回補、限時動態、精選集、置頂都不做", "",
@@ -254,6 +273,21 @@ def indexes() -> None:
     (out / "README.md").write_text("\n".join(top) + "\n", encoding="utf-8")
 
 
+def refresh(spec_path: Path) -> None:
+    """發布後只重寫 README.md 與索引，反映最新的狀態與網址。"""
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    pack, bld = W.pack_dir(spec_path), W.build_dir(spec_path)
+    card = W.parse_card(W.WIKI / "wiki" / "concepts" / f"{d['concept']}.md")
+    series = load_series(d.get("series"))
+    title = card.front["title"]
+    if series:
+        title = next((m["planned_title"] for m in series["members"] if m["concept"] == d["concept"]), title)
+    (pack / "README.md").write_text(readme_md(d, title, series, pack, bld), encoding="utf-8")
+    if bld.name == "_build":
+        indexes()
+    print("refreshed", pack)
+
+
 def build(spec_path: Path, force: bool = False) -> None:
     d = json.loads(spec_path.read_text(encoding="utf-8"))
     W.guard_published(d, force)
@@ -278,4 +312,4 @@ def build(spec_path: Path, force: bool = False) -> None:
 
 
 if __name__ == "__main__":
-    build(Path(sys.argv[1]).resolve(), "--force" in sys.argv)
+    (refresh if "--refresh" in sys.argv else lambda p: build(p, "--force" in sys.argv))(Path(sys.argv[1]).resolve())

@@ -55,6 +55,7 @@ CASES = [  # (名稱, 基底, 修改, 預期錯誤中要出現的字串)
     ("hashtag 超過 5 個", GOOD_A, lambda s: s["caption"].update(hashtags=["DSO_Jev", "a", "b", "c", "d", "e"]), "hashtag"),
     ("缺系列標籤", GOOD_A, lambda s: s["caption"].update(hashtags=["LLM"]), "系列標籤"),
     ("出現 podcast", GOOD_A, lambda s: s["caption"].update(nav="歡迎收聽 podcast"), "podcast"),
+    ("前向指稱「系列後面」會被讀成這則的後面幾頁", GOOD_A, lambda s: s["slides"][6].update(body="Jev 會漏掉計數與日期這類題目，細節系列後面會再細講，算術要留在程式碼裡做。"), "前向指稱"),
     ("AI 腔黑名單", GOOD_A, lambda s: s["slides"][6].update(body="總而言之，需要注意到主張不成立、反覆推敲的深思型判斷，Jev 在這類判斷上會漏掉。"), "AI 腔"),
     ("脈絡張沒引用 context 主張", GOOD_A, lambda s: s["slides"][1].update(refs=["c11"]), "脈絡張"),
     ("補充字數不在 40 到 60", GOOD_A, lambda s: s["slides"][6].update(body="Jev 會漏掉。"), "補充"),

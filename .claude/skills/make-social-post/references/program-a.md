@@ -16,6 +16,7 @@
 | 圖上出現的名稱（拉丁字詞：模型名、系統名）要被引用的主張涵蓋 | 名稱沒有來源 |
 | 比較詞與全稱詞（`comparative_words`）出現在貼文，卻不在引用主張的 text、source_quotes、qualifiers 裡 | 派生的比較判斷是最常見的走樣來源 |
 | 中文 AI 腔黑名單（`ai_tone_blacklist`）；出現「podcast」 | 風格與規則違反 |
+| 前向指稱（`ambiguous_forward_refs`：「系列後面」「後面會再細講」「後面幾則」…） | 會被讀成這則的後面幾頁；寫成「此系列的後續 post」（2026-10-15 人的回饋） |
 | 被使用的主張，它的每條限定條件（`cid#k`）必須在整則貼文某處被 `quals` 標記帶出 | 壓縮時限定條件被砍 |
 | 卡的 `context_type` 是 `evidence_from_single_source` 或 `bound_to_source` 時，脈絡張必須引用 `role: context` 的主張 | 漏交代方法來源 |
 | 貼文或系列檔的 `planned_title` 出現 `config/terms.yaml` 左邊的詞（例如「判官」，應寫 Judge） | 用語不一致（導流行引用的文章原標題不檢查） |
@@ -34,4 +35,4 @@
 
 ## 回歸測試
 
-`uv run python tests/test_check_a.py`：21 個故意做壞的貼文必須被抓到、2 則正確貼文必須通過（測誤殺）。新增或改動檢查時，先加一個壞貼文案例確認抓得到，再改程式。
+`uv run python tests/test_check_a.py`：26 個故意做壞的貼文必須被抓到、4 則正確貼文必須通過（測誤殺）。新增或改動檢查時，先加一個壞貼文案例確認抓得到，再改程式。

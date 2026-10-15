@@ -102,3 +102,33 @@ def validate_jpeg(path: Path) -> list[str]:
     if not (RATIO_MIN - 1e-9 <= r <= RATIO_MAX + 1e-9):
         errs.append(f"{path.name}: 比例 {r:.3f}，需在 4:5 到 1.91:1")
     return errs
+
+
+def compact(result: dict) -> dict:
+    """--summary：把 dry-run／發佈結果縮成人要看的部分（problems、warnings、張數、caption／正文、額度、結果）。
+    url_checks 只留數量與失敗的；requests 只留步驟名稱，以及 caption／text（人要確認的文字）。"""
+    out = {k: v for k, v in result.items() if k not in ("url_checks", "requests")}
+    if "url_checks" in result:
+        bad = [c for c in result["url_checks"] if not c.get("ok")]
+        out["url_checks"] = {"total": len(result["url_checks"]), "failed": bad}
+    if "requests" in result:
+        out["requests"] = [{"step": r.get("step"), **{k: r["params"][k] for k in ("caption", "text") if k in (r.get("params") or {})}}
+                           for r in result["requests"] if any(k in (r.get("params") or {}) for k in ("caption", "text")) or not r.get("params")]
+        out["request_count"] = len(result["requests"])
+    return out
+
+
+def refresh_index(pack: Path) -> str | None:
+    """發布成功後更新這則的 README.md 與 out/ 索引（build_package.py --refresh）。失敗只回傳訊息，不影響發布結果。"""
+    spec = pack / "_build" / "spec.json"
+    if not spec.exists():
+        return None
+    try:
+        import contextlib
+        import io
+        import build_package
+        with contextlib.redirect_stdout(io.StringIO()):
+            build_package.refresh(spec)
+        return None
+    except Exception as e:       # noqa: BLE001 — 索引更新失敗不能讓發布看起來失敗
+        return f"索引沒有自動更新（{e}）；請手動執行 build_package.py --refresh"

@@ -36,6 +36,7 @@ import cardlib as W
 import hosting
 import ig_api
 import publish_common as PC
+import series_links as SL
 import state as ST
 import threads_api as TA
 
@@ -90,6 +91,12 @@ def _finish_plan(d: dict, posts: list[dict], problems: list[str]) -> dict:
             problems.append(f"第 {i} 則（{p['kind']}）{n} 字，超過 {TA.TEXT_MAX}")
         if not p["text"].strip():
             problems.append(f"第 {i} 則（{p['kind']}）沒有文字")
+    try:
+        stale = SL.stale(d)
+    except (OSError, KeyError, AttributeError):      # 沒有系列檔（獨立貼文、測試）就不檢查
+        stale = []
+    for t in stale:
+        problems.append(f"最後一則還寫「{t}（尚未發布）」，但它已經發布：先跑 series_links.py <spec.json> --write 補上網址，再重跑 check_a.py 與 build_package.py")
     return {"concept": d["concept"], "series": d.get("series"), "hook_style": d["hook"]["style"], "posts": posts, "problems": problems}
 
 
@@ -352,6 +359,7 @@ def main(argv: list[str]) -> int:
     ti.add_argument("--write", action="store_true", help="把 THREADS_TOKEN_REFRESHED_AT 校正成「到期時間減 60 天」（長效 token 才適用）")
     pp = sub.add_parser("publish")
     pp.add_argument("pack"); pp.add_argument("--confirm", action="store_true"); pp.add_argument("--no-record", action="store_true")
+    pp.add_argument("--summary", action="store_true", help="輸出縮短版：problems、warnings、則數、每則的完整文字、額度與結果")
     rb = sub.add_parser("rollback")
     rb.add_argument("pack"); rb.add_argument("--confirm", action="store_true")
     bf = sub.add_parser("backfill")
@@ -443,7 +451,12 @@ def main(argv: list[str]) -> int:
         PC.set_env("THREADS_TOKEN_REFRESHED_AT", dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"))
         return emit({"ok": True, "expires_in_s": body.get("expires_in"), "note": "長效 token 已寫入 .env（不會顯示）"})
     if a.cmd == "publish":
-        return emit(publish_thread(Path(a.pack).resolve(), a.confirm, env, client, host, record=not a.no_record) | {"warnings": warns})
+        res = publish_thread(Path(a.pack).resolve(), a.confirm, env, client, host, record=not a.no_record) | {"warnings": warns}
+        if a.confirm and res.get("ok") and not a.no_record:
+            note = PC.refresh_index(Path(a.pack).resolve())
+            if note:
+                res["warnings"] = res["warnings"] + [note]
+        return emit(PC.compact(res) if a.summary else res)
     if a.cmd == "rollback":
         return emit(rollback(Path(a.pack).resolve(), a.confirm, client))
     if a.cmd == "backfill":

@@ -29,6 +29,7 @@ import build_package as BP
 import cardlib as W
 import hosting
 import ig_api
+import publish_common as PC
 import state as ST
 from publish_common import (ENV_PATH, MAX_BYTES, TOKEN_LIFETIME_DAYS, WARN_DAYS, ensure_token_fresh, load_env,  # noqa: F401
                             set_env, token_days_left, validate_jpeg)
@@ -306,6 +307,7 @@ def main(argv: list[str]) -> int:
             p.add_argument("--no-reuse", action="store_true", help="不沿用預檢的 container，重新建立")
             p.add_argument("--confirm", action="store_true", help="實際發佈（沒有這個旗標一律是 dry-run）")
             p.add_argument("--no-record", action="store_true", help="實測用：發佈後不寫回 state（因為測試貼文會被手動刪除）")
+            p.add_argument("--summary", action="store_true", help="輸出縮短版：problems、warnings、張數、caption、額度與結果（不列每張圖的網址與請求）")
     p = sub.add_parser("publish-image")
     p.add_argument("image")
     p.add_argument("--caption", default="")
@@ -375,7 +377,12 @@ def main(argv: list[str]) -> int:
     if a.cmd == "preflight":
         return emit(preflight_carousel(Path(a.pack).resolve(), env, client, host) | {"warnings": warns})
     if a.cmd == "publish":
-        return emit(publish_carousel(Path(a.pack).resolve(), a.confirm, env, client, host, record=not a.no_record, reuse=not a.no_reuse) | {"warnings": warns})
+        res = publish_carousel(Path(a.pack).resolve(), a.confirm, env, client, host, record=not a.no_record, reuse=not a.no_reuse) | {"warnings": warns}
+        if a.confirm and res.get("ok") and not a.no_record:
+            note = PC.refresh_index(Path(a.pack).resolve())
+            if note:
+                res["warnings"] = res["warnings"] + [note]
+        return emit(PC.compact(res) if a.summary else res)
     if a.cmd == "publish-image":
         return emit(publish_image(Path(a.image).resolve(), a.caption, a.alt, a.confirm, env, client, host) | {"warnings": warns})
     return 1

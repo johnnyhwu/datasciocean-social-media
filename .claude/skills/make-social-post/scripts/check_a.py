@@ -142,6 +142,10 @@ def main(spec_path: str) -> int:
         for w in P["ai_tone_blacklist"]:
             if w in txt_all:
                 err.append(f"{name}: AI 腔黑名單命中 {w!r}")
+        # 13. 前向指稱：「後面」會被讀成這則的後面幾頁（2026-10-15）
+        for w in P.get("ambiguous_forward_refs", []):
+            if w in txt_all:
+                err.append(f"{name}: 前向指稱 {w!r} 會被讀成這則的後面幾頁，改寫成「此系列的後續 post」")
         if "podcast" in txt_all.lower():
             err.append(f"{name}: 出現 podcast")
 

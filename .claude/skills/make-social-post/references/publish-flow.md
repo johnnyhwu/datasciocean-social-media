@@ -25,17 +25,19 @@ P=out/<系列>/<觀念>                              # 要發的發布包資料�
 
 **人一次授權整串（2026-10-10 人同意）**：人在同一則訊息明確說「prepare、push `ig/jpg/`、發佈到兩個平台」（或等義）時，視為已經說了「發」和同意 push，可以連續執行：前提檢查 → `prepare` → push `ig/jpg/`（只 add 這個資料夾）→ IG 預檢 → IG dry-run → IG `--confirm` → Threads dry-run → Threads `--confirm`。**每一個 dry-run 都還是要跑、要看**；只要出現 `problems`、`warnings`、圖片網址抓不到、額度不足，或內容和人確認的不一樣，就**停下來問人**。人只說「ready」或「準備發」不算授權發布。
 
+**標 `ready` 時就問一次**（省掉發布當天多一輪來回）：問人要不要整串授權，並附上現成的那句話讓人直接照說——「prepare、push `ig/jpg/`、發佈到兩個平台」。人只說「發」（沒有整串）時，prepare 做完、push 前還是要問。
+
 | # | 做什麼 | 指令 | 誰 |
 |---|---|---|---|
 | 1 | 把投影片轉成 IG 與 Threads 都能用的 JPEG，驗證官方限制 | `ig_publish.py prepare $P` | Claude |
 | 2 | **commit 並 push `$P/ig/jpg/`**（Meta 要從這個公開 repo 的 raw 網址抓圖；沒 push 就抓不到）。只 add 這個資料夾，commit message 簡短說明 | `git add $P/ig/jpg && git commit … && git push origin main` | Claude，**push 前先問人** |
 | 3 | **IG 預檢**：建好所有 container、等到 FINISHED，**但不發佈**（帳號上看不到；23 小時內有效） | `ig_publish.py preflight $P` | Claude |
-| 4 | **IG dry-run**：印出將送出的請求、檢查網址與額度、報告預檢能不能沿用。把 caption、張數、預檢狀態用白話給人 | `ig_publish.py publish $P` | Claude → 人看 |
+| 4 | **IG dry-run**：印出將送出的請求、檢查網址與額度、報告預檢能不能沿用。把 caption、張數、預檢狀態用白話給人。**加 `--summary`**：只印 problems、warnings、張數、caption、額度（網址檢查只留數量與失敗的），不用另外寫程式摘要 | `ig_publish.py publish $P --summary` | Claude → 人看 |
 | 5 | 人說「發」→ **IG 發佈**（沿用預檢，只送一個 `media_publish`）；成功後自動寫回 state 與 `state/ig-publish-log.jsonl` | `ig_publish.py publish $P --confirm` | 人確認，Claude 執行 |
-| 5.5 | **補「同系列」連結**：最後一則回覆裡已發布的同系列貼文，把 Threads 網址放在標題下一行（`state/<觀念>.yaml` 有網址）；改了 spec 要重跑 check_a、build_package | 手動編輯 `_build/spec.json` 的 `threads.last.text` | Claude |
-| 6 | **Threads dry-run**：列出每一則的完整文字、字數、附圖、連結預覽、額度（輪播模式只有 2 則：輪播貼文＋連結回覆；舊逐張串文約 7 則）。把完整文字給人 | `threads_publish.py publish $P` | Claude → 人看 |
+| 5.5 | **補「同系列」連結**：最後一則回覆裡已發布的同系列貼文，Threads 網址放在標題下一行。腳本從 `state/` 讀網址，改完要重跑 check_a、build_package；Threads dry-run 發現「已發布卻還寫尚未發布」會列為 problem 擋住 | `series_links.py $P/_build/spec.json`（dry-run）→ `--write` | Claude |
+| 6 | **Threads dry-run**：列出每一則的完整文字、字數、附圖、連結預覽、額度（輪播模式只有 2 則：輪播貼文＋連結回覆；舊逐張串文約 7 則）。把完整文字給人（同樣加 `--summary`） | `threads_publish.py publish $P --summary` | Claude → 人看 |
 | 7 | 人說「發」→ **Threads 發佈**：依序發，每一則回覆前一則，每一則發完立刻記錄 id（輪播：先建每張圖的子項 container，再建輪播本體；整串約 1 到 2 分鐘，舊逐張串文約 4 到 5 分鐘）；成功後自動寫回 state 與 `state/threads-publish-log.jsonl` | `threads_publish.py publish $P --confirm` | 人確認，Claude 執行 |
-| 8 | 驗證：`state.py status` 該觀念兩格式都是 `published`；`state/<觀念>.yaml` 有兩個網址；把網址給人 | | Claude |
+| 8 | 驗證：`state.py status` 該觀念兩格式都是 `published`；`state/<觀念>.yaml` 有兩個網址；把網址給人。**貼文 `README.md` 與 `out/` 索引會在 `--confirm` 成功後自動更新**（`build_package.py --refresh`，兩個格式都發完才會顯示「已發布」與網址）；不用再手動 `build_package.py --force` | | Claude |
 | 9 | **Threads 回補**：`state/backfill.md` 有項目時，跑 dry-run，把每則回覆的完整文字給人看，人說「發」才 `--confirm`；成功後自動標記已回補。IG 與其他事項不做（見下） | `threads_publish.py backfill`（dry-run）→ `threads_publish.py backfill --confirm` | Claude；人確認 |
 | 10 | 把這次的 state 與發佈紀錄 commit（問人要不要 push） | | Claude，**先問人** |
 

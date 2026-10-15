@@ -53,18 +53,19 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 |---|---|
 | `check_a.py` | 程式 A：引用標記、比較詞、限定條件、數字、字數、重疊率、用語… |
 | `render.py` | 渲染引擎與程式 B：spec.json + 系列模板 → 1080×1350 PNG，並做版面檢查，寫 `_build/checks-b.json`、`alt-text.json` |
-| `build_package.py` | 由 spec.json 產生人看的入口（`README.md`、`ig/post.md`、`threads/post.md`）、審查用貼文文字，並更新 `out/README.md` 與系列索引 |
+| `build_package.py` | 由 spec.json 產生人看的入口（`README.md`、`ig/post.md`、`threads/post.md`）、審查用貼文文字，並更新 `out/README.md` 與系列索引；`--refresh` 只重寫 README 與索引（發布成功後由發布程式自動呼叫） |
 | `contact_sheet.py` | 把投影片拼成縮圖總覽 |
 | `verify_faithful.py`、`verify_reader.py` | 驗證忠實者／讀者的 JSON：引用逐字出自卡或貼文、分級、陷阱題 |
 | `batch_check.py` | 批次層檢查：相鄰 hook 樣態、相鄰系列色、模板 hash、標題一致、存量 |
 | `ig_publish.py`、`ig_api.py` | IG 官方 API 發佈：prepare／preflight／publish（dry-run 預設，`--confirm` 才發）、token 管理 |
 | `threads_publish.py`、`threads_api.py` | Threads 官方 API 發佈整串：publish／rollback／delete／token-info（dry-run 預設；中途失敗可續發） |
 | `publish_common.py`、`hosting.py` | 兩個平台共用：`.env` 讀寫、token 效期與自動 refresh、JPEG 驗證；圖片託管介面（GitHub raw 網址） |
+| `series_links.py` | Threads 最後一則的「同系列」：把已發布的貼文從「（尚未發布）」補成標題＋網址（dry-run／`--write`）；發布 dry-run 會擋沒補的 |
 | `series_deps.py` | 系列規劃：列出該合併成一則的候選（輔助，不是偵測器；規劃時一定要問人） |
 | `state.py` | 各觀念各格式的狀態（`not_tried`／`ready`／`published`／`unsuitable`）、發布紀錄、回補清單（`state/`） |
 | `cardlib.py` | 共用：唯讀解析觀念卡、系列與發布包路徑、文字正規化與逐字比對 |
 
-`render.py`、`build_package.py` 對**已發布**的貼文預設拒絕，要重做才加 `--force`。
+`render.py`、`build_package.py` 對**已發布**的貼文預設拒絕，要重做才加 `--force`（發布後要更新 README 與索引用 `--refresh`，不用 `--force`）。`ig_publish.py`、`threads_publish.py` 的 `publish` 都有 `--summary`（縮短版輸出，給人看 dry-run 用）。
 
 改了任何腳本或審查流程，跑 `CLAUDE.md`「工作方式」列的全部回歸測試。
 

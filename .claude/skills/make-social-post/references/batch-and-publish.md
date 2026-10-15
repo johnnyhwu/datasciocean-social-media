@@ -67,7 +67,7 @@ status: planning                 # planning | publishing | done
 
 `out/README.md` 是全部貼文的總入口（待發布清單與各系列狀態），`out/<series>/README.md` 是系列的發文順序。
 
-確認後：`state.py ready <concept> <format> <pack-dir>`（每個格式各一次），接著依 `publish-flow.md` 發布。
+確認後：`state.py ready <concept> <format> <pack-dir>`（每個格式各一次），接著依 `publish-flow.md` 發布。**標 ready 的同一則回報裡，順便問人要不要整串授權**（附上那句：「prepare、push `ig/jpg/`、發佈到兩個平台」），人說了才能連續執行。
 
 ## 7. 發布後：寫回狀態
 
