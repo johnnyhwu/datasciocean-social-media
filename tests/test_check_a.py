@@ -43,6 +43,7 @@ CASES = [  # (名稱, 基底, 修改, 預期錯誤中要出現的字串)
     ("結構區塊太長", GOOD_A, lambda s: s["slides"][-1].update(title="這是一個太長的結構標題絕對超過字數上限"), "「結構」區塊超過"),
     ("引用 pending 主張", GOOD_B, lambda s: s["slides"][2].update(refs=["c1", "c4"]), "不得使用"),
     ("限定條件被砍", GOOD_A, lambda s: s["threads"]["body"].update(quals=[]), "限定條件未帶出"),
+    ("限定條件放行沒寫理由", GOOD_A, lambda s: (s["threads"]["body"].update(quals=[]), s.update(waived_quals=[{"id": "c1#1"}])), "waived_quals 每項要有 id 與 reason"),
     ("卡上沒有的比較詞「最」", GOOD_A, lambda s: s["slides"][6].update(body="計數不可靠、日期是文字不是有序量，這是最嚴重的失效模式，算術要留在程式碼裡做。"), "比較詞/全稱詞 '最'"),
     ("數字在引用主張之外（HINT）", GOOD_A, lambda s: s["slides"][4]["bars"][0].update(value=99.9), "不在引用主張原文"),
     ("引用不存在的主張", GOOD_A, lambda s: s["slides"][2].update(refs=["c99"]), "不存在的主張"),
@@ -68,7 +69,8 @@ CASES = [  # (名稱, 基底, 修改, 預期錯誤中要出現的字串)
 def main():
     fails = 0
     carousel_ok = mut(GOOD_A, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items")))
-    for base, name in ((GOOD_A, "正確的貼文 A（必須通過）"), (GOOD_B, "正確的貼文 B（必須通過）"), (carousel_ok, "正確的貼文 A 改成 Threads 輪播模式（必須通過，測誤殺）")):
+    waived_ok = mut(GOOD_A, lambda s: (s.update(waived_quals=[{"id": q, "reason": "人決定刪除"} for q in s["threads"]["body"]["quals"]]), s["threads"]["body"].update(quals=[])))
+    for base, name in ((waived_ok, "正確的貼文 A：限定條件有寫理由地放行（必須通過，測誤殺）"), (GOOD_A, "正確的貼文 A（必須通過）"), (GOOD_B, "正確的貼文 B（必須通過）"), (carousel_ok, "正確的貼文 A 改成 Threads 輪播模式（必須通過，測誤殺）")):
         code, out = run(base)
         ok = code == 0
         fails += not ok

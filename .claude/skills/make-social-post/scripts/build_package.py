@@ -31,7 +31,7 @@ CONTENT = {"text", "table", "chart_bars", "chart_sounding", "diagram"}
 # 避免「新增欄位、卻漏了輸出」（審查者與人都看不到那段內容）。
 CONTENT_KEYS = {"title", "body", "label", "question", "rows", "bars", "note", "nav", "legend",
                 "nodes", "outcomes", "loop", "columns", "heads", "pairs", "count", "points", "ref", "ranges", "group", "start", "end"}
-LAYOUT_KEYS = {"layout", "refs", "quals", "unit", "key_w", "subs_inline", "current", "axis_max", "kind"}
+LAYOUT_KEYS = {"layout", "refs", "quals", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols"}   # cols：點陣每列幾個點（版面參數，不含文字）
 
 
 def check_fields(d: dict) -> None:

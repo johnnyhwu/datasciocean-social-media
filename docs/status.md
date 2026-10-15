@@ -6,6 +6,10 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 
 見 CLAUDE.md「目前狀態」；更詳細的規劃與決定記在 memory `project_skillopt_series_plan`。
 
+## persona-aware-d2s（進行中）
+
+見 CLAUDE.md「目前狀態」。第 1 則 `persona-d2s-task-and-pipeline`（16 張）已發布（2026-10-15）：IG https://www.instagram.com/p/DefqxZOH0Ot/ 、Threads https://www.threads.com/@datasciocean/post/DefrJYsH5nk 。第 2、3 則 `ready`。
+
 ## jev-cascade（已發完；2026-10-10 的狀態）
 
 - 系列 `jev-cascade`（JEV 串接 Judge 系列，來自文章 `jev-as-a-judge`；視覺哲學「潮線」）**5 張卡做成 3 則 post，三則都已用 API 發到 IG 與 Threads**（兩個格式都是 `published`）。系列標題（`planned_title`）是草案。

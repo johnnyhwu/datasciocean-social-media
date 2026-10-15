@@ -33,7 +33,7 @@ RP = PARAMS["render"]
 WD, HT, SAFE_X, PAD_X = RP["width"], RP["height"], RP["safe_x"], RP["pad_x"]
 CREAM, TEAL, DEEP, GOLD = "#F2E0C0", "#076876", "#01353F", "#DDA642"
 MID, LIGHT, ABYSS = "#1F8A8D", "#69B4AA", "#032027"
-SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT}
+SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP}
 ALLOWED_FONT_PX = {28, 34, 38, 40, 56, 72, 76}
 ZERO_Y = 706          # 測深圖水面（0）
 
@@ -138,11 +138,109 @@ COVER_PATH = [(250, 1060), (400, 1110), (505, 1075), (585, 1022), (650, 1003), (
 COVER_RADII = [60, 130, 205, 285, 370, 460, 555, 655, 760]
 
 
-def progress_dots(idx, n, dark=False):
+# ---------------------------------------------------------------- 一式四份系列（style: cards）的 SVG 元件
+# 一份來源文件，長出四張投影片：列＝受眾（上專家、下非專家），欄＝長度（左長版、右短版）；
+# 長版條列多、短版條列少。金色只給一張卡（目前這一張在講的那一版）。
+# 都用 class "bg"（背景層，不進程式 B 的文字與圖形重疊檢查），排版時要自己確保不壓到文字（看圖確認）。
+CARD_BULLETS = [5, 2, 5, 3]         # 四張卡的條列數：專家長、專家短、非專家長、非專家短
+
+
+def slide_card(x, y, w, h, nb, gold=False, dark=False, edge=False):
+    """一張小投影片：頂端標題列，下面是帶圓點的條列。dark=True 用在深色底（只有細框）。"""
+    k = w / 270
+    s = ""
+    if gold:
+        s += f'<ellipse class="bg" cx="{x + w / 2:.1f}" cy="{y + h / 2:.1f}" rx="{w * .75:.1f}" ry="{h * .85:.1f}" fill="url(#glow)"/>'
+    stroke = (f' stroke="{GOLD}" stroke-width="5"' if gold else (f' stroke="{LIGHT}" stroke-opacity=".6" stroke-width="3"' if dark else
+              (f' stroke="{LIGHT}" stroke-opacity=".35" stroke-width="2"' if edge else "")))
+    s += f'<rect class="bg" x="{x}" y="{y}" width="{w}" height="{h}" rx="{14 * k:.1f}" fill="{"none" if dark else "url(#sea)"}"{stroke}/>'
+    c, op = (GOLD, 1) if gold else ((LIGHT, .6) if dark else (CREAM, 1))
+    pad = w * .09
+    s += f'<rect class="bg" x="{x + pad:.1f}" y="{y + pad:.1f}" width="{w * .42:.1f}" height="{11 * k:.1f}" rx="{5.5 * k:.1f}" fill="{c}" fill-opacity="{op}"/>'
+    top = y + pad + 40 * k
+    gap = (y + h - pad - top) / nb
+    for i in range(nb):
+        cy = top + i * gap + gap / 2
+        s += f'<circle class="bg" cx="{x + pad + 6 * k:.1f}" cy="{cy:.1f}" r="{5 * k:.1f}" fill="{c}" fill-opacity="{op * .9:.2f}"/>'
+        s += (f'<rect class="bg" x="{x + pad + 24 * k:.1f}" y="{cy - 4 * k:.1f}" width="{w - 2 * pad - 24 * k - (i % 3) * w * .1:.1f}" '
+              f'height="{8 * k:.1f}" rx="{4 * k:.1f}" fill="{c}" fill-opacity="{op * .7:.2f}"/>')
+    return s
+
+
+def source_doc(x, y, w, h):
+    """來源文件：米色紙面、藍綠細框、淡陰影、一疊字線。"""
+    s = f'<rect class="bg" x="{x + 6}" y="{y + 9}" width="{w}" height="{h}" rx="10" fill="{DEEP}" fill-opacity=".14"/>'
+    s += f'<rect class="bg" x="{x}" y="{y}" width="{w}" height="{h}" rx="10" fill="{CREAM}" stroke="{TEAL}" stroke-width="3"/>'
+    n = int((h - 60) // 28)
+    for i in range(n):
+        s += f'<rect class="bg" x="{x + 24}" y="{y + 30 + i * 28}" width="{w - 48 - (i % 3) * 26}" height="8" rx="4" fill="{TEAL}" fill-opacity=".75"/>'
+    return s
+
+
+def link(d, color=TEAL, op=.6):
+    return f'<path class="bg" d="{d}" fill="none" stroke="{color}" stroke-opacity="{op}" stroke-width="3"/>'
+
+
+# 直切版面（2026-10-14 人選 H2）：右邊是一條深海直欄（x≥700），四張投影片錯開排列、橫跨米色與深色的交界（偶數張靠左、奇數張靠右一點），
+# 金框一張一張往下換；封面左下角多一份來源文件，一條線接到最下面那張，再由一條匯流線往上分岔到其他三張。
+# 圖表類版型要整幅寬度，改成右緣一條窄的索引欄（四張迷你投影片，金框同樣表示現在是哪一版）。
+# 直欄與索引欄各有一個看不見的 class "g" 護欄矩形，文字壓進去程式 B 會抓到。
+PANEL_X = 700       # 直欄左緣
+GUARD_X = 620       # 護欄左緣：文字欄 80～600（寬 520），匯流線在 x=620
+RAIL_X = 1032
+CARD_W, CARD_H, CARD_GAP, CARD_Y0 = 400, 260, 36, 60
+
+
+def stagger(gold, dark=False, doc=False):
+    """四張投影片錯開排列。dark=True 用在深色整頁（帶走張）：直欄不畫，投影片只有細框。doc=True：左下角一份文件接到最下面那張。"""
+    s = ""
+    if not dark:
+        s += f'<rect class="bg" x="{PANEL_X}" y="0" width="{WD - PANEL_X}" height="{HT}" fill="url(#sea)"/>'
+    s += f'<rect class="g guard" x="{GUARD_X}" y="0" width="{WD - GUARD_X}" height="1300" fill="none" stroke="none"/>'
+    xs = [640 + (k % 2) * 36 for k in range(4)]
+    ys = [CARD_Y0 + k * (CARD_H + CARD_GAP) for k in range(4)]
+    mids = [y + CARD_H / 2 for y in ys]
+    if doc:
+        dy = mids[3] - 125
+        s += f'<g transform="rotate(-3 175 {mids[3]:.1f})">' + source_doc(80, dy, 190, 250) + '</g>'
+        s += link(f"M270,{mids[3]:.1f} L{xs[3]},{mids[3]:.1f}")
+        s += link(f"M{GUARD_X},{mids[3]:.1f} L{GUARD_X},{mids[0]:.1f}")
+        for k in range(3):
+            s += link(f"M{GUARD_X},{mids[k]:.1f} L{xs[k]},{mids[k]:.1f}")
+        for k in range(4):
+            s += f'<circle class="bg" cx="{GUARD_X}" cy="{mids[k]:.1f}" r="6" fill="{TEAL}" fill-opacity=".7"/>'
+    for k in range(4):
+        x, y = xs[k], ys[k]
+        if not dark:
+            s += f'<rect class="bg" x="{x + 8}" y="{y + 14}" width="{CARD_W}" height="{CARD_H}" rx="16" fill="{DEEP}" fill-opacity=".22"/>'
+        s += slide_card(x, y, CARD_W, CARD_H, CARD_BULLETS[k], gold=(k == gold), dark=dark, edge=not dark)
+    return s
+
+
+def rail(gold):
+    """圖表類版型的右緣索引欄：四張迷你投影片，金框 = 現在對應的版本。"""
+    s = f'<rect class="bg" x="{RAIL_X}" y="0" width="{WD - RAIL_X}" height="{HT}" fill="{DEEP}"/>'
+    s += f'<rect class="g guard" x="{RAIL_X}" y="0" width="{WD - RAIL_X}" height="1300" fill="none" stroke="none"/>'
+    w, h, g = 30, 42, 16
+    x, y0 = RAIL_X + 9, (HT - (4 * h + 3 * g)) / 2
+    for k in range(4):
+        y = y0 + k * (h + g)
+        on = k == gold
+        if on:
+            s += f'<ellipse class="bg" cx="{x + w / 2}" cy="{y + h / 2}" rx="34" ry="40" fill="url(#glow)"/>'
+        stroke = f' stroke="{GOLD}" stroke-width="3"' if on else f' stroke="{LIGHT}" stroke-opacity=".5" stroke-width="2"'
+        s += f'<rect class="bg" x="{x}" y="{y}" width="{w}" height="{h}" rx="5" fill="url(#sea)"{stroke}/>'
+        c = GOLD if on else CREAM
+        for j, ww in enumerate((18, 12)):
+            s += f'<rect class="bg" x="{x + 6}" y="{y + 11 + j * 11}" width="{ww}" height="4" rx="2" fill="{c}" fill-opacity=".85"/>'
+    return s
+
+
+def progress_dots(idx, n, dark=False, panel=False):
     """內頁右下角的一排小點：點數 = 這則的張數，金色是現在這一張，已看過的實心、還沒看的空心。"""
-    col = LIGHT if dark else TEAL
-    gap = 30
-    x0 = 1000 - (n - 1) * gap
+    col = LIGHT if (dark or panel) else TEAL
+    gap = min(30, 300 / max(n - 1, 1)) if panel else 30      # 直欄裡只有 300px 的寬度，張數多時縮小間距
+    x0 = (1044 if panel else 1000) - (n - 1) * gap
     s = ""
     for k in range(1, n + 1):
         x = x0 + (k - 1) * gap
@@ -210,9 +308,13 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     tpl = (tdir / f"{lay}.html").read_text(encoding="utf-8")
     sc = SERIES_COLORS.get(series.get("color"), MID)
     contour = series.get("style") == "contour"
+    cards = series.get("style") == "cards"
     idx, n_sl = spec.get("_idx", 1), spec.get("_n", 1)          # 第幾張／共幾張（render_all 填入）
     mi, mn = spec.get("_mi", 0), spec.get("_mn", 1)            # 這則是系列的第幾則／共幾則
-    kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", "")))}
+    kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", ""))), "FAM": "", "BODY_STYLE": ""}
+    split = cards and (lay in ("cover", "text", "takeaway") or (lay == "context" and not spec.get("rows")))   # 直切版面（文字版型）
+    if cards:
+        kw["FAM"] = "split" if split else "rail"
 
     if lay in ("text", "table", "chart_bars", "chart_sounding", "diagram"):   # 小標籤（例如「我的判斷」）：右上角
         kw["LABEL"] = f'<div class="t abs chip">{esc(spec["label"])}</div>' if spec.get("label") else ""
@@ -221,21 +323,33 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["SVG"] = svg_wrap(contours(800, 1010, COVER_RADII, sc, .38) + step_path(COVER_PATH[:k], sc, rejected=[(610, 1090)]))
         kw["SUB_TOP"] = 560
         kw["BODY"] = kw["BODY"].replace("\n", "<br>")
+    elif lay == "cover" and cards:     # 米色底；左邊文字欄，右邊直欄（文件在上、四張投影片由上疊到下）；金框每一則換一張
+        kw["SVG"] = svg_wrap(stagger(mi % 4, doc=True))
+        kw["SUB_TOP"] = 560
+        kw["BODY"] = kw["BODY"].replace("\n", "<br>")
     elif lay == "cover":
         kw["SVG"] = svg_wrap(waves(1000, sc))
         kw["SUB_TOP"] = 560
         kw["BODY"] = kw["BODY"].replace("\n", "<br>")      # 副標可以用換行分成幾條
     elif lay == "context":
         if spec.get("rows"):      # 脈絡張也可以在補充下面放對照表（名詞表）
-            parts, cells, _ = table_block(spec["rows"], max(470, body_end(spec.get("body", ""), 40, 1.6) + 44), spec.get("key_w", 300))
+            y0_ = max(470, body_end(spec.get("body", ""), 40, 1.6) + 44)
+            shift = 0
+            if cards:     # 一式四份：補充加名詞表整塊，在標題下方到頁尾之間垂直置中（2026-10-14 人的回饋）
+                _, _, yend = table_block(spec["rows"], y0_, spec.get("key_w", 300))
+                shift = int(max(-52, min(200, 250 + (985 - (yend - 352)) / 2 - 352)))
+                kw["BODY_STYLE"] = f"top:{352 + shift}px"
+            parts, cells, _ = table_block(spec["rows"], y0_ + shift, spec.get("key_w", 300))
             kw["SVG"], kw["CELLS"] = svg_wrap(parts), cells
         else:
-            kw["SVG"], kw["CELLS"] = "", ""
+            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else ""), ""
     elif lay == "text" and contour:
         k = 3 + round(3 * idx / max(n_sl, 1))                   # 同一則裡越後面的一張，路徑走得越遠
         # 最外圈的頂端要低於補充文字（最多 5 行，約到 y=690）：半徑上限 295 → 頂端約 y=795
         kw["SVG"] = svg_wrap(contours(620, 1120, [45, 100, 160, 225, 295], MID, .45, seed0=idx * .5)
                              + step_path([(x - 150, y + 110) for (x, y) in COVER_PATH[:k]], TEAL))
+    elif lay == "text" and cards:      # 下方一排四張小投影片；金框每一張換到下一張
+        kw["SVG"] = svg_wrap(stagger((idx - 1) % 4))
     elif lay == "text":
         kw["SVG"] = svg_wrap(
             waves(760, sc)
@@ -359,15 +473,15 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["LEGEND"] = f'刻度每格 {unit_ticks:g} {esc(spec.get("unit", ""))}'
         kw["NOTE"] = esc(spec.get("note", ""))
         spec["_S"], spec["_unit_ticks"] = S, unit_ticks
-    elif lay == "takeaway" and contour:
+    elif lay == "takeaway" and (contour or cards):
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
         q = spec.get("question")
         kw["QUESTION"] = f'<div class="t abs take-q" style="top:320px">{esc(q)}</div>' if q else ""
-        kw["TAKE_STYLE"] = f"top:{320 + math.ceil(len(q) / 15.0) * 73 + 36}px" if q else ""
+        kw["TAKE_STYLE"] = (f"top:{320 + est_lines(q, 520 / 56 - 0.4) * 73 + 36}px" if cards else f"top:{320 + math.ceil(len(q) / 15.0) * 73 + 36}px") if q else ""
         lab = spec.get("label")
         kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
-        kw["SVG"] = svg_wrap(contours(800, 1200, [60, 130, 205, 285, 370, 460], LIGHT, .30)
-                             + step_path(COVER_PATH, LIGHT))
+        kw["SVG"] = (svg_wrap(contours(800, 1200, [60, 130, 205, 285, 370, 460], LIGHT, .30) + step_path(COVER_PATH, LIGHT)) if contour
+                     else svg_wrap(stagger(mi % 4, dark=True)))
     elif lay == "takeaway":
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")      # 兩關這類並列的結論，可以用換行分成幾條
         q = spec.get("question")        # 先問一個問題，再給答案（讀者才知道這句話在回答什麼）
@@ -385,11 +499,11 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         cur = [m["concept"] for m in series["members"]].index(spec["current"])
         y, svg, out = 330, "", ""
         for i, t in enumerate(items):
-            if contour and i == cur:
+            if (contour or cards) and i == cur:
                 svg += f'<rect class="bg" x="72" y="{y - 10}" width="936" height="84" rx="6" fill="{DEEP}"/>'
                 svg += f'<circle class="g mark" data-e="1" cx="100" cy="{y + 32}" r="12" fill="{GOLD}"/>'
                 out += f'<div class="t abs item cur" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
-            elif contour:
+            elif contour or cards:
                 svg += f'<circle class="g mark" cx="100" cy="{y + 32}" r="8" fill="{TEAL}"/>'
                 out += f'<div class="t abs item" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
             elif i == cur:
@@ -424,21 +538,35 @@ def build(spec: dict, series: dict, tag: str) -> dict:
                             f'<circle class="bg" cx="{x_:.1f}" cy="{y_:.1f}" r="22" fill="{GOLD}"/>')
                 else:
                     svg += f'<circle class="bg" cx="{x_:.1f}" cy="{y_:.1f}" r="16" fill="{CREAM}" stroke="{TEAL}" stroke-width="6"/>'
+        if cards:    # 下半部：左邊一份來源文件，右邊一排 mn 張投影片，一張是一則（目前這則金框），相鄰兩張之間有短連線
+            svg += source_doc(80, 860, 170, 230)
+            cw_, cg_ = 200, 24
+            x0_ = 1000 - mn * cw_ - (mn - 1) * cg_
+            svg += link(f"M250,975 L{x0_},975")
+            for k_ in range(mn):
+                x_ = x0_ + k_ * (cw_ + cg_)
+                svg += slide_card(x_, 900, cw_, 150, CARD_BULLETS[k_ % 4], gold=(k_ == mi))
+                if k_ < mn - 1:
+                    svg += link(f"M{x_ + cw_},975 L{x_ + cw_ + cg_},975")
         kw["SVG"] = svg_wrap(svg)
         kw["ITEMS"] = out
         kw["NAV"] = esc(spec.get("nav", ""))
     else:
         raise ValueError(f"未知版型 {lay}")
 
-    if contour and lay not in ("cover", "takeaway"):
-        dots = progress_dots(idx, n_sl)
+    if (contour or cards) and lay not in ("cover", "takeaway"):
+        dots = progress_dots(idx, n_sl, panel=split)
+        if cards and not split:      # 圖表類版型：右緣的索引欄（金框 = 這一張對應的版本；系列地圖用這一則）
+            dots += rail(mi % 4 if lay == "series_map" else (idx - 1) % 4)
         kw["SVG"] = kw["SVG"].replace("</svg>", dots + "</svg>") if kw.get("SVG") else svg_wrap(dots)
 
     # 模板填入
     for k, v in kw.items():
         tpl = tpl.replace("{{" + k + "}}", str(v))
     assert "{{" not in tpl, re.findall(r"\{\{\w+\}\}", tpl)
-    return {"body": tpl}
+    # 沒有圖註時，模板裡的空圖註框會被邊界檢查量成 left=0，填完後拿掉
+    tpl = re.sub(r'<div class="t abs note"[^>]*></div>', "", tpl)
+    return {"body": tpl, "dyn": split}
 
 
 MEASURE_JS = r"""
@@ -532,7 +660,7 @@ def program_b(spec: dict, m: dict, img: Image.Image, series_name: str, tag_texts
     chk(f"文字對比度 >= {RP['min_contrast']}（取文字框外緣四角的實際背景色）", worst[0] >= RP["min_contrast"], f"最低 {worst[0]:.1f}（{worst[1]}）")
     ti = m["chk"].get("title")
     if ti:
-        mx = 4 if lay == "takeaway" else PARAMS["title_max_lines"]
+        mx = 4 if lay == "takeaway" else (3 if spec.get("_split") else PARAMS["title_max_lines"])
         chk(f"標題最多 {mx} 行", ti["lines"] <= mx, f"{ti['lines']} 行")
         chk("標題末行 >= 2 字、換行不拆詞", ti["lastChars"] >= 2 and not ti["bad"], {"lastChars": ti["lastChars"], "bad": ti["bad"]})
         chk("標題的數字與單位不拆成兩行", not ti["badNum"], ti["badNum"])
@@ -597,6 +725,7 @@ def render_all(spec_path: Path, only: set[int] | None = None, force: bool = Fals
             mids = [m_["concept"] for m_ in series["members"]]
             sl["_mi"], sl["_mn"] = (mids.index(doc["concept"]) if doc["concept"] in mids else 0), len(mids)
             built = build(sl, series, tag)
+            sl["_split"] = bool(built.get("dyn")) and sl["layout"] != "cover"
             page = (f'<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><style>{css}</style></head>'
                     f'<body>{built["body"]}</body></html>')
             hp = htmldir / f"{i:02d}.html"
@@ -604,9 +733,9 @@ def render_all(spec_path: Path, only: set[int] | None = None, force: bool = Fals
             pg.goto(hp.as_uri())
             pg.evaluate("document.fonts.ready")
             pg.wait_for_timeout(200)
-            if sl["layout"] == "cover":
+            if sl["layout"] == "cover" or built.get("dyn"):    # 封面與直切版面：補充文字接在標題下面
                 pg.evaluate("() => {const t=document.getElementById('title'), s=document.getElementById('body'); "
-                            "s.style.top=(t.getBoundingClientRect().bottom+36)+'px'}")
+                            "if(s) s.style.top=(t.getBoundingClientRect().bottom+36)+'px'}")
             m = pg.evaluate(MEASURE_JS)
             png = outdir / f"{i:02d}.png"
             pg.screenshot(path=str(png), clip={"x": 0, "y": 0, "width": WD, "height": HT})

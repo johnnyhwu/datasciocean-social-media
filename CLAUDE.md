@@ -74,7 +74,7 @@ out/                                    發布包（程式產生）
         threads/post.md                     Threads：舊格式是正文＋逐張串文＋最後一則；輪播模式是一則輪播（全部圖）＋一則連結回覆
         _build/                             機器用：spec.json（內容規格，唯一的真相來源）、checks-b.json、審查用文字…
 docs/                                   status.md（各系列進度與發布網址）、stage2-token-usage.md（token 用量與流程觀察）
-tests/                                  七份回歸測試（含 test_multicard.py：雙卡貼文與高密度版型）+ fixtures/（舊的 jev-teardown 兩則貼文、系列檔與觀念卡，只給測試用）
+tests/                                  八份回歸測試（含 test_multicard.py：雙卡貼文與高密度版型；test_cards_style.py：一式四份系列模板）+ fixtures/（舊的 jev-teardown 兩則貼文、系列檔與觀念卡，只給測試用）
 ```
 
 **找東西的規則**：要發文，從 `out/README.md` 進去，打開貼文的 `README.md`；要改內容，改該貼文 `_build/spec.json`，然後依序重跑 `check_a.py` → `render.py` → `contact_sheet.py` → `build_package.py`（`contact_sheet.py` 要在 `build_package.py` 之前，README 才會有縮圖）。
@@ -91,7 +91,9 @@ tests/                                  七份回歸測試（含 test_multicard.
 
 系列 3 則都已發完。**待做：** 第 1、2 則 Threads 的回補（補上第 3 則連結）：`threads_publish.py backfill`（dry-run 給人看、人說「發」才 `--confirm`）；清單在 `state/backfill.md`。第 1 則 IG 的系列地圖列 3 則（已鎖定）。
 
-存量（`ready`）：0 則。其他系列：`jev-cascade` 三則都已發完，細節在 `docs/status.md`。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。發布流程用真實帳號跑過四次（含 IG 19 張、Threads 輪播），照 `references/publish-flow.md`。
+存量（`ready`）：2 則（persona 第 2、3 則）。其他系列：`jev-cascade` 三則都已發完，細節在 `docs/status.md`。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。發布流程用真實帳號跑過四次（含 IG 19 張、Threads 輪播），照 `references/publish-flow.md`。
+
+**進行中：系列 `persona-aware-d2s`**（Persona-Aware-D2S: 同一份文件，怎麼長出不同簡報；視覺「一式四份」，`style: cards`，米色底＋一份來源文件長出四張深海漸層小投影片，金框只給一張）。3 卡 3 則、一卡一則不合併（2026-10-14 人決定）：`persona-d2s-task-and-pipeline` → `persona-d2s-training-design-flaws` → `persona-d2s-what-to-borrow`。系列名、三則標題已由人定案；視覺：D3（米色底、文件長出四張投影片）被人退回，理由是和前兩個系列構圖太像、IG 主頁會混淆，2026-10-14 改選「直切」（H2：右邊一條深海直欄，四張投影片錯開橫跨交界，封面左下一份文件）並要求內頁一起大膽（第一次做得太整齊，人說醜，又照草圖的錯開排法重做），模板已重做（`series/persona-aware-d2s/templates/`，`tests/test_cards_style.py` 過），新樣張人已同意；第 1 則 `persona-d2s-task-and-pipeline`（16 張）人已確認、已標 `ready`；第 2 則 `persona-d2s-training-design-flaws`（14 張，hook「三個疑點：資料少、沒驗證、難擴展」）人已確認、已標 `ready`；第 3 則 `persona-d2s-what-to-borrow` 的 spec 已做完（13 張，人看過後刪了 Table 10 precision 圖註與「相關性評分」那張；限定條件 c8#1 用 spec 頂層 `waived_quals` 放行；hook「兩招不用訓練的技巧 代價各是什麼？」，忠實者 3 輪通過，人已確認、已標 `ready`）。三則都已 `ready`、系列已鎖定（`members_locked: true`）、hashtag `DSO_PersonaD2S` 已定案（2026-10-14）；**第 1 則已發布（2026-10-15）**，IG https://www.instagram.com/p/DefqxZOH0Ot/ 、Threads https://www.threads.com/@datasciocean/post/DefrJYsH5nk 。下一步：先對第 1 則的 Threads 回補（連到第 2 則）要等第 2 則發布；人說「發」才發第 2 則（發前把第 2 則 Threads 最後一則的「同系列」第 1 則補上網址）。新增圖型：`equation`（算式圖）、`quad` 的 `bars`、`dotgrid` 的 `cols`。系列檔第 1 則的 `planned_title` 已改成「同一份文件，怎麼長出四種簡報？」與封面一致。封面標題因文字欄只有 520px，hook 要每約 9 個字有標點。另兩張 `decision-transformer-reward-conditioning`、`bradley-terry-pairwise-preference` 不進系列、之後獨立發。**定位語**（人決定 A+C）：第 1 則寫事實（EACL 2024、微調 GPT-3.5-turbo），再加人口吻的一行「這個系列是在了解早期的簡報生成怎麼做」，這一行不在卡上、是人授權的例外（規則 1），審查時要告訴忠實者這是放行項。
 
 **待人決定**：封面主標是否放寬成 3 行；`config/params.yaml` 的 `structure_text_max_chars` 與 `ai_tone_blacklist` 仍是初稿；Threads token 是否補上 `threads_delete` 權限（目前沒有，刪除只能手動）；系列名與標題的取名偏好（memory `feedback_series_naming`）；審查後「只削弱語氣的小改」要不要重審。
 
@@ -104,7 +106,7 @@ tests/                                  七份回歸測試（含 test_multicard.
   - 系列成員鎖定後才又合併，已發布貼文的系列地圖改不了，回補時連到合併後那一則（`batch-and-publish.md` §2）。
 - **貼文要口語、白話、資訊密度夠，讀者是沒有 AI 背景的一般人**（人的回饋，2026-10-08 與 2026-10-10）：像在跟朋友解釋，不要像摘要或條列結論；術語、題庫名稱、統計用語第一次出現就用白話講；**寧可文字多一點、好懂，也不要精簡到讀者要猜**；可以用生活化比喻（比喻只翻譯、不加卡上沒有的事實）；**每張圖都要用滿**（下半部是空海面就是浪費，改用對照表、橫條圖、名詞表）；**圖要直接支撐主標**（人的回饋：圖要謹慎思考，見 `chart-thinking`）；不標「我的判斷」；準確度差距寫 %；帶走張先問問題再回答；並列的結論可用「第一關／第二關」這類標號。細節見 `ig-carousel.md` §4。審查的讀者預設是一般讀者，並且要看圖（`review-loop.md`）。
 
-- **張數與圖型**（人的回饋，2026-10-11）：**讀者真正看懂比張數重要**，上限放寬到 20 張（`slides_max`；IG 官方 API 文件寫輪播最多 10 張，但 2026-10-12 實測建立 11、15、20 個子項的 container 都成功，`ig_publish.py` 已放寬到 20；**2026-10-12 已用 19 張實發 IG 成功**（Threads 輪播也實發成功））。圖**不要每篇都是橫條圖**：文字下面空出來的區塊是「塗鴉牆」，用 `diagram` 版型（流程、對比、點陣、前後對比、區間條、漏斗…，`design-series-visuals/references/brand-and-layouts.md`）畫出讓讀者更好理解、也覺得有趣的圖。細節留到系列後面幾則時，第 1 則在對應的張用圖註提醒「系列後面會細講」。
+- **張數與圖型**（人的回饋，2026-10-11）：**讀者真正看懂比張數重要**，上限放寬到 20 張（`slides_max`；IG 官方 API 文件寫輪播最多 10 張，但 2026-10-12 實測建立 11、15、20 個子項的 container 都成功，`ig_publish.py` 已放寬到 20；**2026-10-12 已用 19 張實發 IG 成功**（Threads 輪播也實發成功））。圖**不要每篇都是橫條圖**：文字下面空出來的區塊是「塗鴉牆」，用 `diagram` 版型（流程、對比、點陣、前後對比、區間條、漏斗…，`design-series-visuals/references/brand-and-layouts.md`）畫出讓讀者更好理解、也覺得有趣的圖。細節留到系列後面幾則時，第 1 則在對應的張用圖註提醒「會在此系列的後續 post 中細講」。
 - **圖像設計要大膽、有故事**（人的回饋，2026-10-12）：人最喜歡的是「受保護區塊」那張（文件裡一塊金色區塊、一邊箭頭被叉掉、一邊通過）：圖本身在說一個畫面，不只是排版好看。示意圖優先選這種有隱喻、能讓讀者一眼看懂機制的畫法（對照 `design-series-visuals` 的「機制 → 圖型」表）；同一則連續 3 張以上同圖型要換（編輯審查者每次都抓這個）；可以新增圖型，不必先出樣張（見規則 12）。
 - **白話解釋的尺度**（人的決定，2026-10-12）：解釋機制可以用白話，只要**不改變卡的意思、不加新事實**（新的原因、用途、數字、範圍）就允許；審查者之間（讀者要白話、忠實者要卡上有）衝突時照這條。自創比喻容易出事：用卡上的正式術語加白話，比用自創說法穩（例：「驗證資料集」，不寫「選擇題」）。
 - **用語偏好**（人的回饋）：目標 Agent（不寫目標模型）、單個隨機樣本、優化器＝教練、訓練／驗證／測試資料集、「我的想法」可代替「我的推論」。不要文縐縐（宏觀層級、戰略筆記、步驟級…換成大方向、小修改），不要寫「文章沒有提到／卡上沒有」這類交代資料缺口的話（卡上沒有的就直接不提）。
@@ -115,6 +117,6 @@ tests/                                  七份回歸測試（含 test_multicard.
 - **請人拍板的事，要用白話說清楚**：這是什麼、選了會怎樣、代價是什麼、我的建議；不要只丟一句簡短的選項。
 - **做完一個階段，主動列出人接下來要確認或決定的事**（要確認什麼、還沒決定什麼）。人不做手動事項：需要手動才能完成的事，要嘛由 Claude 做、要嘛不做，不當成待辦丟給人。
 - skill 與 `references/` 是依實測整理出來的；細節有疑問時以它們為準，沒寫到的先問人，不要自己決定。
-- 修改任何程式檢查、審查或發布流程後，**重跑全部回歸測試**：`uv run python tests/test_check_a.py`、`test_state_and_batch.py`、`test_render_numunit.py`、`test_ig_publish.py`、`test_threads_publish.py`、`test_multicard.py`、`test_diagrams.py`；新增檢查要加「故意做壞的版本」確認抓得到。
+- 修改任何程式檢查、審查或發布流程後，**重跑全部回歸測試**：`uv run python tests/test_check_a.py`、`test_state_and_batch.py`、`test_render_numunit.py`、`test_ig_publish.py`、`test_threads_publish.py`、`test_multicard.py`、`test_diagrams.py`、`test_cards_style.py`；新增檢查要加「故意做壞的版本」確認抓得到。
 - 整理 repo 或文件時，順便檢查：討論中得到的回饋是否已寫進 CLAUDE.md 或 skill、有沒有過時（legacy）內容可刪、哪些屬於 `.claude/`（Claude 怎麼做事）而不是資料與設定。
 - 範例資料：**品質基準是 skillopt 第 2、3 則**（`out/skillopt/skillopt-batch-evidence-minibatch/`、`out/skillopt/skillopt-blind-acceptance-gate/`；雙卡、17 張、多種示意圖、口語白話、Threads 輪播；人說這兩則都比較滿意）；`skillopt-overview` 是單卡＋diagram 的範例；jev-cascade 的 `cascade-complementary-errors` 是成對橫條圖的範例（舊基準），`jev-cascade-overview` 的寫法已過時。內容規格在各則 `_build/spec.json`。`tests/fixtures/` 只給回歸測試用。

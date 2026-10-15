@@ -24,7 +24,7 @@
 
 1. 讀 `principles.md`（IG 設計原則）與 `brand-and-layouts.md`；想看範例讀 `series/jev-cascade/`；需要原始設計哲學時讀 `canvas-design-original.md`（Anthropic canvas-design skill，授權見 `canvas-design-LICENSE.txt`）。
 2. 寫系列哲學：從系列主題推出一個暗藏的參照，只談形式。存 `series/<id>/philosophy.md`。
-3. 選系列色（四層海浪深淺，相鄰系列不同色）。**目前 `render.py` 的 `SERIES_COLORS` 只有 `teal-mid`，新色要在那裡加。**
+3. 選系列色（四層海浪深淺，相鄰系列不同色）。**`render.py` 的 `SERIES_COLORS` 目前有 `teal-mid`、`abyss-contour`、`paper-cards`，新色要在那裡加。**新的風格（像 `contour`、`cards`）要在 `render.py` 的 `build()` 加對應分支（封面、`text`、`takeaway`、`series_map` 的 SVG 背景；`cards` 的元件是 `slide_card()`、`source_doc()`、`stagger()`、`rail()`），並補回歸測試（`tests/test_cards_style.py` 是範例）。**新系列的外觀要先出草圖給人選**：2026-10-14 persona-aware-d2s 前後試了四個方向人才定案，其中平塗的藍綠或淺藍綠底與品牌的米色紙面加海漸層不搭，人說「顏色怪怪的」；顏色留在米色、深海漸層、金色。**構圖也要和相鄰系列分得開**：人看了第一版樣張說「跟前兩則都很像，IG 主頁會混淆；核心配色一樣，但構圖要更大膽」——前兩個系列的封面骨架（標題靠左、y≈350～500、副標接著、下面一條裝飾）一樣，只換底色與下半裝飾，縮圖就像同一家。要比的是整張封面的骨架，不只配色；提草圖時並排放上相鄰系列的封面比。persona-aware-d2s 最後選了「直切」：右邊一條深海直欄、四張投影片錯開橫跨交界。**草圖選中的是它的動感（錯開、跨界、歪放的文件），第一次照著做時把東西全關進直欄、排得整齊死板，人說「好醜、跟剛剛的感覺不一樣」：把草圖選中的元素逐項列出來照做，不要「整理」成規矩的版本。**窄欄的代價是 `keep-all` 下標題要每約 9 個字、補充每約 13～15 個字就有標點。
 4. 從哲學導出所有版型的模板，放 `series/<id>/templates/`。可以複製 `series/jev-cascade/templates/` 後改外觀，但幾何與檢查改動要同步改 `render.py` 與程式 B，並確認：不重疊、對比度、換行不拆詞。
 5. 建 `series/<id>/series.md`（成員、`planned_title`、hashtag、色）。
 6. 產生**所有版型的樣張**（用一則真實或假想的 spec 渲染，過程式 B），拼成縮圖（`contact_sheet.py`）給人看，**人審過才開始量產**。人看過才算數：檢查全過不代表好看。

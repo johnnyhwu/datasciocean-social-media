@@ -8,7 +8,7 @@
   samples   一個點 vs 一批點：nodes = [{text, sub?}, {text, sub?}]
   paths     亂走 vs 小步走：nodes = [{text, sub?}, {text, sub?}]
   epochs    小步子與每輪結束的檢查旗：nodes = [{text}（小點是什麼）, {text}（金旗是什麼）]
-  dotgrid   點陣：count、nodes = [{text}]（一個點代表什麼）
+  dotgrid   點陣：count、選用 cols（每列幾個點）、nodes = [{text}]（一個點代表什麼）
   dumbbell  前後對比（軸從 0 起）：points = [{name, value}, {name, value}]、ref = {name, value}、unit、axis_max
   range     區間條（軸從 0 起）：ranges = [{name, sub?, lo, hi, emph?}]（lo == hi 畫成標記線）、unit、axis_max
   funnel    漏斗：nodes（3 層，每層 text、選用 sub）
@@ -16,7 +16,8 @@
   decay     從 start 慢慢降到 end 的曲線（軸從 0 起、高度與數值成正比）：start、end、unit、axis_max、nodes = [{text}（初期）, {text}（後期）]
   fan       幾組同時做事、再匯成一份：heads（2～4 個組別標籤）、nodes = [{text}（組別上方的說明）, {text, sub?}（匯整後的結果）]
   peaks     兩條曲線的最高點落在同一處（純示意）：nodes = [{text}（線一）, {text}（線二）, {text}（最高點的標籤）]
-  quad      2×2 四個格子：nodes = 4 個 [{text, sub?, emph?}]
+  equation  算式 A × B ＝ C：nodes = 算元 [{text（大數字）, sub（單位）, sub2?, emph?}]、選用 ops、選用 outcomes[0]（底下一條橫框）
+  quad      2×2 四個格子：nodes = 4 個 [{text, sub?, emph?, bars?}]（bars＝格子上方的小投影片有幾條條列）
   locked    文件裡一塊受保護的區塊：heads = [被擋下的來源, 能更新的來源]、nodes = [{text}（文件名）, {text}（受保護區塊）]
   stops     由上往下三個停靠點（不按比例）：nodes = [{text, sub?, emph?}]、選用 heads = [上端標籤, 下端標籤]
 
@@ -339,12 +340,12 @@ def epochs(c: Canvas, spec: dict, y0: float) -> float:
 # ------------------------------------------------------------------ dotgrid
 def dotgrid(c: Canvas, spec: dict, y0: float) -> float:
     n = spec["count"]
-    cols = 13 if n > 40 else 10
+    cols = int(spec.get("cols") or (13 if n > 40 else 10))      # cols（選用）：每列幾個點，例如 20 篇 × 4 種配置排成 20 欄 4 列
     rows = math.ceil(n / cols)
     legs = spec["nodes"]
     leg_h = [c.lines(l["text"], X1 - X0 - 70, 34) * 44.2 for l in legs]
     avail = BOTTOM - y0 - sum(leg_h) - 40 * len(legs) - 10
-    pitch = min(72, avail / rows)
+    pitch = min(72, avail / rows, (X1 - X0) / cols)
     r = pitch * 0.36
     gw = (cols - 1) * pitch
     gx = X0 + (X1 - X0 - gw) / 2
@@ -651,13 +652,17 @@ def peaks(c: Canvas, spec: dict, y0: float) -> float:
 
 # ------------------------------------------------------------------ quad（2×2 四個格子，可標一格為重點）
 def quad(c: Canvas, spec: dict, y0: float) -> float:
-    """nodes = 4 個格子 [{text, sub?, emph?}]，依序是左上、右上、左下、右下。"""
+    """nodes = 4 個格子 [{text, sub?, emph?, bars?}]，依序是左上、右上、左下、右下。
+    bars（選用，2026-10-14）：格子上方畫一張小投影片，條列數 = bars（長版多、短版少），讓格子不只是字。"""
     nodes = spec["nodes"]
     gap = 24
     cw = (X1 - X0 - gap) / 2
+    ICON_H = 190                                           # 小投影片（約 150）加上下留白
     rows = []
     for r in range(2):
-        rows.append(max(c.lines(nd["text"], cw - 44, 34) * 44.2 + (c.lines(nd["sub"], cw - 44, 28) * 39.2 + 6 if nd.get("sub") else 0) + 60 for nd in nodes[r * 2:r * 2 + 2]))
+        pair = nodes[r * 2:r * 2 + 2]
+        rows.append(max(c.lines(nd["text"], cw - 44, 34) * 44.2 + (c.lines(nd["sub"], cw - 44, 28) * 39.2 + 6 if nd.get("sub") else 0) + 60
+                        + (ICON_H if nd.get("bars") else 0) for nd in pair))
     total = sum(rows) + gap
     _fit(total, BOTTOM - y0, "quad")
     extra = BOTTOM - y0 - total
@@ -667,8 +672,32 @@ def quad(c: Canvas, spec: dict, y0: float) -> float:
         for k in range(2):
             nd = nodes[r * 2 + k]
             emph = nd.get("emph")
-            c.textbox(X0 + k * (cw + gap), y, cw, nd["text"], nd.get("sub"), fill=GOLD if emph else CREAM, tcolor=DEEP,
-                      scolor=DEEP, stroke=None if emph else DEEP, dash=None if emph else "8 8", align="center", h=rows[r])
+            x = X0 + k * (cw + gap)
+            if not nd.get("bars"):
+                c.textbox(x, y, cw, nd["text"], nd.get("sub"), fill=GOLD if emph else CREAM, tcolor=DEEP,
+                          scolor=DEEP, stroke=None if emph else DEEP, dash=None if emph else "8 8", align="center", h=rows[r])
+                continue
+            h = rows[r]
+            c.rect(x, y, cw, h, fill=GOLD if emph else CREAM, stroke=None if emph else DEEP, dash=None if emph else "8 8")
+            k = 1.45                                            # 小投影片的放大倍數
+            iw, ih = 168 * k, 104 * k
+            l1 = c.lines(nd["text"], cw - 44, 34)
+            th = l1 * 44.2 + (c.lines(nd["sub"], cw - 44, 28) * 39.2 + 6 if nd.get("sub") else 0)
+            grp = ih + 18 + th                                  # 小投影片加文字，整組在格子裡垂直置中
+            ix, iy = x + (cw - iw) / 2, y + max(14, (h - grp) / 2)
+            c.rect(ix, iy, iw, ih, fill=DEEP, rx=12 * k)
+            c.rect(ix + 16 * k, iy + 14 * k, iw * .42, 8 * k, fill=CREAM, rx=4 * k)
+            n = int(nd["bars"])
+            gp = (ih - 38 * k) / max(n, 1)
+            for i in range(n):
+                cy = iy + 28 * k + gp * i + gp / 2
+                c.circle(ix + 20 * k, cy, 4 * k, fill=CREAM)
+                c.rect(ix + 34 * k, cy - 3.5 * k, iw - 50 * k - (i % 3) * 14 * k, 7 * k, fill=CREAM, rx=3.5 * k, op=.8)
+            ty = iy + ih + 18
+            box = (x, y, cw, h)
+            c.text(x + 22, ty, cw - 44, nd["text"], "dn", DEEP, "center", box)
+            if nd.get("sub"):
+                c.text(x + 22, ty + l1 * 44.2 + 6, cw - 44, nd["sub"], "ds", DEEP, "center", box)
         y += rows[r] + gap
     return y - gap
 
@@ -713,9 +742,47 @@ def locked(c: Canvas, spec: dict, y0: float) -> float:
     return y0 + total
 
 
+# ------------------------------------------------------------------ equation（算式：A × B ＝ C，底下可接一行補充）
+def equation(c: Canvas, spec: dict, y0: float) -> float:
+    """nodes = 算元 [{text（大數字）, sub（單位或名稱）, sub2?（小字說明）, emph?}]；ops（選用，預設 ["×", "="]）；
+    outcomes[0]（選用）= 底下一條橫框 {text, sub?}。2026-10-14 新增：點陣排成方陣說不出「幾乘幾等於幾」，算式圖才是這個畫面。"""
+    nodes, ops = spec["nodes"], spec.get("ops", ["×", "="])
+    foot = (spec.get("outcomes") or [None])[0]
+    n, opw, w = len(nodes), 88, X1 - X0
+    bw = (w - opw * (n - 1)) / n
+    iw = bw - 36
+    hs = [90 + c.lines(nd["sub"], iw, 34) * 44.2 + (c.lines(nd["sub2"], iw, 28) * 39.2 + 6 if nd.get("sub2") else 0) + 56 for nd in nodes]
+    bh = max(hs)
+    fh = (c.lines(foot["text"], w - 44, 34) * 44.2 + (c.lines(foot["sub"], w - 44, 28) * 39.2 + 6 if foot.get("sub") else 0) + 44) if foot else 0
+    gap = 34 if foot else 0
+    total = bh + gap + fh
+    _fit(total, BOTTOM - y0, "equation")
+    extra = BOTTOM - y0 - total
+    bh += min(extra * .5, 140)
+    twm = max(90 + c.lines(nd["sub"], iw, 34) * 44.2 + (c.lines(nd["sub2"], iw, 28) * 39.2 + 6 if nd.get("sub2") else 0) for nd in nodes)   # 三個算元的數字對齊在同一高度
+    for i, nd in enumerate(nodes):
+        x = X0 + i * (bw + opw)
+        emph = nd.get("emph")
+        c.rect(x, y0, bw, bh, fill=GOLD if emph else CREAM, stroke=None if emph else DEEP, dash=None if emph else "8 8")
+        ty = y0 + (bh - twm) / 2
+        box = (x, y0, bw, bh)
+        c.text(x + 18, ty, iw, nd["text"], "dv", DEEP, "center", box)
+        c.text(x + 18, ty + 90, iw, nd["sub"], "dn", DEEP, "center", box)
+        if nd.get("sub2"):
+            c.text(x + 18, ty + 90 + c.lines(nd["sub"], iw, 34) * 44.2 + 6, iw, nd["sub2"], "ds", DEEP, "center", box)
+        if i < n - 1:
+            c.text(x + bw + 8, y0 + bh / 2 - 40, opw - 16, ops[i], "dv", DEEP, "center")
+    y = y0 + bh
+    if foot:
+        y += gap
+        c.textbox(X0, y, w, foot["text"], foot.get("sub"), fill=DEEP, tcolor=CREAM, scolor=LIGHT, align="center")
+        y += fh
+    return y
+
+
 KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "paths": paths, "epochs": epochs,
          "dotgrid": dotgrid, "dumbbell": dumbbell, "range": range_chart, "funnel": funnel,
-         "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked}
+         "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation}
 
 
 def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:
@@ -730,7 +797,7 @@ def texts(sl: dict) -> list[str]:
     """示意圖上的所有文字與數字（逐欄位，給 check_a 的數字／名稱檢查與 build_package 的審查文字用）。"""
     out = []
     for n in sl.get("nodes", []) + sl.get("outcomes", []):
-        out.append(n["text"]); out += [n["sub"]] if n.get("sub") else []
+        out.append(n["text"]); out += [n["sub"]] if n.get("sub") else []; out += [n["sub2"]] if n.get("sub2") else []
     if sl.get("loop"):
         out.append(sl["loop"])
     for col in sl.get("columns", []):

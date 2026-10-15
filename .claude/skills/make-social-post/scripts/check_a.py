@@ -155,9 +155,16 @@ def main(spec_path: str) -> int:
             if old in m["planned_title"]:
                 err.append(f"系列檔 planned_title {m['planned_title']!r}: 用語 {old!r} 應寫成 {new!r}")
     # 3. 被使用的主張，它綁定的限定條件必須出現在貼文某處（以 quals 標記）
+    # 人明確決定不帶出的限定條件：spec 頂層 waived_quals: [{"id": "c8#1", "reason": "…"}]，reason 必填
+    waived = {}
+    for w in doc.get("waived_quals") or []:
+        if not (isinstance(w, dict) and w.get("id") and str(w.get("reason", "")).strip()):
+            err.append(f"waived_quals 每項要有 id 與 reason：{w!r}")
+        else:
+            waived[w["id"]] = w["reason"]
     for cid in sorted(used_claims):
         for k, q in enumerate(claims[cid].get("qualifiers", []), 1):
-            if f"{cid}#{k}" not in used_quals:
+            if f"{cid}#{k}" not in used_quals and f"{cid}#{k}" not in waived:
                 err.append(f"限定條件未帶出：{cid}#{k} {q.get('text','')[:40]}")
     # 4. evidence_from_single_source：脈絡張必須引用方法來源（role=context）的主張
     if card.front["context_type"] in ("evidence_from_single_source", "bound_to_source"):
