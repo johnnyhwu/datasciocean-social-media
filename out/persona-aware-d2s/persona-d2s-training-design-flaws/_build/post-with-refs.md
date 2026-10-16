@@ -132,7 +132,8 @@
 ### 最後一則（置頂）
 Persona-Aware-D2S 的訓練設計，有哪三個疑點？大綱生成只有 80 筆樣本、reward model 沒驗證容量、每種條件各訓一個模型，難以擴展。
 文章：datasciocean.com/paper-intro/persona-aware-d2s
-同系列：同一份文件，怎麼長出四種簡報？（尚未發布）
+同系列：同一份文件，怎麼長出四種簡報？
+https://www.threads.com/@datasciocean/post/DefrJYsH5nk
 同系列：不用訓練就能抄的兩招，各有什麼代價？（尚未發布）
 引用：c1, c10, c11, c13
 

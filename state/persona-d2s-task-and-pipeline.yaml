@@ -20,4 +20,5 @@ posts:
   published_at: 2026-10-15T00:30:34+0000
   hook_type: 讀者疑問
   mentions: []
-  backfilled: []
+  backfilled:
+  - persona-d2s-training-design-flaws

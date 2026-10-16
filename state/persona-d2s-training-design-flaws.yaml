@@ -1,9 +1,23 @@
 concept: persona-d2s-training-design-flaws
 formats:
   ig_carousel:
-    status: ready
-    pack: out/persona-aware-d2s/persona-d2s-training-design-flaws
+    status: published
   threads_thread:
-    status: ready
-    pack: out/persona-aware-d2s/persona-d2s-training-design-flaws
-posts: []
+    status: published
+posts:
+- post_id: persona-d2s-training-design-flaws:ig_carousel
+  format: ig_carousel
+  series_id: persona-aware-d2s
+  url: https://www.instagram.com/p/Dejx3ZWGGGt/
+  published_at: 2026-10-16T14:46:19+0000
+  hook_type: 並列重點
+  mentions: []
+  backfilled: []
+- post_id: persona-d2s-training-design-flaws:threads_thread
+  format: threads_thread
+  series_id: persona-aware-d2s
+  url: https://www.threads.com/@datasciocean/post/DejyJ7bmJTr
+  published_at: 2026-10-16T14:48:46+0000
+  hook_type: 並列重點
+  mentions: []
+  backfilled: []

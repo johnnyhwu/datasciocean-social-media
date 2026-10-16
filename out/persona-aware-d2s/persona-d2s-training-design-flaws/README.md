@@ -5,8 +5,8 @@
 | 系列 | Persona-Aware-D2S: 同一份文件，怎麼長出不同簡報 |
 | 觀念 | `persona-d2s-training-design-flaws`（卡：`concept-wiki/wiki/concepts/persona-d2s-training-design-flaws.md`） |
 | hook 樣態 | 並列重點 |
-| IG 輪播 | 待發布（14 張） |
-| Threads 串文 | 待發布（2 則） |
+| IG 輪播 | 已發布（14 張） |
+| Threads 串文 | 已發布（2 則） |
 
 ## 要看／要發的檔案
 
@@ -23,11 +23,10 @@
 - 程式 B：14/14 張通過（模板版本 `4c31eba78489`）
 - 程式 A、批次檢查、忠實者與讀者審查的結果不存在發布包裡（審查產出放暫存，不進 repo）；最後確認時由 Claude 在報告中說明
 
-## 發布前
+## 已發布
 
-- [ ] 人最後確認圖、文字、caption
-- [ ] IG（API）：`ig_publish.py prepare` → push `ig/jpg/` → `preflight` → `publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）
-- [ ] Threads（API）：`threads_publish.py publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）
+- IG：https://www.instagram.com/p/Dejx3ZWGGGt/
+- Threads：https://www.threads.com/@datasciocean/post/DejyJ7bmJTr
 
 ## 發布後
 
