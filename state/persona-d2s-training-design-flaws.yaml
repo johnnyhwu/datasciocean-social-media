@@ -20,4 +20,5 @@ posts:
   published_at: 2026-10-16T14:48:46+0000
   hook_type: 並列重點
   mentions: []
-  backfilled: []
+  backfilled:
+  - persona-d2s-what-to-borrow

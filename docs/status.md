@@ -6,9 +6,9 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 
 見 CLAUDE.md「目前狀態」；更詳細的規劃與決定記在 memory `project_skillopt_series_plan`。
 
-## persona-aware-d2s（進行中）
+## persona-aware-d2s（已發完）
 
-見 CLAUDE.md「目前狀態」。第 1 則 `persona-d2s-task-and-pipeline`（16 張）已發布（2026-10-15）：IG https://www.instagram.com/p/DefqxZOH0Ot/ 、Threads https://www.threads.com/@datasciocean/post/DefrJYsH5nk 。第 2 則 `persona-d2s-training-design-flaws`（14 張）已發布（2026-10-16）：IG https://www.instagram.com/p/Dejx3ZWGGGt/ 、Threads https://www.threads.com/@datasciocean/post/DejyJ7bmJTr ；第 1 則 Threads 已回補（連到第 2 則）。第 3 則 `ready`。
+見 CLAUDE.md「目前狀態」。第 1 則 `persona-d2s-task-and-pipeline`（16 張）已發布（2026-10-15）：IG https://www.instagram.com/p/DefqxZOH0Ot/ 、Threads https://www.threads.com/@datasciocean/post/DefrJYsH5nk 。第 2 則 `persona-d2s-training-design-flaws`（14 張）已發布（2026-10-16）：IG https://www.instagram.com/p/Dejx3ZWGGGt/ 、Threads https://www.threads.com/@datasciocean/post/DejyJ7bmJTr ；第 1 則 Threads 已回補（連到第 2 則）。第 3 則 `persona-d2s-what-to-borrow`（13 張）已發布（2026-10-17）：IG https://www.instagram.com/p/DelBriik7pd/ 、Threads https://www.threads.com/@datasciocean/post/DelDUocE7Zt ；第 1、2 則 Threads 已回補（連到第 3 則）。
 
 ## jev-cascade（已發完；2026-10-10 的狀態）
 

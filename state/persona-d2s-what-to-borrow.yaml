@@ -1,9 +1,23 @@
 concept: persona-d2s-what-to-borrow
 formats:
   ig_carousel:
-    status: ready
-    pack: out/persona-aware-d2s/persona-d2s-what-to-borrow
+    status: published
   threads_thread:
-    status: ready
-    pack: out/persona-aware-d2s/persona-d2s-what-to-borrow
-posts: []
+    status: published
+posts:
+- post_id: persona-d2s-what-to-borrow:ig_carousel
+  format: ig_carousel
+  series_id: persona-aware-d2s
+  url: https://www.instagram.com/p/DelBriik7pd/
+  published_at: 2026-10-17T02:32:44+0000
+  hook_type: 代價與取捨
+  mentions: []
+  backfilled: []
+- post_id: persona-d2s-what-to-borrow:threads_thread
+  format: threads_thread
+  series_id: persona-aware-d2s
+  url: https://www.threads.com/@datasciocean/post/DelDUocE7Zt
+  published_at: 2026-10-17T02:38:01+0000
+  hook_type: 代價與取捨
+  mentions: []
+  backfilled: []
