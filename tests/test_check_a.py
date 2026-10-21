@@ -81,6 +81,7 @@ CASES = [  # (名稱, 基底, 修改, 預期錯誤中要出現的字串)
     ("獨立貼文的延伸閱讀列了不存在的觀念", GOOD_A, lambda s: (standalone(s), s["slides"][-1].update(items=["no-such-concept"])), "不是任何系列的成員"),
     ("獨立貼文的延伸閱讀列了還沒發布的貼文", GOOD_A, lambda s: (standalone(s), s["slides"][-1].update(items=["confound-three-questions"])), "還沒發布"),
     ("圖上的拉丁字詞（網址）不在卡上也沒被 latin_allow 放行", GOOD_A, lambda s: s["slides"][4]["bars"][1].update(name="arxiv.org"), "圖上名稱"),
+    ("示意圖只是把同張的補充重講一遍（HINT）", GOOD_A, lambda s: s["slides"].__setitem__(2, {**s["slides"][2], "layout": "diagram", "kind": "flow", "title": "先判再轉交", "body": "便宜的 Judge 先判斷，信心低的題目再轉交給強的 Judge 處理。", "nodes": [{"text": "便宜的 Judge 先判斷"}, {"text": "信心低的題目再轉交給強的 Judge 處理"}]}), "重述同張"),
     ("caption 第一句太長", GOOD_A, lambda s: s["caption"].update(first="很長" * 30), "第一句"),
 ]
 

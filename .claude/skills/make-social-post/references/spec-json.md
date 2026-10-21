@@ -1,6 +1,6 @@
 # 內容規格 JSON（`out/<series>/<concept>/_build/spec.json`）
 
-LLM 只產出這份 JSON；外觀完全由模板決定。範例：`out/skillopt/skillopt-batch-evidence-minibatch/_build/spec.json` 與 `out/skillopt/skillopt-blind-acceptance-gate/_build/spec.json`（現行品質基準：雙卡貼文、17 張、多種示意圖、口語白話、Threads 輪播）；`skillopt-overview` 是單卡＋示意圖的範例；`cascade-complementary-errors` 是成對橫條圖的舊基準；`jev-cascade-overview` 的寫法已過時，不要參考。
+LLM 只產出這份 JSON；外觀完全由模板決定。範例：`out/skillopt/skillopt-batch-evidence-minibatch/_build/spec.json` 與 `skillopt-blind-acceptance-gate`（品質基準：雙卡、17 張、多種示意圖）；`skillopt-overview`（單卡）；`out/standalone/decision-transformer-reward-conditioning/`（獨立貼文）；`cascade-complementary-errors`（成對橫條圖）。`jev-cascade-overview` 的寫法已過時。
 `build_package.py` 有投影片欄位白名單：spec 出現不認得的欄位就報錯，避免新欄位漏了輸出。要新增欄位，先在 `build_package.py` 的 `CONTENT_KEYS`／`LAYOUT_KEYS` 加上、讓它輸出到審查文字與 `ig/post.md`，並補測試。
 
 ## 頂層
@@ -29,7 +29,7 @@ LLM 只產出這份 JSON；外觀完全由模板決定。範例：`out/skillopt/
 - **視覺**：每則獨立貼文各有自己的一套，放 `standalone/<觀念 id>/`（`standalone.md` front matter 的 `style`、`color`；`philosophy.md`；`templates/`；`sketches/`），不共用（人決定，2026-10-18：Bradley-Terry 要獨立重做、不沿用 Decision Transformer 的「地平線」）。`render.py`、`check_a.py`、`batch_check.py` 在 `series` 為 null 時讀這裡。
 - **沒有系列標籤**：`caption.hashtags` 不放系列專屬標籤；封面沒有系列色帶；Threads 最後一則沒有「同系列」。
 - **最後一張**：可以是帶走張（人決定不連回別則時）；要放「延伸閱讀」就用 `series_map`，寫 `items`（觀念 id 清單，必須是某系列成員且**已發布**，標題由系列檔的 `planned_title` 自動填）、不寫 `current`。
-- 導流行與 Threads 最後一則的文章連結照常（來源文章）。
+- 導流行（`caption.nav`）與 Threads 最後一則的文章連結（`threads.last.link`）可省略；要不要放先問人（Decision Transformer：人決定都不放）。
 
 ## 雙卡貼文（一則 post 併入兩張卡）
 
@@ -49,6 +49,7 @@ LLM 只產出這份 JSON；外觀完全由模板決定。範例：`out/skillopt/
 |---|---|
 | `refs` | 這個區塊引用卡上哪幾條主張（claim id，例如 `["c3", "c5"]`）。純結構文字（轉場、系列地圖）寫 `["結構"]` |
 | `quals` | 這個區塊帶出的限定條件，格式 `"c3#1"`（c3 的第 1 條 `qualifiers`）。被使用的主張的所有限定條件，必須在整則貼文某處出現 |
+| `latin_allow`（頂層） | 人決定放在圖上、但卡上沒有的拉丁字詞（例如論文網址 `["arxiv.org", "abs"]`），程式 A 不再要求被引用的主張涵蓋；只在人要求時用 |
 | `waived_quals`（頂層） | 人明確決定不帶出的限定條件：`[{"id": "c8#1", "reason": "…"}]`，`reason` 必填，程式 A 不再要求它出現。只有人決定時才用（規則 7），不可自己放行 |
 
 caption 第一句用 `first_refs`。`refs` 只證明「有對應」，不證明意思沒走樣；走樣由忠實者判斷。

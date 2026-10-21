@@ -82,21 +82,12 @@ tests/                                  九份回歸測試（含 test_multicard.
 
 為什麼 `config/`、`series/`、`state/` 在根目錄而不在 skill 裡：這些是人會改、會審、會長期累積的資料與設定；`.claude/` 放的是「Claude 怎麼做事」的流程與腳本。
 
-## 目前狀態（2026-10-14）
+## 目前狀態（2026-10-21）
 
-**進行中：系列 `skillopt`**（SkillOpt: 自動優化你的 Agent Skill；視覺「等深線」；`members_locked: true`；Threads 用輪播）。5 張卡做成 3 則：
-
-1. `skillopt-overview`（19 張）：**已發布（2026-10-12）**，IG https://www.instagram.com/p/DeYn1j2oCAP/ 、Threads https://www.threads.com/@datasciocean/post/DeYo4JSIGcl 。
-2. `skillopt-batch-evidence-minibatch`＋`skillopt-bounded-edit-budget`（雙卡，17 張）：**已發布（2026-10-13）**，IG https://www.instagram.com/p/Dea5IgXIBKS/ 、Threads https://www.threads.com/@datasciocean/post/Dea6HxFICya 。
-3. `skillopt-blind-acceptance-gate`＋`skillopt-epoch-level-control`（雙卡，17 張）：**已發布（2026-10-14）**，IG https://www.instagram.com/p/DedaYcgk8zR/ 、Threads https://www.threads.com/@datasciocean/post/Dedbc--IMBp 。
-
-系列 3 則都已發完，Threads 回補也都做完（`state/backfill.md` 沒有待回補項目）。第 1 則 IG 的系列地圖列 3 則（已鎖定）。
-
-存量（`ready`）：0 則（persona 三則都已發完）。其他系列：`jev-cascade` 三則都已發完，細節在 `docs/status.md`。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。發布流程用真實帳號跑過四次（含 IG 19 張、Threads 輪播），照 `references/publish-flow.md`。
-
-**進行中：系列 `persona-aware-d2s`**（Persona-Aware-D2S: 同一份文件，怎麼長出不同簡報；視覺「一式四份」，`style: cards`，米色底＋一份來源文件長出四張深海漸層小投影片，金框只給一張）。3 卡 3 則、一卡一則不合併（2026-10-14 人決定）：`persona-d2s-task-and-pipeline` → `persona-d2s-training-design-flaws` → `persona-d2s-what-to-borrow`。系列名、三則標題已由人定案；視覺：D3（米色底、文件長出四張投影片）被人退回，理由是和前兩個系列構圖太像、IG 主頁會混淆，2026-10-14 改選「直切」（H2：右邊一條深海直欄，四張投影片錯開橫跨交界，封面左下一份文件）並要求內頁一起大膽（第一次做得太整齊，人說醜，又照草圖的錯開排法重做），模板已重做（`series/persona-aware-d2s/templates/`，`tests/test_cards_style.py` 過），新樣張人已同意；第 1 則 `persona-d2s-task-and-pipeline`（16 張）人已確認、已標 `ready`；第 2 則 `persona-d2s-training-design-flaws`（14 張，hook「三個疑點：資料少、沒驗證、難擴展」）人已確認、已標 `ready`；第 3 則 `persona-d2s-what-to-borrow` 的 spec 已做完（13 張，人看過後刪了 Table 10 precision 圖註與「相關性評分」那張；限定條件 c8#1 用 spec 頂層 `waived_quals` 放行；hook「兩招不用訓練的技巧 代價各是什麼？」，忠實者 3 輪通過，人已確認、已標 `ready`）。三則都已 `ready`、系列已鎖定（`members_locked: true`）、hashtag `DSO_PersonaD2S` 已定案（2026-10-14）；**第 1 則已發布（2026-10-15）**，IG https://www.instagram.com/p/DefqxZOH0Ot/ 、Threads https://www.threads.com/@datasciocean/post/DefrJYsH5nk 。**第 2 則已發布（2026-10-16）**，IG https://www.instagram.com/p/Dejx3ZWGGGt/ 、Threads https://www.threads.com/@datasciocean/post/DejyJ7bmJTr ，第 1 則 Threads 已回補。**第 3 則已發布（2026-10-17）**，IG https://www.instagram.com/p/DelBriik7pd/ 、Threads https://www.threads.com/@datasciocean/post/DelDUocE7Zt ，第 1、2 則 Threads 已回補。系列 3 則都已發完，無待辦。新增圖型：`equation`（算式圖）、`quad` 的 `bars`、`dotgrid` 的 `cols`。系列檔第 1 則的 `planned_title` 已改成「同一份文件，怎麼長出四種簡報？」與封面一致。封面標題因文字欄只有 520px，hook 要每約 9 個字有標點。另兩張 `decision-transformer-reward-conditioning`、`bradley-terry-pairwise-preference` 不進系列、獨立發：**Decision Transformer 已發布（2026-10-21，9 張）**，IG https://www.instagram.com/p/DevHQBlk2nG/ 、Threads https://www.threads.com/@datasciocean/post/DevHi6skzg5 ；導流行與文章連結依人決定全部拿掉（不連回 Persona-Aware-D2S），圖上的老鼠走迷宮例子與 PPO／DPO 的 arXiv 網址是人授權的放行項（`latin_allow`）。製作過程（2026-10-18）（視覺「地平線」，自己一套在 `standalone/decision-transformer-reward-conditioning/`；hook「AI 學做決策，能不能先許願要幾分？」人選 A 並微調；人決定不放 Persona-Aware-D2S 轉折張與延伸閱讀，整則不連回 Persona；忠實者 3 輪、讀者、編輯已過；新增圖型 `tokens`；新增獨立貼文架構：`series: null`、`out/standalone/`、`standalone/<id>/`）。Bradley-Terry 要另做一套全新視覺（尚未開始）。**定位語**（人決定 A+C）：第 1 則寫事實（EACL 2024、微調 GPT-3.5-turbo），再加人口吻的一行「這個系列是在了解早期的簡報生成怎麼做」，這一行不在卡上、是人授權的例外（規則 1），審查時要告訴忠實者這是放行項。
-
-**待人決定**：封面主標是否放寬成 3 行；`config/params.yaml` 的 `structure_text_max_chars` 與 `ai_tone_blacklist` 仍是初稿；Threads token 是否補上 `threads_delete` 權限（目前沒有，刪除只能手動）；系列名與標題的取名偏好（memory `feedback_series_naming`）；審查後「只削弱語氣的小改」要不要重審。
+- **做完並發布的貼文**：系列 `skillopt`（3 則）、`persona-aware-d2s`（3 則）、`jev-cascade`（3 則），以及獨立貼文 `decision-transformer-reward-conditioning`（2026-10-21，9 張）。存量（`ready`）0 則；Threads 回補都做完（`state/backfill.md` 無項目）。各則網址與細節：`docs/status.md`。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。
+- **還沒做**：`bradley-terry-pairwise-preference`（獨立貼文，要另做一套全新視覺，不沿用 Decision Transformer 的「地平線」）；3 張 `claude-code-*` 卡（新文章，要先規劃系列）。
+- **獨立貼文**（沒有系列）：spec 寫 `series: null`，視覺在 `standalone/<觀念 id>/`，發布包在 `out/standalone/`（`spec-json.md`「獨立貼文」、`design-series-visuals`）。轉折張、延伸閱讀、導流連結先問人。
+- **待人決定**：封面主標是否放寬成 3 行；`config/params.yaml` 的 `structure_text_max_chars` 與 `ai_tone_blacklist` 仍是初稿；Threads token 是否補上 `threads_delete` 權限（目前沒有，刪除只能手動）；系列名與標題的取名偏好（memory `feedback_series_naming`）；審查後「只削弱語氣的小改」要不要重審。
 
 ## 工作方式
 
@@ -105,14 +96,14 @@ tests/                                  九份回歸測試（含 test_multicard.
   - 寫 spec 前先做**版型規劃**（每張選好版型、下半部放什麼、圖上術語在哪張定義；術語不能只在 Threads 定義），見 `ig-carousel.md` §0 與 `self-check.md` 第 10～23 項。
   - `render.py`、`build_package.py` 對**已發布**的貼文預設拒絕（`--force` 才重做；一般不要做，模板改了已發布的記舊 hash 是預期的）；`build_package.py` 遇到不認得的投影片欄位會報錯（要新增欄位先讓它輸出並補測試）。
   - 系列成員鎖定後才又合併，已發布貼文的系列地圖改不了，回補時連到合併後那一則（`batch-and-publish.md` §2）。
-- **貼文要口語、白話、資訊密度夠，讀者是沒有 AI 背景的一般人**（人的回饋，2026-10-08 與 2026-10-10）：像在跟朋友解釋，不要像摘要或條列結論；術語、題庫名稱、統計用語第一次出現就用白話講；**寧可文字多一點、好懂，也不要精簡到讀者要猜**；可以用生活化比喻（比喻只翻譯、不加卡上沒有的事實）；**每張圖都要用滿**（下半部是空海面就是浪費，改用對照表、橫條圖、名詞表）；**圖要直接支撐主標**（人的回饋：圖要謹慎思考，見 `chart-thinking`）；**圖不能只是把同一張的文字重講一遍，否則換成具體的假設例子（如老鼠走迷宮），圖註標明「假設的例子」**（人的回饋，2026-10-18）；不標「我的判斷」；準確度差距寫 %；帶走張先問問題再回答；並列的結論可用「第一關／第二關」這類標號。細節見 `ig-carousel.md` §4。審查的讀者預設是一般讀者，並且要看圖（`review-loop.md`）。
+- **貼文要口語、白話、資訊密度夠，讀者是沒有 AI 背景的一般人**（人的回饋，2026-10-08 與 2026-10-10）：像在跟朋友解釋，不要像摘要或條列結論；術語、題庫名稱、統計用語第一次出現就用白話講；**寧可文字多一點、好懂，也不要精簡到讀者要猜**；可以用生活化比喻（比喻只翻譯、不加卡上沒有的事實）；**每張圖都要用滿**（下半部是空海面就是浪費，改用對照表、橫條圖、名詞表）；**圖要直接支撐主標**（人的回饋：圖要謹慎思考，見 `chart-thinking`）；**圖要比文字多給資訊，不能只把同一張的文字重講一遍**：定義與機制類預設用具體的假設例子（如老鼠走迷宮，圖註標「假設的例子」；人的回饋，2026-10-18，`self-check.md` 31）；不標「我的判斷」；準確度差距寫 %；帶走張先問問題再回答；並列的結論可用「第一關／第二關」這類標號。細節見 `ig-carousel.md` §4。審查的讀者預設是一般讀者，並且要看圖（`review-loop.md`）。
 
-- **張數與圖型**（人的回饋，2026-10-11）：**讀者真正看懂比張數重要**，上限放寬到 20 張（`slides_max`；IG 官方 API 文件寫輪播最多 10 張，但 2026-10-12 實測建立 11、15、20 個子項的 container 都成功，`ig_publish.py` 已放寬到 20；**2026-10-12 已用 19 張實發 IG 成功**（Threads 輪播也實發成功））。圖**不要每篇都是橫條圖**：文字下面空出來的區塊是「塗鴉牆」，用 `diagram` 版型（流程、對比、點陣、前後對比、區間條、漏斗…，`design-series-visuals/references/brand-and-layouts.md`）畫出讓讀者更好理解、也覺得有趣的圖。細節留到系列後面幾則時，第 1 則在對應的張用圖註提醒「會在此系列的後續 post 中細講」。
+- **張數與圖型**（人的回饋，2026-10-11）：**讀者真正看懂比張數重要**，上限 20 張（`slides_max`；IG 官方文件寫 10 張，實測 20 張可發，已用 19 張實發 IG 與 Threads 成功）。圖**不要每篇都是橫條圖**：文字下面空出來的區塊是「塗鴉牆」，用 `diagram` 版型畫出讓讀者更好理解、也覺得有趣的圖（`design-series-visuals/references/brand-and-layouts.md`）。
 - **圖像設計要大膽、有故事**（人的回饋，2026-10-12）：人最喜歡的是「受保護區塊」那張（文件裡一塊金色區塊、一邊箭頭被叉掉、一邊通過）：圖本身在說一個畫面，不只是排版好看。示意圖優先選這種有隱喻、能讓讀者一眼看懂機制的畫法（對照 `design-series-visuals` 的「機制 → 圖型」表）；同一則連續 3 張以上同圖型要換（編輯審查者每次都抓這個）；可以新增圖型，不必先出樣張（見規則 12）。
 - **白話解釋的尺度**（人的決定，2026-10-12）：解釋機制可以用白話，只要**不改變卡的意思、不加新事實**（新的原因、用途、數字、範圍）就允許；審查者之間（讀者要白話、忠實者要卡上有）衝突時照這條。自創比喻容易出事：用卡上的正式術語加白話，比用自創說法穩（例：「驗證資料集」，不寫「選擇題」）。
 - **用語偏好**（人的回饋）：目標 Agent（不寫目標模型）、單個隨機樣本、優化器＝教練、訓練／驗證／測試資料集、「我的想法」可代替「我的推論」。不要文縐縐（宏觀層級、戰略筆記、步驟級…換成大方向、小修改），不要寫「文章沒有提到／卡上沒有」這類交代資料缺口的話（卡上沒有的就直接不提）。
 
-- **Threads 預設是輪播**（人的決定，2026-10-12）：一則輪播貼文（正文＋全部投影片，順序同 IG，2～20 張）＋一則連結回覆；spec 寫 `threads.mode: carousel`、不寫 `items`（`spec-json.md`）。逐張串文（`mode` 省略）是舊做法，只留給已發布的 jev-cascade 與測試，新貼文不用。2026-10-12 已用 19 張實發 IG 與 Threads 成功。
+- **Threads 預設是輪播**（人的決定，2026-10-12）：一則輪播貼文（正文＋全部投影片）＋一則連結回覆；spec 寫 `threads.mode: carousel`、不寫 `items`（`spec-json.md`）。逐張串文只留給已發布的 jev-cascade 與測試。
 
 - **預設一張觀念卡 = 一則 post**；IG 輪播與 Threads 串文是同一則的兩種格式。兩張卡互相依賴、分開發都不好懂時，**由人決定**合成一則雙卡貼文（系列檔成員的 `also`；做法見 `spec-json.md`「雙卡貼文」）。同一篇文章的多張卡預設組成系列，`standalone_classic` 的卡預設獨立發文（`references/batch-and-publish.md` §1）。
 - **請人拍板的事，要用白話說清楚**：這是什麼、選了會怎樣、代價是什麼、我的建議；不要只丟一句簡短的選項。

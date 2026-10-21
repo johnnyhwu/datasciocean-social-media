@@ -32,7 +32,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 |---|---|---|
 | 1 | 選觀念、決定獨立或系列、系列檔 | `references/batch-and-publish.md` §1–3 |
 | 2 | 5～6 個大膽的 hook 候選（至少 3 種樣態），最多一次 haiku 讀者參考，**用純文字列出完整候選讓人挑（不用 AskUserQuestion）** | `references/hooks.md` |
-| 3 | **先做版型規劃**（每張選好版型、圖上術語在哪張定義，`references/ig-carousel.md` §0；**機制類的圖看 `design-series-visuals/references/brand-and-layouts.md` §4.2「機制 → 圖型」，圖要大膽、有故事，同則連續 3 張以上同圖型要換；Threads 預設輪播**；**每張帶數字的圖先用 `chart-thinking` skill 想過：要比什麼、圖有沒有直接支撐主標**），再寫 `out/<series>/<concept>/_build/spec.json`：投影片、Threads、caption、每個區塊標引用的 claim id | `references/spec-json.md`、`references/ig-carousel.md`、`references/threads-and-caption.md`、`references/anchor-writing-rules.md` |
+| 3 | **先做版型規劃**（每張選好版型、圖上術語在哪張定義，`references/ig-carousel.md` §0；**機制類的圖看 `design-series-visuals/references/brand-and-layouts.md` §4.2「機制 → 圖型」，圖要大膽、有故事，同則連續 3 張以上同圖型要換；Threads 預設輪播**；**每張帶數字的圖先用 `chart-thinking` skill 想過：要比什麼、圖有沒有直接支撐主標；每張圖寫一句「比文字多給什麼」，定義與機制類預設用具體的假設例子**；獨立貼文的轉折張、延伸閱讀、導流連結先問人），再寫 `out/<series>/<concept>/_build/spec.json`：投影片、Threads、caption、每個區塊標引用的 claim id | `references/spec-json.md`、`references/ig-carousel.md`、`references/threads-and-caption.md`、`references/anchor-writing-rules.md` |
 | 4 | `check_a.py <spec.json>`，ERROR 清零 | `references/program-a.md` |
 | 5 | `render.py <spec.json>`，程式 B 全過；`contact_sheet.py <發布包資料夾>` 拼縮圖；**自己看一次渲染後的 PNG** | `references/program-b.md` |
 | 6 | （在 `contact_sheet.py` 之後）`build_package.py <spec.json>`：產生人看的 `README.md`、`ig/post.md`、`threads/post.md`、審查用的 `_build/post-with-refs.md`／`post-reader.md`，並更新 `out/README.md` 索引 | `references/threads-and-caption.md` |
@@ -71,6 +71,6 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 
 ## 派發 subagent 的做法
 
-- 提示詞放在 `references/*-prompt.md`；派發訊息只給提示詞路徑與變數（檔案路徑），不貼全文。審查者看不到撰寫者推理，每輪用全新 subagent。
+- 提示詞在 `references/*-prompt.md`：把全文貼進派發訊息、填好檔案路徑（審查者只准讀指定的檔案，讀不到提示詞檔）；放行項逐項列出（`review-loop.md`）。審查者看不到撰寫者推理，每輪用全新 subagent。
 - 並行上限 20；派完用檔案數核對應到／實到。
 - 審查產出（JSON）放暫存目錄，不進 repo。

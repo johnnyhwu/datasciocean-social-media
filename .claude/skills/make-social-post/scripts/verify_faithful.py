@@ -46,6 +46,8 @@ def main(card_path: str, out_path: str) -> int:
             elif v == "部分支持":
                 mi.append(f"部分支持：{a.get('text','')[:40]!r}｜{a.get('note','')[:80]}")
         for e in b.get("errors", []):
+            if isinstance(e, dict):      # 審查者有時把錯誤寫成物件：取 type／error／category 欄位
+                e = e.get("type") or e.get("error") or e.get("category") or json.dumps(e, ensure_ascii=False)
             if e not in ALL:
                 notes.append(f"[{name}] 錯誤類別不在固定清單：{e!r}")
             elif e in BLOCKER:

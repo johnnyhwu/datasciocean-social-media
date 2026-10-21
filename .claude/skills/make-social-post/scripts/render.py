@@ -823,6 +823,9 @@ def render_all(spec_path: Path, only: set[int] | None = None, force: bool = Fals
     outdir = pack / "ig"
     htmldir = bld / "html"
     outdir.mkdir(parents=True, exist_ok=True); htmldir.mkdir(parents=True, exist_ok=True)
+    if not only:      # 整份重渲：先清掉舊的 PNG，失敗或刪了投影片時才不會留下過期的圖（縮圖與審查會讀到舊圖）
+        for old in outdir.glob("[0-9][0-9].png"):
+            old.unlink()
     css = (series["_tdir"] / "style.css").read_text(encoding="utf-8")
     css = css.replace("{{FONT_REGULAR}}", (ROOT / "assets/fonts/NotoSansCJKtc-Regular.otf").as_uri())
     css = css.replace("{{FONT_BOLD}}", (ROOT / "assets/fonts/NotoSansCJKtc-Bold.otf").as_uri())

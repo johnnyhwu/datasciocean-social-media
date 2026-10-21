@@ -191,6 +191,12 @@ def main(spec_path: str) -> int:
             err.append(f"slide{i:02d}: 圖表版型補充 {len(body)} 字，超過 {P['chart_body_max_chars']}（補充行數預檢）")
         if sl["layout"] == "context" and len(body) > P["context_body_max_chars"]:
             err.append(f"slide{i:02d}: 脈絡張補充 {len(body)} 字，超過 {P['context_body_max_chars']}")
+        if sl["layout"] == "diagram":      # 圖只是把同張的標題與補充重講一遍：要換成文字沒有的資訊（具體的假設例子、關係、對比）
+            dtxt = re.sub(r"\s+", "", " ".join(D.texts(sl)))
+            btxt = re.sub(r"\s+", "", " ".join(strip_marks(sl.get(k, "")) for k in ("title", "body")))
+            bg = BIGRAM(dtxt)
+            if bg and len(bg & BIGRAM(btxt)) / len(bg) > P["diagram_text_overlap_hint"]:
+                hint.append(f"slide{i:02d}: 圖上文字有 {len(bg & BIGRAM(btxt)) / len(bg):.0%} 在重述同張的標題與補充；圖要多給文字沒有的資訊（具體例子、關係、對比），不是把字裝進框裡（self-check 31）")
         lim = P["cover_title_precheck_chars"] if sl["layout"] == "cover" else P["title_precheck_chars"]
         if len(strip_marks(sl.get("title", ""))) > lim + 10:
             hint.append(f"slide{i:02d}: 主標 {len(strip_marks(sl.get('title','')))} 字，預檢上限 {lim}（以渲染行數為準）")

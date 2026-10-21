@@ -23,7 +23,7 @@ P=out/<系列>/<觀念>                              # 要發的發布包資料�
 
 **每一個 `--confirm` 之前，都要先把 dry-run 的結果用白話給人看，等人明確說「發」。不可以在同一輪裡自己決定發。不可以用真實貼文做測試；測試用專用的測試包與 `--no-record`，測完把測試包刪掉。**
 
-**人一次授權整串（2026-10-10 人同意）**：人在同一則訊息明確說「prepare、push `ig/jpg/`、發佈到兩個平台」（或等義）時，視為已經說了「發」和同意 push，可以連續執行：前提檢查 → `prepare` → push `ig/jpg/`（只 add 這個資料夾）→ IG 預檢 → IG dry-run → IG `--confirm` → Threads dry-run → Threads `--confirm`。**每一個 dry-run 都還是要跑、要看**；只要出現 `problems`、`warnings`、圖片網址抓不到、額度不足，或內容和人確認的不一樣，就**停下來問人**。人只說「ready」或「準備發」不算授權發布。
+**人一次授權整串（2026-10-10 人同意）**：人在同一則訊息明確說「prepare、push `ig/jpg/`、發佈到兩個平台」（或等義，例如「直接發 threads 和 IG」「發佈完 commit and push」）時，視為已經說了「發」和同意 push，可以連續執行：前提檢查 → `prepare` → push `ig/jpg/`（只 add 這個資料夾）→ IG 預檢 → IG dry-run → IG `--confirm` → Threads dry-run → Threads `--confirm`。**每一個 dry-run 都還是要跑、要看**；只要出現 `problems`、`warnings`、圖片網址抓不到、額度不足，或內容和人確認的不一樣，就**停下來問人**。人只說「ready」或「準備發」不算授權發布。
 
 **標 `ready` 時就問一次**（省掉發布當天多一輪來回）：問人要不要整串授權，並附上現成的那句話讓人直接照說——「prepare、push `ig/jpg/`、發佈到兩個平台」。人只說「發」（沒有整串）時，prepare 做完、push 前還是要問。
 
@@ -39,7 +39,7 @@ P=out/<系列>/<觀念>                              # 要發的發布包資料�
 | 7 | 人說「發」→ **Threads 發佈**：依序發，每一則回覆前一則，每一則發完立刻記錄 id（輪播：先建每張圖的子項 container，再建輪播本體；整串約 1 到 2 分鐘，舊逐張串文約 4 到 5 分鐘）；成功後自動寫回 state 與 `state/threads-publish-log.jsonl` | `threads_publish.py publish $P --confirm` | 人確認，Claude 執行 |
 | 8 | 驗證：`state.py status` 該觀念兩格式都是 `published`；`state/<觀念>.yaml` 有兩個網址；把網址給人。**貼文 `README.md` 與 `out/` 索引會在 `--confirm` 成功後自動更新**（`build_package.py --refresh`，兩個格式都發完才會顯示「已發布」與網址）；不用再手動 `build_package.py --force` | | Claude |
 | 9 | **Threads 回補**：`state/backfill.md` 有項目時，跑 dry-run，把每則回覆的完整文字給人看，人說「發」才 `--confirm`；成功後自動標記已回補。IG 與其他事項不做（見下） | `threads_publish.py backfill`（dry-run）→ `threads_publish.py backfill --confirm` | Claude；人確認 |
-| 10 | 把這次的 state 與發佈紀錄 commit（問人要不要 push） | | Claude，**先問人** |
+| 10 | 把這次的 state 與發佈紀錄 commit（問人要不要 push；人已說「完成後 commit and push」就直接做：先只 push `ig/jpg/`，發完再把其餘改動一起 commit 並 push） | | Claude，**先問人**（人已授權時除外） |
 
 IG 與 Threads **可以各自獨立發**，順序由人決定（目前慣例是先 IG 再 Threads）。其中一個失敗不影響另一個。
 

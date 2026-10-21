@@ -2,13 +2,20 @@
 
 CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節放在這裡。
 
-## skillopt（進行中）
+## skillopt（已發完）
 
-見 CLAUDE.md「目前狀態」；更詳細的規劃與決定記在 memory `project_skillopt_series_plan`。
+視覺「等深線」，Threads 用輪播；規劃與決定在 memory `project_skillopt_series_plan`。
+1. `skillopt-overview`（19 張，2026-10-12）：IG https://www.instagram.com/p/DeYn1j2oCAP/ 、Threads https://www.threads.com/@datasciocean/post/DeYo4JSIGcl
+2. `skillopt-batch-evidence-minibatch`＋`skillopt-bounded-edit-budget`（雙卡，17 張，2026-10-13）：IG https://www.instagram.com/p/Dea5IgXIBKS/ 、Threads https://www.threads.com/@datasciocean/post/Dea6HxFICya
+3. `skillopt-blind-acceptance-gate`＋`skillopt-epoch-level-control`（雙卡，17 張，2026-10-14）：IG https://www.instagram.com/p/DedaYcgk8zR/ 、Threads https://www.threads.com/@datasciocean/post/Dedbc--IMBp
 
 ## persona-aware-d2s（已發完）
 
-見 CLAUDE.md「目前狀態」。第 1 則 `persona-d2s-task-and-pipeline`（16 張）已發布（2026-10-15）：IG https://www.instagram.com/p/DefqxZOH0Ot/ 、Threads https://www.threads.com/@datasciocean/post/DefrJYsH5nk 。第 2 則 `persona-d2s-training-design-flaws`（14 張）已發布（2026-10-16）：IG https://www.instagram.com/p/Dejx3ZWGGGt/ 、Threads https://www.threads.com/@datasciocean/post/DejyJ7bmJTr ；第 1 則 Threads 已回補（連到第 2 則）。第 3 則 `persona-d2s-what-to-borrow`（13 張）已發布（2026-10-17）：IG https://www.instagram.com/p/DelBriik7pd/ 、Threads https://www.threads.com/@datasciocean/post/DelDUocE7Zt ；第 1、2 則 Threads 已回補（連到第 3 則）。
+視覺「一式四份」直切（`style: cards`）；3 卡 3 則不合併；hashtag `DSO_PersonaD2S`。第 1 則的定位語（人決定 A+C）：事實（EACL 2024、微調 GPT-3.5-turbo）加人口吻的一行「這個系列是在了解早期的簡報生成怎麼做」，這一行不在卡上，是人授權的放行項。新增圖型 `equation`、`quad` 的 `bars`、`dotgrid` 的 `cols`。第 1 則 `persona-d2s-task-and-pipeline`（16 張）已發布（2026-10-15）：IG https://www.instagram.com/p/DefqxZOH0Ot/ 、Threads https://www.threads.com/@datasciocean/post/DefrJYsH5nk 。第 2 則 `persona-d2s-training-design-flaws`（14 張）已發布（2026-10-16）：IG https://www.instagram.com/p/Dejx3ZWGGGt/ 、Threads https://www.threads.com/@datasciocean/post/DejyJ7bmJTr ；第 1 則 Threads 已回補（連到第 2 則）。第 3 則 `persona-d2s-what-to-borrow`（13 張）已發布（2026-10-17）：IG https://www.instagram.com/p/DelBriik7pd/ 、Threads https://www.threads.com/@datasciocean/post/DelDUocE7Zt ；第 1、2 則 Threads 已回補（連到第 3 則）。
+
+## decision-transformer-reward-conditioning（獨立貼文，已發布）
+
+2026-10-21，9 張：IG https://www.instagram.com/p/DevHQBlk2nG/ 、Threads https://www.threads.com/@datasciocean/post/DevHi6skzg5 。視覺「地平線」（`standalone/decision-transformer-reward-conditioning/`）；hook 讀者疑問，人選 A 並微調。人的決定：不放 Persona-Aware-D2S 轉折張與延伸閱讀、導流行與文章連結全拿掉；老鼠走迷宮是假設的例子、PPO／DPO 的 arXiv 網址是放行項（`latin_allow`）；刪掉「多步驟威力」那張。新增：獨立貼文架構、`tokens` 圖型。
 
 ## jev-cascade（已發完；2026-10-10 的狀態）
 

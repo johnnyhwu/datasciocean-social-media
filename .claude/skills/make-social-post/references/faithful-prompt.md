@@ -50,7 +50,7 @@
     {"block": "第 3 張", "atoms": [
        {"text": "原子主張", "verdict": "完全支持|部分支持|不支持|找不到",
         "card_quote": "卡的逐字原文（找不到時留空字串）", "note": "一句話理由"}],
-     "errors": ["固定錯誤清單中的項目，沒有就空陣列"]}
+     "errors": ["固定錯誤清單中的字串（只能是字串，不要寫成物件），沒有就空陣列"]}
   ],
   "recalculations": [{"block": "第 5 張", "expression": "…", "result": "…"}],
   "gaps": [{"description": "…", "card_quote": "…"}]
