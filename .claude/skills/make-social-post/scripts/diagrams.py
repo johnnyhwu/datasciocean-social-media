@@ -19,6 +19,7 @@
   equation  算式 A × B ＝ C：nodes = 算元 [{text（大數字）, sub（單位）, sub2?, emph?}]、選用 ops、選用 outcomes[0]（底下一條橫框）
   quad      2×2 四個格子：nodes = 4 個 [{text, sub?, emph?, bars?}]（bars＝格子上方的小投影片有幾條條列）
   locked    文件裡一塊受保護的區塊：heads = [被擋下的來源, 能更新的來源]、nodes = [{text}（文件名）, {text}（受保護區塊）]
+  tokens    符號序列（2026-10-18）：steps = [{label, cells:[{text, sub?, tone}]}]，一列一步；tone = rtg／state／action／reward／mask；選用 more、outcomes[0]
   stops     由上往下三個停靠點（不按比例）：nodes = [{text, sub?, emph?}]、選用 heads = [上端標籤, 下端標籤]
 
 規則：圖形全部用 class "bg"（不進程式 B 的文字與圖形重疊檢查），所以排版由這裡負責避開文字；框內的文字由程式 B 的「框內文字不超出框」檢查；
@@ -780,9 +781,66 @@ def equation(c: Canvas, spec: dict, y0: float) -> float:
     return y
 
 
+# ------------------------------------------------------------------ tokens（符號序列：一列一步，每格一個符號）
+TOKEN_TONES = {   # tone → (fill, stroke, dash, 主字色, 小字色)
+    "rtg":    (TEAL, None, None, CREAM, CREAM),
+    "state":  (DEEP, None, None, CREAM, LIGHT),
+    "action": (CREAM, DEEP, None, DEEP, DEEP),
+    "reward": (LIGHT, None, None, DEEP, DEEP),
+    "mask":   (GOLD, None, None, DEEP, DEEP),
+}
+
+
+def tokens(c: Canvas, spec: dict, y0: float) -> float:
+    """steps = [{label（列首小字，例如「第一步」）, cells:[{text, sub?, tone}]}]，一列一步、每格一個符號；
+    tone：rtg／state／action／reward／mask（mask＝被蓋住、要模型猜的那格，金色）；more（選用，true）＝最後一列後面畫三個點，表示還有下去；
+    outcomes[0]（選用）＝底下一條橫框 {text, sub?, tone?}（tone: good 金色，否則深海）。
+    2026-10-18 新增（Decision Transformer）：「交錯排列的序列」「蓋住其中一格」是符號序列，流程圖與表格說不出這個畫面。"""
+    steps, foot, more = spec["steps"], (spec.get("outcomes") or [None])[0], bool(spec.get("more"))
+    w, lw, gap, vgap, pad = X1 - X0, 120, 16, 30, 14
+    ncell = max(len(s["cells"]) for s in steps)
+    cw = (w - lw - gap * (ncell - 1)) / ncell
+    iw = cw - 2 * pad
+
+    def ch(cell):
+        return c.lines(cell["text"], iw, 34) * 44.2 + (c.lines(cell["sub"], iw, 28) * 39.2 + 6 if cell.get("sub") else 0) + 2 * pad + 8
+    hs = [max(ch(cell) for cell in s["cells"]) for s in steps]
+    fh = (c.lines(foot["text"], w - 44, 34) * 44.2 + (c.lines(foot["sub"], w - 44, 28) * 39.2 + 6 if foot.get("sub") else 0) + 44) if foot else 0
+    more_h = 64 if more else 0
+    total = sum(hs) + vgap * (len(steps) - 1) + more_h + (vgap + fh if foot else 0)
+    _fit(total, BOTTOM - y0, "tokens")
+    extra = BOTTOM - y0 - total
+    add = min(extra * .6 / len(steps), 60)
+    hs = [h + add for h in hs]
+    vg = vgap + min((extra - add * len(steps)) / max(len(steps) - 1 + (1 if foot else 0) + (1 if more else 0), 1), 30)
+    y = y0
+    ax = X0 + 44                                         # 列首小字下方的箭頭（一步接一步）
+    for i, st in enumerate(steps):
+        h = hs[i]
+        c.text(X0, y + h / 2 - 20, lw - 8, st["label"], "ds", TEAL, "left")
+        for k, cell in enumerate(st["cells"]):
+            fill, stroke, dash, tc, sc = TOKEN_TONES[cell.get("tone", "state")]
+            c.textbox(X0 + lw + k * (cw + gap), y, cw, cell["text"], cell.get("sub"), fill=fill, tcolor=tc, scolor=sc,
+                      stroke=stroke, dash=dash, align="center", pad=pad, h=h)
+        y += h
+        if i < len(steps) - 1 or more:
+            c.arrow(ax, y + 4, ax, y + vg - 4, TEAL, 4, 12)
+            y += vg
+    if more:
+        for j in range(3):
+            c.circle(ax, y + 8 + j * 18, 5, fill=TEAL)
+        y += more_h
+    if foot:
+        y += vg if not more else 18
+        c.textbox(X0, y, w, foot["text"], foot.get("sub"), fill=GOLD if foot.get("tone") == "good" else DEEP,
+                  tcolor=DEEP if foot.get("tone") == "good" else CREAM, scolor=DEEP if foot.get("tone") == "good" else LIGHT, align="center", h=fh)
+        y += fh
+    return y
+
+
 KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "paths": paths, "epochs": epochs,
          "dotgrid": dotgrid, "dumbbell": dumbbell, "range": range_chart, "funnel": funnel,
-         "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation}
+         "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation, "tokens": tokens}
 
 
 def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:
@@ -796,6 +854,10 @@ def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:
 def texts(sl: dict) -> list[str]:
     """示意圖上的所有文字與數字（逐欄位，給 check_a 的數字／名稱檢查與 build_package 的審查文字用）。"""
     out = []
+    for st in sl.get("steps", []):
+        out.append(st["label"])
+        for cell in st["cells"]:
+            out.append(cell["text"]); out += [cell["sub"]] if cell.get("sub") else []
     for n in sl.get("nodes", []) + sl.get("outcomes", []):
         out.append(n["text"]); out += [n["sub"]] if n.get("sub") else []; out += [n["sub2"]] if n.get("sub2") else []
     if sl.get("loop"):

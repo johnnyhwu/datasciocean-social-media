@@ -1,0 +1,348 @@
+{
+  "series": null,
+  "concept": "decision-transformer-reward-conditioning",
+  "also_concepts": [],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "讀者疑問",
+    "title": "AI 學做決策，能不能先[[許願]]要幾分？",
+    "subtitle": "Decision Transformer 把強化學習改成序列預測：除了 state，也把「還想拿多少分」當輸入，讓模型預測 action",
+    "refs": [
+      "c1",
+      "c4",
+      "c5",
+      "c6"
+    ],
+    "candidate": "A（人微調）"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "AI 學做決策，能不能先[[許願]]要幾分？",
+      "body": "Decision Transformer 把強化學習改成序列預測：除了 state，也把「還想拿多少分」當輸入，讓模型預測 action",
+      "refs": [
+        "c1",
+        "c4",
+        "c5",
+        "c6"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "2021 年，強化學習被改寫成序列預測",
+      "body": "Decision Transformer 在 2021 年 6 月掛上 arXiv，卡在 GPT-3 之後、ChatGPT 之前，是「Transformer 能不能解序列決策問題」那波研究風潮的代表作。先認識三個會用到的詞：",
+      "rows": [
+        [
+          "強化學習",
+          "讓 AI 一步步做決定，靠拿到的分數學習。"
+        ],
+        [
+          "價值函數",
+          "估計「某個狀態下，未來預期能拿到多少總分」。"
+        ],
+        [
+          "bootstrapping",
+          "拿自己目前的估計，去修正自己的估計，像用還沒核對的答案批改自己。"
+        ]
+      ],
+      "key_w": 320,
+      "refs": [
+        "c1",
+        "c2",
+        "c3"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "它想解決的，是傳統 RL 的老毛病",
+      "body": "想解決傳統 RL 的老毛病，Decision Transformer 把 RL 問題重新包裝成序列預測問題，用 GPT 式的監督學習來訓練。",
+      "columns": [
+        {
+          "head": "傳統 RL",
+          "items": [
+            {
+              "text": "訓練不穩定",
+              "sub": "Q-learning、policy gradient 這類方法",
+              "muted": true
+            },
+            {
+              "text": "需要精細調參",
+              "muted": true
+            },
+            {
+              "text": "常常得跟環境 online 互動",
+              "muted": true
+            }
+          ]
+        },
+        {
+          "head": "Decision Transformer",
+          "items": [
+            {
+              "text": "改成序列預測",
+              "sub": "用 GPT 式的監督學習訓練",
+              "emph": true
+            },
+            {
+              "text": "不估計價值函數",
+              "sub": "不先估算未來總分"
+            },
+            {
+              "text": "不做 bootstrapping",
+              "sub": "它是訓練不穩定的來源之一"
+            }
+          ]
+        }
+      ],
+      "refs": [
+        "c1",
+        "c3"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "tokens",
+      "title": "reward 要先換成 return-to-go",
+      "body": "一條軌跡（trajectory）由一連串的 (state, action, reward) 組成：state 是現在在哪，action 是做了什麼動作，reward 是拿到的分數。訓練前，先把 reward 換成 return-to-go。",
+      "steps": [
+        {
+          "label": "第一步",
+          "cells": [
+            {
+              "text": "+2 分",
+              "sub": "這一步拿到",
+              "tone": "reward"
+            },
+            {
+              "text": "10 分",
+              "sub": "從這步到終點，還能拿",
+              "tone": "rtg"
+            }
+          ]
+        },
+        {
+          "label": "第二步",
+          "cells": [
+            {
+              "text": "+3 分",
+              "sub": "這一步拿到",
+              "tone": "reward"
+            },
+            {
+              "text": "8 分",
+              "sub": "從這步到終點，還能拿",
+              "tone": "rtg"
+            }
+          ]
+        },
+        {
+          "label": "第三步",
+          "cells": [
+            {
+              "text": "+5 分",
+              "sub": "這一步拿到",
+              "tone": "reward"
+            },
+            {
+              "text": "5 分",
+              "sub": "從這步到終點，還能拿",
+              "tone": "rtg"
+            }
+          ]
+        }
+      ],
+      "note": "假設的例子：老鼠走迷宮，路上撿飼料、終點吃起司",
+      "refs": [
+        "c4",
+        "c5"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "tokens",
+      "title": "輸入交錯排列，訓練時蓋住 action",
+      "body": "模型的輸入是交錯排列的三元組序列：return-to-go、state、action，一組接一組。訓練時蓋住 action，讓模型根據前面的 return-to-go 和 state，預測該輸出什麼 action。",
+      "steps": [
+        {
+          "label": "第一步",
+          "cells": [
+            {
+              "text": "return-to-go",
+              "sub": "還想拿多少分",
+              "tone": "rtg"
+            },
+            {
+              "text": "state",
+              "sub": "現在在哪",
+              "tone": "state"
+            },
+            {
+              "text": "action",
+              "sub": "做什麼動作",
+              "tone": "action"
+            }
+          ]
+        },
+        {
+          "label": "第二步",
+          "cells": [
+            {
+              "text": "return-to-go",
+              "sub": "還想拿多少分",
+              "tone": "rtg"
+            },
+            {
+              "text": "state",
+              "sub": "現在在哪",
+              "tone": "state"
+            },
+            {
+              "text": "action",
+              "sub": "被蓋住，模型來猜",
+              "tone": "mask"
+            }
+          ]
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "舉例來說，模型學到的大致是：想拿到某個分數、又在位置 A，就往右走"
+        }
+      ],
+      "refs": [
+        "c6",
+        "c7"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "title": "使用時，你先許願，模型再一步步走",
+      "body": "推論時（實際使用的時候），使用者先許願，設定一個目標 return（想拿到的分數）；模型根據這個目標加上目前的 state，吐出動作。",
+      "nodes": [
+        {
+          "text": "你先許願",
+          "sub": "設定一個目標 return，也就是想拿到的分數"
+        },
+        {
+          "text": "模型看「目標加上目前的 state」",
+          "sub": "吐出下一個動作"
+        },
+        {
+          "text": "走一步",
+          "sub": "return-to-go 按實際拿到的分數遞減"
+        }
+      ],
+      "loop": "重複，直到走完",
+      "refs": [
+        "c8"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "quad",
+      "title": "在研究圈內，它有影響力",
+      "body": "同期有 Trajectory Transformer 提出類似想法，後續有 Online Decision Transformer，也被延伸到這些領域：",
+      "nodes": [
+        {
+          "text": "推薦系統"
+        },
+        {
+          "text": "機器人"
+        },
+        {
+          "text": "embodied AI"
+        },
+        {
+          "text": "網頁導航 agent"
+        }
+      ],
+      "refs": [
+        "c9"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "但它沒成為 LLM 對齊的主流",
+      "body": "LLM 對齊，是讓語言模型的回答貼近人類偏好。今天的主流，仍是 PPO 或後來的 DPO。",
+      "columns": [
+        {
+          "head": "LLM 對齊的主流",
+          "items": [
+            {
+              "text": "PPO",
+              "sub": "用強化學習微調，InstructGPT 那條線\narxiv.org/abs/1707.06347"
+            },
+            {
+              "text": "DPO",
+              "sub": "後來出現，不用強化學習\narxiv.org/abs/2305.18290"
+            }
+          ]
+        },
+        {
+          "head": "Decision Transformer",
+          "items": [
+            {
+              "text": "offline RL 與機器人控制",
+              "sub": "這個子領域，持續發揮影響力",
+              "emph": true
+            },
+            {
+              "text": "不是家喻戶曉",
+              "sub": "的產品級技術"
+            }
+          ]
+        }
+      ],
+      "refs": [
+        "c10"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "所以，Decision Transformer 在做什麼？",
+      "title": "訓練時，學走法跟\n分數的關聯；\n使用時，先許願，\n模型回推怎麼走",
+      "refs": [
+        "c1"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "AI 學做決策，能不能先許願要幾分？\n\nDecision Transformer（2021 年）把強化學習改寫成序列預測，用 GPT 式的監督學習訓練：訓練時，觀察別人怎麼走、最後拿多少分，學會兩者的關聯；使用時，你先設定想要的分數，模型回推該怎麼走。\n\n它想解決傳統強化學習的老毛病：訓練不穩定、需要精細調參，而且常常得跟環境 online 互動（訓練時要不斷取得新資料）。\n\n在研究圈內它有影響力，但沒有成為 LLM 對齊的主流（今天仍然是 PPO 或後來的 DPO）。",
+      "refs": [
+        "c1",
+        "c2",
+        "c3",
+        "c9",
+        "c10"
+      ]
+    },
+    "last": {
+      "text": "Decision Transformer 是什麼？訓練時學「怎麼走」跟「最後拿多少分」的關聯，使用時你先設定想要的分數，模型回推該怎麼走。",
+      "refs": [
+        "c1"
+      ]
+    }
+  },
+  "caption": {
+    "first": "Decision Transformer：把強化學習改成序列預測，先設定想要的分數",
+    "first_refs": [
+      "c1"
+    ],
+    "nav": "",
+    "hashtags": [
+      "DecisionTransformer",
+      "強化學習",
+      "機器學習"
+    ]
+  },
+  "latin_allow": [
+    "arxiv.org",
+    "abs"
+  ]
+}

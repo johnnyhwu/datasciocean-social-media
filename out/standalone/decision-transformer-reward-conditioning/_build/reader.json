@@ -1,0 +1,117 @@
+{
+  "post": "decision-transformer-reward-conditioning",
+  "skim": {
+    "conclusion": "Decision Transformer 把強化學習改寫成序列預測，用來解決傳統 RL 的老毛病：訓練時把 reward 換成 return-to-go、蓋住 action 讓模型猜；使用時你先許願一個分數，模型再一步步走。它在研究圈有影響力，但沒成為 LLM 對齊的主流，真正的威力在多步驟的決策。",
+    "citations": [
+      {"quote": "AI 學做決策，能不能先許願要幾分？"},
+      {"quote": "Decision Transformer 把強化學習改成序列預測：除了 state，也把「還想拿多少分」當輸入，讓模型預測 action"},
+      {"quote": "2021 年，強化學習被改寫成序列預測"},
+      {"quote": "它想解決的，是傳統 RL 的老毛病"},
+      {"quote": "訓練時，蓋住 action 讓模型猜"},
+      {"quote": "使用時，你先許願，模型再一步步走"},
+      {"quote": "在研究圈內，它確實有影響力"},
+      {"quote": "但它沒成為 LLM 對齊的主流"},
+      {"quote": "它真正的威力，在多步驟的決策"}
+    ]
+  },
+  "core": {
+    "thesis": {
+      "answer": "Decision Transformer 把強化學習改成序列預測：訓練時學「怎麼走」跟「分數」的關聯，使用時先許願想拿的分數，模型回推該怎麼走。",
+      "citations": [
+        {"quote": "訓練時，學走法跟分數的關聯；使用時，先許願，模型回推怎麼走"},
+        {"quote": "Decision Transformer 把強化學習改成序列預測：除了 state，也把「還想拿多少分」當輸入，讓模型預測 action"}
+      ]
+    },
+    "mechanism": {
+      "answer": "把軌跡裡的 reward 換成 return-to-go（從現在到終點還會拿多少分），排成 return-to-go、state、action 交錯的序列；訓練時蓋住 action 讓模型根據前面的分數與狀態去猜；使用時你先設定目標分數，模型看目標加目前狀態吐出動作，走一步後 return-to-go 按實際拿到的分數遞減。這樣就用 GPT 式的監督學習訓練，不用估價值函數、不做 bootstrapping。",
+      "citations": [
+        {"quote": "return-to-go：從現在這一步到終點，總共還會拿到多少分"},
+        {"quote": "模型的輸入是交錯排列的三元組序列：依序是 return-to-go、state、action，一組接一組，重複排下去。"},
+        {"quote": "訓練時蓋住 action，讓模型根據前面的 return-to-go 和 state，預測該輸出什麼 action。"},
+        {"quote": "模型根據這個目標加上目前的 state，吐出動作。"},
+        {"quote": "做法是把 RL 問題重新包裝成序列預測問題，用 GPT 式的監督學習來訓練。"}
+      ]
+    },
+    "evidence": {
+      "answer": "貼文沒有給實驗數字或結果。只有定性說法：同期有 Trajectory Transformer 提出類似想法、後續有 Online Decision Transformer、被延伸到推薦系統、機器人、embodied AI、網頁導航 agent；以及 LLM 對齊主流仍是 PPO 或 DPO。對「它真的有效」沒有分數或比較數據支撐。",
+      "citations": [
+        {"quote": "同期有 Trajectory Transformer 提出類似想法，後續有 Online Decision Transformer，也被延伸到這些領域："},
+        {"quote": "今天這個領域的主流，仍然是 PPO 或後來的 DPO。"}
+      ]
+    }
+  },
+  "terms": [
+    {"term": "Transformer / GPT 式的監督學習", "blocks_core": false, "note": "只知道 LLM 的讀者大概能意會，但輪播沒白話說明「監督學習」是什麼。"},
+    {"term": "state", "blocks_core": false, "note": "封面副標直接用，第 4 張補充才說「現在在哪」，第 5 張圖也有。封面當下看不懂，但後面有定義。"},
+    {"term": "action", "blocks_core": false, "note": "第 4 張補充有定義「做了什麼動作」。"},
+    {"term": "reward", "blocks_core": false, "note": "第 4 張補充有定義「拿到的分數」。"},
+    {"term": "trajectory（軌跡）", "blocks_core": false, "note": "第 4 張補充有定義。"},
+    {"term": "三元組", "blocks_core": false, "note": "第 5 張直接用，圖上看得出是三樣一組，但沒白話解釋。"},
+    {"term": "推論（inference）", "blocks_core": false, "note": "第 7 張補充用括號說明「實際使用的時候」，有定義。"},
+    {"term": "映射", "blocks_core": false, "note": "第 6 張圖下方「學到的映射」，沒白話，但後面接了例子。"},
+    {"term": "arXiv / NeurIPS", "blocks_core": false, "note": "第 2 張出現，沒說明；只是背景資訊。"},
+    {"term": "Q-learning、policy gradient", "blocks_core": false, "note": "第 3 張只列為「傳統 RL 這類方法」，沒解釋；讀者只需知道是舊方法。"},
+    {"term": "online（跟環境 online 互動）", "blocks_core": false, "note": "第 3 張圖用小字補一句「訓練時要不斷取得新資料」，算有白話。"},
+    {"term": "offline RL", "blocks_core": false, "note": "第 9 張圖出現，沒定義。只在比較欄裡。"},
+    {"term": "PPO、DPO、InstructGPT", "blocks_core": false, "note": "第 9 張有簡短描述（用強化學習微調／不用強化學習、直接用偏好資料微調），但「微調」「偏好資料」沒白話；只影響第 9 張的理解，不影響主軸。"},
+    {"term": "Trajectory Transformer、Online Decision Transformer", "blocks_core": false, "note": "第 8 張只列名字，沒說明。"},
+    {"term": "embodied AI", "blocks_core": false, "note": "第 8 張圖上出現，沒白話。"},
+    {"term": "return（目標 return）", "blocks_core": false, "note": "第 7 張補充說「目標 return」，圖上說「也就是想拿到的分數」，有補；但與 return-to-go 的關係沒明講，輕微混淆。"},
+    {"term": "價值函數、bootstrapping", "blocks_core": false, "note": "第 2 張有白話定義，但 bootstrapping 的定義（用自己目前的估計值修正自己的估計）仍抽象，且為什麼不做它是好事沒解釋。"}
+  ],
+  "post_only_questions": [
+    {
+      "q": "訓練的時候，模型被蓋住、要自己猜的是哪一個部分？",
+      "answer": "action（做什麼動作）。",
+      "citations": [
+        {"quote": "訓練時蓋住 action，讓模型根據前面的 return-to-go 和 state，預測該輸出什麼 action。"},
+        {"quote": "被蓋住，模型來猜"}
+      ]
+    },
+    {
+      "q": "使用時，每走一步，剩下的 return-to-go 會怎麼變？",
+      "answer": "按實際拿到的分數遞減（走一步、拿到多少分，剩下的就減掉多少）。",
+      "citations": [
+        {"quote": "走一步｜return-to-go 按實際拿到的分數遞減"}
+      ]
+    },
+    {
+      "q": "Decision Transformer 在 Atari 遊戲上拿到多少分？",
+      "answer": "貼文沒寫",
+      "citations": []
+    }
+  ],
+  "feel": {
+    "felt_misled": "沒有被騙。封面「先許願要幾分」後面幾張都有講到，內容和封面一致。不過封面看起來像在講一個很厲害的新方法，結尾卻說它沒成為 LLM 對齊主流，期待落差稍大；而且封面的 LLM 讀者可能預期會講 ChatGPT 相關，實際主要是講 RL 與機器人。",
+    "unclear_slides": [
+      "第 1 張：副標用了 state、action，還沒有白話定義，要到第 4 張才懂。",
+      "第 8 張：只列四個領域名稱，沒說明它在這些領域做了什麼，看不出「有影響力」的依據。",
+      "第 9 張：PPO、DPO、InstructGPT、offline RL 對一般讀者都是陌生詞，雖有一句描述，但整張偏難。",
+      "第 10 張：圖和主標說的「多步驟決策」大致對得上，但為什麼 Decision Transformer 擅長這個沒有解釋，只是在重述。"
+    ]
+  },
+  "hard_to_understand": [
+    {"slide": 1, "quote": "除了 state，也把「還想拿多少分」當輸入，讓模型預測 action", "why": "state、action 還沒定義，封面一般人會卡住。"},
+    {"slide": 2, "quote": "卡在 GPT-3 之後、ChatGPT 之前，是「Transformer 能不能解序列決策問題」那波研究風潮的代表作", "why": "「序列決策問題」沒解釋；arXiv、NeurIPS 也沒有解釋。"},
+    {"slide": 3, "quote": "訓練不穩定 / 需要精細調參 / 不估計價值函數 / 不做 bootstrapping", "why": "右欄「不估計價值函數、不做 bootstrapping」是列特色，但沒說這為什麼比較好；「訓練不穩定」與它的對應關係看不出來。"},
+    {"slide": 3, "quote": "用 GPT 式的監督學習來訓練", "why": "「監督學習」沒白話說明，也沒說為什麼把 RL 包裝成這樣就能解決老毛病。"},
+    {"slide": 5, "quote": "模型的輸入是交錯排列的三元組序列", "why": "「三元組」「交錯排列」較書面；圖雖看得懂，但為什麼要把還想拿的分數放進輸入沒說。"},
+    {"slide": 6, "quote": "舉例來說，學到的映射大致是：我還想拿到某個分數，而我現在在位置 A → 往右走", "why": "「映射」是術語；整句也有些抽象，位置 A 往右走的例子太簡略。"},
+    {"slide": 7, "quote": "設定一個目標 return，也就是想拿到的分數", "why": "「return」和前面的「return-to-go」關係沒有講，讀者可能以為是兩個東西。"},
+    {"slide": 8, "quote": "推薦系統｜機器人｜embodied AI｜網頁導航 agent", "why": "只列名字，沒說明做了什麼，主標「確實有影響力」沒有可看的依據。"},
+    {"slide": 9, "quote": "PPO｜用強化學習微調，InstructGPT 那條線", "why": "「微調」「InstructGPT 那條線」對一般讀者是陌生詞。"},
+    {"slide": 9, "quote": "不是家喻戶曉的產品級技術", "why": "「產品級技術」略模糊；與主標「沒成為主流」的關係可懂，但為何沒成為主流沒有交代。"},
+    {"slide": 10, "quote": "Decision Transformer 真正的威力，在處理多步驟、有前後因果關係的序列決策。", "why": "只是宣稱，沒有說明它為什麼擅長；圖也只是重述『這一步影響下一步』。"}
+  ],
+  "charts": [
+    {"slide": 2, "can_state_claim": true, "issue": "三詞對照表清楚，字夠大。主標講 2021 年改寫，表只定義三個詞，與主標關聯較弱，但不影響閱讀。"},
+    {"slide": 3, "can_state_claim": true, "issue": "左右對照看得懂傳統 RL 的問題 vs Decision Transformer 的做法；但左欄是缺點、右欄是做法特色，兩邊不是一一對應，讀者看不出右欄哪項解決了哪個缺點。左欄小字略小。"},
+    {"slide": 4, "can_state_claim": true, "issue": "流程圖簡單易懂，金色框突出 return-to-go 的定義，主標對得上。但沒有數字例子，抽象。（只看縮圖，字夠大。）"},
+    {"slide": 5, "can_state_claim": true, "issue": "三列的格子清楚呈現交錯排列，主標與圖一致，字大、不擠。第三步後有省略點。"},
+    {"slide": 6, "can_state_claim": true, "issue": "金色格標出被蓋住的 action，一眼看懂主標；下方黑框的例句較抽象，但整體清楚。"},
+    {"slide": 7, "can_state_claim": true, "issue": "三步驟流程加『重複』，與主標一致，字夠大，不擠。『許願』是比喻，圖也有解釋成目標分數。"},
+    {"slide": 8, "can_state_claim": false, "issue": "只有四個虛線框裝名詞，看不出『影響力』，沒有任何補充說明；圖偏空、資訊量低。"},
+    {"slide": 9, "can_state_claim": true, "issue": "對照欄看得出主流是 PPO、DPO，Decision Transformer 在 offline RL 與機器人；字夠大。但框內有不少空白，InstructGPT、offline RL 等詞陌生。"},
+    {"slide": 10, "can_state_claim": true, "issue": "垂直時間線和金色『影響下一步能拿到多少分』能表達『一步影響下一步』；不過圖不能顯示 Decision Transformer 為什麼擅長，只是在說多步驟的特性；下方有一些空白。『從這一步出發』『走到終點』標籤字偏小。"}
+  ]
+}

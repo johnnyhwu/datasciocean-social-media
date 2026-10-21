@@ -33,7 +33,7 @@ RP = PARAMS["render"]
 WD, HT, SAFE_X, PAD_X = RP["width"], RP["height"], RP["safe_x"], RP["pad_x"]
 CREAM, TEAL, DEEP, GOLD = "#F2E0C0", "#076876", "#01353F", "#DDA642"
 MID, LIGHT, ABYSS = "#1F8A8D", "#69B4AA", "#032027"
-SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP}
+SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD}
 ALLOWED_FONT_PX = {28, 34, 38, 40, 56, 72, 76}
 ZERO_Y = 706          # 測深圖水面（0）
 
@@ -48,9 +48,33 @@ def template_dir(series_id: str) -> Path:
     return W.series_dir(series_id) / "templates"
 
 
-def template_hash(series_id: str) -> str:
+def load_visual(doc: dict) -> dict:
+    """這則貼文的視覺設定。系列貼文讀 series/<id>/series.md；獨立貼文（spec 的 series 為空）讀 standalone/<觀念>/standalone.md，
+    風格與模板都在那個資料夾，沒有系列名、沒有成員。回傳的 dict 有 id、name、members、_tdir（模板目錄）。"""
+    if doc.get("series"):
+        v = load_series(doc["series"])
+        v["id"] = v.get("id", doc["series"])
+        v["_tdir"] = template_dir(v["id"])
+        return v
+    d = W.standalone_dir(doc["concept"])
+    m = re.match(r"^---\n(.*?)\n---", (d / "standalone.md").read_text(encoding="utf-8"), re.S)
+    v = yaml.safe_load(m.group(1))
+    v.update({"id": doc["concept"], "name": "", "members": [], "standalone": True, "_tdir": d / "templates"})
+    return v
+
+
+def planned_title_of(concept: str) -> str:
+    """某個觀念在系列檔裡的 planned_title（獨立貼文的「延伸閱讀」列出已發布的系列貼文，標題用它）。"""
+    for sid in W.series_ids():
+        for mem in load_series(sid).get("members", []):
+            if mem["concept"] == concept or concept in (mem.get("also") or []):
+                return mem["planned_title"]
+    raise KeyError(f"系列檔裡找不到觀念 {concept}")
+
+
+def template_hash(tdir: Path) -> str:
     h = hashlib.sha1()
-    for p in sorted(template_dir(series_id).glob("*")):
+    for p in sorted(tdir.glob("*")):
         h.update(p.name.encode())
         h.update(p.read_bytes())
     return h.hexdigest()[:12]
@@ -300,21 +324,83 @@ def table_block(rows: list, y0: float, key_w: int = 300) -> tuple[str, str, floa
     return parts, cells, y
 
 
+# ---------------------------------------------------------------- 地平線（style: horizon，standalone/decision-transformer-reward-conditioning）的 SVG 元件
+# 一條地平線，上面是深海、下面是米色紙面；先把太陽（目標）放在地平線上，再一步一步走向它。
+# 都用 class "bg"（背景層，不進程式 B 的文字與圖形重疊檢查），排版時要自己確保不壓到文字（看圖確認）。
+H_LINE = 700            # 封面地平線 y
+H_SUN = (860, 700)      # 封面太陽（半圓，圓心在地平線上）
+
+
+def h_defs():
+    return (f'<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{ABYSS}"/>'
+            f'<stop offset=".55" stop-color="{DEEP}"/><stop offset="1" stop-color="{TEAL}"/></linearGradient>'
+            f'<linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{TEAL}"/>'
+            f'<stop offset=".45" stop-color="{DEEP}"/><stop offset="1" stop-color="{ABYSS}"/></linearGradient></defs>')
+
+
+def h_sun(cx, cy, r, color=GOLD, glow=True):
+    """半個太陽：圓心在地平線 (cy) 上，只畫地平線以上的一半。"""
+    cid = f"above{int(cx)}_{int(cy)}"
+    s = f'<clipPath id="{cid}"><rect x="0" y="0" width="{WD}" height="{cy}"/></clipPath>'
+    if glow:
+        s += f'<circle class="bg" cx="{cx}" cy="{cy}" r="{r * 1.6:.0f}" fill="{color}" fill-opacity=".2" clip-path="url(#{cid})"/>'
+    return s + f'<circle class="bg" cx="{cx}" cy="{cy}" r="{r}" fill="{color}" clip-path="url(#{cid})"/>'
+
+
+def h_cover():
+    return (h_defs() + f'<rect class="bg" x="0" y="0" width="{WD}" height="{H_LINE}" fill="url(#sky)"/>'
+            + h_sun(*H_SUN, 96)
+            + f'<line class="bg" x1="0" y1="{H_LINE}" x2="{WD}" y2="{H_LINE}" stroke="{LIGHT}" stroke-width="3"/>')
+
+
+def h_strip(idx, n):
+    """內頁頂端的深海細帶：一排小點 = 這則的張數，金色太陽是現在這一張（越後面越靠右，離地平線上的目標越近）。"""
+    s = f'<rect class="bg" x="0" y="0" width="{WD}" height="64" fill="{DEEP}"/>'
+    gap = min(48.0, 920.0 / max(n - 1, 1))
+    x0 = 80
+    for k in range(1, n + 1):
+        x = x0 + (k - 1) * gap
+        if k == idx:
+            s += f'<circle class="bg" cx="{x}" cy="32" r="26" fill="{GOLD}" fill-opacity=".25"/><circle class="bg" cx="{x}" cy="32" r="13" fill="{GOLD}"/>'
+        elif k < idx:
+            s += f'<circle class="bg" cx="{x}" cy="32" r="6" fill="{CREAM}"/>'
+        else:
+            s += f'<circle class="bg" cx="{x}" cy="32" r="6" fill="none" stroke="{LIGHT}" stroke-width="3"/>'
+    return s
+
+
+def h_band(idx, n, y=1090):
+    """文字張底部的一條地平線：深海帶，半個淡太陽，位置隨張數由左往右。"""
+    cx = 160 + 760 * (idx - 1) / max(n - 1, 1)
+    return (h_defs() + f'<rect class="bg" x="0" y="{y}" width="{WD}" height="{HT - y}" fill="url(#dusk)"/>'
+            + h_sun(round(cx), y, 70, color=LIGHT, glow=False)
+            + f'<line class="bg" x1="0" y1="{y}" x2="{WD}" y2="{y}" stroke="{LIGHT}" stroke-width="3"/>')
+
+
+def h_takeaway():
+    return (h_defs() + f'<rect class="bg" x="0" y="1090" width="{WD}" height="{HT - 1090}" fill="{ABYSS}"/>'
+            + h_sun(*H_SUN[:1], 1090, 96)
+            + f'<line class="bg" x1="0" y1="1090" x2="{WD}" y2="1090" stroke="{LIGHT}" stroke-width="3"/>')
+
+
 # ---------------------------------------------------------------- 各版型
 def build(spec: dict, series: dict, tag: str) -> dict:
     """回傳 {layout, html_body, ...}。HTML 片段以模板檔填入。"""
     lay = spec["layout"]
-    tdir = template_dir(series["id"])
+    tdir = series["_tdir"]
     tpl = (tdir / f"{lay}.html").read_text(encoding="utf-8")
     sc = SERIES_COLORS.get(series.get("color"), MID)
     contour = series.get("style") == "contour"
     cards = series.get("style") == "cards"
+    horizon = series.get("style") == "horizon"
     idx, n_sl = spec.get("_idx", 1), spec.get("_n", 1)          # 第幾張／共幾張（render_all 填入）
     mi, mn = spec.get("_mi", 0), spec.get("_mn", 1)            # 這則是系列的第幾則／共幾則
-    kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", ""))), "FAM": "", "BODY_STYLE": ""}
+    kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", ""))), "FAM": "", "BODY_STYLE": "", "FOOT_CLS": ""}
     split = cards and (lay in ("cover", "text", "takeaway") or (lay == "context" and not spec.get("rows")))   # 直切版面（文字版型）
     if cards:
         kw["FAM"] = "split" if split else "rail"
+    if horizon:
+        kw["FAM"] = "horizon"
 
     if lay in ("text", "table", "chart_bars", "chart_sounding", "diagram"):   # 小標籤（例如「我的判斷」）：右上角
         kw["LABEL"] = f'<div class="t abs chip">{esc(spec["label"])}</div>' if spec.get("label") else ""
@@ -326,6 +412,10 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     elif lay == "cover" and cards:     # 米色底；左邊文字欄，右邊直欄（文件在上、四張投影片由上疊到下）；金框每一則換一張
         kw["SVG"] = svg_wrap(stagger(mi % 4, doc=True))
         kw["SUB_TOP"] = 560
+        kw["BODY"] = kw["BODY"].replace("\n", "<br>")
+    elif lay == "cover" and horizon:   # 上半深海、下半米色，地平線上升起半個金色太陽；副標固定在地平線下面
+        kw["SVG"] = svg_wrap(h_cover())
+        kw["SUB_TOP"] = H_LINE + 70
         kw["BODY"] = kw["BODY"].replace("\n", "<br>")
     elif lay == "cover":
         kw["SVG"] = svg_wrap(waves(1000, sc))
@@ -342,7 +432,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             parts, cells, _ = table_block(spec["rows"], y0_ + shift, spec.get("key_w", 300))
             kw["SVG"], kw["CELLS"] = svg_wrap(parts), cells
         else:
-            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else ""), ""
+            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else "")), ""
+            if horizon:
+                kw["FOOT_CLS"] = "light"
     elif lay == "text" and contour:
         k = 3 + round(3 * idx / max(n_sl, 1))                   # 同一則裡越後面的一張，路徑走得越遠
         # 最外圈的頂端要低於補充文字（最多 5 行，約到 y=690）：半徑上限 295 → 頂端約 y=795
@@ -350,6 +442,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
                              + step_path([(x - 150, y + 110) for (x, y) in COVER_PATH[:k]], TEAL))
     elif lay == "text" and cards:      # 下方一排四張小投影片；金框每一張換到下一張
         kw["SVG"] = svg_wrap(stagger((idx - 1) % 4))
+    elif lay == "text" and horizon:    # 底部一條地平線，半個淡太陽隨張數由左往右
+        kw["SVG"] = svg_wrap(h_band(idx, n_sl))
+        kw["FOOT_CLS"] = "light"
     elif lay == "text":
         kw["SVG"] = svg_wrap(
             waves(760, sc)
@@ -473,6 +568,14 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["LEGEND"] = f'刻度每格 {unit_ticks:g} {esc(spec.get("unit", ""))}'
         kw["NOTE"] = esc(spec.get("note", ""))
         spec["_S"], spec["_unit_ticks"] = S, unit_ticks
+    elif lay == "takeaway" and horizon:
+        kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
+        q = spec.get("question")
+        kw["QUESTION"] = f'<div class="t abs take-q" style="top:240px">{esc(q)}</div>' if q else ""
+        kw["TAKE_STYLE"] = f"top:{240 + est_lines(q, 920 / 56 - 0.4) * 73 + 36}px" if q else "top:300px"
+        lab = spec.get("label")
+        kw["LABEL"] = f'<div class="t abs take-label" style="top:190px">{esc(lab)}</div>' if lab else ""
+        kw["SVG"] = svg_wrap(h_takeaway())
     elif lay == "takeaway" and (contour or cards):
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
         q = spec.get("question")
@@ -494,6 +597,16 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             " ".join(f"{x},{y + 7 * math.sin(2 * math.pi * x / wl + ph):.1f}" for x in range(0, WD + 1, 10)) + '"/>'
             for y, wl, ph in ((1090, 520, 0.0), (1130, 470, 1.4), (1170, 560, 2.6)))
         kw["SVG"] = svg_wrap(lines)
+    elif lay == "series_map" and series.get("standalone"):    # 獨立貼文的「延伸閱讀」：列出已發布的相關貼文（spec 的 items 是觀念 id）
+        y, svg, out = 330, "", ""
+        for cid in spec["items"]:
+            svg += f'<rect class="bg" x="72" y="{y - 10}" width="936" height="84" rx="6" fill="{DEEP}"/>'
+            svg += f'<circle class="g mark" cx="100" cy="{y + 32}" r="9" fill="{LIGHT}"/>'
+            out += f'<div class="t abs item cur" style="left:132px;top:{y + 8}px">{esc(planned_title_of(cid))}</div>'
+            y += 112
+        svg += h_band(idx, n_sl, y=1020)
+        kw["SVG"] = svg_wrap(svg)
+        kw["ITEMS"], kw["NAV"], kw["FOOT_CLS"] = out, esc(spec.get("nav", "")), "light"
     elif lay == "series_map":
         items = [m["planned_title"] for m in series["members"]]
         cur = [m["concept"] for m in series["members"]].index(spec["current"])
@@ -554,6 +667,8 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     else:
         raise ValueError(f"未知版型 {lay}")
 
+    if horizon and lay not in ("cover", "takeaway"):
+        kw["SVG"] = kw["SVG"].replace("</svg>", h_strip(idx, n_sl) + "</svg>", 1) if kw.get("SVG") else svg_wrap(h_strip(idx, n_sl))
     if (contour or cards) and lay not in ("cover", "takeaway"):
         dots = progress_dots(idx, n_sl, panel=split)
         if cards and not split:      # 圖表類版型：右緣的索引欄（金框 = 這一張對應的版本；系列地圖用這一則）
@@ -702,17 +817,16 @@ def program_b(spec: dict, m: dict, img: Image.Image, series_name: str, tag_texts
 def render_all(spec_path: Path, only: set[int] | None = None, force: bool = False) -> int:
     doc = json.loads(spec_path.read_text(encoding="utf-8"))
     W.guard_published(doc, force)
-    series = load_series(doc["series"])
-    series["id"] = series.get("id", doc["series"])
+    series = load_visual(doc)
     tag = series["name"]
     pack, bld = W.pack_dir(spec_path), W.build_dir(spec_path)
     outdir = pack / "ig"
     htmldir = bld / "html"
     outdir.mkdir(parents=True, exist_ok=True); htmldir.mkdir(parents=True, exist_ok=True)
-    css = (template_dir(series["id"]) / "style.css").read_text(encoding="utf-8")
+    css = (series["_tdir"] / "style.css").read_text(encoding="utf-8")
     css = css.replace("{{FONT_REGULAR}}", (ROOT / "assets/fonts/NotoSansCJKtc-Regular.otf").as_uri())
     css = css.replace("{{FONT_BOLD}}", (ROOT / "assets/fonts/NotoSansCJKtc-Bold.otf").as_uri())
-    thash = template_hash(series["id"])
+    thash = template_hash(series["_tdir"])
     report, alts, failed = [], {}, 0
     with sync_playwright() as p:
         b = p.chromium.launch()
@@ -733,7 +847,7 @@ def render_all(spec_path: Path, only: set[int] | None = None, force: bool = Fals
             pg.goto(hp.as_uri())
             pg.evaluate("document.fonts.ready")
             pg.wait_for_timeout(200)
-            if sl["layout"] == "cover" or built.get("dyn"):    # 封面與直切版面：補充文字接在標題下面
+            if (sl["layout"] == "cover" and not series.get("standalone")) or built.get("dyn"):    # 封面與直切版面：補充文字接在標題下面（獨立貼文的封面副標固定在地平線下）
                 pg.evaluate("() => {const t=document.getElementById('title'), s=document.getElementById('body'); "
                             "if(s) s.style.top=(t.getBoundingClientRect().bottom+36)+'px'}")
             m = pg.evaluate(MEASURE_JS)
@@ -751,7 +865,8 @@ def render_all(spec_path: Path, only: set[int] | None = None, force: bool = Fals
             report.append({"slide": i, "layout": sl["layout"], "checks": [{"name": n, "ok": ok, "detail": d} for n, ok, d in res]})
             body = plain(sl.get("body", ""))
             if sl["layout"] == "series_map":
-                alts[f"{i:02d}.png"] = plain(sl["title"]) + "。" + "、".join(m_["planned_title"] for m_ in series["members"])
+                names = [planned_title_of(c_) for c_ in sl["items"]] if series.get("standalone") else [m_["planned_title"] for m_ in series["members"]]
+                alts[f"{i:02d}.png"] = plain(sl["title"]) + "。" + "、".join(names)
             else:
                 alts[f"{i:02d}.png"] = ((sl["question"] + "　" if sl.get("question") else "") + plain(sl.get("title", "")) + ("。" + body if body else "")
                                         + ("。圖上寫：" + "、".join(D.texts(sl)) if sl["layout"] == "diagram" else ""))

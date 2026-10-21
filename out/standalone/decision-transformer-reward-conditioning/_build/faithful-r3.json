@@ -1,0 +1,32 @@
+{
+"post":"decision-transformer-reward-conditioning",
+"blocks":[
+{"block":"第 2 張","atoms":[
+{"text":"bootstrapping｜拿自己目前的估計，去修正自己的估計，像用還沒核對的答案批改自己","verdict":"完全支持","card_quote":"bootstrapping：用自己目前的估計值去更新自己的估計，是傳統 RL 訓練不穩定的來源之一。","note":"比喻只翻譯「用自己的估計更新自己的估計」，沒加新因果，屬授權例外 (3)。"}
+],"errors":[]},
+{"block":"第 3 張","atoms":[
+{"text":"不估計價值函數｜不先估算未來總分","verdict":"完全支持","card_quote":"完全不估計價值函數、不做 bootstrapping。","note":"白話對應名詞補充中價值函數「未來預期能拿到多少總報酬」，意思未變。"},
+{"text":"不做 bootstrapping｜它是訓練不穩定的來源之一","verdict":"完全支持","card_quote":"bootstrapping：用自己目前的估計值去更新自己的估計，是傳統 RL 訓練不穩定的來源之一。","note":"意思相符；「它」指 bootstrapping，未宣稱 Decision Transformer 因此更穩定，屬授權例外 (3)。"},
+{"text":"傳統 RL｜訓練不穩定／Q-learning、policy gradient 這類方法／需要精細調參／常常得跟環境 online 互動","verdict":"完全支持","card_quote":"Q-learning、policy gradient 這類方法訓練不穩定、需要精細調參、而且常常得跟環境 online 互動。","note":"逐項對上。"},
+{"text":"Decision Transformer｜改成序列預測｜用 GPT 式的監督學習訓練","verdict":"完全支持","card_quote":"把 RL 問題重新包裝成序列預測問題，用 GPT 式的監督學習訓練","note":"對上 c1。"}
+],"errors":[]},
+{"block":"第 4 張","atoms":[
+{"text":"一條軌跡（trajectory）由一連串的 (state, action, reward) 組成；訓練前先把 reward 換成 return-to-go","verdict":"完全支持","card_quote":"一條軌跡（trajectory）由一連串的 (state, action, reward) 組成。／訓練前先把 reward 轉成 return-to-go","note":"對上 c4、c5。"},
+{"text":"return-to-go：從這步到終點，還能拿（10、8、5 分）","verdict":"完全支持","card_quote":"return-to-go：從現在這一步到終點，總共還會拿到多少分。","note":"例子中 return-to-go 含當前這一步，與卡定義一致；數字重算自洽（見 recalculations）。"},
+{"text":"圖註：假設的例子：老鼠走迷宮，路上撿飼料、終點吃起司（+2、+3、+5 分）","verdict":"完全支持","card_quote":"（部落格舉例）訓練前先把 reward 轉成 return-to-go：從現在這一步到終點，總共還會拿到多少分。","note":"已標明為假設的例子，數字是設定而非卡上主張，未被畫成事實。"}
+],"errors":[]},
+{"block":"第 8 張","atoms":[
+{"text":"PPO 框內加網址 arxiv.org/abs/1707.06347；DPO 框內加網址 arxiv.org/abs/2305.18290","verdict":"完全支持","card_quote":"今天的 … 生態主流仍然是 PPO（InstructGPT 那條線）或後來的 …。","note":"網址是人要求放的，非卡的主張，依授權例外 (2) 不判錯；框內其他文字未被改動，PPO／DPO 的定位與卡一致。"},
+{"text":"DPO｜後來出現，不用強化學習","verdict":"完全支持","card_quote":"DPO：一種不需要另外訓練 reward model、也不用強化學習，直接用偏好資料微調語言模型的對齊方法。／後來的 DPO","note":"「後來」在 c10，「不用強化學習」在名詞補充。"}
+],"errors":[]},
+{"block":"第 9 張","atoms":[
+{"text":"這一步怎麼選，會影響下一步能拿到多少分","verdict":"完全支持","card_quote":"Decision Transformer 真正的威力在於處理多步驟、有前後因果關係的序列決策：這一步怎麼選，會影響下一步能拿到多少分。","note":"部落格判斷，直接以作者口吻寫，與卡同強度。"},
+{"text":"第一個路口往右：這步 2 分、下一步 3 分、走到起司共 10 分；往左：這步 4 分、下一步死路 0 分、走不到起司共 4 分","verdict":"完全支持","card_quote":"這一步怎麼選，會影響下一步能拿到多少分。","note":"例子顯示往右下一步 3 分、往左下一步 0 分，與卡說法一致；已標假設的例子；共 10 與 4 自洽（右路含第 4 張第三步 +5）。"}
+],"errors":[]}
+],
+"recalculations":[
+{"block":"第 4 張","expression":"return-to-go 第一步 = 2+3+5；第二步 = 3+5；第三步 = 5","result":"10、8、5，與圖上 10、8、5 完全相符"},
+{"block":"第 9 張","expression":"往右 = 2+3+5（第三步 +5 來自第 4 張）；往左 = 4+0","result":"10 與 4，與圖上相符；右路與第 4 張第一步 return-to-go 10 一致"}
+],
+"gaps":["第 9 張圖上只列 2 與 3 分卻寫共 10 分，缺的 5 分要靠上一張第三步 +5 才算得出（圖註有寫「同上一個例子」），自洽但單看這張加不起來，僅提醒、不判錯。"]
+}

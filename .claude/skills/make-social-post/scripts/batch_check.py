@@ -29,16 +29,28 @@ def load_series(sid: str) -> dict:
     return yaml.safe_load(re.match(r"^---\n(.*?)\n---", t, re.S).group(1))
 
 
+def sid_of(d: dict) -> str:
+    """系列 id；獨立貼文（沒有系列）用 standalone:<觀念 id>，視覺在 standalone/<觀念>/。"""
+    return d.get("series") or f"standalone:{d['concept']}"
+
+
+def load_visual(d: dict) -> dict:
+    if d.get("series"):
+        return load_series(d["series"])
+    t = (W.standalone_dir(d["concept"]) / "standalone.md").read_text(encoding="utf-8")
+    return {**yaml.safe_load(re.match(r"^---\n(.*?)\n---", t, re.S).group(1)), "members": []}
+
+
 def main(specs: list[str]) -> int:
     docs = [(Path(p), json.loads(Path(p).read_text(encoding="utf-8"))) for p in specs]
     err, warn = [], []
-    series = {d["series"]: load_series(d["series"]) for _, d in docs}
+    series = {sid_of(d): load_visual(d) for _, d in docs}
 
     for (pa, a), (pb, b) in zip(docs, docs[1:]):
         if a["hook"]["style"] == b["hook"]["style"]:
             err.append(f"相鄰兩則 hook 樣態相同（{a['hook']['style']}）：{a['concept']} → {b['concept']}")
-        if a["series"] != b["series"] and series[a["series"]]["color"] == series[b["series"]]["color"]:
-            err.append(f"相鄰系列封面色相同（{series[a['series']]['color']}）：{a['series']} → {b['series']}")
+        if sid_of(a) != sid_of(b) and series[sid_of(a)]["color"] == series[sid_of(b)]["color"]:
+            err.append(f"相鄰系列封面色相同（{series[sid_of(a)]['color']}）：{sid_of(a)} → {sid_of(b)}")
 
     by_series: dict[str, set] = {}
     for pa, a in docs:
@@ -48,13 +60,13 @@ def main(specs: list[str]) -> int:
         if not cb.exists():
             err.append(f"{a['concept']}：沒有 checks-b.json（還沒渲染或程式 B 沒跑）")
             continue
-        by_series.setdefault(a["series"], set()).add(json.loads(cb.read_text(encoding="utf-8"))["template_hash"])
+        by_series.setdefault(sid_of(a), set()).add(json.loads(cb.read_text(encoding="utf-8"))["template_hash"])
     for sid, hashes in by_series.items():
         if len(hashes) > 1:
             err.append(f"系列 {sid} 的貼文用了不同版模板：{sorted(hashes)}")
 
     for pa, a in docs:
-        titles = {m["planned_title"] for m in series[a["series"]]["members"]}
+        titles = {m["planned_title"] for m in series[sid_of(a)]["members"]}
         for line in a["threads"]["last"]["text"].splitlines():
             if line.startswith("同系列："):
                 t = re.sub(r"（尚未發布）$|（.*?）$", "", line[len("同系列："):]).strip()

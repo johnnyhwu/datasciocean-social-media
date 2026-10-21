@@ -1,0 +1,173 @@
+{
+  "post": "decision-transformer-reward-conditioning",
+  "blocks": [
+    {
+      "block": "第 2 張（只審「先認識三個會用到的詞」）",
+      "atoms": [
+        {
+          "text": "強化學習｜讓 AI 一步步做決定，靠拿到的分數學習，簡稱 RL。",
+          "verdict": "部分支持",
+          "card_quote": "把強化學習（RL）問題重新包裝成序列預測問題",
+          "note": "「強化學習（RL）」簡稱有卡上支持；「一步步做決定、靠拿到的分數學習」的白話定義不在卡的名詞補充清單內，只能視為通用知識釋義，未改變卡意也未加數字。"
+        },
+        {
+          "text": "價值函數｜估計「某個狀態下，未來預期能拿到多少總分」。",
+          "verdict": "完全支持",
+          "card_quote": "**價值函數（value function）**：估計「在某個狀態下，未來預期能拿到多少總報酬」的函數",
+          "note": "與名詞補充一致，僅「總報酬」白話為「總分」。"
+        },
+        {
+          "text": "bootstrapping｜用自己目前的估計值，修正自己的估計。",
+          "verdict": "完全支持",
+          "card_quote": "**bootstrapping**：用自己目前的估計值去更新自己的估計",
+          "note": "與名詞補充一致，「更新」換成「修正」語意相同。"
+        }
+      ],
+      "errors": [
+        {
+          "type": "其他",
+          "where": "強化學習 一列",
+          "note": "名詞補充清單沒有列出「強化學習」本身，該釋義無卡上逐字依據，屬通用知識；是否放行由人決定。"
+        }
+      ]
+    },
+    {
+      "block": "第 5 張（合併：交錯排列輸入＋蓋住 action）",
+      "atoms": [
+        {
+          "text": "模型的輸入是交錯排列的三元組序列：return-to-go、state、action，一組接一組。",
+          "verdict": "完全支持",
+          "card_quote": "模型的輸入是交錯排列的三元組序列： / return-to-go, state, action, return-to-go, state, action",
+          "note": "「一組接一組」對應重複排列。"
+        },
+        {
+          "text": "訓練時蓋住 action，讓模型根據前面的 return-to-go 和 state，預測該輸出什麼 action。",
+          "verdict": "完全支持",
+          "card_quote": "訓練時蓋住 action，讓模型根據前面的 (return-to-go, state) 預測該輸出什麼 action。",
+          "note": "逐字對應。"
+        },
+        {
+          "text": "圖：return-to-go＝還想拿多少分",
+          "verdict": "完全支持",
+          "card_quote": "return-to-go（還想拿多少分） | reward model 打出的分數",
+          "note": "卡上括號即此說法；c5 另有「還會拿到多少分」。"
+        },
+        {
+          "text": "圖：state＝現在在哪；action＝做什麼動作",
+          "verdict": "部分支持",
+          "card_quote": "state（目前在哪） | prompt（論文內容加上 persona 條件） ／ action（要往哪走） | 要生成的大綱",
+          "note": "state「目前在哪」有卡上依據；action 卡上寫「要往哪走」，圖寫「做什麼動作」為白話改寫，未加新事實；這兩個釋義在貼文中引用標記為 c6、c7，未標 c13。"
+        },
+        {
+          "text": "圖：第一步／第二步重複排列；第二步 action「被蓋住，模型來猜」",
+          "verdict": "完全支持",
+          "card_quote": "return-to-go, state, action, return-to-go, state, action ／ 訓練時蓋住 action，讓模型根據前面的 (return-to-go, state) 預測該輸出什麼 action。",
+          "note": "分成兩步呈現是對「重複排下去」的圖示。"
+        },
+        {
+          "text": "舉例來說，模型學到的大致是：想拿到某個分數、又在位置 A，就往右走",
+          "verdict": "完全支持",
+          "card_quote": "學到的映射大致是「我還想拿到 10 分，而我現在在位置 A → 往右走」。",
+          "note": "有「舉例來說」標明為例子，且把 10 分泛化為「某個分數」，未加新數字。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 6 張（使用時）",
+      "atoms": [
+        {
+          "text": "推論時（實際使用的時候），使用者先許願，設定一個目標 return（想拿到的分數）；",
+          "verdict": "完全支持",
+          "card_quote": "推論時使用者先許願：設定一個目標 return（例如「我想拿 10 分」）",
+          "note": "「想拿到的分數」是例子「我想拿 10 分」的白話；「實際使用的時候」為對推論時的白話，與 c1「使用時」一致。"
+        },
+        {
+          "text": "模型根據這個目標加上目前的 state，吐出動作。",
+          "verdict": "完全支持",
+          "card_quote": "模型根據這個目標加上目前 state 吐出動作",
+          "note": "逐字對應。"
+        },
+        {
+          "text": "圖：設定目標分數，當作一開始的 return-to-go",
+          "verdict": "部分支持",
+          "card_quote": "設定一個目標 return（例如「我想拿 10 分」），模型根據這個目標加上目前 state 吐出動作；每走一步，剩餘的 return-to-go 就按實際拿到的分數遞減，重複到走完。",
+          "note": "卡上沒有逐字寫「目標 return 就是最初的 return-to-go」；但「剩餘的 return-to-go 按實際拿到的分數遞減」預設它從目標值起算，且 c1 說使用時先設定想要的分數、c13 把 return-to-go 解為「還想拿多少分」。屬機制上的推論式白話，未加新數字、原因或範圍；嚴格逐字則不是卡上明說的句子。"
+        },
+        {
+          "text": "圖：走一步｜return-to-go 按實際拿到的分數遞減｜重複，直到走完",
+          "verdict": "完全支持",
+          "card_quote": "每走一步，剩餘的 return-to-go 就按實際拿到的分數遞減，重複到走完。",
+          "note": "逐字對應。"
+        },
+        {
+          "text": "圖：你先許願｜模型看「目標加上目前的 state」｜吐出下一個動作",
+          "verdict": "完全支持",
+          "card_quote": "使用者先許願 … 模型根據這個目標加上目前 state 吐出動作",
+          "note": "「下一個」動作為流程呈現的白話，未加新事實。"
+        }
+      ],
+      "errors": [
+        {
+          "type": "措辭與卡不同",
+          "where": "圖：設定目標分數，當作一開始的 return-to-go",
+          "note": "「當作一開始的 return-to-go」是卡上隱含但未明說的連結；判斷為輕微，不屬新數字／新原因／新範圍，是否放行由人決定。"
+        }
+      ]
+    },
+    {
+      "block": "第 7 張（標題改「在研究圈內，它很有影響力」）",
+      "atoms": [
+        {
+          "text": "主標：在研究圈內，它很有影響力",
+          "verdict": "部分支持",
+          "card_quote": "在研究圈內確實有影響力",
+          "note": "卡上是「確實有影響力」，主標加了程度副詞「很」，比卡強一點。"
+        },
+        {
+          "text": "同期有 Trajectory Transformer 提出類似想法，後續有 Online Decision Transformer，也被延伸到這些領域：推薦系統、機器人、embodied AI、網頁導航 agent",
+          "verdict": "完全支持",
+          "card_quote": "同期有 Trajectory Transformer（Janner et al., 2021）提出類似想法，後續有 Online Decision Transformer，也被延伸到推薦系統、機器人、embodied AI、網頁導航 agent 等領域。",
+          "note": "內文與四個領域逐一對應；省略「等」不改意思。"
+        }
+      ],
+      "errors": [
+        {
+          "type": "封面比內文說得滿",
+          "where": "主標「很有影響力」",
+          "note": "卡上為「確實有影響力」，無「很」的程度；輕微放大，內文與例子本身未放大。"
+        }
+      ]
+    },
+    {
+      "block": "Threads 正文（第二段）",
+      "atoms": [
+        {
+          "text": "它想解決傳統強化學習的老毛病：訓練不穩定、需要精細調參，",
+          "verdict": "完全支持",
+          "card_quote": "它想解決的是傳統 RL 的老毛病：Q-learning、policy gradient 這類方法訓練不穩定、需要精細調參、而且常常得跟環境 online 互動。",
+          "note": "卡上老毛病的主詞是「傳統 RL」，冒號後的方法舉例省略不改變主詞。"
+        },
+        {
+          "text": "而且常常得跟環境互動。",
+          "verdict": "部分支持",
+          "card_quote": "而且常常得跟環境 online 互動",
+          "note": "省略了「online」；「互動」涵蓋範圍比「online 互動」廣，限定詞掉了，但沒有加入新事實，也未讓主張變得更強於卡的毛病敘述。"
+        }
+      ],
+      "errors": [
+        {
+          "type": "限定條件掉了",
+          "where": "Threads 第二段「常常得跟環境互動」",
+          "note": "卡上為「online 互動」，貼文刪去 online；輕微，是否放行由人決定。IG 第 3 張仍寫「online 互動」且圖上有說明，兩者對照有落差。"
+        }
+      ]
+    }
+  ],
+  "recalculations": [],
+  "gaps": [
+    "第 2 張「強化學習」白話定義不在卡的名詞補充清單，只能算通用知識。",
+    "第 6 張「當作一開始的 return-to-go」：卡以「剩餘的 return-to-go 遞減」隱含起點為目標值，並未逐字寫出等同；屬推論式白話而非新事實，由人決定是否放行。",
+    "第 5 張 state／action 的白話釋義依據在 c13，但貼文只標 c6、c7。"
+  ]
+}

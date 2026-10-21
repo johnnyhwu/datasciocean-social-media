@@ -1,0 +1,23 @@
+concept: decision-transformer-reward-conditioning
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: decision-transformer-reward-conditioning:ig_carousel
+  format: ig_carousel
+  series_id: null
+  url: https://www.instagram.com/p/DevHQBlk2nG/
+  published_at: 2026-10-21T00:25:24+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []
+- post_id: decision-transformer-reward-conditioning:threads_thread
+  format: threads_thread
+  series_id: null
+  url: https://www.threads.com/@datasciocean/post/DevHi6skzg5
+  published_at: 2026-10-21T00:27:22+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []

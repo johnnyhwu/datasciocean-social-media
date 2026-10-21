@@ -63,7 +63,10 @@ def main(spec_path: str) -> int:
     doc = json.loads(sp.read_text(encoding="utf-8"))
     card = W.parse_card(W.WIKI / "wiki" / "concepts" / f"{doc['concept']}.md")
     claims = W.spec_claims(doc)   # 主卡裸 id；併入的卡「卡id:cN」
-    series = yaml.safe_load(re.match(r"^---\n(.*?)\n---", W.series_file(doc["series"]).read_text(encoding="utf-8"), re.S).group(1))
+    if doc.get("series"):
+        series = yaml.safe_load(re.match(r"^---\n(.*?)\n---", W.series_file(doc["series"]).read_text(encoding="utf-8"), re.S).group(1))
+    else:      # 獨立貼文：沒有系列、沒有系列標籤；視覺在 standalone/<觀念>/（render.py 的 load_visual）
+        series = {"members": [], "standalone": True}
     err, hint = [], []
     terms = (yaml.safe_load((W.ROOT / "config" / "terms.yaml").read_text(encoding="utf-8")) or {}).get("replace", {})
 
@@ -126,7 +129,7 @@ def main(spec_path: str) -> int:
                         err.append(f"{name}: 圖上名稱 {tok!r} 沒有被引用的主張涵蓋")
         if sl and sl["layout"] == "diagram":
             for tok in re.findall(r"[A-Za-z][A-Za-z0-9.\-]*", " ".join(D.texts(sl))):
-                if tok.lower() not in ref_text.lower() and tok not in P.get("latin_allow", []):
+                if tok.lower() not in ref_text.lower() and tok not in P.get("latin_allow", []) and tok not in (doc.get("latin_allow") or []):   # doc.latin_allow：人決定放在圖上、但卡上沒有的拉丁字詞（例如論文網址），整則貼文有效
                     err.append(f"{name}: 圖上名稱 {tok!r} 沒有被引用的主張涵蓋")
         # 9. 比較詞與全稱詞
         for w in P["comparative_words"]:
@@ -219,14 +222,33 @@ def main(spec_path: str) -> int:
         err.append(f"caption 第一句 {len(cap['first'])} 字，超過 {P['caption_first_sentence_max_chars']}")
     if len(cap["hashtags"]) > P["hashtags_max"]:
         err.append(f"hashtag {len(cap['hashtags'])} 個，超過 {P['hashtags_max']}")
-    if series["hashtag"] not in cap["hashtags"]:
+    if not series.get("standalone") and series["hashtag"] not in cap["hashtags"]:
         err.append(f"系列貼文必須含系列標籤 #{series['hashtag']}")
     if "podcast" in json.dumps(doc, ensure_ascii=False).lower():
         err.append("貼文內容出現 podcast")
     # 系列標籤與標題一致（由渲染引擎從 wiki 填入；這裡確認 series_map 的 current 存在）
     cur = [s.get("current") for s in doc["slides"] if s["layout"] == "series_map"]
-    if cur and cur[0] not in [m["concept"] for m in series["members"]]:
+    if cur and not series.get("standalone") and cur[0] not in [m["concept"] for m in series["members"]]:
         err.append(f"系列地圖 current={cur[0]} 不在系列成員內")
+    # 獨立貼文的延伸閱讀：每個觀念都要是某個系列的成員（標題才找得到），而且已發布（不列還沒發的貼文）
+    if series.get("standalone"):
+        known = {}
+        for sid in W.series_ids():
+            t = yaml.safe_load(re.match(r"^---\n(.*?)\n---", W.series_file(sid).read_text(encoding="utf-8"), re.S).group(1))
+            for m in t.get("members", []):
+                known[m["concept"]] = m["planned_title"]
+        for sl in doc["slides"]:
+            if sl["layout"] != "series_map":
+                continue
+            if not sl.get("items"):
+                err.append("獨立貼文的延伸閱讀（series_map）要有 items（已發布的相關貼文的觀念 id）")
+            if sl.get("current"):
+                err.append("獨立貼文的延伸閱讀不用 current（沒有「你正在看這則」）")
+            for cid in sl.get("items", []):
+                if cid not in known:
+                    err.append(f"延伸閱讀 items 的 {cid} 不是任何系列的成員")
+                elif not W.published_formats(cid):
+                    err.append(f"延伸閱讀 items 的 {cid} 還沒發布")
 
     print(f"== 程式 A {doc['concept']}: {'FAIL' if err else 'PASS'}（ERROR {len(err)}，HINT {len(hint)}）")
     for e in err:

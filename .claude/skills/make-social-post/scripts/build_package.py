@@ -32,8 +32,9 @@ CONTENT = {"text", "table", "chart_bars", "chart_sounding", "diagram"}
 # 投影片欄位白名單：文字內容欄位都必須輸出到審查文字與 ig/post.md；版面參數不輸出。遇到不認得的欄位就報錯，
 # 避免「新增欄位、卻漏了輸出」（審查者與人都看不到那段內容）。
 CONTENT_KEYS = {"title", "body", "label", "question", "rows", "bars", "note", "nav", "legend",
-                "nodes", "outcomes", "loop", "columns", "heads", "pairs", "count", "points", "ref", "ranges", "group", "start", "end"}
-LAYOUT_KEYS = {"layout", "refs", "quals", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols"}   # cols：點陣每列幾個點（版面參數，不含文字）
+                "nodes", "outcomes", "loop", "columns", "heads", "pairs", "count", "points", "ref", "ranges", "group", "start", "end",
+                "items", "steps"}
+LAYOUT_KEYS = {"layout", "refs", "quals", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols", "more"}   # cols：點陣每列幾個點（版面參數，不含文字）
 
 
 def check_fields(d: dict) -> None:
@@ -59,8 +60,17 @@ def caption_text(d: dict) -> str:
             fc = first_clause(sl.get("body", ""))
             lead = f"{sl['label']}：" if sl.get("label") and not mark(sl["title"]).startswith(sl["label"]) else ""     # 小標籤放在前面；標題已經以同樣的詞開頭就不重複（「第一關：第一關：」）
             lines.append(f"・{lead}{mark(sl['title'])}" + (f"（{fc}）" if fc else ""))
-    lines += ["", cap["nav"], "", " ".join("#" + h for h in cap["hashtags"])]
+    lines += ([""] + [cap["nav"]] if cap.get("nav") else []) + ["", " ".join("#" + h for h in cap["hashtags"])]   # 導流行可省略（獨立貼文，人決定不導回來源文章）
     return "\n".join(lines)
+
+
+def planned_title_of(concept: str) -> str:
+    """獨立貼文「延伸閱讀」的標題：取自系列檔裡這個觀念的 planned_title（與 render.py 同一規則）。"""
+    for sid in W.series_ids():
+        for m in (load_series(sid) or {}).get("members", []):
+            if m["concept"] == concept or concept in (m.get("also") or []):
+                return m["planned_title"]
+    raise KeyError(f"系列檔裡找不到觀念 {concept}")
 
 
 def slide_lines(sl: dict, with_refs: bool) -> list[str]:
@@ -84,6 +94,8 @@ def slide_lines(sl: dict, with_refs: bool) -> list[str]:
         out.append(f"示意圖（{sl['kind']}）上的文字與數字：" + "｜".join(D.texts(sl)))
     if sl.get("note"):
         out.append(f"圖註：{sl['note']}")
+    for cid in sl.get("items", []):
+        out.append(f"延伸閱讀：{planned_title_of(cid)}")
     if sl.get("nav"):
         out.append(f"導流行：{sl['nav']}")
     if with_refs:
@@ -134,7 +146,7 @@ def ig_md(d: dict, title: str, series_name: str | None, alts: dict) -> str:
                 L.append(f"- **先問的問題**：{sl['question']}")
             L.append(f"- **一句話**：{mark(sl['title'])}")
         elif sl["layout"] == "series_map":
-            L += [f"- **主標**：{mark(sl['title'])}", f"- **導流行**：{sl.get('nav', '')}"]
+            L += [f"- **主標**：{mark(sl['title'])}"] + [f"- **延伸閱讀**：{planned_title_of(c)}" for c in sl.get("items", [])] + [f"- **導流行**：{sl.get('nav', '')}"]
         else:
             if sl.get("label"):
                 L.append(f"- **小標籤**：{sl['label']}")
@@ -268,6 +280,17 @@ def indexes() -> None:
         if any_pack:
             (out / sid / "README.md").write_text("\n".join([f"# {s['name']}", "", "發文順序依下表（概覽先發，被依賴的先發）。發文時間由人決定；經人確認後才發布。", ""] + rows) + "\n", encoding="utf-8")
         top += [f"## {s['name']}（`{sid}`）", ""] + rows + [""]
+    # 獨立貼文（沒有系列）：out/standalone/<觀念 id>/，視覺在 standalone/<觀念 id>/
+    solo = sorted(c.name for c in (out / "standalone").iterdir() if (c / "README.md").exists()) if (out / "standalone").exists() else []
+    if solo:
+        rows = ["| 觀念 | IG | Threads | 打開 |", "|---|---|---|---|"]
+        for c in solo:
+            st = state_of(c)
+            ig, th = (STATUS_ZH.get(st.get(f, "not_tried"), "?") for f in ("ig_carousel", "threads_thread"))
+            rows.append(f"| `{c}` | {ig} | {th} | [README](standalone/{c}/README.md) |")
+            if "ready" in st.values():
+                ready_lines.append(f"- 獨立貼文：[{c}](standalone/{c}/README.md)")
+        top += ["## 獨立貼文（沒有系列）", ""] + rows + [""]
     top[4:4] = ["## 待發布", ""] + (ready_lines or ["（目前沒有）"]) + [""]
     out.mkdir(exist_ok=True)
     (out / "README.md").write_text("\n".join(top) + "\n", encoding="utf-8")

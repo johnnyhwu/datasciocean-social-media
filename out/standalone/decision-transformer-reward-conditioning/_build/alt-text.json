@@ -1,0 +1,11 @@
+{
+  "01.png": "AI 學做決策，能不能先許願要幾分？。Decision Transformer 把強化學習改成序列預測：除了 state，也把「還想拿多少分」當輸入，讓模型預測 action",
+  "02.png": "2021 年，強化學習被改寫成序列預測。Decision Transformer 在 2021 年 6 月掛上 arXiv，卡在 GPT-3 之後、ChatGPT 之前，是「Transformer 能不能解序列決策問題」那波研究風潮的代表作。先認識三個會用到的詞：",
+  "03.png": "它想解決的，是傳統 RL 的老毛病。想解決傳統 RL 的老毛病，Decision Transformer 把 RL 問題重新包裝成序列預測問題，用 GPT 式的監督學習來訓練。。圖上寫：傳統 RL、訓練不穩定、Q-learning、policy gradient 這類方法、需要精細調參、常常得跟環境 online 互動、Decision Transformer、改成序列預測、用 GPT 式的監督學習訓練、不估計價值函數、不先估算未來總分、不做 bootstrapping、它是訓練不穩定的來源之一",
+  "04.png": "reward 要先換成 return-to-go。一條軌跡（trajectory）由一連串的 (state, action, reward) 組成：state 是現在在哪，action 是做了什麼動作，reward 是拿到的分數。訓練前，先把 reward 換成 return-to-go。。圖上寫：第一步、+2 分、這一步拿到、10 分、從這步到終點，還能拿、第二步、+3 分、這一步拿到、8 分、從這步到終點，還能拿、第三步、+5 分、這一步拿到、5 分、從這步到終點，還能拿",
+  "05.png": "輸入交錯排列，訓練時蓋住 action。模型的輸入是交錯排列的三元組序列：return-to-go、state、action，一組接一組。訓練時蓋住 action，讓模型根據前面的 return-to-go 和 state，預測該輸出什麼 action。。圖上寫：第一步、return-to-go、還想拿多少分、state、現在在哪、action、做什麼動作、第二步、return-to-go、還想拿多少分、state、現在在哪、action、被蓋住，模型來猜、舉例來說，模型學到的大致是：想拿到某個分數、又在位置 A，就往右走",
+  "06.png": "使用時，你先許願，模型再一步步走。推論時（實際使用的時候），使用者先許願，設定一個目標 return（想拿到的分數）；模型根據這個目標加上目前的 state，吐出動作。。圖上寫：你先許願、設定一個目標 return，也就是想拿到的分數、模型看「目標加上目前的 state」、吐出下一個動作、走一步、return-to-go 按實際拿到的分數遞減、重複，直到走完",
+  "07.png": "在研究圈內，它有影響力。同期有 Trajectory Transformer 提出類似想法，後續有 Online Decision Transformer，也被延伸到這些領域：。圖上寫：推薦系統、機器人、embodied AI、網頁導航 agent",
+  "08.png": "但它沒成為 LLM 對齊的主流。LLM 對齊，是讓語言模型的回答貼近人類偏好。今天的主流，仍是 PPO 或後來的 DPO。。圖上寫：LLM 對齊的主流、PPO、用強化學習微調，InstructGPT 那條線\narxiv.org/abs/1707.06347、DPO、後來出現，不用強化學習\narxiv.org/abs/2305.18290、Decision Transformer、offline RL 與機器人控制、這個子領域，持續發揮影響力、不是家喻戶曉、的產品級技術",
+  "09.png": "所以，Decision Transformer 在做什麼？　訓練時，學走法跟\n分數的關聯；\n使用時，先許願，\n模型回推怎麼走"
+}

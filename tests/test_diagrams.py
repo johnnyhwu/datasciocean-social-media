@@ -84,5 +84,16 @@ expect("故意做壞：四格圖的字太多放不下 → 報錯", code != 0 and
 code, out = render(D("locked", heads=["很長的來源" * 10, "乙"], nodes=[{"text": "文件" * 30}, {"text": "很長的區塊說明" * 30}]))
 expect("故意做壞：受保護區塊圖的字太多放不下 → 報錯", code != 0 and "放不下" in out, out)
 
+T3 = [{"text": "return-to-go", "sub": "還想拿多少分", "tone": "rtg"}, {"text": "state", "sub": "目前在哪", "tone": "state"}, {"text": "action", "sub": "往哪走", "tone": "action"}]
+code, out = render(D("tokens", steps=[{"label": "第一步", "cells": T3}, {"label": "第二步", "cells": T3}, {"label": "第三步", "cells": T3}], more=True))
+expect("正確的符號序列圖（三步加省略點）通過程式 B", code == 0, out)
+code, out = render(D("tokens", steps=[{"label": "第一步", "cells": T3}, {"label": "第二步", "cells": T3[:2] + [{"text": "action", "sub": "蓋住", "tone": "mask"}]}],
+                     outcomes=[{"text": "學到：還想拿到某個分數、在位置 A → 往右走"}]))
+expect("正確的符號序列圖（蓋住一格＋底欄）通過程式 B", code == 0, out)
+code, out = render(D("tokens", steps=[{"label": "第一步", "cells": [{"text": "很長的符號名稱" * 8, "sub": "很長的說明" * 12, "tone": "state"}] * 3} for _ in range(4)], more=True))
+expect("故意做壞：符號序列圖的字太多放不下 → 報錯", code != 0 and "放不下" in out, out)
+code, out = render(D("tokens", steps=[{"label": "第一步", "cells": [{"text": "這是一段沒有任何標點而且非常非常長的符號文字塞不進格子", "tone": "state"}] * 3}]))
+expect("故意做壞：符號格的文字塞不進框 → 程式 B 抓得到", code != 0, out)
+
 print("\n全部通過" if not fails else f"\n{len(fails)} 項失敗")
 raise SystemExit(1 if fails else 0)

@@ -23,6 +23,19 @@ GOOD_A = json.loads((FX / "out/jev-teardown/jev-overview/spec.json").read_text(e
 GOOD_B = json.loads((FX / "out/jev-teardown/confound-three-questions/spec.json").read_text(encoding="utf-8"))
 
 
+# 獨立貼文（series: null）的延伸閱讀會查 state/ 確認已發布：用暫存的 state 目錄，裡面 jev-overview 已發布
+_STATE = tempfile.mkdtemp()
+(Path(_STATE) / "jev-overview.yaml").write_text("concept: jev-overview\nformats:\n  ig_carousel:\n    status: published\n", encoding="utf-8")
+os.environ["DSO_STATE_DIR"] = _STATE
+
+
+def standalone(s):
+    """把 GOOD_A 改成獨立貼文：沒有系列、沒有系列標籤、最後一張是延伸閱讀（items 是已發布的相關貼文）。"""
+    s["series"] = None
+    s["caption"]["hashtags"] = [h for h in s["caption"]["hashtags"] if h != "DSO_Jev"]
+    s["slides"][-1] = {"layout": "series_map", "title": "延伸閱讀", "items": ["jev-overview"], "nav": "完整文章：datasciocean.com/ai-concept/jev-overview", "refs": ["結構"]}
+
+
 def run(spec):
     with tempfile.TemporaryDirectory() as d:
         p = Path(d) / "spec.json"
@@ -63,6 +76,11 @@ CASES = [  # (名稱, 基底, 修改, 預期錯誤中要出現的字串)
     ("用語：貼文寫了「判官」而不是 Judge", GOOD_A, lambda s: s["threads"]["items"][0].update(text=s["threads"]["items"][0]["text"] + "這個判官很快。"), "用語"),
     ("Threads 輪播模式卻還有逐張 items", GOOD_A, lambda s: s["threads"].update(mode="carousel"), "不該有 items"),
     ("Threads 輪播超過 20 張", GOOD_A, lambda s: (s["threads"].update(mode="carousel", items=[]), s["slides"].extend([copy.deepcopy(s["slides"][2]) for _ in range(20)])), "輪播要 2～20 張"),
+    ("獨立貼文的延伸閱讀沒有 items", GOOD_A, lambda s: (standalone(s), s["slides"][-1].pop("items")), "要有 items"),
+    ("獨立貼文的延伸閱讀寫了 current", GOOD_A, lambda s: (standalone(s), s["slides"][-1].update(current="jev-overview")), "不用 current"),
+    ("獨立貼文的延伸閱讀列了不存在的觀念", GOOD_A, lambda s: (standalone(s), s["slides"][-1].update(items=["no-such-concept"])), "不是任何系列的成員"),
+    ("獨立貼文的延伸閱讀列了還沒發布的貼文", GOOD_A, lambda s: (standalone(s), s["slides"][-1].update(items=["confound-three-questions"])), "還沒發布"),
+    ("圖上的拉丁字詞（網址）不在卡上也沒被 latin_allow 放行", GOOD_A, lambda s: s["slides"][4]["bars"][1].update(name="arxiv.org"), "圖上名稱"),
     ("caption 第一句太長", GOOD_A, lambda s: s["caption"].update(first="很長" * 30), "第一句"),
 ]
 
@@ -71,7 +89,7 @@ def main():
     fails = 0
     carousel_ok = mut(GOOD_A, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items")))
     waived_ok = mut(GOOD_A, lambda s: (s.update(waived_quals=[{"id": q, "reason": "人決定刪除"} for q in s["threads"]["body"]["quals"]]), s["threads"]["body"].update(quals=[])))
-    for base, name in ((waived_ok, "正確的貼文 A：限定條件有寫理由地放行（必須通過，測誤殺）"), (GOOD_A, "正確的貼文 A（必須通過）"), (GOOD_B, "正確的貼文 B（必須通過）"), (carousel_ok, "正確的貼文 A 改成 Threads 輪播模式（必須通過，測誤殺）")):
+    for base, name in ((waived_ok, "正確的貼文 A：限定條件有寫理由地放行（必須通過，測誤殺）"), (GOOD_A, "正確的貼文 A（必須通過）"), (GOOD_B, "正確的貼文 B（必須通過）"), (carousel_ok, "正確的貼文 A 改成 Threads 輪播模式（必須通過，測誤殺）"), (mut(GOOD_A, standalone), "正確的獨立貼文（series: null，延伸閱讀列已發布的貼文；必須通過，測誤殺）"), (mut(GOOD_A, lambda s: (standalone(s), s["slides"].pop())), "正確的獨立貼文：最後一張是帶走、沒有延伸閱讀（必須通過，測誤殺）")):
         code, out = run(base)
         ok = code == 0
         fails += not ok

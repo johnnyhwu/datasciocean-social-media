@@ -1,0 +1,421 @@
+{
+ "post": "decision-transformer-reward-conditioning",
+ "blocks": [
+  {
+   "block": "hook（第 1 張主標與副標）",
+   "atoms": [
+    {
+     "text": "Decision Transformer 把強化學習改成序列預測",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer 的提案是一個典範轉移——把 RL 問題重新包裝成序列預測問題，用 GPT 式的監督學習訓練，完全不估計價值函數、不做 bootstrapping。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "除了 state，也把「還想拿多少分」當輸入",
+     "verdict": "完全支持",
+     "card_quote": "return-to-go（還想拿多少分）",
+     "note": "輸入含 return-to-go（還想拿多少分）與 state，卡 c6、c13 支持"
+    },
+    {
+     "text": "讓模型預測 action",
+     "verdict": "完全支持",
+     "card_quote": "訓練時蓋住 action，讓模型根據前面的 (return-to-go, state) 預測該輸出什麼 action。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "標題問句：能不能先許願要幾分（使用時先設定想要的分數）",
+     "verdict": "完全支持",
+     "card_quote": "一句話總結：訓練時是「觀察別人怎麼走、最後拿多少分，學會兩者的關聯」；使用時是「你先設定想要的分數，模型回推該怎麼走」。",
+     "note": "問句，字面不主張超出卡；內文 c8 有許願機制"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 1 張",
+   "atoms": [
+    {
+     "text": "封面主副標合看字面皆可由卡支持（同 hook）",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer 的提案是一個典範轉移——把 RL 問題重新包裝成序列預測問題，用 GPT 式的監督學習訓練，完全不估計價值函數、不做 bootstrapping。",
+     "note": "符合 (a)(b)(c)(d)，限定條件卡上無"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 2 張",
+   "atoms": [
+    {
+     "text": "2021 年，強化學習被改寫成序列預測",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer 的提案是一個典範轉移——把 RL 問題重新包裝成序列預測問題，用 GPT 式的監督學習訓練，完全不估計價值函數、不做 bootstrapping。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "2021 年 6 月掛上 arXiv，同年發表於 NeurIPS",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer（Chen et al., 2021）2021 年 6 月掛上 arXiv，同年在 NeurIPS 發表。時間點卡在 GPT-3 之後、ChatGPT 之前，屬於「Transformer 能不能用來解序列決策問題」那波研究風潮的代表作。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "卡在 GPT-3 之後、ChatGPT 之前，是「Transformer 能不能解序列決策問題」那波研究風潮的代表作",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer（Chen et al., 2021）2021 年 6 月掛上 arXiv，同年在 NeurIPS 發表。時間點卡在 GPT-3 之後、ChatGPT 之前，屬於「Transformer 能不能用來解序列決策問題」那波研究風潮的代表作。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "價值函數：估計某個狀態下未來預期能拿到多少總分",
+     "verdict": "完全支持",
+     "card_quote": "估計「在某個狀態下，未來預期能拿到多少總報酬」的函數",
+     "note": "名詞補充"
+    },
+    {
+     "text": "bootstrapping：用自己目前的估計值修正自己的估計",
+     "verdict": "完全支持",
+     "card_quote": "用自己目前的估計值去更新自己的估計",
+     "note": "名詞補充"
+    },
+    {
+     "text": "強化學習：讓 AI 一步步做決定、靠拿到的分數學習，簡稱 RL",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "名詞白話定義，依規則不算卡主張，且未加新事實"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 3 張",
+   "atoms": [
+    {
+     "text": "Decision Transformer 想解決傳統 RL 的老毛病",
+     "verdict": "完全支持",
+     "card_quote": "它想解決的是傳統 RL 的老毛病：Q-learning、policy gradient 這類方法訓練不穩定、需要精細調參、而且常常得跟環境 online 互動。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "傳統 RL 的毛病：訓練不穩定、需要精細調參、常常得跟環境 online 互動（Q-learning、policy gradient 這類方法）",
+     "verdict": "完全支持",
+     "card_quote": "它想解決的是傳統 RL 的老毛病：Q-learning、policy gradient 這類方法訓練不穩定、需要精細調參、而且常常得跟環境 online 互動。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "online 互動即訓練時要不斷取得新資料",
+     "verdict": "完全支持",
+     "card_quote": "online 指訓練時需要不斷與環境互動取得新資料",
+     "note": "名詞補充"
+    },
+    {
+     "text": "做法是把 RL 重新包裝成序列預測、用 GPT 式監督學習訓練",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer 的提案是一個典範轉移——把 RL 問題重新包裝成序列預測問題，用 GPT 式的監督學習訓練，完全不估計價值函數、不做 bootstrapping。",
+     "note": "卡把「想解決」與提案相鄰陳述；貼文用「做法是」連接，未寫成已解決上述每項毛病"
+    },
+    {
+     "text": "Decision Transformer：不估計價值函數、不做 bootstrapping",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer 的提案是一個典範轉移——把 RL 問題重新包裝成序列預測問題，用 GPT 式的監督學習訓練，完全不估計價值函數、不做 bootstrapping。",
+     "note": "卡上原文直接支持"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 4 張",
+   "atoms": [
+    {
+     "text": "一條軌跡由一連串 (state, action, reward) 組成",
+     "verdict": "完全支持",
+     "card_quote": "一條軌跡（trajectory）由一連串的 (state, action, reward) 組成。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "state 是現在在哪、action 是做了什麼動作、reward 是拿到的分數",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "名詞白話定義，不算卡主張"
+    },
+    {
+     "text": "訓練前先把 reward 換成 return-to-go；return-to-go 是從現在這一步到終點總共還會拿到多少分",
+     "verdict": "完全支持",
+     "card_quote": "訓練前先把 reward 轉成 return-to-go：從現在這一步到終點，總共還會拿到多少分。",
+     "note": "卡上原文直接支持"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 5 張",
+   "atoms": [
+    {
+     "text": "模型輸入是交錯排列的三元組序列，依序為 return-to-go、state、action，一組接一組重複",
+     "verdict": "完全支持",
+     "card_quote": "return-to-go, state, action, return-to-go, state, action",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "return-to-go 即「還想拿多少分」",
+     "verdict": "完全支持",
+     "card_quote": "return-to-go（還想拿多少分）",
+     "note": "c13 括號"
+    },
+    {
+     "text": "圖以三步示意重複排列",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "示意圖，與「重複排下去」一致，無新事實"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 6 張",
+   "atoms": [
+    {
+     "text": "訓練時蓋住 action，讓模型根據前面的 return-to-go 和 state 預測該輸出什麼 action",
+     "verdict": "完全支持",
+     "card_quote": "訓練時蓋住 action，讓模型根據前面的 (return-to-go, state) 預測該輸出什麼 action。學到的映射大致是「我還想拿到 10 分，而我現在在位置 A → 往右走」。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "舉例：學到的映射大致是「我還想拿到某個分數，而我現在在位置 A → 往右走」",
+     "verdict": "完全支持",
+     "card_quote": "訓練時蓋住 action，讓模型根據前面的 (return-to-go, state) 預測該輸出什麼 action。學到的映射大致是「我還想拿到 10 分，而我現在在位置 A → 往右走」。",
+     "note": "部落格舉例，貼文標「舉例來說」「大致」，並把 10 分換成「某個分數」，未加新事實"
+    },
+    {
+     "text": "圖中只示意第二步的 action 被蓋住",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "示意圖，與卡意思不衝突"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 7 張",
+   "atoms": [
+    {
+     "text": "推論時使用者先許願，設定一個目標 return",
+     "verdict": "完全支持",
+     "card_quote": "推論時使用者先許願：設定一個目標 return（例如「我想拿 10 分」），模型根據這個目標加上目前 state 吐出動作；每走一步，剩餘的 return-to-go 就按實際拿到的分數遞減，重複到走完。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "模型根據目標加上目前 state 吐出動作",
+     "verdict": "完全支持",
+     "card_quote": "推論時使用者先許願：設定一個目標 return（例如「我想拿 10 分」），模型根據這個目標加上目前 state 吐出動作；每走一步，剩餘的 return-to-go 就按實際拿到的分數遞減，重複到走完。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "每走一步，return-to-go 按實際拿到的分數遞減，重複直到走完",
+     "verdict": "完全支持",
+     "card_quote": "推論時使用者先許願：設定一個目標 return（例如「我想拿 10 分」），模型根據這個目標加上目前 state 吐出動作；每走一步，剩餘的 return-to-go 就按實際拿到的分數遞減，重複到走完。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "「推論時」即實際使用的時候",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "名詞白話，不算新事實"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 8 張",
+   "atoms": [
+    {
+     "text": "在研究圈內確實有影響力",
+     "verdict": "完全支持",
+     "card_quote": "在研究圈內確實有影響力：同期有 Trajectory Transformer（Janner et al., 2021）提出類似想法，後續有 Online Decision Transformer，也被延伸到推薦系統、機器人、embodied AI、網頁導航 agent 等領域。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "同期有 Trajectory Transformer 提出類似想法，後續有 Online Decision Transformer",
+     "verdict": "完全支持",
+     "card_quote": "在研究圈內確實有影響力：同期有 Trajectory Transformer（Janner et al., 2021）提出類似想法，後續有 Online Decision Transformer，也被延伸到推薦系統、機器人、embodied AI、網頁導航 agent 等領域。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "被延伸到推薦系統、機器人、embodied AI、網頁導航 agent",
+     "verdict": "完全支持",
+     "card_quote": "在研究圈內確實有影響力：同期有 Trajectory Transformer（Janner et al., 2021）提出類似想法，後續有 Online Decision Transformer，也被延伸到推薦系統、機器人、embodied AI、網頁導航 agent 等領域。",
+     "note": "卡上原文直接支持"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 9 張",
+   "atoms": [
+    {
+     "text": "沒成為 LLM 對齊的主流",
+     "verdict": "完全支持",
+     "card_quote": "沒有成為 LLM alignment 的主流路線",
+     "note": "部落格判斷，作者口吻可"
+    },
+    {
+     "text": "今天主流仍是 PPO 或後來的 DPO",
+     "verdict": "完全支持",
+     "card_quote": "PPO（InstructGPT 那條線）或後來的 DPO",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "PPO 是 InstructGPT 那條線",
+     "verdict": "完全支持",
+     "card_quote": "PPO（InstructGPT 那條線）或後來的 DPO",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "DPO 後來出現，不用強化學習，直接用偏好資料微調",
+     "verdict": "完全支持",
+     "card_quote": "不需要另外訓練 reward model、也不用強化學習，直接用偏好資料微調語言模型的對齊方法",
+     "note": "名詞補充"
+    },
+    {
+     "text": "PPO 用強化學習微調",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "卡 RLHF 生態與 PPO 的名詞補充被指到另一張卡，本卡無逐字句；屬 PPO 一句白話定義，依規則不算主張"
+    },
+    {
+     "text": "Decision Transformer 在 offline RL 與機器人控制這個子領域持續發揮影響力，不是家喻戶曉的產品級技術",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer 比較像是在 offline RL 與機器人控制這個子領域持續發揮影響力，不是一個家喻戶曉的產品級技術。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "LLM 對齊是讓語言模型的回答貼近人類偏好",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "名詞白話定義，依規則不算主張"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 10 張",
+   "atoms": [
+    {
+     "text": "Decision Transformer 真正的威力在處理多步驟、有前後因果關係的序列決策",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer 真正的威力在於處理多步驟、有前後因果關係的序列決策：這一步怎麼選，會影響下一步能拿到多少分。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "這一步怎麼選，影響下一步能拿到多少分",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer 真正的威力在於處理多步驟、有前後因果關係的序列決策：這一步怎麼選，會影響下一步能拿到多少分。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "一路接下去，走到終點",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer 真正的威力在於處理多步驟、有前後因果關係的序列決策",
+     "note": "「多步驟、有前後因果關係的序列決策」與 c8「重複到走完」支持；屬圖像化表達，未加新因果"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 11 張",
+   "atoms": [
+    {
+     "text": "訓練時學走法跟分數的關聯",
+     "verdict": "完全支持",
+     "card_quote": "一句話總結：訓練時是「觀察別人怎麼走、最後拿多少分，學會兩者的關聯」；使用時是「你先設定想要的分數，模型回推該怎麼走」。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "使用時先許願，模型回推怎麼走",
+     "verdict": "完全支持",
+     "card_quote": "一句話總結：訓練時是「觀察別人怎麼走、最後拿多少分，學會兩者的關聯」；使用時是「你先設定想要的分數，模型回推該怎麼走」。",
+     "note": "卡上原文直接支持"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "Threads 正文",
+   "atoms": [
+    {
+     "text": "Decision Transformer（2021 年）把強化學習改寫成序列預測，用 GPT 式監督學習訓練",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer 的提案是一個典範轉移——把 RL 問題重新包裝成序列預測問題，用 GPT 式的監督學習訓練，完全不估計價值函數、不做 bootstrapping。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "訓練時觀察別人怎麼走、最後拿多少分，學會關聯；使用時先設定想要的分數，模型回推怎麼走",
+     "verdict": "完全支持",
+     "card_quote": "一句話總結：訓練時是「觀察別人怎麼走、最後拿多少分，學會兩者的關聯」；使用時是「你先設定想要的分數，模型回推該怎麼走」。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "傳統 RL 毛病：Q-learning、policy gradient 訓練不穩定、需要精細調參、常得跟環境 online 互動",
+     "verdict": "完全支持",
+     "card_quote": "它想解決的是傳統 RL 的老毛病：Q-learning、policy gradient 這類方法訓練不穩定、需要精細調參、而且常常得跟環境 online 互動。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "在研究圈內確實有影響力",
+     "verdict": "完全支持",
+     "card_quote": "在研究圈內確實有影響力：同期有 Trajectory Transformer（Janner et al., 2021）提出類似想法，後續有 Online Decision Transformer，也被延伸到推薦系統、機器人、embodied AI、網頁導航 agent 等領域。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "沒有成為 LLM 對齊的主流（今天仍然是 PPO 或後來的 DPO）",
+     "verdict": "完全支持",
+     "card_quote": "沒有成為 LLM alignment 的主流路線",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "真正的威力在多步驟、有前後因果關係的決策",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer 真正的威力在於處理多步驟、有前後因果關係的序列決策：這一步怎麼選，會影響下一步能拿到多少分。",
+     "note": "省略「序列」二字，不改意思"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "Threads 最後一則",
+   "atoms": [
+    {
+     "text": "訓練時學「怎麼走」跟「最後拿多少分」的關聯",
+     "verdict": "完全支持",
+     "card_quote": "一句話總結：訓練時是「觀察別人怎麼走、最後拿多少分，學會兩者的關聯」；使用時是「你先設定想要的分數，模型回推該怎麼走」。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "使用時先設定想要的分數，模型回推該怎麼走",
+     "verdict": "完全支持",
+     "card_quote": "一句話總結：訓練時是「觀察別人怎麼走、最後拿多少分，學會兩者的關聯」；使用時是「你先設定想要的分數，模型回推該怎麼走」。",
+     "note": "卡上原文直接支持"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "IG caption 第一句",
+   "atoms": [
+    {
+     "text": "把強化學習改成序列預測",
+     "verdict": "完全支持",
+     "card_quote": "Decision Transformer 的提案是一個典範轉移——把 RL 問題重新包裝成序列預測問題，用 GPT 式的監督學習訓練，完全不估計價值函數、不做 bootstrapping。",
+     "note": "卡上原文直接支持"
+    },
+    {
+     "text": "先設定想要的分數",
+     "verdict": "完全支持",
+     "card_quote": "一句話總結：訓練時是「觀察別人怎麼走、最後拿多少分，學會兩者的關聯」；使用時是「你先設定想要的分數，模型回推該怎麼走」。",
+     "note": "卡上原文直接支持"
+    }
+   ],
+   "errors": []
+  }
+ ],
+ "recalculations": [],
+ "gaps": []
+}

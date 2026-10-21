@@ -20,6 +20,14 @@
 
 **模板版本 hash**：`render.py` 對 `series/<series-id>/templates/` 全部檔案算 hash，寫進 `checks-b.json`；同一系列所有貼文必須是同一個 hash。**改模板就會改 hash**；已發布的貼文不重渲（網路上的圖已定，`batch_check.py` 也不比對已發布貼文的 hash），所以影響的只有還沒發布的貼文。模板定案後仍不要為單一貼文隨意改它；非改不可（例如 2026-10-10 加成對橫條圖的 `.num2`），要重跑回歸測試，並在報告裡告訴人。
 
+## 獨立貼文的視覺（沒有系列；2026-10-18 起）
+
+`standalone_classic` 的卡獨立發文，**每一則各有自己的視覺，不共用**（人決定：Decision Transformer 選「地平線」，Bradley-Terry 要獨立重做）。檔案放 `standalone/<觀念 id>/`：`standalone.md`（front matter：`style`、`color`）、`philosophy.md`、`templates/`、`sketches/`。做法與系列相同（先出 3 個方向的草圖、人選、再做模板與樣張），差別：
+- 草圖只比 IG 首頁 3×3 格裡和**相鄰既有系列**分得開不開；不用再顧「同系列的其他則」。
+- `render.py` 的 `load_visual()` 在 `series` 為 null 時讀 `standalone/<觀念>/`；`SERIES_COLORS` 要加這個風格的色；模板沒有系列標籤與色帶，`series_map` 變成「延伸閱讀」（`items`）。
+- 風格的回歸測試：`tests/test_standalone_style.py`（地平線 `horizon`：九個版型、封面副標固定在地平線下、故意做壞三種）；檢查項目的獨立貼文案例在 `tests/test_check_a.py`。
+- 第一個例子：`standalone/decision-transformer-reward-conditioning/`（「地平線」：先把目標放在地平線上，再一步一步走向它；封面上深下淺、半個金太陽在地平線上；內頁頂端一條帶進度點的深海細帶）。
+
 ## 做一個新系列的步驟
 
 1. 讀 `principles.md`（IG 設計原則）與 `brand-and-layouts.md`；想看範例讀 `series/jev-cascade/`；需要原始設計哲學時讀 `canvas-design-original.md`（Anthropic canvas-design skill，授權見 `canvas-design-LICENSE.txt`）。

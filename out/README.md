@@ -30,3 +30,9 @@
 | 2 | `skillopt-batch-evidence-minibatch`＋`skillopt-bounded-edit-budget` | 該改哪裡、改多少？別被一次失敗牽著走 | 已發布 | 已發布 | [README](skillopt-batch-evidence-minibatch/README.md) |
 | 3 | `skillopt-blind-acceptance-gate`＋`skillopt-epoch-level-control` | 改完真的有變好嗎？拿沒看過的題目測試它 | 已發布 | 已發布 | [README](skillopt-blind-acceptance-gate/README.md) |
 
+## 獨立貼文（沒有系列）
+
+| 觀念 | IG | Threads | 打開 |
+|---|---|---|---|
+| `decision-transformer-reward-conditioning` | 已發布 | 已發布 | [README](standalone/decision-transformer-reward-conditioning/README.md) |
+

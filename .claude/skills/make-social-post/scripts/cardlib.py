@@ -28,6 +28,8 @@ ROOT = project_root()
 WIKI = Path(os.environ.get("DSO_CONCEPT_WIKI") or ROOT / "concept-wiki")
 # 系列檔目錄；DSO_SERIES_DIR 只給測試用（指向 tests/fixtures/series）
 SERIES_DIR = Path(os.environ.get("DSO_SERIES_DIR") or ROOT / "series")
+# 獨立貼文（沒有系列）各有自己的視覺：standalone/<觀念 id>/ 放 standalone.md（風格、色）、philosophy.md、templates/、sketches/
+STANDALONE_DIR = Path(os.environ.get("DSO_STANDALONE_DIR") or ROOT / "standalone")
 
 
 # state/ 目錄；DSO_STATE_DIR 只給測試用
@@ -69,6 +71,10 @@ def series_lock_warning(series_id: str | None, concept: str) -> str | None:
 def series_dir(sid: str) -> Path:
     """一個系列的所有東西都在 series/<id>/：series.md、philosophy.md、templates/。"""
     return SERIES_DIR / sid
+
+
+def standalone_dir(concept: str) -> Path:
+    return STANDALONE_DIR / concept
 
 
 def series_file(sid: str) -> Path:
