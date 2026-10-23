@@ -118,9 +118,12 @@ def review_files(d: dict, build: Path) -> None:
             L += ["", f"### 串文 {j}（配第 {it['slide']} 張圖）", it["text"]]
             if with_refs:
                 L.append(f"引用：{', '.join(it['refs'])}")
-        L += ["", "### 最後一則（置頂）", th["last"]["text"]]
-        if with_refs:
-            L.append(f"引用：{', '.join(th['last']['refs'])}")
+        if th.get("last"):
+            L += ["", "### 最後一則（置頂）", th["last"]["text"]]
+            if with_refs:
+                L.append(f"引用：{', '.join(th['last']['refs'])}")
+        else:
+            L += ["", "（沒有最後一則回覆：只發輪播貼文）"]
         L += ["", "## IG caption", "", caption_text(d)]
         (build / name).write_text("\n".join(L) + "\n", encoding="utf-8")
 
@@ -173,11 +176,13 @@ def threads_md(d: dict, title: str) -> str:
     th = d["threads"]
     if th.get("mode") == "carousel":
         n = len(d["slides"])
+        how = ("，再用一則回覆放連結與系列（連結只放那則回覆）" if th.get("last") else "；沒有連結要放，**不發回覆**，只發這一則")
         L = [f"# Threads：{title}", "",
-             f"- 發文方式：**一則輪播貼文**（正文＋全部 {n} 張圖，順序與 IG 相同），再用一則回覆放連結與系列（連結只放那則回覆）",
+             f"- 發文方式：**一則輪播貼文**（正文＋全部 {n} 張圖，順序與 IG 相同）{how}",
              "- 圖檔在 `../ig/`（與 IG 輪播共用同一套）", "", "## 貼文正文（附下方全部圖片）", ""] + fence(th["body"]["text"]) + [""]
         L += ["## 附圖（依序）", ""] + [f"![第 {i} 頁](../ig/{i:02d}.png)" for i in range(1, n + 1)] + [""]
-        L += ["## 回覆：連結與系列", ""] + fence(th["last"]["text"]) + [""]
+        if th.get("last"):
+            L += ["## 回覆：連結與系列", ""] + fence(th["last"]["text"]) + [""]
         return "\n".join(L)
     L = [f"# Threads 串文：{title}", "",
          "- 發文方式：正文用「新增到串文」**一次發出**，每則串文附下方標註的圖；**連結只放最後一則**（置頂）",
@@ -309,6 +314,24 @@ def refresh(spec_path: Path) -> None:
     if bld.name == "_build":
         indexes()
     print("refreshed", pack)
+
+
+def check_tex_leftovers(raw_spec: dict, pack: Path, bld: Path) -> None:
+    """spec 有開 `math` 時，所有給人與給平台看的文字都不該殘留 LaTeX 記號（IG caption 曾出現「$r$」）。"""
+    if not raw_spec.get("math"):
+        return
+    bad = []
+    for f in (pack / "ig" / "post.md", pack / "threads" / "post.md", pack / "README.md",
+              bld / "post-reader.md", bld / "post-with-refs.md", bld / "alt-text.json"):
+        if f.exists():
+            text = f.read_text(encoding="utf-8")
+            if f.suffix == ".json":      # 只掃值；JSON 的 \n 跳脫不是 LaTeX
+                text = "\n".join(str(v) for v in json.loads(text).values())
+            left = W.tex_leftovers(text)
+            if left:
+                bad.append(f"{f.relative_to(pack)}：{' '.join(left)}")
+    if bad:
+        sys.exit("ERROR：發布文字殘留 LaTeX 記號（要在 cardlib.untex 轉成純文字）：\n  " + "\n  ".join(bad))
 
 
 def build(spec_path: Path, force: bool = False) -> None:

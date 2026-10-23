@@ -81,7 +81,8 @@ def main(spec_path: str) -> int:
     blocks.append(("threads.body", [th["body"]["text"]], th["body"].get("refs"), th["body"].get("quals", []), None))
     for j, it in enumerate(th.get("items", []), 1):
         blocks.append((f"threads.item{j}(slide{it['slide']})", [it["text"]], it.get("refs"), it.get("quals", []), None))
-    blocks.append(("threads.last", [th["last"]["text"]], th["last"].get("refs"), th["last"].get("quals", []), None))
+    if th.get("last"):      # 沒有文章連結的獨立貼文不發最後一則回覆（只發輪播）
+        blocks.append(("threads.last", [th["last"]["text"]], th["last"].get("refs"), th["last"].get("quals", []), None))
     cap = doc["caption"]
     blocks.append(("caption.first", [cap["first"]], cap.get("first_refs"), [], None))
     blocks.append(("hook", [strip_marks(doc["hook"]["title"]), doc["hook"]["subtitle"]], doc["hook"].get("refs"), doc["hook"].get("quals", []), None))

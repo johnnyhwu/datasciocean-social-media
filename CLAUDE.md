@@ -26,10 +26,10 @@ datasciocean-concept-wiki（Stage 1，submodule：concept-wiki/）
 
 ## 不可違反的規則
 
-1. **只讀卡，不讀 blog。** Stage 2 不讀 `concept-wiki/blog/`。**卡是貼文內容的上限，貼文是卡的子集**，不得加入卡上沒有的判斷、數字、比較詞、缺席型主張。blog 沉默不等於「論文沒有做」。
+1. **只讀卡，不讀 blog。** Stage 2 不讀 `concept-wiki/blog/`。**卡是貼文內容的上限，貼文是卡的子集**，不得加入卡上沒有的判斷、數字、比較詞、缺席型主張。blog 沉默不等於「論文沒有做」。例外：論文**書目資訊**（作者、年份、arXiv 連結）卡上沒有時，可外部查證，並標明來源非卡（`anchor-writing-rules.md`）。
 2. **單向。** 不修改卡、不退回 Stage 1。寫不出合格貼文就標 `unsuitable` 並附原因，或刪掉做不出來的那張投影片。
 3. **`pending_author_confirmation` 的主張一律不用；`author_confirmed` 的寫法取保守。**
-4. **審查者要獨立、要嚴格。** 每輪用全新的 subagent，審查者看不到撰寫者的推理；忠實者預設不通過、必須引用卡上原文；撰寫者不能反駁審查者，只能標「爭議」交給人。
+4. **審查者要獨立、要嚴格。** 每輪用全新的 subagent，審查者看不到撰寫者的推理；忠實者預設不通過、必須引用卡上原文；撰寫者不能反駁審查者，只能標「爭議」交給人。**審查通過後新增文字、改數字／符號／論文資訊，要重審改過的區塊**（`spec_diff.py`；只刪內容或削弱語氣免審，見 `review-loop.md`）。
 5. **能用程式強制的規則，就寫在程式裡，不靠 LLM。** 引用標記、數字比對、字數、座標軸從 0 起、重疊與對比度、用語、批次檢查、發布前檢查都在 `scripts/`。LLM 負責需要判斷的事。
 6. **每個數字都要有比較對象；錨點類型決定寫法。** 設計參數主詞要是方法名、官方宣稱主詞要是宣稱方；部落格判斷可直接以作者口吻寫、不必標「我的判斷」（人決定，2026-10-08），但不得寫成卡上沒有的事實或比卡更強。
 7. **限定條件綁在主張上。** 用了某條主張，它的限定條件必須一起出現。
@@ -37,7 +37,7 @@ datasciocean-concept-wiki（Stage 1，submodule：concept-wiki/）
 9. **發布一定要經人確認；經確認後 IG 與 Threads 都用官方 API 發布。** `ig_publish.py`、`threads_publish.py` 預設是 dry-run，**只有人明確說「發」之後才加 `--confirm`**，不可在同一輪自己決定（人在同一則訊息明確說「prepare、push `ig/jpg/`、發佈到兩個平台」，視為整串授權，可連續執行，但每個 dry-run 都要看，出現 problems 或 warnings 就停下來問；見 `publish-flow.md`）；已發布過的貼文不重複發；不用真實貼文做測試（測試用專用測試包與 `--no-record`，測完刪掉）。限時動態、精選集、置頂**不做**（人不做手動事項，也不提醒）；Threads 回補由 Claude 用 API 做（`threads_publish.py backfill`，dry-run 給人看、人說「發」才發）；IG 不回補（`references/publish-flow.md` §2）。
 10. **貼文不提 podcast，不加 AI 揭露。** podcast 連結只放個人檔案。
 11. **寧可暫停，也不降低標準。** 存量不足時暫停發文，不為了維持每天一則而放行未通過審查的內容。
-12. **不確定就停下來問人。** hook（由人挑）、審查者爭議、最後確認、任何與先前慣例不同的做法，都由人決定。**新圖型不必先出樣張**（2026-10-12 人決定）：可直接在貼文裡做，但要附程式 B 檢查與回歸測試，並在交貼文時明講「這則新增了哪些圖型」，由人看貼文時一併審。
+12. **不確定就停下來問人。** hook（由人挑）、審查者爭議、最後確認、任何與先前慣例不同的做法，都由人決定。**新圖型不必先出樣張**（2026-10-12）：可直接在貼文裡做，但要附程式 B 檢查與回歸測試，交貼文時明講新增了哪些圖型。**問人時要說明選項的下游後果**（例：不放導流連結 → Threads 輪播下就沒有回覆），並附發出去的樣子。
 13. **審查者要求改人選的 hook 時，要告知人**（原文、改後、原因）。與審查者對語氣或留白有爭議時，標「爭議」交給人，人可以改審查者提示詞。
 14. **封面 hook 以吸引點擊為先，不欺騙為界**：可以沒說完整（留白、反差、口語語氣詞），但主標副標合看字面為真、範圍不放大、限定條件在內文出現（`references/hooks.md`）。取捨時預設選更吸引人。封面要**獨立可懂**（不假設讀者看過系列），口語活潑；圖上不放 emoji。
 15. **不要自己 commit 或 push**；commit 與 push 由人決定時機（人明確要求時例外）。發布前要 push `ig/jpg/`（託管是這個公開 repo 的 raw 網址）；人沒有一次授權整串時，push 前先問人。
@@ -67,44 +67,41 @@ standalone/<觀念 id>/                  獨立貼文（沒有系列）自己的
 state/                                  <觀念 id>.yaml（各格式狀態、發布紀錄）、backfill.md（待回補清單）、ig-publish-log.jsonl、threads-publish-log.jsonl（API 發文紀錄，含曾經的測試發文，不要刪）
 out/                                    發布包（程式產生）
     README.md                             總入口：待發布清單、各系列狀態（build_package.py 產生，不手改）
-    <系列 id>/README.md                   系列的發文順序與各則狀態
-    <系列 id>/<觀念 id>/                  一則貼文（獨立貼文放 out/standalone/<觀念 id>/）
+    <系列 id>/<觀念 id>/                  一則貼文（獨立貼文放 out/standalone/<觀念 id>/）；系列資料夾另有 README.md（發文順序）
         README.md                           這則貼文的入口：縮圖、檢查結果、發布前後待辦
         ig/post.md、ig/01.png …             IG 輪播：每一頁的圖與文字、替代文字、整段 caption
         ig/jpg/01.jpg …                     給 IG 與 Threads API 用的 JPEG（`ig_publish.py prepare` 產生，要 push 才有公開網址）
-        threads/post.md                     Threads：舊格式是正文＋逐張串文＋最後一則；輪播模式是一則輪播（全部圖）＋一則連結回覆
-        _build/                             機器用：spec.json（內容規格，唯一的真相來源）、checks-b.json、審查用文字…
+        threads/post.md                     Threads：輪播貼文＋（有連結時）一則回覆；舊格式是逐張串文
+        _build/                             機器用：spec.json（內容規格，唯一的真相來源）、checks-b.json、審查用文字、reviewed-spec.json（審查通過版本）…
 docs/                                   status.md（各系列進度與發布網址）、stage2-token-usage.md（token 用量與流程觀察）
-tests/                                  十份回歸測試（含 test_multicard.py：雙卡貼文與高密度版型；test_cards_style.py：一式四份系列模板；test_standalone_style.py：獨立貼文的地平線風格；test_seesaw_style.py：獨立貼文的蹺蹺板風格與新示意圖）+ fixtures/（舊的 jev-teardown 兩則貼文、系列檔與觀念卡，只給測試用）
+tests/                                  十份回歸測試（`test_*_style.py` 各測一種視覺風格；`test_multicard.py` 雙卡與高密度版型）+ fixtures/（舊貼文、系列檔與觀念卡，只給測試用）
 ```
 
 **找東西的規則**：要發文，從 `out/README.md` 進去，打開貼文的 `README.md`；要改內容，改該貼文 `_build/spec.json`，然後依序重跑 `check_a.py` → `render.py` → `contact_sheet.py` → `build_package.py`（`contact_sheet.py` 要在 `build_package.py` 之前，README 才會有縮圖）。
 
 為什麼 `config/`、`series/`、`state/` 在根目錄而不在 skill 裡：這些是人會改、會審、會長期累積的資料與設定；`.claude/` 放的是「Claude 怎麼做事」的流程與腳本。
 
-## 目前狀態（2026-10-23）
+## 目前狀態（2026-10-23；各則網址與細節：`docs/status.md`）
 
-- **做完並發布的貼文**：系列 `skillopt`（3 則）、`persona-aware-d2s`（3 則）、`jev-cascade`（3 則），以及獨立貼文 `decision-transformer-reward-conditioning`（2026-10-21，9 張）與 `bradley-terry-pairwise-preference`（2026-10-23，12 張，用 LaTeX 數學式）。存量（`ready`）0 則；Threads 回補都做完（`state/backfill.md` 無項目）。各則網址與細節：`docs/status.md`。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。
+- **已發布**：系列 `skillopt`（3 則）、`persona-aware-d2s`（3 則）、`jev-cascade`（3 則），獨立貼文 `decision-transformer-reward-conditioning`（9 張）與 `bradley-terry-pairwise-preference`（12 張，用 LaTeX）。存量（`ready`）0；Threads 回補都做完。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。
 - **還沒做**：3 張 `claude-code-*` 卡（新文章，要先規劃系列）。
-- **獨立貼文**（沒有系列）：spec 寫 `series: null`，視覺在 `standalone/<觀念 id>/`，發布包在 `out/standalone/`（`spec-json.md`「獨立貼文」、`design-series-visuals`）。轉折張、延伸閱讀、導流連結先問人。**沒有對應文章連結的獨立貼文，Threads 不發最後一則回覆**（人的決定，2026-10-23；工具要先改，見 `threads-and-caption.md`）。
-- **待人決定**：封面主標是否放寬成 3 行；`config/params.yaml` 的 `structure_text_max_chars` 與 `ai_tone_blacklist` 仍是初稿；Threads token 是否補上 `threads_delete` 權限（目前沒有，刪除只能手動）；系列名與標題的取名偏好（memory `feedback_series_naming`）；審查後「只削弱語氣的小改」要不要重審。
+- **獨立貼文**（沒有系列）：spec 寫 `series: null`，視覺在 `standalone/<觀念 id>/`，發布包在 `out/standalone/`（`spec-json.md`「獨立貼文」、`design-series-visuals`）。轉折張、延伸閱讀、導流連結、Threads 回覆打包問人；**沒有文章連結時 `threads.last` 不寫，只發輪播**（人的決定，2026-10-23；工具已支援）。
+- **待人決定**：封面主標是否放寬成 3 行；`config/params.yaml` 的 `structure_text_max_chars` 與 `ai_tone_blacklist` 仍是初稿；Threads token 是否補 `threads_delete` 權限（沒有則刪除只能手動）；系列名與標題的取名偏好（memory `feedback_series_naming`）。
 
 ## 工作方式
 
 - **規劃與防呆**（2026-10-08 整理，目的是下一則一次就到位）：
   - 做系列規劃時一定要**問人哪些卡要合併**（先跑 `series_deps.py` 當輔助；它不是偵測器，要用讀者角度逐則看）；成員定案後加 `members_locked: true`，**第 1 則發布前**就定案（IG 系列地圖發布後改不了）；**整個系列的 spec 都做完、張數與標題都定案，才鎖定並發第 1 則**（2026-10-11 人決定，skillopt 照這樣做；鎖定後不改成員與 `planned_title`）。
-  - 寫 spec 前先做**版型規劃**（每張選好版型、下半部放什麼、圖上術語在哪張定義；術語不能只在 Threads 定義），見 `ig-carousel.md` §0 與 `self-check.md` 第 10～23 項。
+  - 寫 spec 前先做**版型規劃**（每張選好版型、下半部放什麼、圖上術語在哪張定義；術語不能只在 Threads 定義），見 `ig-carousel.md` §0 與 `self-check.md`（機制／數學類先做概念依賴表）。
   - `render.py`、`build_package.py` 對**已發布**的貼文預設拒絕（`--force` 才重做；一般不要做，模板改了已發布的記舊 hash 是預期的）；`build_package.py` 遇到不認得的投影片欄位會報錯（要新增欄位先讓它輸出並補測試）。
   - 系列成員鎖定後才又合併，已發布貼文的系列地圖改不了，回補時連到合併後那一則（`batch-and-publish.md` §2）。
-- **貼文要口語、白話、資訊密度夠，讀者是沒有 AI 背景的一般人**（人的回饋，2026-10-08 與 2026-10-10）：像在跟朋友解釋，不要像摘要或條列結論；術語、題庫名稱、統計用語第一次出現就用白話講；**寧可文字多一點、好懂，也不要精簡到讀者要猜**；可以用生活化比喻（比喻只翻譯、不加卡上沒有的事實）；**每張圖都要用滿**（下半部是空海面就是浪費，改用對照表、橫條圖、名詞表）；**圖要直接支撐主標**（人的回饋：圖要謹慎思考，見 `chart-thinking`）；**圖要比文字多給資訊，不能只把同一張的文字重講一遍**：定義與機制類預設用具體的假設例子（如老鼠走迷宮，圖註標「假設的例子」；人的回饋，2026-10-18，`self-check.md` 31）；不標「我的判斷」；準確度差距寫 %；帶走張先問問題再回答；並列的結論可用「第一關／第二關」這類標號。細節見 `ig-carousel.md` §4。審查的讀者預設是一般讀者，並且要看圖（`review-loop.md`）。
+- **貼文要口語、白話、資訊密度夠，讀者是沒有 AI 背景的一般人**（人的回饋，2026-10-08 與 2026-10-10）：像在跟朋友解釋，不要像摘要或條列結論；術語、題庫名稱、統計用語第一次出現就用白話講；**寧可文字多一點、好懂，也不要精簡到讀者要猜**；可以用生活化比喻（比喻只翻譯、不加卡上沒有的事實）；**每張圖都要用滿**（下半部是空海面就是浪費，改用對照表、橫條圖、名詞表）；**圖要直接支撐主標**（見 `chart-thinking`）；**圖要比文字多給資訊，不能只把同一張的文字重講一遍**：定義與機制類預設用具體的假設例子（如老鼠走迷宮，圖註標「假設的例子」；人的回饋，2026-10-18；`self-check.md`）；不標「我的判斷」；準確度差距寫 %；帶走張先問問題再回答；並列的結論可用「第一關／第二關」這類標號。細節見 `ig-carousel.md` §4。審查的讀者預設是一般讀者，並且要看圖（`review-loop.md`）。
 
-- **張數與圖型**（人的回饋，2026-10-11）：**讀者真正看懂比張數重要**，上限 20 張（`slides_max`；IG 官方文件寫 10 張，實測 20 張可發，已用 19 張實發 IG 與 Threads 成功）。圖**不要每篇都是橫條圖**：文字下面空出來的區塊是「塗鴉牆」，用 `diagram` 版型畫出讓讀者更好理解、也覺得有趣的圖（`design-series-visuals/references/brand-and-layouts.md`）。
-- **圖像設計要大膽、有故事**（人的回饋，2026-10-12）：人最喜歡的是「受保護區塊」那張（文件裡一塊金色區塊、一邊箭頭被叉掉、一邊通過）：圖本身在說一個畫面，不只是排版好看。示意圖優先選這種有隱喻、能讓讀者一眼看懂機制的畫法（對照 `design-series-visuals` 的「機制 → 圖型」表）；同一則連續 3 張以上同圖型要換（編輯審查者每次都抓這個）；可以新增圖型，不必先出樣張（見規則 12）。
-- **白話解釋的尺度**（人的決定，2026-10-12）：解釋機制可以用白話，只要**不改變卡的意思、不加新事實**（新的原因、用途、數字、範圍）就允許；審查者之間（讀者要白話、忠實者要卡上有）衝突時照這條。自創比喻容易出事：用卡上的正式術語加白話，比用自創說法穩（例：「驗證資料集」，不寫「選擇題」）。
+- **張數與圖型**（人的回饋，2026-10-11、10-12）：**讀者真正看懂比張數重要**，上限 20 張（`slides_max`；IG 文件寫 10 張，實測 20 張可發）。文字下面空出來的區塊是「塗鴉牆」，用 `diagram` 版型畫圖，**不要每篇都是橫條圖，同一則連續 3 張以上同圖型要換**。**圖要大膽、有故事**：人最喜歡「受保護區塊」那張（一塊金色區塊、一邊箭頭被叉掉、一邊通過），圖本身在說一個畫面；優先選有隱喻、一眼看懂機制的畫法（`design-series-visuals` 的「機制 → 圖型」表）。可以新增圖型，不必先出樣張（規則 12）。
+- **白話解釋的尺度**（人的決定，2026-10-12）：可以用白話解釋機制，只要**不改變卡的意思、不加新事實**；讀者要白話、忠實者要卡上有而衝突時照這條。自創比喻容易出事，用卡上的正式術語加白話比較穩（「驗證資料集」，不寫「選擇題」）。
 - **用語偏好**（人的回饋）：目標 Agent（不寫目標模型）、單個隨機樣本、優化器＝教練、訓練／驗證／測試資料集、「我的想法」可代替「我的推論」。不要文縐縐（宏觀層級、戰略筆記、步驟級…換成大方向、小修改），不要寫「文章沒有提到／卡上沒有」這類交代資料缺口的話（卡上沒有的就直接不提）。
 
-- **Threads 預設是輪播**（人的決定，2026-10-12）：一則輪播貼文（正文＋全部投影片）＋一則連結回覆；spec 寫 `threads.mode: carousel`、不寫 `items`（`spec-json.md`）。逐張串文只留給已發布的 jev-cascade 與測試。
-
+- **Threads 預設是輪播**（人的決定，2026-10-12）：一則輪播貼文（正文＋全部投影片）＋一則連結回覆（沒有連結的獨立貼文省略回覆）；spec 寫 `threads.mode: carousel`、不寫 `items`（`spec-json.md`）。逐張串文只留給已發布的 jev-cascade 與測試。
 - **預設一張觀念卡 = 一則 post**；IG 輪播與 Threads 串文是同一則的兩種格式。兩張卡互相依賴、分開發都不好懂時，**由人決定**合成一則雙卡貼文（系列檔成員的 `also`；做法見 `spec-json.md`「雙卡貼文」）。同一篇文章的多張卡預設組成系列，`standalone_classic` 的卡預設獨立發文（`references/batch-and-publish.md` §1）。
 - **請人拍板的事，要用白話說清楚**：這是什麼、選了會怎樣、代價是什麼、我的建議；不要只丟一句簡短的選項。
 - **做完一個階段，主動列出人接下來要確認或決定的事**（要確認什麼、還沒決定什麼）。人不做手動事項：需要手動才能完成的事，要嘛由 Claude 做、要嘛不做，不當成待辦丟給人。
@@ -112,4 +109,4 @@ tests/                                  十份回歸測試（含 test_multicard.
 - **發布流程的工具**（2026-10-15 整理）：dry-run 加 `--summary` 給人看；`--confirm` 成功後 README 與 `out/` 索引自動更新（`build_package.py --refresh`）；系列貼文的「同系列」連結用 `series_links.py` 補（Threads dry-run 會擋沒補的）；標 `ready` 時順便問人要不要整串授權。新系列的草圖：一次 3 個方向、IG 首頁 3×3 格與相鄰系列並排、存 `series/<id>/sketches/`（`design-series-visuals`）。
 - 修改任何程式檢查、審查或發布流程後，**重跑全部回歸測試**：`uv run python tests/test_check_a.py`、`test_state_and_batch.py`、`test_render_numunit.py`、`test_ig_publish.py`、`test_threads_publish.py`、`test_multicard.py`、`test_diagrams.py`、`test_cards_style.py`、`test_standalone_style.py`、`test_seesaw_style.py`；新增檢查要加「故意做壞的版本」確認抓得到。
 - 整理 repo 或文件時，順便檢查：討論中得到的回饋是否已寫進 CLAUDE.md 或 skill、有沒有過時（legacy）內容可刪、哪些屬於 `.claude/`（Claude 怎麼做事）而不是資料與設定。
-- 範例資料：**品質基準是 skillopt 第 2、3 則**（`out/skillopt/skillopt-batch-evidence-minibatch/`、`out/skillopt/skillopt-blind-acceptance-gate/`；雙卡、17 張、多種示意圖、口語白話、Threads 輪播；人說這兩則都比較滿意）；`skillopt-overview` 是單卡＋diagram 的範例；jev-cascade 的 `cascade-complementary-errors` 是成對橫條圖的範例（舊基準），`jev-cascade-overview` 的寫法已過時。內容規格在各則 `_build/spec.json`。`tests/fixtures/` 只給回歸測試用。
+- 範例資料：**品質基準是 skillopt 第 2、3 則**（`out/skillopt/skillopt-batch-evidence-minibatch/`、`out/skillopt/skillopt-blind-acceptance-gate/`；雙卡、17 張、多種示意圖、Threads 輪播；人說比較滿意）；`skillopt-overview` 是單卡＋diagram 的範例；含 LaTeX 與新示意圖的範例是 `out/standalone/bradley-terry-pairwise-preference/`。jev-cascade 的寫法已過時。內容規格在各則 `_build/spec.json`；`tests/fixtures/` 只給回歸測試用。

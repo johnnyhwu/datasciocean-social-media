@@ -231,6 +231,11 @@ def tex_plain(s: str) -> str:
     return re.sub(r"\$([^$]+)\$", lambda m: _tex_one(m.group(1)), s) if "$" in s else s
 
 
+def tex_leftovers(text: str) -> list[str]:
+    """文字裡殘留的 LaTeX 記號（`$`、`\\frac` 這類反斜線指令）；發布文字與審查文字不該有。"""
+    return sorted(set(re.findall(r"\$|\\[A-Za-z]+", text)))
+
+
 def untex(obj):
     """遞迴把 spec 裡所有字串的 `$...$` 轉成純文字（給程式 A 與發布文字用）。"""
     if isinstance(obj, str):

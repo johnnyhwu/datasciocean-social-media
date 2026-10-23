@@ -29,7 +29,7 @@ LLM 只產出這份 JSON；外觀完全由模板決定。範例：`out/skillopt/
 - **視覺**：每則獨立貼文各有自己的一套，放 `standalone/<觀念 id>/`（`standalone.md` front matter 的 `style`、`color`；`philosophy.md`；`templates/`；`sketches/`），不共用（人決定，2026-10-18：Bradley-Terry 要獨立重做、不沿用 Decision Transformer 的「地平線」）。`render.py`、`check_a.py`、`batch_check.py` 在 `series` 為 null 時讀這裡。
 - **沒有系列標籤**：`caption.hashtags` 不放系列專屬標籤；封面沒有系列色帶；Threads 最後一則沒有「同系列」。
 - **最後一張**：可以是帶走張（人決定不連回別則時）；要放「延伸閱讀」就用 `series_map`，寫 `items`（觀念 id 清單，必須是某系列成員且**已發布**，標題由系列檔的 `planned_title` 自動填）、不寫 `current`。
-- 導流行（`caption.nav`）與 Threads 最後一則的文章連結（`threads.last.link`）可省略；要不要放先問人（Decision Transformer：人決定都不放）。
+- 導流行（`caption.nav`）與 Threads 最後一則可省略。**規劃時把「轉折張、延伸閱讀、導流連結、Threads 回覆」打包成一個問題問人，每個選項附發出去的樣子**（2026-10-23：只問「連結要不要放」，人發布後才發現 Threads 輪播下沒有回覆而覺得怪）。沒有文章連結時，**`threads.last` 整個不寫**（只發輪播，人的決定 2026-10-23；`check_a`、`build_package`、`threads_publish` 都支援），不要用只有一句話的回覆湊數。
 
 ## 雙卡貼文（一則 post 併入兩張卡）
 
@@ -92,7 +92,7 @@ caption 第一句用 `first_refs`。`refs` 只證明「有對應」，不證明�
 }
 ```
 
-**輪播模式（2026-10-12 起是預設；新貼文一律用，skillopt 三則都是）**：加 `"mode": "carousel"`、**不寫 `items`**。Threads 發成**一則輪播貼文**（`body` 當正文，附**全部投影片**，順序與 IG 相同，2～20 張）＋**一則回覆**（`last`，帶連結預覽與系列）；沒有逐張串文，所以正文要自己撐起重點與限定條件。沒寫 `mode` 是舊的逐張串文（legacy，只留給已發布的三則 jev-cascade 與測試；新貼文不要用）。
+**輪播模式（2026-10-12 起是預設；新貼文一律用，skillopt 三則都是）**：加 `"mode": "carousel"`、**不寫 `items`**。Threads 發成**一則輪播貼文**（`body` 當正文，附**全部投影片**，順序與 IG 相同，2～20 張）＋**一則回覆**（`last`，帶連結預覽與系列；獨立貼文沒有連結時可省略）；沒有逐張串文，所以正文要自己撐起重點與限定條件。沒寫 `mode` 是舊的逐張串文（legacy，只留給已發布的三則 jev-cascade 與測試；新貼文不要用）。
 
 ## caption
 

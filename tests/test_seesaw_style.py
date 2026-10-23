@@ -142,5 +142,26 @@ with _tf.TemporaryDirectory() as _d:
     _cap = IGP.load_pack(Path(_d))["caption"]
     expect("IG caption 沒有殘留的 $（LaTeX 已轉純文字）", "$" not in _cap and "為什麼只看 r 的差" in _cap, _cap)
 
+# 發布文字不能殘留 LaTeX 記號（build_package.check_tex_leftovers；spec 開 math 才檢查）
+import build_package as BP
+expect("tex_leftovers：抓得到 $ 與 \\frac", W.tex_leftovers(r"贏的機率 $r$ 與 \frac{a}{b}") == ["$", "\\frac"], "")
+expect("tex_leftovers：純文字沒有殘留", W.tex_leftovers("σ(r_i - r_j) 與 p_i/(p_i + p_j)") == [], "")
+with _tf.TemporaryDirectory() as _d:
+    _p = Path(_d)
+    (_p / "ig").mkdir()
+    (_p / "threads").mkdir()
+    (_p / "_build").mkdir()
+    (_p / "ig" / "post.md").write_text("乾淨的 caption", encoding="utf-8")
+    BP.check_tex_leftovers({"math": True}, _p, _p / "_build")
+    expect("沒有殘留時通過", True, "")
+    (_p / "_build" / "alt-text.json").write_text('{"01.png": "替代文字 $r$"}', encoding="utf-8")
+    BP.check_tex_leftovers({}, _p, _p / "_build")      # 沒開 math：不檢查
+    expect("沒開 math 時不檢查", True, "")
+    try:
+        BP.check_tex_leftovers({"math": True}, _p, _p / "_build")
+        expect("故意做壞：替代文字殘留 $ → 抓得到", False, "沒有擋下")
+    except SystemExit as e:
+        expect("故意做壞：替代文字殘留 $ → 抓得到", "alt-text.json" in str(e), str(e))
+
 print("\n全部通過" if not fails else f"\n失敗 {len(fails)} 項：{fails}")
 raise SystemExit(1 if fails else 0)

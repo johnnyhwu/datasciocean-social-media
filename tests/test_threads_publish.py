@@ -238,6 +238,17 @@ def main():
         r = TP.publish_thread(pk, False, env, None, H(), fetch=opener_ok)
         check("抓得到：輪播缺一張 JPEG → 問題", not r["ok"] and any("JPEG 不存在" in p for p in r["problems"]), r["problems"])
 
+        # 沒有最後一則回覆（沒有文章連結的獨立貼文，2026-10-23 人決定）：只發輪播
+        pk = fake_carousel_pack(tmp / "c6", 3)
+        sp = json.loads((pk / "_build" / "spec.json").read_text(encoding="utf-8"))
+        sp["threads"].pop("last")
+        (pk / "_build" / "spec.json").write_text(json.dumps(sp, ensure_ascii=False), encoding="utf-8")
+        plan = TP.plan_thread(pk, H())
+        check("沒有 last：計畫只有一則輪播、沒有問題", [p["media_type"] for p in plan["posts"]] == ["CAROUSEL"] and not plan["problems"], plan)
+        fk = Fake()
+        r = TP.publish_thread(pk, True, env, client(fk, []), H(), fetch=opener_ok)
+        check("沒有 last：--confirm 只發一則（3 個子項 → 輪播本體 → 發佈），沒有回覆", r["ok"] and kinds(fk) == ["create"] * 4 + ["publish"] and r["post_ids"] == ["P1"], (kinds(fk), r.get("error")))
+
         # 客戶端
         c = client(Fake(statuses=["IN_PROGRESS", "FINISHED"]), [])
         check("wait_ready：IN_PROGRESS 之後 FINISHED 通過", c.wait_ready("C1") == "FINISHED")

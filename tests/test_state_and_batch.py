@@ -103,5 +103,24 @@ with tempfile.TemporaryDirectory() as d:
         S.set_format("schema-valid-not-correct", "threads_thread", status="unsuitable", reason="卡上內容不夠撐串文")
     check("state：unsuitable 附原因", S.load("schema-valid-not-correct")["formats"]["threads_thread"]["reason"])
 
+# spec_diff：審查後的改動範圍（只審改過的區塊）
+import spec_diff as SD  # noqa: E402
+_old = {"slides": [{"layout": "cover", "title": "甲"}, {"layout": "text", "title": "乙"}], "threads": {"body": {"text": "正文"}, "last": {"text": "回覆"}}, "caption": {"first": "第一句"}}
+_new = copy.deepcopy(_old)
+check("spec_diff：沒有改動 → 空清單", SD.changed(_old, _new) == [])
+_new["slides"][1]["title"] = "乙改"
+_new["slides"].append({"layout": "text", "title": "新增頁"})
+_new["threads"].pop("last")
+_new["caption"]["first"] = "新第一句"
+check("spec_diff：抓得到改過、新增、刪除的區塊", SD.changed(_old, _new) == ["slide02", "slide03", "caption", "threads.last（已刪除）"], SD.changed(_old, _new))
+check("spec_diff：沒有審查版本 → 全部區塊", SD.changed(None, _old) == ["slide01", "slide02", "threads.body", "threads.last", "caption"])
+with tempfile.TemporaryDirectory() as d:
+    sp = Path(d) / "spec.json"
+    sp.write_text(json.dumps(_old, ensure_ascii=False), encoding="utf-8")
+    with contextlib.redirect_stdout(io.StringIO()):
+        check("spec_diff：--mark 之後沒有改動（結束碼 0）", SD.main(["x", str(sp), "--mark"]) == 0 and SD.main(["x", str(sp)]) == 0)
+        sp.write_text(json.dumps(_new, ensure_ascii=False), encoding="utf-8")
+        check("spec_diff：改了之後結束碼 1", SD.main(["x", str(sp)]) == 1)
+
 print(f"\n{'全部通過' if not fails else f'{len(fails)} 項失敗：' + '; '.join(fails)}")
 sys.exit(1 if fails else 0)

@@ -90,7 +90,7 @@ def main():
     fails = 0
     carousel_ok = mut(GOOD_A, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items")))
     waived_ok = mut(GOOD_A, lambda s: (s.update(waived_quals=[{"id": q, "reason": "人決定刪除"} for q in s["threads"]["body"]["quals"]]), s["threads"]["body"].update(quals=[])))
-    for base, name in ((waived_ok, "正確的貼文 A：限定條件有寫理由地放行（必須通過，測誤殺）"), (GOOD_A, "正確的貼文 A（必須通過）"), (GOOD_B, "正確的貼文 B（必須通過）"), (carousel_ok, "正確的貼文 A 改成 Threads 輪播模式（必須通過，測誤殺）"), (mut(GOOD_A, standalone), "正確的獨立貼文（series: null，延伸閱讀列已發布的貼文；必須通過，測誤殺）"), (mut(GOOD_A, lambda s: (standalone(s), s["slides"].pop())), "正確的獨立貼文：最後一張是帶走、沒有延伸閱讀（必須通過，測誤殺）")):
+    for base, name in ((waived_ok, "正確的貼文 A：限定條件有寫理由地放行（必須通過，測誤殺）"), (GOOD_A, "正確的貼文 A（必須通過）"), (GOOD_B, "正確的貼文 B（必須通過）"), (carousel_ok, "正確的貼文 A 改成 Threads 輪播模式（必須通過，測誤殺）"), (mut(GOOD_A, standalone), "正確的獨立貼文（series: null，延伸閱讀列已發布的貼文；必須通過，測誤殺）"), (mut(GOOD_A, lambda s: (standalone(s), s["slides"].pop())), "正確的獨立貼文：最後一張是帶走、沒有延伸閱讀（必須通過，測誤殺）"), (mut(GOOD_A, lambda s: (standalone(s), s["slides"].pop(), s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["threads"].pop("last"))), "正確的獨立貼文：Threads 輪播沒有最後一則回覆（必須通過，測誤殺）")):
         code, out = run(base)
         ok = code == 0
         fails += not ok

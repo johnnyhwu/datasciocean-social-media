@@ -67,8 +67,9 @@ def plan_thread(pack: Path, host: hosting.Host) -> dict:
         if not TA.CAROUSEL_MIN <= len(children) <= TA.CAROUSEL_MAX and not problems:
             problems.append(f"輪播要 {TA.CAROUSEL_MIN}～{TA.CAROUSEL_MAX} 張，目前 {len(children)} 張")
         posts = [{"kind": "root-carousel", "media_type": "CAROUSEL", "text": th["body"]["text"], "children": children}]
-        last = th["last"]
-        posts.append({"kind": "last", "media_type": "TEXT", "text": last["text"], "link_attachment": last.get("link")})
+        if th.get("last"):      # 沒有文章連結的獨立貼文：只發輪播，不發回覆
+            last = th["last"]
+            posts.append({"kind": "last", "media_type": "TEXT", "text": last["text"], "link_attachment": last.get("link")})
         return _finish_plan(d, posts, problems)
     posts = [{"kind": "root", "media_type": "TEXT", "text": th["body"]["text"]}]
     for it in th["items"]:
