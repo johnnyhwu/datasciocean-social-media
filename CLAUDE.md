@@ -75,18 +75,18 @@ out/                                    發布包（程式產生）
         threads/post.md                     Threads：舊格式是正文＋逐張串文＋最後一則；輪播模式是一則輪播（全部圖）＋一則連結回覆
         _build/                             機器用：spec.json（內容規格，唯一的真相來源）、checks-b.json、審查用文字…
 docs/                                   status.md（各系列進度與發布網址）、stage2-token-usage.md（token 用量與流程觀察）
-tests/                                  九份回歸測試（含 test_multicard.py：雙卡貼文與高密度版型；test_cards_style.py：一式四份系列模板；test_standalone_style.py：獨立貼文的地平線風格）+ fixtures/（舊的 jev-teardown 兩則貼文、系列檔與觀念卡，只給測試用）
+tests/                                  十份回歸測試（含 test_multicard.py：雙卡貼文與高密度版型；test_cards_style.py：一式四份系列模板；test_standalone_style.py：獨立貼文的地平線風格；test_seesaw_style.py：獨立貼文的蹺蹺板風格與新示意圖）+ fixtures/（舊的 jev-teardown 兩則貼文、系列檔與觀念卡，只給測試用）
 ```
 
 **找東西的規則**：要發文，從 `out/README.md` 進去，打開貼文的 `README.md`；要改內容，改該貼文 `_build/spec.json`，然後依序重跑 `check_a.py` → `render.py` → `contact_sheet.py` → `build_package.py`（`contact_sheet.py` 要在 `build_package.py` 之前，README 才會有縮圖）。
 
 為什麼 `config/`、`series/`、`state/` 在根目錄而不在 skill 裡：這些是人會改、會審、會長期累積的資料與設定；`.claude/` 放的是「Claude 怎麼做事」的流程與腳本。
 
-## 目前狀態（2026-10-21）
+## 目前狀態（2026-10-23）
 
-- **做完並發布的貼文**：系列 `skillopt`（3 則）、`persona-aware-d2s`（3 則）、`jev-cascade`（3 則），以及獨立貼文 `decision-transformer-reward-conditioning`（2026-10-21，9 張）。存量（`ready`）0 則；Threads 回補都做完（`state/backfill.md` 無項目）。各則網址與細節：`docs/status.md`。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。
-- **還沒做**：`bradley-terry-pairwise-preference`（獨立貼文，要另做一套全新視覺，不沿用 Decision Transformer 的「地平線」）；3 張 `claude-code-*` 卡（新文章，要先規劃系列）。
-- **獨立貼文**（沒有系列）：spec 寫 `series: null`，視覺在 `standalone/<觀念 id>/`，發布包在 `out/standalone/`（`spec-json.md`「獨立貼文」、`design-series-visuals`）。轉折張、延伸閱讀、導流連結先問人。
+- **做完並發布的貼文**：系列 `skillopt`（3 則）、`persona-aware-d2s`（3 則）、`jev-cascade`（3 則），以及獨立貼文 `decision-transformer-reward-conditioning`（2026-10-21，9 張）與 `bradley-terry-pairwise-preference`（2026-10-23，12 張，用 LaTeX 數學式）。存量（`ready`）0 則；Threads 回補都做完（`state/backfill.md` 無項目）。各則網址與細節：`docs/status.md`。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。
+- **還沒做**：3 張 `claude-code-*` 卡（新文章，要先規劃系列）。
+- **獨立貼文**（沒有系列）：spec 寫 `series: null`，視覺在 `standalone/<觀念 id>/`，發布包在 `out/standalone/`（`spec-json.md`「獨立貼文」、`design-series-visuals`）。轉折張、延伸閱讀、導流連結先問人。**沒有對應文章連結的獨立貼文，Threads 不發最後一則回覆**（人的決定，2026-10-23；工具要先改，見 `threads-and-caption.md`）。
 - **待人決定**：封面主標是否放寬成 3 行；`config/params.yaml` 的 `structure_text_max_chars` 與 `ai_tone_blacklist` 仍是初稿；Threads token 是否補上 `threads_delete` 權限（目前沒有，刪除只能手動）；系列名與標題的取名偏好（memory `feedback_series_naming`）；審查後「只削弱語氣的小改」要不要重審。
 
 ## 工作方式
@@ -110,6 +110,6 @@ tests/                                  九份回歸測試（含 test_multicard.
 - **做完一個階段，主動列出人接下來要確認或決定的事**（要確認什麼、還沒決定什麼）。人不做手動事項：需要手動才能完成的事，要嘛由 Claude 做、要嘛不做，不當成待辦丟給人。
 - skill 與 `references/` 是依實測整理出來的；細節有疑問時以它們為準，沒寫到的先問人，不要自己決定。
 - **發布流程的工具**（2026-10-15 整理）：dry-run 加 `--summary` 給人看；`--confirm` 成功後 README 與 `out/` 索引自動更新（`build_package.py --refresh`）；系列貼文的「同系列」連結用 `series_links.py` 補（Threads dry-run 會擋沒補的）；標 `ready` 時順便問人要不要整串授權。新系列的草圖：一次 3 個方向、IG 首頁 3×3 格與相鄰系列並排、存 `series/<id>/sketches/`（`design-series-visuals`）。
-- 修改任何程式檢查、審查或發布流程後，**重跑全部回歸測試**：`uv run python tests/test_check_a.py`、`test_state_and_batch.py`、`test_render_numunit.py`、`test_ig_publish.py`、`test_threads_publish.py`、`test_multicard.py`、`test_diagrams.py`、`test_cards_style.py`、`test_standalone_style.py`；新增檢查要加「故意做壞的版本」確認抓得到。
+- 修改任何程式檢查、審查或發布流程後，**重跑全部回歸測試**：`uv run python tests/test_check_a.py`、`test_state_and_batch.py`、`test_render_numunit.py`、`test_ig_publish.py`、`test_threads_publish.py`、`test_multicard.py`、`test_diagrams.py`、`test_cards_style.py`、`test_standalone_style.py`、`test_seesaw_style.py`；新增檢查要加「故意做壞的版本」確認抓得到。
 - 整理 repo 或文件時，順便檢查：討論中得到的回饋是否已寫進 CLAUDE.md 或 skill、有沒有過時（legacy）內容可刪、哪些屬於 `.claude/`（Claude 怎麼做事）而不是資料與設定。
 - 範例資料：**品質基準是 skillopt 第 2、3 則**（`out/skillopt/skillopt-batch-evidence-minibatch/`、`out/skillopt/skillopt-blind-acceptance-gate/`；雙卡、17 張、多種示意圖、口語白話、Threads 輪播；人說這兩則都比較滿意）；`skillopt-overview` 是單卡＋diagram 的範例；jev-cascade 的 `cascade-complementary-errors` 是成對橫條圖的範例（舊基準），`jev-cascade-overview` 的寫法已過時。內容規格在各則 `_build/spec.json`。`tests/fixtures/` 只給回歸測試用。

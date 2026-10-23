@@ -51,7 +51,7 @@ def threads_len(text: str) -> int:
 
 
 def plan_thread(pack: Path, host: hosting.Host) -> dict:
-    d = json.loads((pack / "_build" / "spec.json").read_text(encoding="utf-8"))
+    d = W.untex(json.loads((pack / "_build" / "spec.json").read_text(encoding="utf-8")))      # LaTeX 轉純文字
     th = d["threads"]
     problems = []
     if th.get("mode") == "carousel":

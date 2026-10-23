@@ -4,7 +4,7 @@
 流程圖、任何圖都可以，只要讓讀者更好理解、覺得有趣」。所以除了橫條圖，另有下列 kind（spec 的 `kind` 欄位）：
   flow      由上往下的流程：nodes（每個 text、選用 sub）、選用 outcomes（兩三個結果，good 金色／bad 外框）、選用 loop（底部虛線框的說明）
   compare   兩欄並列：columns = [{head, items:[{text, sub?, gone?, emph?}]}]（gone = 劃掉、emph = 左側金條）
-  pairs     「換掉什麼 → 換成什麼」：heads = [左標, 右標]、pairs = [[左, 右], …]
+  pairs     「換掉什麼 → 換成什麼」：heads = [左標, 右標]、pairs = [[左, 右], …]、選用 outcomes[0]（底下一條橫框，tone: good 金色）
   samples   一個點 vs 一批點：nodes = [{text, sub?}, {text, sub?}]
   paths     亂走 vs 小步走：nodes = [{text, sub?}, {text, sub?}]
   epochs    小步子與每輪結束的檢查旗：nodes = [{text}（小點是什麼）, {text}（金旗是什麼）]
@@ -20,6 +20,9 @@
   quad      2×2 四個格子：nodes = 4 個 [{text, sub?, emph?, bars?}]（bars＝格子上方的小投影片有幾條條列）
   locked    文件裡一塊受保護的區塊：heads = [被擋下的來源, 能更新的來源]、nodes = [{text}（文件名）, {text}（受保護區塊）]
   tokens    符號序列（2026-10-18）：steps = [{label, cells:[{text, sub?, tone}]}]，一列一步；tone = rtg／state／action／reward／mask；選用 more、outcomes[0]
+  seesaw    蹺蹺板（2026-10-22，Bradley-Terry）：nodes = [{text（隊名）, sub?（實力值）, blocks（方塊數）, win（贏的機率標籤）}, {…}]；重的一端壓低（傾斜角隨兩端比例）；梁下面一條橫條，長度與兩端方塊數的比例成正比；選用 outcomes[0]（底下一條橫框）；純示意
+  hidden    水面上看得到的、水面下看不到的：heads = [上標籤, 下標籤]、nodes = 水面上的結果 [{text}]（最多 3）、outcomes = 水面下藏著的東西 [{text, sub?}]（畫成虛線框的「？」；最多 3）
+  cycle     三個節點繞成一圈（A→B→C→A，最後一條箭頭金色）：nodes = 3 個 [{text, sub?}]、heads = 3 條邊的標籤（依序 A→B、B→C、C→A）、選用 outcomes[0]（底下一條橫框）
   stops     由上往下三個停靠點（不按比例）：nodes = [{text, sub?, emph?}]、選用 heads = [上端標籤, 下端標籤]
 
 規則：圖形全部用 class "bg"（不進程式 B 的文字與圖形重疊檢查），所以排版由這裡負責避開文字；框內的文字由程式 B 的「框內文字不超出框」檢查；
@@ -28,6 +31,7 @@
 from __future__ import annotations
 
 import math
+import re
 
 CREAM, TEAL, DEEP, GOLD = "#F2E0C0", "#076876", "#01353F", "#DDA642"
 MID, LIGHT, ABYSS = "#1F8A8D", "#69B4AA", "#032027"
@@ -77,6 +81,9 @@ class Canvas:
              (x2 - head * math.cos(ang + .45), y2 - head * math.sin(ang + .45))]
         self.poly(p, fill=color, closed=True)
 
+    def raw(self, svg: str):
+        self.svg.append(svg)
+
     # ---- 文字（class t；data-box 讓程式 B 檢查文字不超出框）
     def text(self, x, y, w, s, cls="dn", color=DEEP, align="left", box=None, extra=""):
         b = f' data-box="{box[0]:.1f},{box[1]:.1f},{box[2]:.1f},{box[3]:.1f}"' if box else ""
@@ -84,7 +91,9 @@ class Canvas:
         self.html.append(f'<div class="t abs {cls}" style="left:{x:.1f}px;top:{y:.1f}px;width:{w:.1f}px;color:{color};text-align:{align}{extra}"{b}>{self.ctx.esc(t) if "<br>" not in t else "<br>".join(self.ctx.esc(p) for p in t.split("<br>"))}</div>')
 
     def lines(self, s, w, size):
-        return self.ctx.est_lines(self.ctx.bind(s), w / size - 0.7)
+        # 文字裡的 \n 是明確換行（text() 會轉成 <br>），每一段各自估行數再加總
+        # 分數（\\frac）比一般行高：含分數的那一段多算約一行；含上下標或 \\mathcal 的算式多算約三分之一行
+        return sum(self.ctx.est_lines(self.ctx.bind(seg), w / size - 0.7) + (0.9 if re.search(r"\\[dt]?frac", seg) else 0.35 if re.search(r"\$[^$]*[_^\\][^$]*\$", seg) else 0) for seg in s.split("\n"))
 
     def textbox(self, x, y, w, title, sub=None, fill=DEEP, tcolor=CREAM, scolor=LIGHT, stroke=None, dash=None, align="left", pad=22, h=None, size=34):
         """畫一個框，框裡放標題與副標；回傳框高。h 給定時用固定高（文字垂直置中）。"""
@@ -197,7 +206,10 @@ def pairs(c: Canvas, spec: dict, y0: float) -> float:
     lw, rw, mid = 380, 460, 80
     rx = X0 + lw + mid
     rows = [max(c.lines(l, lw - 44, 34), c.lines(r, rw - 44, 34)) * 44.2 + 44 for l, r in prs]
-    total = 44 + 14 + sum(rows) + 18 * (len(prs) - 1)
+    foot = (spec.get("outcomes") or [None])[0]      # 選用（2026-10-22）：底下一條橫框，例如拿前面的例子驗算 {text, sub?, tone?}
+    fh = (c.lines(foot["text"], X1 - X0 - 44, 34) * 44.2 + (c.lines(foot["sub"], X1 - X0 - 44, 28) * 39.2 + 6 if foot.get("sub") else 0) + 44) if foot else 0
+    fgap = 30 if foot else 0
+    total = 44 + 14 + sum(rows) + 18 * (len(prs) - 1) + fgap + fh
     _fit(total, BOTTOM - y0, "pairs")
     add = min((BOTTOM - y0 - total) / len(prs), 60)
     rows = [r + add for r in rows]
@@ -212,6 +224,12 @@ def pairs(c: Canvas, spec: dict, y0: float) -> float:
         c.text(rx + 22, y + (h - c.lines(r, rw - 44, 34) * 44.2) / 2, rw - 44, r, "dn", CREAM, "left", (rx, y, rw, h))
         c.arrow(X0 + lw + 10, y + h / 2, rx - 10, y + h / 2, color=GOLD, sw=5)
         y += h + 18
+    if foot:
+        good = foot.get("tone") == "good"
+        y += fgap - 18
+        c.textbox(X0, y, X1 - X0, foot["text"], foot.get("sub"), fill=GOLD if good else DEEP, tcolor=DEEP if good else CREAM,
+                  scolor=DEEP if good else LIGHT, align="center", h=fh)
+        return y + fh
     return y0 + total
 
 
@@ -838,9 +856,163 @@ def tokens(c: Canvas, spec: dict, y0: float) -> float:
     return y
 
 
+# ------------------------------------------------------------------ seesaw（蹺蹺板：兩端各疊幾塊，梁向重的一邊傾斜；下面一條橫條是贏的機率）
+def _stack(c: Canvas, x, base_y, n, u, fill, cols):
+    """從 base_y（梁的上緣）往上疊 n 塊（每列 cols 塊）。"""
+    for i in range(n):
+        col, row = i % cols, i // cols
+        c.rect(x + col * u, base_y - (row + 1) * u, u - 4, u - 4, fill=fill, rx=max(3, u * .1))
+
+
+def seesaw(c: Canvas, spec: dict, y0: float) -> float:
+    """nodes = [{text（隊名）, sub?（實力值）, blocks（方塊數）, win（贏的機率標籤，放在下面橫條裡）}, {…}]。
+    第一個是重的一端（左），第二個是輕的一端（右，金色）。傾斜角 = 16° x（重 − 輕）/（重 ＋ 輕），最多 14°；純示意。
+    橫條的長度與兩端方塊數的比例成正比（左：深海、右：金色）；outcomes[0]（選用）= 底下一條橫框 {text, sub?}。"""
+    (a, b), foot = spec["nodes"], (spec.get("outcomes") or [None])[0]
+    na, nb = int(a["blocks"]), int(b["blocks"])
+    w = X1 - X0
+    ca, cb = (2 if na > 3 else 1), (2 if nb > 3 else 1)
+    ra, rb = math.ceil(na / ca), math.ceil(nb / cb)
+    tilt = min(14.0, 16.0 * (na - nb) / (na + nb))
+    L = 800.0
+    lab_h = max(c.lines(n["text"], 330, 34) * 44.2 + (c.lines(n["sub"], 330, 28) * 39.2 + 6 if n.get("sub") else 0) for n in (a, b))
+    bar_h = 84
+    fh = (c.lines(foot["text"], w - 44, 34) * 44.2 + (c.lines(foot["sub"], w - 44, 28) * 39.2 + 6 if foot.get("sub") else 0) + 44) if foot else 0
+    avail = BOTTOM - y0
+    fixed = lab_h + 16 + 34 + bar_h + (30 + fh if foot else 0)
+    u = max(28.0, min(52.0, (avail - fixed - 120) / (max(ra, rb) + 1.2)))      # 方塊大小：依剩下的高度決定
+    drop = (L / 2) * math.sin(math.radians(tilt))
+    top = max(ra * u - drop, rb * u + drop) + 8                                   # 梁中心以上要留的高度
+    fk = 70.0                                                                       # 支點高度
+    zone = top + max(fk, drop + 20)
+    total = zone + 16 + lab_h + 34 + bar_h + (30 + fh if foot else 0)
+    _fit(total, avail, "seesaw")
+    cx, cy = X0 + w / 2, y0 + top
+    thick = 14
+    parts = []
+    ux = cx - L / 2 + u * .5
+    rx_ = cx + L / 2 - u * .5 - cb * u
+    inner = Canvas(c.ctx)
+    _stack(inner, ux, cy - thick / 2, na, u, TEAL, ca)
+    _stack(inner, rx_, cy - thick / 2, nb, u, GOLD, cb)
+    inner.rect(cx - L / 2, cy - thick / 2, L, thick, fill=DEEP, rx=thick / 2)
+    c.raw(f'<g transform="rotate({-tilt:.2f} {cx:.1f} {cy:.1f})">' + "".join(inner.svg) + '</g>')
+    c.poly([(cx, cy + 2), (cx - fk * .65, cy + fk), (cx + fk * .65, cy + fk)], fill=TEAL, closed=True)
+    fy = cy + max(fk, drop + 20)
+    c.line(cx - L / 2 - 20, fy, cx + L / 2 + 20, fy, DEEP, 4)
+    # 兩端的標籤：放在梁兩端下方的地線之下，置中對齊各自的方塊堆
+    ex = [cx - (L / 2) * math.cos(math.radians(tilt)) + u, cx + (L / 2) * math.cos(math.radians(tilt)) - u]
+    y = fy + 16
+    for ex_, n in zip(ex, (a, b)):
+        l1 = c.lines(n["text"], 330, 34)
+        c.text(ex_ - 165, y, 330, n["text"], "dn", DEEP, "center")
+        if n.get("sub"):
+            c.text(ex_ - 165, y + l1 * 44.2 + 6, 330, n["sub"], "ds", DEEP, "center")
+    y += lab_h + 34
+    # 贏的機率橫條：兩段的寬度與方塊數的比例成正比
+    wa = w * na / (na + nb)
+    c.rect(X0, y, wa, bar_h, fill=DEEP, rx=14)
+    c.rect(X0 + wa, y, w - wa, bar_h, fill=GOLD, rx=14)
+    c.text(X0 + 14, y + (bar_h - 44) / 2, wa - 28, a["win"], "dn", CREAM, "center", (X0, y, wa, bar_h))
+    c.text(X0 + wa + 8, y + (bar_h - 39) / 2, w - wa - 16, b["win"], "dl", DEEP, "center", (X0 + wa, y, w - wa, bar_h))
+    y += bar_h
+    if foot:
+        y += 30
+        c.textbox(X0, y, w, foot["text"], foot.get("sub"), fill=DEEP, tcolor=CREAM, scolor=LIGHT, align="center")
+        y += fh
+    return y
+
+
+# ------------------------------------------------------------------ hidden（水面上看得到的，水面下看不到的）
+def hidden(c: Canvas, spec: dict, y0: float) -> float:
+    """heads = [上標籤, 下標籤]；nodes = 水面上的結果 [{text}]（1～3 個）；outcomes = 水面下藏著的東西 [{text, sub?}]（1～3 個，畫成虛線框的「？」）。"""
+    h_up, h_dn = spec["heads"]
+    res, hid = spec["nodes"], spec["outcomes"]
+    w = X1 - X0
+    gap = 20
+    cw = (w - gap * (len(res) - 1)) / len(res)
+    rh = max(c.lines(r["text"], cw - 36, 34) for r in res) * 44.2 + 40
+    hw = (w - gap * (len(hid) - 1)) / len(hid)
+    hh = 96 + max(c.lines(n["text"], hw - 28, 34) * 44.2 + (c.lines(n["sub"], hw - 28, 28) * 39.2 + 6 if n.get("sub") else 0) for n in hid) + 36
+    top = 46 + rh + 50                                  # 標籤 + 結果 + 水面上的留白
+    sea_head = 54
+    total = top + 18 + sea_head + hh + 24
+    avail = BOTTOM - y0
+    _fit(total, avail, "hidden")
+    extra = avail - total
+    rh += min(extra * .3, 40); hh += min(extra * .4, 60)
+    top = 46 + rh + 50
+    sea_y = y0 + top
+    sea_h = (BOTTOM - sea_y) if extra > 0 else (18 + sea_head + hh + 24)
+    c.text(X0, y0, w, h_up, "ds", TEAL, "left")
+    for k, r in enumerate(res):
+        x = X0 + k * (cw + gap)
+        c.rect(x, y0 + 46, cw, rh, fill=CREAM, stroke=DEEP, sw=3, rx=14)
+        l1 = c.lines(r["text"], cw - 36, 34)
+        c.text(x + 18, y0 + 46 + (rh - l1 * 44.2) / 2, cw - 36, r["text"], "dt", DEEP, "center", (x, y0 + 46, cw, rh))
+    # 水面：一條浪線，浪線下面是深海色的面板
+    pts = [(X0 + i * w / 40, sea_y + 7 * math.sin(i * 0.9)) for i in range(41)]
+    c.poly(pts + [(X1, sea_y + sea_h), (X0, sea_y + sea_h)], fill=DEEP, closed=True)
+    c.poly(pts, stroke=LIGHT, sw=4)
+    c.text(X0 + 24, sea_y + 22, w - 48, h_dn, "ds", LIGHT, "left")
+    by = sea_y + 22 + sea_head
+    for k, n in enumerate(hid):
+        x = X0 + k * (hw + gap)
+        bh = sea_h - (by - sea_y) - 24
+        c.rect(x + 14, by, hw - 28, bh, fill="none", stroke=LIGHT, sw=3, dash="10 8", rx=14)
+        l1 = c.lines(n["text"], hw - 56, 34)
+        th = 84 + l1 * 44.2 + (c.lines(n["sub"], hw - 56, 28) * 39.2 + 6 if n.get("sub") else 0)
+        ty = by + (bh - th) / 2
+        box = (x + 14, by, hw - 28, bh)
+        c.text(x + 28, ty, hw - 56, "？", "dv", GOLD, "center", box)
+        c.text(x + 28, ty + 84, hw - 56, n["text"], "dn", CREAM, "center", box)
+        if n.get("sub"):
+            c.text(x + 28, ty + 84 + l1 * 44.2 + 6, hw - 56, n["sub"], "ds", LIGHT, "center", box)
+    return sea_y + sea_h
+
+
+# ------------------------------------------------------------------ cycle（三個節點繞成一圈：A→B→C→A）
+def cycle(c: Canvas, spec: dict, y0: float) -> float:
+    """nodes = 3 個 [{text, sub?}]（上、左下、右下）；heads = 3 條邊的標籤，依序 A→B（左邊）、B→C（下邊）、C→A（右邊，金色）；
+    outcomes[0]（選用）= 底下一條橫框 {text, sub?}。"""
+    nodes, heads, foot = spec["nodes"], spec["heads"], (spec.get("outcomes") or [None])[0]
+    w, r = X1 - X0, 64
+    fh = (c.lines(foot["text"], w - 44, 34) * 44.2 + (c.lines(foot["sub"], w - 44, 28) * 39.2 + 6 if foot.get("sub") else 0) + 44) if foot else 0
+    avail = BOTTOM - y0
+    under = 24 + 44                                      # 下邊標籤
+    fixed = 2 * r + under + (28 + fh if foot else 0)
+    tri = min(330.0, avail - fixed)
+    _fit(fixed + 220, avail, "cycle")                    # 三角形至少要有 220 的高
+    ya = y0 + r
+    yb = ya + tri
+    A, B, C = (X0 + w / 2, ya), (X0 + w / 2 - 250, yb), (X0 + w / 2 + 250, yb)
+    pts = [A, B, C]
+    def trim(p, q, d):
+        dx, dy = q[0] - p[0], q[1] - p[1]; n = math.hypot(dx, dy)
+        return (p[0] + dx / n * d, p[1] + dy / n * d)
+    for i, (p, q) in enumerate(((A, B), (B, C), (C, A))):
+        s_, e_ = trim(p, q, r + 8), trim(q, p, r + 14)
+        gold = i == 2
+        c.arrow(s_[0], s_[1], e_[0], e_[1], color=GOLD if gold else DEEP, sw=9 if gold else 6, head=26 if gold else 22)
+    for p, n in zip(pts, nodes):
+        c.circle(p[0], p[1], r, fill=DEEP)
+        c.text(p[0] - r, p[1] - 36, 2 * r, n["text"], "dv", CREAM, "center", (p[0] - r, p[1] - r, 2 * r, 2 * r))
+    lw = 300
+    c.text(X0, (A[1] + B[1]) / 2 - 22, lw, heads[0], "dn", DEEP, "right")
+    c.text(X0 + w / 2 - lw / 2, yb + r + 24, lw, heads[1], "dn", DEEP, "center")
+    c.text(X1 - lw, (A[1] + C[1]) / 2 - 22, lw, heads[2], "dn", DEEP, "left")
+    y = yb + r + under
+    if foot:
+        y += 28
+        c.textbox(X0, y, w, foot["text"], foot.get("sub"), fill=DEEP, tcolor=CREAM, scolor=LIGHT, align="center")
+        y += fh
+    return y
+
+
 KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "paths": paths, "epochs": epochs,
          "dotgrid": dotgrid, "dumbbell": dumbbell, "range": range_chart, "funnel": funnel,
-         "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation, "tokens": tokens}
+         "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation, "tokens": tokens,
+         "seesaw": seesaw, "hidden": hidden, "cycle": cycle}
 
 
 def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:
@@ -859,7 +1031,7 @@ def texts(sl: dict) -> list[str]:
         for cell in st["cells"]:
             out.append(cell["text"]); out += [cell["sub"]] if cell.get("sub") else []
     for n in sl.get("nodes", []) + sl.get("outcomes", []):
-        out.append(n["text"]); out += [n["sub"]] if n.get("sub") else []; out += [n["sub2"]] if n.get("sub2") else []
+        out.append(n["text"]); out += [n["sub"]] if n.get("sub") else []; out += [n["sub2"]] if n.get("sub2") else []; out += [n["win"]] if n.get("win") else []
     if sl.get("loop"):
         out.append(sl["loop"])
     for col in sl.get("columns", []):

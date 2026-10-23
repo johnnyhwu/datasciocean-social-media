@@ -54,7 +54,7 @@
 | `takeaway` 帶走 | 倒數第二張 | 深海底，金色字，只有一句話，字最大，適合截圖 |
 | `series_map` 系列地圖（獨立 post 為「延伸閱讀」） | 最後一張 | 米色底；列出同系列各則標題，目前這則用深海色塊加金色標記；底部導流行 |
 
-**示意圖版型 `diagram`（2026-10-11 新增，等深線系列 `series/skillopt` 與一式四份系列 `series/persona-aware-d2s` 有模板；jev-cascade 沒有）**：流程 `flow`、並列對比 `compare`、換掉什麼換成什麼 `pairs`、一個點 vs 一批點 `samples`、亂走 vs 小步走 `paths`、小步子與檢查旗 `epochs`、點陣 `dotgrid`、前後對比 `dumbbell`、區間條 `range`、漏斗 `funnel`、一個池子切成幾組 `batches`、從多降到少的曲線 `decay`（軸從 0 起）、三個停靠點 `stops`、幾組同時做再匯成一份 `fan`、兩條曲線高點重合 `peaks`、2×2 四格 `quad`、受保護區塊 `locked`（2026-10-12 加，skillopt 第 2 則用）、符號序列 `tokens`（2026-10-18 加，Decision Transformer 用：一列一步、每格一個符號，可蓋住一格；樣式 rtg／state／action／reward／mask）。圖形全用 class `bg`（不進程式 B 的文字與圖形重疊檢查，排版由 `scripts/diagrams.py` 負責避開文字）、字級只用 {28, 34, 40, 56}、金色只給最重要的一處；框內文字與比例由程式 B 檢查。**不要每篇貼文都用同一種橫條圖**：文字下方空出來的區塊是「塗鴉牆」。
+**示意圖版型 `diagram`（2026-10-11 新增，等深線系列 `series/skillopt` 與一式四份系列 `series/persona-aware-d2s` 有模板；jev-cascade 沒有）**：流程 `flow`、並列對比 `compare`、換掉什麼換成什麼 `pairs`、一個點 vs 一批點 `samples`、亂走 vs 小步走 `paths`、小步子與檢查旗 `epochs`、點陣 `dotgrid`、前後對比 `dumbbell`、區間條 `range`、漏斗 `funnel`、一個池子切成幾組 `batches`、從多降到少的曲線 `decay`（軸從 0 起）、三個停靠點 `stops`、幾組同時做再匯成一份 `fan`、兩條曲線高點重合 `peaks`、2×2 四格 `quad`、受保護區塊 `locked`（2026-10-12 加，skillopt 第 2 則用）、符號序列 `tokens`（2026-10-18 加，Decision Transformer 用：一列一步、每格一個符號，可蓋住一格；樣式 rtg／state／action／reward／mask）、蹺蹺板 `seesaw`（2026-10-22 加，Bradley-Terry 用：兩端各疊幾塊、梁向重的一邊傾斜，下面一條橫條的長度與方塊數比例成正比；純示意）、水面上下 `hidden`（同上：上面是看得到的結果、水面下是虛線框的「？」）、繞一圈 `cycle`（同上：三個節點 A→B→C→A，最後一條箭頭金色）。`pairs` 底下可加一條橫框（`outcomes[0]`，例如拿前面的例子驗算）。圖形全用 class `bg`（不進程式 B 的文字與圖形重疊檢查，排版由 `scripts/diagrams.py` 負責避開文字）、字級只用 {28, 34, 40, 56}、金色只給最重要的一處；框內文字與比例由程式 B 檢查。**不要每篇貼文都用同一種橫條圖**：文字下方空出來的區塊是「塗鴉牆」。
 
 **系列標籤**：同一系列每則貼文的每一張，都要有系列標籤（封面放在海浪色帶上，其餘放左上角），文字必須與系列檔的 `name` 完全相同。獨立 post 沒有系列標籤。
 
@@ -97,6 +97,9 @@
 | 兩條線的高點落在同一處 | `peaks`（純示意） | 驗證分數與測試分數的高點重合 |
 | 幾乘幾等於幾（資料量、模型數） | `equation`（A × B ＝ C，大數字；比點陣方陣更能說「怎麼算出來的」） | persona-aware-d2s 第 2 則：20 篇 × 4 種 persona ＝ 80 筆 |
 | 2×2 的四種狀態 | `quad`（只有在格子的軸有卡上依據時才用；可加 `bars` 在格子上畫小投影片） | persona-aware-d2s 第 1 則：專家／非專家 × 長版／短版 |
+| 看得到的結果 vs 看不到的隱藏量 | `hidden`（水面上是結果、水面下是虛線框的「？」） | Bradley-Terry：比賽結果看得見、實力值看不見 |
+| 兩端不一樣重、傾斜多少就是機率 | `seesaw`（方塊數＝實力，橫條與方塊數成正比） | Bradley-Terry：實力 8 對 2，贏面八成 |
+| A 比 B 好、B 比 C 好、C 比 A 好（循環） | `cycle`（金色箭頭是打破傳遞性的那一條） | Bradley-Terry 的傳遞性缺陷 |
 | 決策樹 | 尚未實作 | — |
 
 ### 4.3 用法

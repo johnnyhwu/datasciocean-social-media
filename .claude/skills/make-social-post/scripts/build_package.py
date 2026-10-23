@@ -298,7 +298,7 @@ def indexes() -> None:
 
 def refresh(spec_path: Path) -> None:
     """發布後只重寫 README.md 與索引，反映最新的狀態與網址。"""
-    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    d = W.untex(json.loads(spec_path.read_text(encoding="utf-8")))
     pack, bld = W.pack_dir(spec_path), W.build_dir(spec_path)
     card = W.parse_card(W.WIKI / "wiki" / "concepts" / f"{d['concept']}.md")
     series = load_series(d.get("series"))
@@ -312,7 +312,7 @@ def refresh(spec_path: Path) -> None:
 
 
 def build(spec_path: Path, force: bool = False) -> None:
-    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    d = W.untex(json.loads(spec_path.read_text(encoding="utf-8")))
     W.guard_published(d, force)
     check_fields(d)
     pack, bld = W.pack_dir(spec_path), W.build_dir(spec_path)

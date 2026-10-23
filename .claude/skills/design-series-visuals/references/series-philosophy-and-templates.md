@@ -26,6 +26,7 @@
 - 草圖只比 IG 首頁 3×3 格裡和**相鄰既有系列**分得開不開；不用再顧「同系列的其他則」。
 - `render.py` 的 `load_visual()` 在 `series` 為 null 時讀 `standalone/<觀念>/`；`SERIES_COLORS` 要加這個風格的色；模板沒有系列標籤與色帶，`series_map` 變成「延伸閱讀」（`items`）。
 - 風格的回歸測試：`tests/test_standalone_style.py`（地平線 `horizon`：九個版型、封面副標固定在地平線下、故意做壞三種）；檢查項目的獨立貼文案例在 `tests/test_check_a.py`。
+- 第二個例子：`standalone/bradley-terry-pairwise-preference/`（「蹺蹺板」`seesaw`：米色底、封面下半一座蹺蹺板，一端疊 8 塊、一端疊 2 塊，梁向重的一邊傾斜、金色只給輕的一端；內頁頂端右側一個小蹺蹺板，傾斜角隨頁數轉向；帶走張深海底。2026-10-22 人從三個草圖（蹺蹺板／對戰網／八比二）選 S1；回歸測試 `tests/test_seesaw_style.py`，含三種新示意圖 `seesaw`、`hidden`、`cycle`）。
 - 第一個例子：`standalone/decision-transformer-reward-conditioning/`（「地平線」：先把目標放在地平線上，再一步一步走向它；封面上深下淺、半個金太陽在地平線上；內頁頂端一條帶進度點的深海細帶）。
 
 ## 做一個新系列的步驟

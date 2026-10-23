@@ -60,7 +60,7 @@ def slide_texts(sl: dict) -> list[str]:
 
 def main(spec_path: str) -> int:
     sp = Path(spec_path)
-    doc = json.loads(sp.read_text(encoding="utf-8"))
+    doc = W.untex(json.loads(sp.read_text(encoding="utf-8")))      # `$...$` 轉純文字再檢查
     card = W.parse_card(W.WIKI / "wiki" / "concepts" / f"{doc['concept']}.md")
     claims = W.spec_claims(doc)   # 主卡裸 id；併入的卡「卡id:cN」
     if doc.get("series"):

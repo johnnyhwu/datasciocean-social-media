@@ -200,3 +200,43 @@ def spec_claims(doc: dict) -> dict[str, dict]:
 
 def load_all_cards() -> list[Card]:
     return [parse_card(p) for p in sorted((WIKI / "wiki" / "concepts").glob("*.md"))]
+
+
+# ---------------------------------------------------------------- LaTeX 標記（spec 的 `$...$`，2026-10-22）
+# 圖上的數學符號與算式用 `$...$` 寫 LaTeX（頂層 `"math": true` 才啟用，由 render.py 用 KaTeX 排版）。
+# 其他所有吃文字的地方（程式 A、審查用文字、README、alt text）看到的都是下面轉出來的純文字。
+_TEX_SYM = {r"\sigma": "σ", r"\approx": "≈", r"\div": "÷", r"\times": "×", r"\cdot": "·", r"\ln": "ln", r"\log": "log",
+            r"\le": "≤", r"\ge": "≥", r"\neq": "≠", r"\pm": "±", r"\,": "", r"\;": " ", r"\!": "", r"\left": "", r"\right": ""}
+
+
+def _tex_one(t: str) -> str:
+    t = re.sub(r"\\(?:text|mathcal|mathbb|mathrm|mathbf)\{([^{}]*)\}", r"\1", t)
+    for _ in range(4):                      # 上下標先展開（內層先），分數的 {} 裡就沒有巢狀大括號
+        t = re.sub(r"\^\{([^{}]*)\}", lambda m: "^" + (m.group(1) if len(m.group(1)) == 1 else f"({m.group(1)})"), t)
+        t = re.sub(r"_\{([^{}]*)\}", lambda m: "_" + (m.group(1) if len(m.group(1)) == 1 else f"({m.group(1)})"), t)
+    for _ in range(6):                      # 由內往外展開分數
+        t2 = re.sub(r"\\[dt]?frac\{([^{}]*)\}\{([^{}]*)\}",
+                    lambda m: (m.group(1) if re.fullmatch(r"[\w.]+", m.group(1)) else f"({m.group(1)})") + "/"
+                    + (m.group(2) if re.fullmatch(r"[\w.]+", m.group(2)) else f"({m.group(2)})"), t)
+        if t2 == t:
+            break
+        t = t2
+    for k in sorted(_TEX_SYM, key=len, reverse=True):
+        t = t.replace(k, _TEX_SYM[k])
+    return re.sub(r"[{}]", "", t).strip()
+
+
+def tex_plain(s: str) -> str:
+    """把字串裡的 `$...$` 轉成純文字（σ、÷、分數寫成 a/b、上下標寫成 ^ 與 _），其餘不動。"""
+    return re.sub(r"\$([^$]+)\$", lambda m: _tex_one(m.group(1)), s) if "$" in s else s
+
+
+def untex(obj):
+    """遞迴把 spec 裡所有字串的 `$...$` 轉成純文字（給程式 A 與發布文字用）。"""
+    if isinstance(obj, str):
+        return tex_plain(obj)
+    if isinstance(obj, list):
+        return [untex(x) for x in obj]
+    if isinstance(obj, dict):
+        return {k: untex(v) for k, v in obj.items()}
+    return obj

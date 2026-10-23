@@ -65,7 +65,7 @@ def prepare_images(pack: Path) -> dict:
 # ---------------------------------------------------------------- 發文計畫
 def load_pack(pack: Path) -> dict:
     spec_f = pack / "_build" / "spec.json"
-    d = json.loads(spec_f.read_text(encoding="utf-8"))
+    d = W.untex(json.loads(spec_f.read_text(encoding="utf-8")))      # 圖上的 `$...$` LaTeX 在 caption 要是純文字
     alt_f = pack / "_build" / "alt-text.json"
     alts = json.loads(alt_f.read_text(encoding="utf-8")) if alt_f.exists() else {}
     return {"spec": d, "alts": alts, "caption": BP.caption_text(d)}

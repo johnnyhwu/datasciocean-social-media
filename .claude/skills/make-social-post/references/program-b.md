@@ -48,3 +48,5 @@ spec.json → 填入該系列的 HTML 模板（內嵌字型）→ Playwright 無
 ## 渲染是確定性的
 
 同一份 spec 與同一版模板，重渲的 PNG 逐位元相同。想確認「改了程式／搬了 repo 有沒有改壞渲染」，重渲現有發布包後比對 PNG 的 md5 即可。
+
+- **LaTeX 算式沒有語法錯誤**（2026-10-22）：spec 頂層 `"math": true` 時，KaTeX 對寫錯的 `$...$` 會輸出紅字的 `.katex-error`，程式 B 找到就擋。

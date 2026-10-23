@@ -33,7 +33,7 @@ RP = PARAMS["render"]
 WD, HT, SAFE_X, PAD_X = RP["width"], RP["height"], RP["safe_x"], RP["pad_x"]
 CREAM, TEAL, DEEP, GOLD = "#F2E0C0", "#076876", "#01353F", "#DDA642"
 MID, LIGHT, ABYSS = "#1F8A8D", "#69B4AA", "#032027"
-SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD}
+SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD, "seesaw": GOLD}
 ALLOWED_FONT_PX = {28, 34, 38, 40, 56, 72, 76}
 ZERO_Y = 706          # 測深圖水面（0）
 
@@ -89,6 +89,8 @@ def bind_nums(s: str) -> str:
     只在渲染時處理，spec 與 alt-text 保持原文。DSO_NO_NUMBIND=1 只給測試用（驗證程式 B 抓得到拆行）。"""
     if os.environ.get("DSO_NO_NUMBIND"):
         return s
+    if "$" in s:      # LaTeX 片段原樣保留，只處理片段以外的文字
+        return "".join(p if i % 2 else bind_nums(p) for i, p in enumerate(re.split(r"(\$[^$]+\$)", s)))
     s = re.sub(r"(?<=[A-Za-z0-9])-(?=[A-Za-z0-9])", "-⁠", s)     # GPT-6、GPT-5.6：連字號後不斷行（不然會拆成「GPT-／6」）
     s = re.sub(r"(?<=[0-9%]) +(?=[\u4e00-\u9fff])", "\u00a0", s)      # 27% 的、GPT-6 單獨、1.87 秒
     return re.sub(r"(?<=[\u4e00-\u9fff]) +(?=[0-9])", "\u00a0", s)    # 只轉 25%、費用 27%
@@ -99,7 +101,7 @@ def title_html(s: str) -> str:
 
 
 def plain(s: str) -> str:
-    return re.sub(r"\[\[(.+?)\]\]", r"\1", s)
+    return W.tex_plain(re.sub(r"\[\[(.+?)\]\]", r"\1", s))
 
 
 # ---------------------------------------------------------------- SVG 元件
@@ -286,6 +288,7 @@ def bob(x, y_end, col, v="", emph=False):
 
 def est_lines(txt: str, per_line: float) -> int:
     """模擬 word-break: keep-all：只在標點或空白後斷行，其餘中文連續串不可拆。per_line = 一行容納的全形字數。"""
+    txt = W.tex_plain(txt)       # LaTeX 片段用轉成純文字後的寬度估計
     def width(t):
         return sum(0 if ch == "\u2060" else 0.35 if ch == "\u00a0" else 1 if ord(ch) > 127 else 0.55 for ch in t)
     chunks = [c for c in re.split(r"(?<=[、，；,;。：:」』）])|(?<= )", txt) if c]
@@ -383,6 +386,64 @@ def h_takeaway():
             + f'<line class="bg" x1="0" y1="1090" x2="{WD}" y2="1090" stroke="{LIGHT}" stroke-width="3"/>')
 
 
+
+# ---------------------------------------------------------------- 蹺蹺板（style: seesaw，standalone/bradley-terry-pairwise-preference）的 SVG 元件
+# 一條梁架在支點上，重的一端疊 8 塊、輕的一端疊 2 塊（實力 8 對 2），梁向重的一邊傾斜；金色只給輕的那一端（爆冷的機會）。
+# 都用 class "bg"（背景層，不進程式 B 的文字與圖形重疊檢查），排版時要自己確保不壓到文字（看圖確認）。
+SS_HEAVY, SS_LIGHT = 8, 2
+
+
+def ss_defs(prefix="ss"):
+    return (f'<defs><linearGradient id="{prefix}blk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="{TEAL}"/>'
+            f'<stop offset="1" stop-color="{DEEP}"/></linearGradient></defs>')
+
+
+def ss_seesaw(cx, cy, length, unit, tilt, dark=False, floor=True, thick=None, fh=None, floor_w=None):
+    """蹺蹺板。tilt > 0：重的一端（左）壓低；梁的上緣在 y = cy - thick/2，方塊疊在梁上、隨梁一起轉；
+    支點是三角形（頂在梁的中心），fh 是支點高度。dark=True 用在深色底（米色梁、淺藍綠方塊）。"""
+    thick = thick or max(8, round(unit * .31))
+    fh = fh or round(unit * 1.9)
+    half = length / 2
+    beam_c, heavy_c, tri_c = (CREAM, LIGHT, MID) if dark else (DEEP, "url(#ssblk)", TEAL)
+    s = ""
+    ux = cx - half + unit * .7
+    for i in range(SS_HEAVY):
+        col, row = i % 2, i // 2
+        s += (f'<rect class="bg" x="{ux + col * unit:.1f}" y="{cy - thick / 2 - (row + 1) * unit:.1f}" width="{unit - 4:.1f}" '
+              f'height="{unit - 4:.1f}" rx="{max(3, unit * .1):.1f}" fill="{heavy_c}"/>')
+    lx = cx + half - unit * .7 - unit
+    for i in range(SS_LIGHT):
+        s += (f'<rect class="bg" x="{lx:.1f}" y="{cy - thick / 2 - (i + 1) * unit:.1f}" width="{unit - 4:.1f}" '
+              f'height="{unit - 4:.1f}" rx="{max(3, unit * .1):.1f}" fill="{GOLD}"/>')
+    beam = f'<rect class="bg" x="{cx - half:.1f}" y="{cy - thick / 2:.1f}" width="{length}" height="{thick}" rx="{thick / 2:.1f}" fill="{beam_c}"/>'
+    out = f'<g transform="rotate({-tilt} {cx} {cy})">{beam}{s}</g>'
+    out += f'<polygon class="bg" points="{cx},{cy + 2} {cx - fh * .65:.1f},{cy + fh} {cx + fh * .65:.1f},{cy + fh}" fill="{tri_c}"/>'
+    if floor:
+        fw = floor_w or length * 1.05
+        out += (f'<line class="bg" x1="{cx - fw / 2:.1f}" y1="{cy + fh}" x2="{cx + fw / 2:.1f}" y2="{cy + fh}" '
+                f'stroke="{LIGHT if dark else DEEP}" stroke-width="{max(3, thick // 3)}" stroke-linecap="round"/>')
+    return out
+
+
+def ss_cover():
+    return ss_defs() + ss_seesaw(540, 1060, 900, 58, 10, fh=110)
+
+
+def ss_corner(idx, n):
+    """內頁頂端右側的小蹺蹺板：傾斜角隨頁數由 +8° 慢慢轉到 -8°（翻頁的進度，不是數據）。"""
+    tilt = 8 - 16 * (idx - 2) / max(n - 3, 1)
+    return ss_defs() + ss_seesaw(870, 92, 240, 14, tilt, fh=26, floor_w=250)
+
+
+def ss_mid(idx, n):
+    """文字張中段的蹺蹺板（那張沒有別的東西可畫）。"""
+    tilt = 8 - 16 * (idx - 2) / max(n - 3, 1)
+    return ss_defs() + ss_seesaw(540, 1010, 760, 44, tilt, fh=84)
+
+
+def ss_takeaway():
+    return ss_seesaw(540, 1125, 900, 52, 10, dark=True, fh=95)
+
 # ---------------------------------------------------------------- 各版型
 def build(spec: dict, series: dict, tag: str) -> dict:
     """回傳 {layout, html_body, ...}。HTML 片段以模板檔填入。"""
@@ -393,6 +454,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     contour = series.get("style") == "contour"
     cards = series.get("style") == "cards"
     horizon = series.get("style") == "horizon"
+    seesaw = series.get("style") == "seesaw"
     idx, n_sl = spec.get("_idx", 1), spec.get("_n", 1)          # 第幾張／共幾張（render_all 填入）
     mi, mn = spec.get("_mi", 0), spec.get("_mn", 1)            # 這則是系列的第幾則／共幾則
     kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", ""))), "FAM": "", "BODY_STYLE": "", "FOOT_CLS": ""}
@@ -401,6 +463,8 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["FAM"] = "split" if split else "rail"
     if horizon:
         kw["FAM"] = "horizon"
+    if seesaw:
+        kw["FAM"] = "seesaw"
 
     if lay in ("text", "table", "chart_bars", "chart_sounding", "diagram"):   # 小標籤（例如「我的判斷」）：右上角
         kw["LABEL"] = f'<div class="t abs chip">{esc(spec["label"])}</div>' if spec.get("label") else ""
@@ -417,6 +481,10 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["SVG"] = svg_wrap(h_cover())
         kw["SUB_TOP"] = H_LINE + 70
         kw["BODY"] = kw["BODY"].replace("\n", "<br>")
+    elif lay == "cover" and seesaw:    # 米色底，標題在上，下半一座蹺蹺板；副標固定在 y=400
+        kw["SVG"] = svg_wrap(ss_cover())
+        kw["SUB_TOP"] = 400
+        kw["BODY"] = kw["BODY"].replace("\n", "<br>")
     elif lay == "cover":
         kw["SVG"] = svg_wrap(waves(1000, sc))
         kw["SUB_TOP"] = 560
@@ -432,7 +500,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             parts, cells, _ = table_block(spec["rows"], y0_ + shift, spec.get("key_w", 300))
             kw["SVG"], kw["CELLS"] = svg_wrap(parts), cells
         else:
-            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else "")), ""
+            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else (svg_wrap(ss_mid(idx, n_sl)) if seesaw else ""))), ""
             if horizon:
                 kw["FOOT_CLS"] = "light"
     elif lay == "text" and contour:
@@ -445,6 +513,8 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     elif lay == "text" and horizon:    # 底部一條地平線，半個淡太陽隨張數由左往右
         kw["SVG"] = svg_wrap(h_band(idx, n_sl))
         kw["FOOT_CLS"] = "light"
+    elif lay == "text" and seesaw:     # 中段一座蹺蹺板，傾斜角隨張數轉向
+        kw["SVG"] = svg_wrap(ss_mid(idx, n_sl))
     elif lay == "text":
         kw["SVG"] = svg_wrap(
             waves(760, sc)
@@ -576,6 +646,14 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         lab = spec.get("label")
         kw["LABEL"] = f'<div class="t abs take-label" style="top:190px">{esc(lab)}</div>' if lab else ""
         kw["SVG"] = svg_wrap(h_takeaway())
+    elif lay == "takeaway" and seesaw:
+        kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
+        q = spec.get("question")
+        kw["QUESTION"] = f'<div class="t abs take-q" style="top:240px">{esc(q)}</div>' if q else ""
+        kw["TAKE_STYLE"] = f"top:{240 + est_lines(q, 920 / 56 - 0.4) * 73 + 36}px" if q else "top:300px"
+        lab = spec.get("label")
+        kw["LABEL"] = f'<div class="t abs take-label" style="top:190px">{esc(lab)}</div>' if lab else ""
+        kw["SVG"] = svg_wrap(ss_takeaway())
     elif lay == "takeaway" and (contour or cards):
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
         q = spec.get("question")
@@ -604,9 +682,10 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             svg += f'<circle class="g mark" cx="100" cy="{y + 32}" r="9" fill="{LIGHT}"/>'
             out += f'<div class="t abs item cur" style="left:132px;top:{y + 8}px">{esc(planned_title_of(cid))}</div>'
             y += 112
-        svg += h_band(idx, n_sl, y=1020)
+        if horizon:
+            svg += h_band(idx, n_sl, y=1020)
         kw["SVG"] = svg_wrap(svg)
-        kw["ITEMS"], kw["NAV"], kw["FOOT_CLS"] = out, esc(spec.get("nav", "")), "light"
+        kw["ITEMS"], kw["NAV"], kw["FOOT_CLS"] = out, esc(spec.get("nav", "")), "light" if horizon else ""
     elif lay == "series_map":
         items = [m["planned_title"] for m in series["members"]]
         cur = [m["concept"] for m in series["members"]].index(spec["current"])
@@ -669,6 +748,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
 
     if horizon and lay not in ("cover", "takeaway"):
         kw["SVG"] = kw["SVG"].replace("</svg>", h_strip(idx, n_sl) + "</svg>", 1) if kw.get("SVG") else svg_wrap(h_strip(idx, n_sl))
+    if seesaw and lay not in ("cover", "takeaway", "text") and not (lay == "context" and not spec.get("rows")):
+        corner = ss_corner(idx, n_sl)      # 頂端右側的小蹺蹺板（文字張與沒有名詞表的脈絡張已經有中段的大蹺蹺板）
+        kw["SVG"] = kw["SVG"].replace("</svg>", corner + "</svg>", 1) if kw.get("SVG") else svg_wrap(corner)
     if (contour or cards) and lay not in ("cover", "takeaway"):
         dots = progress_dots(idx, n_sl, panel=split)
         if cards and not split:      # 圖表類版型：右緣的索引欄（金框 = 這一張對應的版本；系列地圖用這一則）
@@ -707,7 +789,7 @@ MEASURE_JS = r"""
   const emph=document.querySelectorAll('[data-e="1"]').length;
   function lines(el){
     const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT); const chars=[]; let n;
-    while(n=w.nextNode()){ for(let i=0;i<n.length;i++){const rg=document.createRange(); rg.setStart(n,i); rg.setEnd(n,i+1);
+    while(n=w.nextNode()){ if(n.parentElement.closest('.katex')) continue; for(let i=0;i<n.length;i++){const rg=document.createRange(); rg.setStart(n,i); rg.setEnd(n,i+1);
       const r=rg.getClientRects()[0]; chars.push({c:n.data[i], top:r?Math.round(r.top):null});}}
     const text=chars.map(x=>x.c).join(''); const tops=chars.map(x=>x.top);
     const real=tops.filter(t=>t!==null); const uniq=[...new Set(real)].sort((a,b)=>a-b);
@@ -724,7 +806,8 @@ MEASURE_JS = r"""
     return {lines:cl.length,lastChars,bad,badNum,text};
   }
   const chk={}; document.querySelectorAll('.chk').forEach(e=>chk[e.id]=lines(e));
-  return {ts,gs,ropes,bobs,bars,axis,ticks,emph,chk,inbox,rbars,dpts,
+  const katexErr = window.katex ? document.querySelectorAll('.katex-error').length : null;
+  return {ts,gs,ropes,bobs,bars,axis,ticks,emph,chk,inbox,rbars,dpts,katexErr,
     pageH:document.documentElement.scrollHeight,pageW:document.documentElement.scrollWidth,
     fontOk:document.fonts.check('700 40px DSO')&&document.fonts.check('400 40px DSO')};
 }
@@ -755,6 +838,8 @@ def program_b(spec: dict, m: dict, img: Image.Image, series_name: str, tag_texts
     lo = min(t["r"]["l"] for t in m["ts"]); hi = max(t["r"]["r"] for t in m["ts"])
     chk(f"文字左右邊界 >= {SAFE_X}px", lo >= SAFE_X and hi <= WD - SAFE_X, f"最小左={lo:.0f}, 最大右={hi:.0f}")
     chk("文字框無橫向溢出", not any(t["ov"] for t in m["ts"]), [t["n"] for t in m["ts"] if t["ov"]])
+    if m.get("katexErr") is not None:
+        chk("LaTeX 算式沒有語法錯誤（KaTeX）", m["katexErr"] == 0, f"{m['katexErr']} 處")
     low = max([t["r"]["b"] for t in m["ts"]] + [g["r"]["b"] for g in m["gs"]])
     chk(f"文字與圖形不超出版面下緣（至少留 20px）", low <= HT - 20, f"最低 {low:.0f}px，版面 {HT}px")
     tt = [(a["n"], b["n"]) for i, a in enumerate(m["ts"]) for b in m["ts"][i + 1:] if inter(a["r"], b["r"])]
@@ -814,6 +899,21 @@ def program_b(spec: dict, m: dict, img: Image.Image, series_name: str, tag_texts
     return res
 
 
+# LaTeX（spec 頂層 "math": true 才啟用）：圖上 `$...$` 由 KaTeX 排版（assets/katex/，MIT，內嵌在 repo，不連網）。
+# 只處理 class t 的文字區塊裡的文字節點；output: html（不輸出 MathML，不會干擾程式 B 的行數檢查）。
+MATH_HEAD = (f'<link rel="stylesheet" href="{(ROOT / "assets/katex/katex.min.css").as_uri()}">'
+             f'<script src="{(ROOT / "assets/katex/katex.min.js").as_uri()}"></script>'
+             '<style>.katex{font-size:1.05em;text-indent:0}.katex-html{white-space:nowrap}</style>')
+MATH_TAIL = r"""<script>(function(){
+const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),ns=[];let n;
+while(n=w.nextNode()){ if(n.data.includes('$')&&n.parentElement.closest('.t')) ns.push(n); }
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+ns.forEach(t=>{const sp=document.createElement('span');
+  sp.innerHTML=t.data.split(/(\$[^$]+\$)/).map(p=>/^\$[^$]+\$$/.test(p)?katex.renderToString(p.slice(1,-1),{output:'html',throwOnError:false}):esc(p)).join('');
+  t.replaceWith(sp);});
+})();</script>"""
+
+
 def render_all(spec_path: Path, only: set[int] | None = None, force: bool = False) -> int:
     doc = json.loads(spec_path.read_text(encoding="utf-8"))
     W.guard_published(doc, force)
@@ -843,13 +943,13 @@ def render_all(spec_path: Path, only: set[int] | None = None, force: bool = Fals
             sl["_mi"], sl["_mn"] = (mids.index(doc["concept"]) if doc["concept"] in mids else 0), len(mids)
             built = build(sl, series, tag)
             sl["_split"] = bool(built.get("dyn")) and sl["layout"] != "cover"
-            page = (f'<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><style>{css}</style></head>'
-                    f'<body>{built["body"]}</body></html>')
+            page = (f'<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><style>{css}</style>{MATH_HEAD if doc.get("math") else ""}</head>'
+                    f'<body>{built["body"]}{MATH_TAIL if doc.get("math") else ""}</body></html>')
             hp = htmldir / f"{i:02d}.html"
             hp.write_text(page, encoding="utf-8")
             pg.goto(hp.as_uri())
             pg.evaluate("document.fonts.ready")
-            pg.wait_for_timeout(200)
+            pg.wait_for_timeout(300 if doc.get("math") else 200)
             if (sl["layout"] == "cover" and not series.get("standalone")) or built.get("dyn"):    # 封面與直切版面：補充文字接在標題下面（獨立貼文的封面副標固定在地平線下）
                 pg.evaluate("() => {const t=document.getElementById('title'), s=document.getElementById('body'); "
                             "if(s) s.style.top=(t.getBoundingClientRect().bottom+36)+'px'}")
@@ -872,7 +972,7 @@ def render_all(spec_path: Path, only: set[int] | None = None, force: bool = Fals
                 alts[f"{i:02d}.png"] = plain(sl["title"]) + "。" + "、".join(names)
             else:
                 alts[f"{i:02d}.png"] = ((sl["question"] + "　" if sl.get("question") else "") + plain(sl.get("title", "")) + ("。" + body if body else "")
-                                        + ("。圖上寫：" + "、".join(D.texts(sl)) if sl["layout"] == "diagram" else ""))
+                                        + ("。圖上寫：" + "、".join(W.tex_plain(x) for x in D.texts(sl)) if sl["layout"] == "diagram" else ""))
         b.close()
     (bld / "alt-text.json").write_text(json.dumps(alts, ensure_ascii=False, indent=2), encoding="utf-8")
     (bld / "checks-b.json").write_text(json.dumps({"template_hash": thash, "slides": report}, ensure_ascii=False, indent=2), encoding="utf-8")
