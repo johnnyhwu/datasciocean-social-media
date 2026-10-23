@@ -34,5 +34,6 @@
 
 | 觀念 | IG | Threads | 打開 |
 |---|---|---|---|
+| `bradley-terry-pairwise-preference` | 已發布 | 已發布 | [README](standalone/bradley-terry-pairwise-preference/README.md) |
 | `decision-transformer-reward-conditioning` | 已發布 | 已發布 | [README](standalone/decision-transformer-reward-conditioning/README.md) |
 

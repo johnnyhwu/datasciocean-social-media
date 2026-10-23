@@ -1,0 +1,393 @@
+{
+ "series": null,
+ "concept": "bradley-terry-pairwise-preference",
+ "also_concepts": [],
+ "lang": "zh-TW",
+ "status": "draft",
+ "hook": {
+  "style": "反直覺斷言",
+  "title": "AI 學人類偏好的底層，是 [[1952 年]]的球隊排名模型",
+  "subtitle": "Bradley-Terry 模型：從 OpenAI 的 InstructGPT 到後來的 DPO，整理下來底層數學都是同一套",
+  "refs": [
+   "c1",
+   "c2",
+   "c8"
+  ],
+  "candidate": "2（為了塞進兩行，「算球隊排名的老模型」改成「的球隊排名模型」）"
+ },
+ "slides": [
+  {
+   "layout": "cover",
+   "title": "AI 學人類偏好的底層，是 [[1952 年]]的球隊排名模型",
+   "body": "Bradley-Terry 模型：從 OpenAI 的 InstructGPT 到後來的 DPO，整理下來底層數學都是同一套",
+   "refs": [
+    "c1",
+    "c2",
+    "c8"
+   ]
+  },
+  {
+   "layout": "context",
+   "title": "原本算球隊排名，現在 RLHF 最廣泛採用它",
+   "body": "Bradley-Terry model（Bradley & Terry, 1952）是個很老的統計模型，原本處理「兩兩比較之後怎麼推算整體排名」，例如球隊戰績排序，跟 AI 一點關係都沒有。先認識三個詞：",
+   "rows": [
+    [
+     "RLHF",
+     "用人類的偏好訓練 AI：先請人比較回答的好壞，再讓 AI 往人類喜歡的方向調整。"
+    ],
+    [
+     "reward model",
+     "給 AI 的回答打分數的模型，分數代表人類有多喜歡。"
+    ],
+    [
+     "偏好模型",
+     "預測「人比較兩個選項時，會選哪一個」的模型。"
+    ]
+   ],
+   "key_w": 250,
+   "refs": [
+    "c1",
+    "c2"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "compare",
+   "title": "打分容易各說各話，二選一的共識度高得多",
+   "body": "直接打分，每個人心裡的 7 分不一樣；「A 跟 B 哪個比較好」，人類直覺上容易判斷。",
+   "columns": [
+    {
+     "head": "請 3 人打分",
+     "items": [
+      {
+       "text": "甲：7 分",
+       "muted": true
+      },
+      {
+       "text": "乙：4 分",
+       "muted": true
+      },
+      {
+       "text": "丙：9 分",
+       "sub": "同一個回答，三種分數",
+       "muted": true
+      }
+     ]
+    },
+    {
+     "head": "請 3 人二選一",
+     "items": [
+      {
+       "text": "甲：選 A"
+      },
+      {
+       "text": "乙：選 A"
+      },
+      {
+       "text": "丙：選 A",
+       "sub": "同一組回答，選擇一致",
+       "emph": true
+      }
+     ]
+    }
+   ],
+   "note": "假設的例子",
+   "refs": [
+    "c12"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "hidden",
+   "title": "比賽結果看得見，實力值看不見",
+   "body": "比賽結果看得到，但每支球隊有多強，看不到。Bradley-Terry 的核心假設：每個項目都有一個看不見的「實力值」，比賽結果只是它的機率反映，不是絕對保證。",
+   "heads": [
+    "看得到：比賽結果",
+    "看不到：每支球隊的實力值"
+   ],
+   "nodes": [
+    {
+     "text": "第 1 場：A 隊贏"
+    },
+    {
+     "text": "第 2 場：A 隊贏"
+    },
+    {
+     "text": "第 3 場：B 隊贏"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "A 隊",
+     "sub": "實力值：？"
+    },
+    {
+     "text": "B 隊",
+     "sub": "實力值：？"
+    }
+   ],
+   "note": "假設的例子；RLHF 裡要比的是 AI 的不同回答",
+   "refs": [
+    "c1",
+    "c4"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "seesaw",
+   "title": "贏的機率，就是實力占的比例",
+   "body": "贏的機率，等於自己的實力除以雙方實力的總和。例如 A 隊實力值 8、B 隊實力值 2，A 贏 B 的機率是 $8/(8+2) = 0.8$。",
+   "nodes": [
+    {
+     "text": "A 隊",
+     "sub": "實力值 8",
+     "blocks": 8,
+     "win": "A 贏面八成"
+    },
+    {
+     "text": "B 隊",
+     "sub": "實力值 2",
+     "blocks": 2,
+     "win": "B 兩成"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "A 實力強四倍，但 B 仍有兩成機率爆冷"
+    }
+   ],
+   "note": "假設的例子",
+   "refs": [
+    "c3",
+    "c4"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "flow",
+   "title": "reward model 輸出分數，loss 只看兩個分數的差",
+   "body": "reward model 對每個回答輸出一個分數 $s$，分數越高，代表人類越喜歡。訓練它用 Bradley-Terry loss，只看被選中與被淘汰的分數差。",
+   "nodes": [
+    {
+     "text": "請人比較兩個回答，選出比較好的",
+     "sub": "被選中的叫 chosen，被淘汰的叫 rejected"
+    },
+    {
+     "text": "reward model 對兩個回答各打一個分數",
+     "sub": "$s_w$：chosen 的分數；$s_r$：rejected 的分數"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "$\\mathcal{L} = -\\mathbb{E}[\\log \\sigma(s_w - s_r)]$",
+     "sub": "Bradley-Terry loss：$\\mathbb{E}$ 是對訓練資料取平均，σ 把任意數字壓進 0 到 1 之間",
+     "tone": "good"
+    }
+   ],
+   "refs": [
+    "c7"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "pairs",
+   "title": "改寫成指數，就是 reward model 常見的形式",
+   "body": "把實力 $p$ 寫成 $e^{r}$（$e$ 是數學常數，約 2.718），贏的機率就只看兩個 $r$ 的差，這正是上一張 loss 裡 σ 的輸入。差越大越接近 1。",
+   "heads": [
+    "Bradley-Terry 的寫法",
+    "reward model 的寫法"
+   ],
+   "pairs": [
+    [
+     "實力 $p_i$",
+     "令 $p_i = e^{r_i}$"
+    ],
+    [
+     "$i$ 贏 $j$ 的機率，是實力的占比",
+     "$\\sigma(r_i - r_j)$，只看 $r$ 的差，不是 $p$ 的差"
+    ]
+   ],
+   "outcomes": [
+    {
+     "text": "拿 A 隊 8、B 隊 2 驗算：兩種寫法都是 0.8",
+     "sub": "$8/(8+2) = 0.8$；$r_A$、$r_B$ 是 8、2 換算出的數字，$\\sigma(r_A - r_B)$ 也 $= 0.8$",
+     "tone": "good"
+    }
+   ],
+   "note": "驗算的例子",
+   "refs": [
+    "c1",
+    "c3",
+    "c4",
+    "c6"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "flow",
+   "title": "為什麼只看 $r$ 的差？因為指數把相除變成相減",
+   "body": "贏的機率看的是實力的比值。實力寫成 $e^{r}$ 後，兩邊相除就變成 $r$ 相減，所以只剩 $r_i - r_j$。",
+   "nodes": [
+    {
+     "text": "贏的機率 ＝ $\\dfrac{p_i}{p_i + p_j}$",
+     "sub": "$i$ 的實力，占 $i$ 與 $j$ 實力總和的比例"
+    },
+    {
+     "text": "令 $p = e^{r}$：$\\dfrac{e^{r_i}}{e^{r_i} + e^{r_j}}$"
+    },
+    {
+     "text": "上下同除以 $e^{r_i}$：$\\dfrac{1}{1 + e^{-(r_i - r_j)}}$"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "$= \\sigma(r_i - r_j)$，其中 $\\sigma(x) = \\dfrac{1}{1 + e^{-x}}$",
+     "sub": "$\\sigma$ 把任意數字壓進 0 到 1 之間；只剩 $r_i - r_j$",
+     "tone": "good"
+    }
+   ],
+   "refs": [
+    "c3",
+    "c6"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "flow",
+   "title": "被選中的比被淘汰的，高 2.5 分，loss 只有 0.08",
+   "body": "代入一組數字：$s_w$ 是 chosen 版本的分數，$s_r$ 是 rejected 版本的分數；loss 是模型判斷「錯多少」的分數，越小越準。",
+   "nodes": [
+    {
+     "text": "舉例：對 chosen 版本打 3.5 分，對 rejected 版本打 1.0 分"
+    },
+    {
+     "text": "分數差：$s_w - s_r = 2.5$"
+    },
+    {
+     "text": "$\\sigma(2.5) \\approx 0.92$",
+     "sub": "σ 把分數差換成 0 到 1 之間的數"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "loss $\\approx 0.08$",
+     "sub": "很小，代表模型判斷準確",
+     "tone": "good"
+    }
+   ],
+   "refs": [
+    "c7",
+    "c10"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "stops",
+   "title": "從 RLHF 到 DPO，整理下來底層是同一套數學",
+   "body": "RLHF 一路發展到 DPO，這幾個研究的底層，用的都是 Bradley-Terry loss。",
+   "heads": [
+    "同一套數學：Bradley-Terry loss",
+    "差別只在怎麼用"
+   ],
+   "nodes": [
+    {
+     "text": "Christiano et al. (2017)",
+     "sub": "RLHF 的開山文獻\narxiv.org/abs/1706.03741"
+    },
+    {
+     "text": "OpenAI 的 InstructGPT",
+     "sub": "Ouyang et al. (2022)，OpenAI 的語言模型\narxiv.org/abs/2203.02155"
+    },
+    {
+     "text": "後來的 DPO",
+     "sub": "Rafailov et al. (2023)，RLHF 之後出現的做法：直接用偏好資料調整語言模型\narxiv.org/abs/2305.18290"
+    }
+   ],
+   "refs": [
+    "c8"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "cycle",
+   "title": "已知缺陷：它假設偏好有傳遞性",
+   "body": "Bradley-Terry 有個已知缺陷：它依賴傳遞性假設，也就是 $A>B$ 且 $B>C$，則 $A>C$。但人類偏好經常不滿足這個假設。",
+   "heads": [
+    "A 比 B 好",
+    "B 比 C 好",
+    "C 比 A 好"
+   ],
+   "nodes": [
+    {
+     "text": "A"
+    },
+    {
+     "text": "B"
+    },
+    {
+     "text": "C"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "為什麼有這個假設？",
+     "sub": "每個項目只有一個實力值：A 比 B 大、B 比 C 大，A 就比 C 大"
+    }
+   ],
+   "note": "假設的例子",
+   "refs": [
+    "c13"
+   ]
+  },
+  {
+   "layout": "takeaway",
+   "question": "所以，Bradley-Terry 怎麼看輸贏？",
+   "title": "每個選項都有一個\n看不見的實力值，\n比較結果只是它的\n機率反映，不是絕對保證",
+   "refs": [
+    "c1"
+   ]
+  }
+ ],
+ "threads": {
+  "mode": "carousel",
+  "body": {
+   "text": "AI 怎麼學會「哪個回答比較好」？RLHF 最廣泛採用的偏好模型，原本是 1952 年用來算球隊排名的 Bradley-Terry model。\n\n它的核心想法：每個項目（球隊，或 AI 的不同回答）都有一個看不見的「實力值」，比較結果只是實力值的機率反映，不是絕對保證。例如 A 隊實力值 8、B 隊實力值 2，A 贏 B 的機率是 8/(8+2)＝0.8，B 仍有兩成機率爆冷。\n\n據整理，從 Christiano et al. (2017)、InstructGPT 到後來的 DPO，底層數學都是同一套 Bradley-Terry loss。\n\n已知缺陷：它依賴傳遞性假設（A>B 且 B>C，則 A>C），但人類偏好經常不滿足這個假設。",
+   "refs": [
+    "c1",
+    "c2",
+    "c3",
+    "c4",
+    "c8",
+    "c13"
+   ]
+  },
+  "last": {
+   "text": "Bradley-Terry 一句話：把兩兩比較的結果，看成每個項目看不見的實力值的機率反映。",
+   "refs": [
+    "c1"
+   ]
+  }
+ },
+ "caption": {
+  "first": "Bradley-Terry 模型是什麼？球隊排名的老模型，如今是 RLHF 最廣泛採用的偏好模型",
+  "first_refs": [
+   "c1",
+   "c2"
+  ],
+  "nav": "",
+  "hashtags": [
+   "BradleyTerry",
+   "RLHF",
+   "RewardModel",
+   "機器學習"
+  ]
+ },
+ "latin_allow": [
+  "arxiv.org",
+  "abs",
+  "Ouyang",
+  "Rafailov",
+  "x"
+ ],
+ "math": true
+}

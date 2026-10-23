@@ -1,0 +1,23 @@
+concept: bradley-terry-pairwise-preference
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: bradley-terry-pairwise-preference:ig_carousel
+  format: ig_carousel
+  series_id: null
+  url: https://www.instagram.com/p/De0b1Udnw6Z/
+  published_at: 2026-10-23T02:01:37+0000
+  hook_type: 反直覺斷言
+  mentions: []
+  backfilled: []
+- post_id: bradley-terry-pairwise-preference:threads_thread
+  format: threads_thread
+  series_id: null
+  url: https://www.threads.com/@datasciocean/post/De0cNARn6v9
+  published_at: 2026-10-23T02:04:02+0000
+  hook_type: 反直覺斷言
+  mentions: []
+  backfilled: []

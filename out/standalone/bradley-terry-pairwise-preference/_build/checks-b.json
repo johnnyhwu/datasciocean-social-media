@@ -1,0 +1,1177 @@
+{
+  "template_hash": "d69306c525a5",
+  "slides": [
+    {
+      "slide": 1,
+      "layout": "cover",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=978"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "LaTeX 算式沒有語法錯誤（KaTeX）",
+          "ok": true,
+          "detail": "0 處"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 5.0（AI 學人類偏好的底層，是 19）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 15, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "補充不拆詞、末行 >= 2 字",
+          "ok": true,
+          "detail": "{'lines': 2, 'bad': [], 'lastChars': 22}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "[]"
+        }
+      ]
+    },
+    {
+      "slide": 2,
+      "layout": "context",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=930"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "LaTeX 算式沒有語法錯誤（KaTeX）",
+          "ok": true,
+          "detail": "0 處"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1308px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 5.0（原本算球隊排名，現在 RLHF ）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 11, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "補充不拆詞、末行 >= 2 字",
+          "ok": true,
+          "detail": "{'lines': 5, 'bad': [], 'lastChars': 7}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "[]"
+        }
+      ]
+    },
+    {
+      "slide": 3,
+      "layout": "diagram",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=883"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "LaTeX 算式沒有語法錯誤（KaTeX）",
+          "ok": true,
+          "detail": "0 處"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 5.0（打分容易各說各話，二選一的共識度）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 10, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "圖表版型補充最多五行、不拆詞",
+          "ok": true,
+          "detail": "{'lines': 2, 'bad': []}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "框內文字不超出框（示意圖）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "只有一組強調元素",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "[]"
+        }
+      ]
+    },
+    {
+      "slide": 4,
+      "layout": "diagram",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=970"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "LaTeX 算式沒有語法錯誤（KaTeX）",
+          "ok": true,
+          "detail": "0 處"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 5.0（比賽結果看得見，實力值看不見）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 6, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "圖表版型補充最多五行、不拆詞",
+          "ok": true,
+          "detail": "{'lines': 4, 'bad': []}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "框內文字不超出框（示意圖）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "只有一組強調元素",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "[]"
+        }
+      ]
+    },
+    {
+      "slide": 5,
+      "layout": "diagram",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=992"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "LaTeX 算式沒有語法錯誤（KaTeX）",
+          "ok": true,
+          "detail": "0 處"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 5.0（贏的機率，就是實力占的比例）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 8, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "圖表版型補充最多五行、不拆詞",
+          "ok": true,
+          "detail": "{'lines': 3, 'bad': []}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "框內文字不超出框（示意圖）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "只有一組強調元素",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "[]"
+        }
+      ]
+    },
+    {
+      "slide": 6,
+      "layout": "diagram",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=973"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "LaTeX 算式沒有語法錯誤（KaTeX）",
+          "ok": true,
+          "detail": "0 處"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 5.0（reward model 輸出分）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 13, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "圖表版型補充最多五行、不拆詞",
+          "ok": true,
+          "detail": "{'lines': 3, 'bad': []}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "框內文字不超出框（示意圖）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "只有一組強調元素",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "[]"
+        }
+      ]
+    },
+    {
+      "slide": 7,
+      "layout": "diagram",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=971"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "LaTeX 算式沒有語法錯誤（KaTeX）",
+          "ok": true,
+          "detail": "0 處"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 5.0（改寫成指數，就是 reward ）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 18, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "圖表版型補充最多五行、不拆詞",
+          "ok": true,
+          "detail": "{'lines': 3, 'bad': []}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "框內文字不超出框（示意圖）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "只有一組強調元素",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "[]"
+        }
+      ]
+    },
+    {
+      "slide": 8,
+      "layout": "diagram",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=872"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "LaTeX 算式沒有語法錯誤（KaTeX）",
+          "ok": true,
+          "detail": "0 處"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 5.0（為什麼只看 r 的差？因為指數把）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 11, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "圖表版型補充最多五行、不拆詞",
+          "ok": true,
+          "detail": "{'lines': 2, 'bad': []}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "框內文字不超出框（示意圖）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "只有一組強調元素",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "[]"
+        }
+      ]
+    },
+    {
+      "slide": 9,
+      "layout": "diagram",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=919"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "LaTeX 算式沒有語法錯誤（KaTeX）",
+          "ok": true,
+          "detail": "0 處"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 5.0（被選中的比被淘汰的，高 2.5 ）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 20, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "圖表版型補充最多五行、不拆詞",
+          "ok": true,
+          "detail": "{'lines': 3, 'bad': []}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "框內文字不超出框（示意圖）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "只有一組強調元素",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "[]"
+        }
+      ]
+    },
+    {
+      "slide": 10,
+      "layout": "diagram",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=991"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "LaTeX 算式沒有語法錯誤（KaTeX）",
+          "ok": true,
+          "detail": "0 處"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 5.0（從 RLHF 到 DPO，整理下）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 12, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "圖表版型補充最多五行、不拆詞",
+          "ok": true,
+          "detail": "{'lines': 2, 'bad': []}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "框內文字不超出框（示意圖）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "只有一組強調元素",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "[]"
+        }
+      ]
+    },
+    {
+      "slide": 11,
+      "layout": "diagram",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=935"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "LaTeX 算式沒有語法錯誤（KaTeX）",
+          "ok": true,
+          "detail": "0 處"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 5.0（已知缺陷：它假設偏好有傳遞性）"
+        },
+        {
+          "name": "標題最多 2 行",
+          "ok": true,
+          "detail": "2 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 9, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "圖表版型補充最多五行、不拆詞",
+          "ok": true,
+          "detail": "{'lines': 3, 'bad': []}"
+        },
+        {
+          "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "框內文字不超出框（示意圖）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "只有一組強調元素",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "[]"
+        }
+      ]
+    },
+    {
+      "slide": 12,
+      "layout": "takeaway",
+      "checks": [
+        {
+          "name": "尺寸 1080x1350、無捲動溢出",
+          "ok": true,
+          "detail": "scroll=1080x1350"
+        },
+        {
+          "name": "字型已內嵌載入（Noto Sans CJK TC）",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "文字左右邊界 >= 40px",
+          "ok": true,
+          "detail": "最小左=80, 最大右=971"
+        },
+        {
+          "name": "文字框無橫向溢出",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "LaTeX 算式沒有語法錯誤（KaTeX）",
+          "ok": true,
+          "detail": "0 處"
+        },
+        {
+          "name": "文字與圖形不超出版面下緣（至少留 20px）",
+          "ok": true,
+          "detail": "最低 1302px，版面 1350px"
+        },
+        {
+          "name": "文字與文字不重疊",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "最小字級 >= 28px",
+          "ok": true,
+          "detail": "最小 28px"
+        },
+        {
+          "name": "字級都在規定集合內",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
+          "ok": true,
+          "detail": "最低 6.1（每個選項都有一個看不見的實力值，）"
+        },
+        {
+          "name": "標題最多 4 行",
+          "ok": true,
+          "detail": "4 行"
+        },
+        {
+          "name": "標題末行 >= 2 字、換行不拆詞",
+          "ok": true,
+          "detail": "{'lastChars': 11, 'bad': []}"
+        },
+        {
+          "name": "標題的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "系列標籤與系列檔的名稱完全相同",
+          "ok": true,
+          "detail": "[]"
+        }
+      ]
+    }
+  ]
+}

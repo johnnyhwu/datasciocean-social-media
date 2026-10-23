@@ -13,6 +13,10 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 
 視覺「一式四份」直切（`style: cards`）；3 卡 3 則不合併；hashtag `DSO_PersonaD2S`。第 1 則的定位語（人決定 A+C）：事實（EACL 2024、微調 GPT-3.5-turbo）加人口吻的一行「這個系列是在了解早期的簡報生成怎麼做」，這一行不在卡上，是人授權的放行項。新增圖型 `equation`、`quad` 的 `bars`、`dotgrid` 的 `cols`。第 1 則 `persona-d2s-task-and-pipeline`（16 張）已發布（2026-10-15）：IG https://www.instagram.com/p/DefqxZOH0Ot/ 、Threads https://www.threads.com/@datasciocean/post/DefrJYsH5nk 。第 2 則 `persona-d2s-training-design-flaws`（14 張）已發布（2026-10-16）：IG https://www.instagram.com/p/Dejx3ZWGGGt/ 、Threads https://www.threads.com/@datasciocean/post/DejyJ7bmJTr ；第 1 則 Threads 已回補（連到第 2 則）。第 3 則 `persona-d2s-what-to-borrow`（13 張）已發布（2026-10-17）：IG https://www.instagram.com/p/DelBriik7pd/ 、Threads https://www.threads.com/@datasciocean/post/DelDUocE7Zt ；第 1、2 則 Threads 已回補（連到第 3 則）。
 
+## bradley-terry-pairwise-preference（獨立貼文，已發布）
+
+2026-10-23，12 張：IG https://www.instagram.com/p/De0b1Udnw6Z/ 、Threads https://www.threads.com/@datasciocean/post/De0cNARn6v9 。視覺「蹺蹺板」（`standalone/bradley-terry-pairwise-preference/`，人從 S1 蹺蹺板／S2 對戰網／S3 八比二選 S1）；hook 反直覺斷言（候選 2，為了塞進兩行改了字）。人的決定：轉折張、延伸閱讀、導流連結都不放；第 5 與 6 張之間加一張 reward model 與 loss 的銜接；保留「改寫成指數」並另加逐步推導；DPO 與 InstructGPT 補作者、年份與 arXiv 短連結（`latin_allow`）。新增：`seesaw`／`hidden`／`cycle` 圖型、`pairs` 底部橫框、**LaTeX 數學式**（spec 頂層 `math: true`，KaTeX 在 `assets/katex/`；程式 A、發布程式讀 spec 都先 `untex`）。放行項：三組假設例子、第 7 張的 8 對 2 驗算（推導）、第 11 張「為什麼有這個假設」的推論句。
+
 ## decision-transformer-reward-conditioning（獨立貼文，已發布）
 
 2026-10-21，9 張：IG https://www.instagram.com/p/DevHQBlk2nG/ 、Threads https://www.threads.com/@datasciocean/post/DevHi6skzg5 。視覺「地平線」（`standalone/decision-transformer-reward-conditioning/`）；hook 讀者疑問，人選 A 並微調。人的決定：不放 Persona-Aware-D2S 轉折張與延伸閱讀、導流行與文章連結全拿掉；老鼠走迷宮是假設的例子、PPO／DPO 的 arXiv 網址是放行項（`latin_allow`）；刪掉「多步驟威力」那張。新增：獨立貼文架構、`tokens` 圖型。
