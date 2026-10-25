@@ -1,0 +1,655 @@
+{
+  "series": "sag",
+  "concept": "sag-latent-hyperedge-one-hop",
+  "also_concepts": [
+    "multihop-vector-vs-graphrag-pain-points"
+  ],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "讀者疑問",
+    "title": "Multi-Hop 推理，一定要先建[[知識圖譜]]嗎？",
+    "subtitle": "SAG：線下不建圖，只存「事件＋實體標籤」，\n查詢時才連成圖，查完就丟。\n論文：arxiv.org/abs/2606.15971",
+    "refs": [
+      "c1",
+      "c2",
+      "c6"
+    ],
+    "candidate": "人挑（2026-10-25）：讀者疑問式"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "Multi-Hop 推理，一定要先建[[知識圖譜]]嗎？",
+      "body": "SAG：線下不建圖，只存「事件＋實體標籤」，\n查詢時才連成圖，查完就丟。\n論文：arxiv.org/abs/2606.15971",
+      "refs": [
+        "c1",
+        "c2",
+        "c6"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "Multi-Hop 推理，是 RAG 最難落地的一塊",
+      "body": "RAG 是讓 AI 先查資料、再回答的做法。先認識三個詞：",
+      "rows": [
+        [
+          "Multi-Hop 推理",
+          "答案要靠好幾份資料，一步步串起來才推得出來；每串一步，叫做一「跳」。"
+        ],
+        [
+          "向量檢索",
+          "把文字轉成數字向量，查詢時回傳語意最相似的前 K 筆（Top-K）。"
+        ],
+        [
+          "GraphRAG",
+          "線下用 LLM 抽出三元組（主體、關係、客體），建成全域知識圖譜，也就是用點和連線記錄知識的大圖。"
+        ]
+      ],
+      "key_w": 240,
+      "refs": [
+        "multihop-vector-vs-graphrag-pain-points:c1",
+        "multihop-vector-vs-graphrag-pain-points:c2",
+        "multihop-vector-vs-graphrag-pain-points:c3"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "hidden",
+      "title": "跳板常跟問題長得不像，第一步就被濾掉",
+      "body": "Multi-Hop 推理的中間證據，字面和語意常常跟原始問題八竿子打不著；單靠向量距離，這種跳板第一步就被濾掉。",
+      "heads": [
+        "向量檢索撈得到：跟問題很像的",
+        "被濾掉的跳板：跟問題不像"
+      ],
+      "nodes": [
+        {
+          "text": "問題：TSMC 創辦人的母校，在哪？"
+        },
+        {
+          "text": "「張忠謀創立了 TSMC」"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "「張忠謀在史丹佛大學拿到博士學位」",
+          "sub": "沒提到 TSMC，第一步就被濾掉；少了它，推理斷在半路"
+        }
+      ],
+      "note": "例子以 TSMC 與創辦人張忠謀為例；文件怎麼切成段是假設的",
+      "refs": [
+        "multihop-vector-vs-graphrag-pain-points:c1",
+        "multihop-vector-vs-graphrag-pain-points:c5",
+        "multihop-vector-vs-graphrag-pain-points:c6"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "drift",
+      "title": "第一步偏一點，後面每一步都跟著歪",
+      "body": "Agent（能自己一步步查資料的 AI）做序列式檢索時，第一步只要因為相似度不夠高而稍微偏掉，後面每一步都在錯的基礎上繼續，最後整條路徑徹底斷掉。",
+      "heads": [
+        "問題",
+        "第一步",
+        "第二步",
+        "第三步",
+        "答案"
+      ],
+      "nodes": [
+        {
+          "text": "正確的推理鏈"
+        },
+        {
+          "text": "向量檢索實際走的路線",
+          "sub": "第一步稍微偏掉，最後整條路徑徹底斷掉"
+        }
+      ],
+      "note": "示意：偏移量只是示意，不是數據",
+      "refs": [
+        "multihop-vector-vs-graphrag-pain-points:c8"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "三元組把一件事拆碎，上下文就沒了",
+      "body": "知識圖譜把關係限制成「主體、關係、客體」；但現實的事件多半牽涉多方、時間、地點。下面是假設的拆法：",
+      "columns": [
+        {
+          "head": "原本的一件事",
+          "items": [
+            {
+              "text": "Facebook 於 2014 年，以 190 億美元收購 WhatsApp；馬克·祖克柏推動此案",
+              "emph": true
+            }
+          ]
+        },
+        {
+          "head": "硬拆成三元組",
+          "items": [
+            {
+              "text": "（Facebook，收購，WhatsApp）"
+            },
+            {
+              "text": "（馬克·祖克柏，推動，此案）"
+            },
+            {
+              "text": "（此案，時間，2014 年）"
+            }
+          ]
+        }
+      ],
+      "refs": [
+        "multihop-vector-vs-graphrag-pain-points:c9",
+        "c8"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "title": "資料一直進來，圖譜往往得重跑好幾步",
+      "body": "真實系統的資料是持續寫入的。圖譜要維持正確，新文件進來時，往往得把這幾步再跑一遍：",
+      "nodes": [
+        {
+          "text": "重跑實體抽取",
+          "sub": "把文章裡的人事物名稱挑出來"
+        },
+        {
+          "text": "重跑實體對齊",
+          "sub": "把指同一個東西的不同寫法對起來"
+        },
+        {
+          "text": "重跑關係正規化"
+        },
+        {
+          "text": "甚至重算全域節點權重，例如 PageRank",
+          "sub": "PageRank：在圖上傳分數、算節點重要度"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "即時增量更新，幾乎不可行"
+        }
+      ],
+      "refs": [
+        "multihop-vector-vs-graphrag-pain-points:c10"
+      ]
+    },
+    {
+      "layout": "table",
+      "title": "圖建好了，查詢時還有三個麻煩",
+      "body": "GraphRAG 這類做法（例如 HippoRAG）補上了結構，但還有三個麻煩。",
+      "rows": [
+        [
+          "結構退化｜論文指出",
+          "花大錢建的圖，查詢時常又變回：對圖節點或社群摘要，做扁平的向量比對。"
+        ],
+        [
+          "分數衰減｜HippoRAG",
+          "在圖上一跳一跳傳分數，跳數一多，遠端節點的分數被阻尼係數（每跳打折）壓得很低，深層答案排不上來。"
+        ],
+        [
+          "雜訊放大",
+          "連到很多點的熱門節點（hub nodes），會把訊號往無關的地方擴散，雜訊分數反而升高。"
+        ]
+      ],
+      "key_w": 200,
+      "refs": [
+        "multihop-vector-vs-graphrag-pain-points:c11",
+        "multihop-vector-vs-graphrag-pain-points:c12",
+        "multihop-vector-vs-graphrag-pain-points:c13"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "title": "SAG 的折衷：線下只存事件和實體標籤",
+      "body": "SAG 論文的折衷：線下不建圖，只把每個 chunk 轉成事件加一組實體標籤，寫進標準 SQL 資料庫（一般常見的資料庫）。舉個例子：",
+      "nodes": [
+        {
+          "text": "chunk：長文件切出的一小段文字",
+          "sub": "例：一段講 Facebook 收購 WhatsApp 的文字"
+        },
+        {
+          "text": "事件：LLM 把 chunk 轉成的一句話，保留完整語意",
+          "sub": "例：Facebook 於 2014 年以 190 億美元收購 WhatsApp，馬克·祖克柏推動此案……"
+        },
+        {
+          "text": "實體標籤：綁在事件上的一組關鍵詞（人、公司、年份…），再一起寫進 SQL",
+          "sub": "例：Facebook、2014年、WhatsApp、馬克·祖克柏、揚·庫姆"
+        }
+      ],
+      "note": "論文：arxiv.org/abs/2606.15971",
+      "refs": [
+        "c2",
+        "c4",
+        "c8",
+        "c9",
+        "multihop-vector-vs-graphrag-pain-points:c4"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "bubble",
+      "title": "一個事件綁住好幾個實體，這個綁定就是一條超邊",
+      "body": "傳統圖論裡一條邊只能連兩個節點，也就是圖上的點；SAG 借用超圖的超邊，一條就能同時包含任意數量的節點。一個事件加它綁定的一組實體，就定義了一條超邊。",
+      "heads": [
+        "傳統圖論的邊",
+        "SAG 借用的超邊"
+      ],
+      "nodes": [
+        {
+          "text": "一條邊只連兩個點"
+        },
+        {
+          "text": "一條超邊圈住任意個",
+          "sub": "例：一個事件綁住五個實體"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "Facebook"
+        },
+        {
+          "text": "2014年"
+        },
+        {
+          "text": "WhatsApp"
+        },
+        {
+          "text": "馬克·祖克柏"
+        },
+        {
+          "text": "揚·庫姆"
+        }
+      ],
+      "note": "例：部落格舉的 Facebook 收購 WhatsApp 那一句",
+      "refs": [
+        "c3",
+        "c4",
+        "c8"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "ingest",
+      "title": "線下不建圖，查詢那一瞬間才長出圖",
+      "body": "線下不算實體之間的全域連線；查詢時才用 SQL JOIN，把共用實體的事件串起來。",
+      "heads": [
+        "線下：建索引時",
+        "線上：使用者發問時"
+      ],
+      "nodes": [
+        {
+          "text": "chunk"
+        },
+        {
+          "text": "事件：一對一"
+        },
+        {
+          "text": "實體：多對多"
+        },
+        {
+          "text": "SQL 資料庫"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "使用者發問"
+        },
+        {
+          "text": "SQL JOIN",
+          "sub": "把共用實體的，事件配起來"
+        },
+        {
+          "text": "局部超圖",
+          "sub": "記憶體裡形成，查完就丟"
+        }
+      ],
+      "fig_refs": [
+        "sag/figure1.png",
+        "sag/figure2.png"
+      ],
+      "refs": [
+        "c2",
+        "c4",
+        "c5",
+        "c6"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "links",
+      "title": "查詢那一瞬間，共用實體的事件才被串起來",
+      "body": "發問的那一瞬間下 SQL JOIN：共用同一個實體的兩個事件，才會在記憶體裡串起來。平常只是一張沒畫線的「事件－實體」表，所以叫「潛在」超邊。",
+      "heads": [
+        "事件",
+        "實體"
+      ],
+      "nodes": [
+        {
+          "text": "張忠謀創立了 TSMC"
+        },
+        {
+          "text": "張忠謀拿到史丹佛博士"
+        },
+        {
+          "text": "TSMC 推出新製程"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "TSMC"
+        },
+        {
+          "text": "張忠謀",
+          "emph": true
+        },
+        {
+          "text": "史丹佛大學"
+        },
+        {
+          "text": "新製程"
+        }
+      ],
+      "edges": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hot": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "note": "例子以 TSMC 為例：靠共用的「張忠謀」，串起沒提到 TSMC 的那段",
+      "refs": [
+        "c5",
+        "c6",
+        "c9"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "hops",
+      "title": "有些問題要跳 4 次，SAG 實務上只跳 1 次",
+      "body": "「跳」就是沿著連線走一步。MuSiQue（Multi-Hop 問答資料集）有些問題，傳統的二元圖譜要跳 4 次才到得了答案。",
+      "heads": [
+        "問題",
+        "答案"
+      ],
+      "nodes": [
+        {
+          "text": "二元圖譜：4 跳",
+          "hops": 4
+        },
+        {
+          "text": "SAG：只擴展 1 跳",
+          "hops": 1
+        }
+      ],
+      "note": "示意：圓點是節點，箭頭是一跳；不代表每題一跳就答對",
+      "refs": [
+        "c10"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "為什麼一跳就夠？落差可能來自資訊密度",
+      "body": "4 跳對 1 跳看起來不合理；落差可能來自資訊密度，也就是一個點裝了多少資訊。",
+      "columns": [
+        {
+          "head": "傳統圖譜的節點",
+          "items": [
+            {
+              "text": "被拆得極碎",
+              "sub": "例：第 5 張那句話，被拆成三條三元組"
+            },
+            {
+              "text": "一次跳轉，只跨很短的邏輯距離"
+            }
+          ]
+        },
+        {
+          "head": "SAG 的一個事件",
+          "items": [
+            {
+              "text": "一句保留完整上下文的話",
+              "emph": true
+            },
+            {
+              "text": "內部已壓縮多個實體",
+              "sub": "例：一句話就綁著五個實體",
+              "emph": true
+            }
+          ]
+        }
+      ],
+      "refs": [
+        "c8",
+        "c10",
+        "c11"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "title": "種子事件，可能已經跨完頭一兩步",
+      "body": "拿事件裡的實體當跳板，再 JOIN 一次，就可能撈回另一個壓縮好後續鏈條的事件。",
+      "nodes": [
+        {
+          "text": "從問題命中第一個種子事件",
+          "sub": "種子事件是一開始就命中問題的事件，它內含的人物、時間、地點，可能已經跨完頭一兩步。例：命中「張忠謀創立了 TSMC」"
+        },
+        {
+          "text": "拿這些實體當跳板，下一次 SQL JOIN",
+          "sub": "撈回另一個完整的事件。例：用「張忠謀」JOIN，撈回「張忠謀在史丹佛大學拿到博士學位」"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "所以一跳 SQL 擴展的資訊覆蓋率（涵蓋多少相關資訊），可能就跟傳統圖譜跳三到四次相當，還可能避開跳很多次帶來的誤差累積與分數衰減",
+          "tone": "good"
+        }
+      ],
+      "refs": [
+        "c12",
+        "c13"
+      ],
+      "note": "例子沿用第 3、11 張的 TSMC 例子"
+    },
+    {
+      "layout": "chart_bars",
+      "title": "加一跳擴展，Recall@5 升到 80.0%",
+      "body": "在 MuSiQue 上，跟無擴展的 SAG 比。H=0 不擴展、H=1 擴展一跳。Recall@1（前 1 筆找回多少）等於沒動，Recall@5（前 5 筆）從 69.4% 升到 80.0%。",
+      "unit": "%",
+      "legend": [
+        "無擴展（H=0）",
+        "有擴展（H=1）"
+      ],
+      "axis_max": 100,
+      "bars": [
+        {
+          "name": "Recall@1",
+          "value": 35.7,
+          "value2": 36.2
+        },
+        {
+          "name": "Recall@5",
+          "value": 69.4,
+          "value2": 80.0
+        }
+      ],
+      "note": "Recall@K：前 K 筆結果裡，找回多少該找回的內容",
+      "fig_refs": [
+        "sag/table3.png"
+      ],
+      "refs": [
+        "c14"
+      ],
+      "quals": [
+        "c14#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "hidden",
+      "title": "擴展可能找回了，向量撈不到的中間證據",
+      "body": "依據 MuSiQue 上拿掉擴展再比較的實驗（前 1 筆等於沒動、前 5 筆找回的比例變高）：擴展可能不是把已有的種子事件排得更好，而是找回原本撈不到的中間證據。",
+      "heads": [
+        "原本就有的種子事件",
+        "擴展才找得回來的"
+      ],
+      "nodes": [
+        {
+          "text": "已有的種子事件（擴展不是在幫它們排名）"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "跟問題語意不相關、向量檢索絕對撈不到，卻對推論鏈至關重要的中間證據",
+          "sub": "例：「張忠謀在史丹佛大學拿到博士學位」"
+        }
+      ],
+      "refs": [
+        "c14",
+        "c15"
+      ],
+      "quals": [
+        "c15#1"
+      ],
+      "note": "例子以 TSMC 為例，只是說明，不是實驗找回的內容"
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "省下維護全域圖的開銷，要付三個代價",
+      "body": "不先建全域圖，維護它的開銷就不存在；但這個做法目前有三個代價。",
+      "columns": [
+        {
+          "head": "好處",
+          "items": [
+            {
+              "text": "不用維護全域靜態圖"
+            }
+          ]
+        },
+        {
+          "head": "代價",
+          "items": [
+            {
+              "text": "固定剪枝預算，會漏掉長尾罕見實體",
+              "sub": "每次只留固定數量，罕見的會被漏掉"
+            },
+            {
+              "text": "不做別名合併，稀釋跨文件連結密度",
+              "sub": "不同寫法不合併，跨文件連起來的機會變少"
+            },
+            {
+              "text": "目前處理不了，知識的更新與失效"
+            }
+          ]
+        }
+      ],
+      "refs": [
+        "c1",
+        "c7"
+      ],
+      "quals": [
+        "c1#1"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "Multi-Hop 推理，一定要先建知識圖譜嗎？",
+      "title": "不一定：\n線下存事件和實體標籤，\n查詢時才連成圖。",
+      "refs": [
+        "c1",
+        "c2",
+        "c6"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "一次看完這個系列",
+      "current": "sag-latent-hyperedge-one-hop",
+      "nav": "完整文章：datasciocean.com/paper-intro/sag",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "Multi-Hop 推理，一定要先建知識圖譜嗎？\n\n向量檢索只看語意相似度，推理走到一半常常斷鏈；GraphRAG 能建立關聯，但線下建置成本高，資料一直進來更難維護。\n\nSAG 的折衷：線下不建圖，只把每個 chunk（長文件切出的一小段文字）轉成「事件」加一組實體標籤，存進 SQL 資料庫；查詢時才用 SQL JOIN 把共用實體的事件串起來。\n\n實務上它只擴展一跳。在 MuSiQue 上，跟沒有擴展的同一個 SAG 比，Recall@5 從 69.4% 升到 80.0%（Recall@1 等於沒動）。\n\n代價：固定剪枝預算會漏掉長尾罕見實體、不做別名合併會稀釋跨文件連結密度、目前處理不了知識的更新與失效。論文：arxiv.org/abs/2606.15971。這是系列第 1 則。",
+      "refs": [
+        "c1",
+        "c2",
+        "c10",
+        "c14",
+        "multihop-vector-vs-graphrag-pain-points:c1"
+      ],
+      "quals": [
+        "c1#1",
+        "c14#1"
+      ]
+    },
+    "last": {
+      "text": "不先建圖、查詢時才連，那查詢時是誰在做事？下一則看 SQL、向量、LLM 怎麼分工。\n文章：datasciocean.com/paper-intro/sag\n同系列：SQL、向量、LLM 怎麼分工？（尚未發布）\n同系列：SAG 的成績從哪來？（尚未發布）\n同系列：SAG 付出了什麼代價？（尚未發布）",
+      "refs": [
+        "c1",
+        "c2"
+      ],
+      "link": "https://datasciocean.com/paper-intro/sag/"
+    }
+  },
+  "caption": {
+    "first": "SAG 不先建知識圖譜：Multi-Hop 推理時，才用 SQL JOIN 把共用實體的事件連起來",
+    "first_refs": [
+      "c1",
+      "c2",
+      "c6"
+    ],
+    "nav": "完整文章請在 datasciocean.com 搜尋「SAG：拋開離線知識圖譜，查詢時用 SQL 連事件」",
+    "hashtags": [
+      "DSO_SAG",
+      "SAG",
+      "RAG",
+      "MultiHop",
+      "知識圖譜"
+    ]
+  },
+  "latin_allow": [
+    "arxiv.org",
+    "abs",
+    "TSMC"
+  ]
+}

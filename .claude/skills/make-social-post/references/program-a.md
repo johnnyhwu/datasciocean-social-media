@@ -18,6 +18,7 @@
 | 中文 AI 腔黑名單（`ai_tone_blacklist`）；出現「podcast」 | 風格與規則違反 |
 | 前向指稱（`ambiguous_forward_refs`：「系列後面」「後面會再細講」「後面幾則」…） | 會被讀成這則的後面幾頁；寫成「此系列的後續 post」（2026-10-15 人的回饋） |
 | 被使用的主張，它的每條限定條件（`cid#k`）必須在整則貼文某處被 `quals` 標記帶出 | 壓縮時限定條件被砍 |
+| 投影片的 `fig_refs`（選用）：每張必須是這張 `refs` 的主張所附的圖、檔案存在、sha256 與卡上一致；引用 pending 主張（連同它的圖）照樣擋 | 引用了不是這張該用的圖；圖檔被動過或缺檔（`tests/test_figures.py`） |
 | 卡的 `context_type` 是 `evidence_from_single_source` 或 `bound_to_source` 時，脈絡張必須引用 `role: context` 的主張 | 漏交代方法來源 |
 | 貼文或系列檔的 `planned_title` 出現 `config/terms.yaml` 左邊的詞（例如「判官」，應寫 Judge） | 用語不一致（導流行引用的文章原標題不檢查） |
 | 張數不超過 `slides_max`；文字張補充 40～110 字；圖表與對照表補充不超過 46 字（2 行）；脈絡張補充不超過 140 字（數字在 `config/params.yaml`） | 超長 |

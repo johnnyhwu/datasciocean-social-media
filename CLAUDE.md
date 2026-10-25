@@ -42,6 +42,7 @@ datasciocean-concept-wiki（Stage 1，submodule：concept-wiki/）
 14. **封面 hook 以吸引點擊為先，不欺騙為界**：可以沒說完整（留白、反差、口語語氣詞），但主標副標合看字面為真、範圍不放大、限定條件在內文出現（`references/hooks.md`）。取捨時預設選更吸引人。封面要**獨立可懂**（不假設讀者看過系列），口語活潑；圖上不放 emoji。
 15. **不要自己 commit 或 push**；commit 與 push 由人決定時機（人明確要求時例外）。發布前要 push `ig/jpg/`（託管是這個公開 repo 的 raw 網址）；人沒有一次授權整串時，push 前先問人。
 16. **憑證只放 `.env`**（已在 `.gitignore`）：token 與 App Secret 不得出現在聊天、log、錯誤訊息、commit；**不要 `cat .env`、不要要求人把 token 貼進聊天**，用 `whoami`、`token-status`、`token-info` 檢查即可。
+17. **卡上主張附的圖（`figures`）只是參考，不是證據**（2026-10-24 上游契約）。貼文內容只能來自主張文字與限定條件；要放視覺就**重製**（程式依 spec 重畫，不複製貼上原圖），圖上內容以**這張引用的主張**為準，主張沒寫的圖上內容預設不放；原圖標明的範圍不得因取捨而放大；`pending_author_confirmation` 主張的圖不能用。選主張時**要用 Read 實際看圖**。重製圖要由**重製圖審查者**對「原圖 × 主張 × 重製圖」獨立審，不假設上游查證過圖上的內容（`references/anchor-writing-rules.md`「參考圖」、`figure-prompt.md`）。圖看不懂或太複雜就不用，完全不用卡上的圖是合法的。
 
 ## 範圍外（不要做）
 
@@ -74,7 +75,7 @@ out/                                    發布包（程式產生）
         threads/post.md                     Threads：輪播貼文＋（有連結時）一則回覆；舊格式是逐張串文
         _build/                             機器用：spec.json（內容規格，唯一的真相來源）、checks-b.json、審查用文字、reviewed-spec.json（審查通過版本）…
 docs/                                   status.md（各系列進度與發布網址）、stage2-token-usage.md（token 用量與流程觀察）
-tests/                                  十份回歸測試（`test_*_style.py` 各測一種視覺風格；`test_multicard.py` 雙卡與高密度版型）+ fixtures/（舊貼文、系列檔與觀念卡，只給測試用）
+tests/                                  十二份回歸測試（`test_*_style.py` 各測一種視覺風格；`test_multicard.py` 雙卡與高密度版型；`test_figures.py` 卡上參考圖的解析、`fig_refs` 檢查、審查材料）+ fixtures/（舊貼文、系列檔與觀念卡，只給測試用）
 ```
 
 **找東西的規則**：要發文，從 `out/README.md` 進去，打開貼文的 `README.md`；要改內容，改該貼文 `_build/spec.json`，然後依序重跑 `check_a.py` → `render.py` → `contact_sheet.py` → `build_package.py`（`contact_sheet.py` 要在 `build_package.py` 之前，README 才會有縮圖）。
@@ -99,7 +100,7 @@ tests/                                  十份回歸測試（`test_*_style.py` �
 
 - **張數與圖型**（人的回饋，2026-10-11、10-12）：**讀者真正看懂比張數重要**，上限 20 張（`slides_max`；IG 文件寫 10 張，實測 20 張可發）。文字下面空出來的區塊是「塗鴉牆」，用 `diagram` 版型畫圖，**不要每篇都是橫條圖，同一則連續 3 張以上同圖型要換**。**圖要大膽、有故事**：人最喜歡「受保護區塊」那張（一塊金色區塊、一邊箭頭被叉掉、一邊通過），圖本身在說一個畫面；優先選有隱喻、一眼看懂機制的畫法（`design-series-visuals` 的「機制 → 圖型」表）。可以新增圖型，不必先出樣張（規則 12）。
 - **白話解釋的尺度**（人的決定，2026-10-12）：可以用白話解釋機制，只要**不改變卡的意思、不加新事實**；讀者要白話、忠實者要卡上有而衝突時照這條。自創比喻容易出事，用卡上的正式術語加白話比較穩（「驗證資料集」，不寫「選擇題」）。
-- **用語偏好**（人的回饋）：目標 Agent（不寫目標模型）、單個隨機樣本、優化器＝教練、訓練／驗證／測試資料集、「我的想法」可代替「我的推論」。不要文縐縐（宏觀層級、戰略筆記、步驟級…換成大方向、小修改），不要寫「文章沒有提到／卡上沒有」這類交代資料缺口的話（卡上沒有的就直接不提）。
+- **用語偏好**（人的回饋）：目標 Agent（不寫目標模型）、單個隨機樣本、優化器＝教練、訓練／驗證／測試資料集、部落格推論與部落格判斷一樣，**不標「我的推論」「我的想法」**（人，2026-10-24；語氣仍不得比卡強、不寫成論文已驗證）；多步／多跳一律寫 Multi-Hop（`config/terms.yaml`）。不要文縐縐（宏觀層級、戰略筆記、步驟級…換成大方向、小修改），不要寫「文章沒有提到／卡上沒有」這類交代資料缺口的話（卡上沒有的就直接不提）。
 
 - **Threads 預設是輪播**（人的決定，2026-10-12）：一則輪播貼文（正文＋全部投影片）＋一則連結回覆（沒有連結的獨立貼文省略回覆）；spec 寫 `threads.mode: carousel`、不寫 `items`（`spec-json.md`）。逐張串文只留給已發布的 jev-cascade 與測試。
 - **預設一張觀念卡 = 一則 post**；IG 輪播與 Threads 串文是同一則的兩種格式。兩張卡互相依賴、分開發都不好懂時，**由人決定**合成一則雙卡貼文（系列檔成員的 `also`；做法見 `spec-json.md`「雙卡貼文」）。同一篇文章的多張卡預設組成系列，`standalone_classic` 的卡預設獨立發文（`references/batch-and-publish.md` §1）。
@@ -107,6 +108,6 @@ tests/                                  十份回歸測試（`test_*_style.py` �
 - **做完一個階段，主動列出人接下來要確認或決定的事**（要確認什麼、還沒決定什麼）。人不做手動事項：需要手動才能完成的事，要嘛由 Claude 做、要嘛不做，不當成待辦丟給人。
 - skill 與 `references/` 是依實測整理出來的；細節有疑問時以它們為準，沒寫到的先問人，不要自己決定。
 - **發布流程的工具**（2026-10-15 整理）：dry-run 加 `--summary` 給人看；`--confirm` 成功後 README 與 `out/` 索引自動更新（`build_package.py --refresh`）；系列貼文的「同系列」連結用 `series_links.py` 補（Threads dry-run 會擋沒補的）；標 `ready` 時順便問人要不要整串授權。新系列的草圖：一次 3 個方向、IG 首頁 3×3 格與相鄰系列並排、存 `series/<id>/sketches/`（`design-series-visuals`）。
-- 修改任何程式檢查、審查或發布流程後，**重跑全部回歸測試**：`uv run python tests/test_check_a.py`、`test_state_and_batch.py`、`test_render_numunit.py`、`test_ig_publish.py`、`test_threads_publish.py`、`test_multicard.py`、`test_diagrams.py`、`test_cards_style.py`、`test_standalone_style.py`、`test_seesaw_style.py`；新增檢查要加「故意做壞的版本」確認抓得到。
+- 修改任何程式檢查、審查或發布流程後，**重跑全部回歸測試**：`uv run python tests/test_check_a.py`、`test_state_and_batch.py`、`test_render_numunit.py`、`test_ig_publish.py`、`test_threads_publish.py`、`test_multicard.py`、`test_diagrams.py`、`test_cards_style.py`、`test_standalone_style.py`、`test_seesaw_style.py`、`test_spotlight_style.py`、`test_figures.py`；新增檢查要加「故意做壞的版本」確認抓得到。
 - 整理 repo 或文件時，順便檢查：討論中得到的回饋是否已寫進 CLAUDE.md 或 skill、有沒有過時（legacy）內容可刪、哪些屬於 `.claude/`（Claude 怎麼做事）而不是資料與設定。
 - 範例資料：**品質基準是 skillopt 第 2、3 則**（`out/skillopt/skillopt-batch-evidence-minibatch/`、`out/skillopt/skillopt-blind-acceptance-gate/`；雙卡、17 張、多種示意圖、Threads 輪播；人說比較滿意）；`skillopt-overview` 是單卡＋diagram 的範例；含 LaTeX 與新示意圖的範例是 `out/standalone/bradley-terry-pairwise-preference/`。jev-cascade 的寫法已過時。內容規格在各則 `_build/spec.json`；`tests/fixtures/` 只給回歸測試用。

@@ -198,6 +198,50 @@ def spec_claims(doc: dict) -> dict[str, dict]:
     return out
 
 
+# ---------------------------------------------------------------- 主張附的參考圖（契約 card-format.md §4.2）
+# 圖只是參考，不是證據；貼文要用必須重製（由程式畫，不直接貼原圖）。這裡只負責「找到圖、確認沒被動過」。
+
+def figure_path(fig: dict) -> Path:
+    """圖檔實際路徑：<wiki>/wiki/<file>（file 相對於 wiki/）。"""
+    return WIKI / "wiki" / fig["file"]
+
+
+def figure_id(fig: dict) -> str:
+    """spec 的 fig_refs 用的圖編號：<article>/<src>，例如 sag/figure1.png。"""
+    return f"{fig['article']}/{fig['src']}"
+
+
+def claim_figures(claim: dict) -> list[dict]:
+    """這條主張附的圖（沒有就空清單；舊卡沒有 figures 欄位照常）。每筆多一個 `path`；檔案不存在要明確報錯，不靜默略過。"""
+    out = []
+    for fig in claim.get("figures") or []:
+        p = figure_path(fig)
+        if not p.exists():
+            raise FileNotFoundError(f"主張 {claim.get('id')} 附的圖不存在：{p}（concept-wiki submodule 是否更新到有 wiki/figures/ 的版本？）")
+        out.append({**fig, "path": p})
+    return out
+
+
+def figure_hash_problem(fig: dict) -> str | None:
+    """檔案 sha256 與卡上記錄不一致就回傳訊息（代表 submodule 內容被改過）；一致回 None。"""
+    import hashlib
+    h = hashlib.sha256(figure_path(fig).read_bytes()).hexdigest()
+    return None if h == fig.get("sha256") else f"{figure_id(fig)} 的 sha256 與卡上記錄不一致（檔案被改過？）"
+
+
+def slide_figures(claims: dict[str, dict], refs: list[str]) -> dict[str, dict]:
+    """一張投影片引用的主張所附的圖：{圖編號: {"fig": 圖資料（含 path）, "claims": [附這張圖的主張 id]}}。
+    只看這張引用的主張（缺檔只在用到時報錯）；pending_author_confirmation 的主張，它的圖不收（圖跟著主張被排除）。"""
+    out: dict[str, dict] = {}
+    for cid in refs:
+        c = claims.get(cid)
+        if not c or c.get("status") == "pending_author_confirmation":
+            continue
+        for fig in claim_figures(c):
+            out.setdefault(figure_id(fig), {"fig": fig, "claims": []})["claims"].append(cid)
+    return out
+
+
 def load_all_cards() -> list[Card]:
     return [parse_card(p) for p in sorted((WIKI / "wiki" / "concepts").glob("*.md"))]
 

@@ -34,7 +34,7 @@ CONTENT = {"text", "table", "chart_bars", "chart_sounding", "diagram"}
 CONTENT_KEYS = {"title", "body", "label", "question", "rows", "bars", "note", "nav", "legend",
                 "nodes", "outcomes", "loop", "columns", "heads", "pairs", "count", "points", "ref", "ranges", "group", "start", "end",
                 "items", "steps"}
-LAYOUT_KEYS = {"layout", "refs", "quals", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols", "more"}   # cols：點陣每列幾個點（版面參數，不含文字）
+LAYOUT_KEYS = {"layout", "refs", "quals", "fig_refs", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols", "more", "edges", "hot"}   # cols：點陣每列幾個點（版面參數，不含文字）
 
 
 def check_fields(d: dict) -> None:
@@ -52,6 +52,27 @@ def first_clause(s: str) -> str:
     return c if len(c) <= 24 else ""
 
 
+def figure_label(fig: dict) -> str:
+    """卡上圖說的圖號：「圖一 — …（來源：原始論文）」→「圖一」；圖說沒有「 — 」時回傳空字串。"""
+    m = re.match(r"^\s*([^—:：]{1,12}?)\s*[—:：]", fig.get("caption", ""))
+    return m.group(1).strip() if m else ""
+
+
+def figure_credit(d: dict) -> str:
+    """有重製圖（fig_refs）時，caption 自動註明出處：改繪自原始論文哪張圖，不說成我們自己做的實驗（契約 guideline §5-5）。"""
+    if not any(sl.get("fig_refs") for sl in d["slides"]):
+        return ""
+    claims = W.spec_claims(d)
+    parts = []
+    for i, sl in enumerate(d["slides"], 1):
+        if not sl.get("fig_refs"):
+            continue
+        figs = W.slide_figures(claims, sl.get("refs") or [])
+        labels = [figure_label(figs[f]["fig"]) for f in sl["fig_refs"] if f in figs]
+        parts.append(f"第 {i} 張" + (f"（{'、'.join(l for l in labels if l)}）" if any(labels) else ""))
+    return ("圖片來源：" + "、".join(parts) + "改繪自原始論文的圖表") if parts else ""
+
+
 def caption_text(d: dict) -> str:
     cap = d["caption"]
     lines = [cap["first"], ""]
@@ -60,6 +81,8 @@ def caption_text(d: dict) -> str:
             fc = first_clause(sl.get("body", ""))
             lead = f"{sl['label']}：" if sl.get("label") and not mark(sl["title"]).startswith(sl["label"]) else ""     # 小標籤放在前面；標題已經以同樣的詞開頭就不重複（「第一關：第一關：」）
             lines.append(f"・{lead}{mark(sl['title'])}" + (f"（{fc}）" if fc else ""))
+    if figure_credit(d):
+        lines += ["", figure_credit(d)]
     lines += ([""] + [cap["nav"]] if cap.get("nav") else []) + ["", " ".join("#" + h for h in cap["hashtags"])]   # 導流行可省略（獨立貼文，人決定不導回來源文章）
     return "\n".join(lines)
 
@@ -92,6 +115,11 @@ def slide_lines(sl: dict, with_refs: bool) -> list[str]:
             out.append(f"圖表項目：{b['name']}｜{'／'.join(b.get('subs', []))}｜{(sl['legend'][0] + ' ') if v2 else ''}{b['value']:g} {sl.get('unit', '')}{v2}" + ("｜強調" if b.get("emphasize") else ""))
     if sl["layout"] == "diagram":
         out.append(f"示意圖（{sl['kind']}）上的文字與數字：" + "｜".join(D.texts(sl)))
+    if sl.get("edges"):      # links 圖的連線是內容（誰跟誰相連），審查者要看得到
+        hot = {tuple(e) for e in sl.get("hot", [])}
+        out.append("示意圖的連線（左—右）：" + "｜".join(f"{sl['nodes'][l]['text']}—{sl['outcomes'][r]['text']}" + ("（金色）" if (l, r) in hot else "") for l, r in sl["edges"]))
+    if sl["layout"] == "diagram" and sl.get("kind") == "hops":
+        out.append("示意圖的跳數（箭頭數）：" + "｜".join(f"{n['text']}＝{n['hops']} 跳" for n in sl["nodes"]))
     if sl.get("note"):
         out.append(f"圖註：{sl['note']}")
     for cid in sl.get("items", []):
@@ -126,6 +154,35 @@ def review_files(d: dict, build: Path) -> None:
             L += ["", "（沒有最後一則回覆：只發輪播貼文）"]
         L += ["", "## IG caption", "", caption_text(d)]
         (build / name).write_text("\n".join(L) + "\n", encoding="utf-8")
+
+
+def figure_review_file(d: dict, pack: Path, build: Path) -> None:
+    """重製圖的審查材料（guideline §4.5）：每張有 fig_refs 的投影片，給審查者原圖路徑、主張文字與限定條件、重製後的圖與圖上文字。
+    沒有 fig_refs 的貼文不產生這個檔（並刪掉舊的）。"""
+    f = build / "figure-review.md"
+    todo = [(i, sl) for i, sl in enumerate(d["slides"], 1) if sl.get("fig_refs")]
+    if not todo:
+        f.unlink(missing_ok=True)
+        return
+    claims = W.spec_claims(d)
+    L = [f"# 重製圖審查材料：{d['concept']}", "",
+         "原圖是 blog 從論文截來的參考圖；圖說（caption）是 blog 的圖說原文，**不是主張**。重製圖要和「原圖」與「主張文字」對得上（見 figure-prompt.md）。"]
+    for i, sl in todo:
+        figs = W.slide_figures(claims, sl.get("refs") or [])
+        L += ["", f"## 第 {i} 張", "", f"- 重製後的圖：{(pack / 'ig' / f'{i:02d}.png').resolve()}", "- 重製圖上的文字（貼文最終文字）："]
+        L += [f"  - {x}" for x in slide_lines(sl, False)]
+        for fid in sl["fig_refs"]:
+            fg = figs[fid]
+            L += ["", f"### 原圖 {fid}", f"- 檔案：{fg['fig']['path'].resolve()}", f"- blog 圖說原文（不是主張）：{fg['fig'].get('caption', '')}", f"- 附這張圖的主張：{', '.join(fg['claims'])}"]
+        L += ["", "### 這張引用的主張（圖要以它們為準）"]
+        for cid in sl.get("refs") or []:
+            c = claims.get(cid)
+            if not c:
+                continue
+            L.append(f"- **{cid}**（{c['anchor_type']}）：{c['text']}")
+            for k, q in enumerate(c.get("qualifiers") or [], 1):
+                L.append(f"  - 限定條件 {cid}#{k}：{q.get('text', '')}" + ("（來源：圖說）" if q.get("source") == "figure_caption" else ""))
+    f.write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
 def fence(text: str) -> list[str]:
@@ -347,6 +404,7 @@ def build(spec_path: Path, force: bool = False) -> None:
     if series:   # 系列貼文用系列檔的 planned_title（簡短），否則用卡的標題
         title = next((m["planned_title"] for m in series["members"] if m["concept"] == d["concept"]), title)
     review_files(d, bld)
+    figure_review_file(d, pack, bld)
     (pack / "ig").mkdir(exist_ok=True)
     (pack / "threads").mkdir(exist_ok=True)
     (pack / "ig" / "post.md").write_text(ig_md(d, title, series["name"] if series else None, alts), encoding="utf-8")

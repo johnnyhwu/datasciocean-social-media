@@ -95,5 +95,58 @@ expect("故意做壞：符號序列圖的字太多放不下 → 報錯", code !=
 code, out = render(D("tokens", steps=[{"label": "第一步", "cells": [{"text": "這是一段沒有任何標點而且非常非常長的符號文字塞不進格子", "tone": "state"}] * 3}]))
 expect("故意做壞：符號格的文字塞不進框 → 程式 B 抓得到", code != 0, out)
 
+# links（左右兩排節點之間的連線）與 hops（幾跳才到答案），2026-10-24
+LL = [{"text": "一個事件", "sub": "一句保留完整語意的話"}]
+LR = [{"text": n} for n in ("實體甲", "實體乙", "實體丙", "實體丁", "實體戊")]
+code, out = render(D("links", heads=["事件", "實體"], nodes=LL, outcomes=LR, edges=[[0, i] for i in range(5)]))
+expect("正確的連線圖（一個事件連五個實體）通過程式 B", code == 0, out)
+code, out = render(D("links", heads=["事件", "實體"], nodes=[{"text": "事件一"}, {"text": "事件二", "emph": True}, {"text": "事件三"}], outcomes=[{"text": "實體甲"}, {"text": "實體乙", "emph": True}, {"text": "實體丙"}],
+                     edges=[[0, 0], [0, 1], [1, 1], [1, 2], [2, 2]], hot=[[0, 1], [1, 1]]))
+expect("正確的連線圖（多對多、共用實體畫金線）通過程式 B", code == 0, out)
+code, out = render(D("links", nodes=LL, outcomes=LR, edges=[[0, 9]]))
+expect("故意做壞：連線指到不存在的節點 → 報錯", code != 0 and "超出節點範圍" in out, out)
+code, out = render(D("links", nodes=LL, outcomes=LR, edges=[[0, 0]], hot=[[0, 1]]))
+expect("故意做壞：hot 不是 edges 的子集 → 報錯", code != 0 and "子集" in out, out)
+code, out = render(D("links", nodes=[{"text": "很長的事件" * 20, "sub": "很長的說明" * 20}], outcomes=[{"text": "很長的實體" * 20, "sub": "很長的說明" * 20}] * 6, edges=[[0, 0]]))
+expect("故意做壞：連線圖的字太多放不下 → 報錯", code != 0 and "放不下" in out, out)
+code, out = render(D("hops", heads=["問題", "答案"], nodes=[{"text": "二元圖譜要跳 4 次", "hops": 4}, {"text": "SAG 只跳 1 次", "hops": 1}]))
+expect("正確的幾跳圖（4 跳對 1 跳）通過程式 B", code == 0, out)
+code, out = render(D("hops", nodes=[{"text": "二元圖譜要跳 4 次", "hops": 3}, {"text": "SAG 只跳 1 次", "hops": 1}]))
+expect("故意做壞：圖上寫的跳數與箭頭數不符 → 報錯", code != 0 and "箭頭數" in out, out)
+code, out = render(D("hops", nodes=[{"text": "很長的說明" * 30, "sub": "很長的小字" * 30, "hops": 4}] * 3))
+expect("故意做壞：幾跳圖的字太多放不下 → 報錯", code != 0 and "放不下" in out, out)
+
+# bubble（一個大泡泡圈住好幾個東西）與 drift（一路偏掉的路徑），2026-10-24
+BI = [{"text": n} for n in ("Facebook", "2014年", "WhatsApp", "馬克·祖克柏", "揚·庫姆")]
+code, out = render(D("bubble", heads=["一般的邊", "超邊"], nodes=[{"text": "只連兩個節點"}, {"text": "一條就圈住任意數量的節點", "sub": "例：一個事件綁五個實體"}], outcomes=BI))
+expect("正確的泡泡圖（一個泡泡圈五個實體）通過程式 B", code == 0, out)
+code, out = render(D("bubble", heads=["左", "右"], nodes=[{"text": "甲"}, {"text": "乙"}], outcomes=[{"text": "只有一個"}]))
+expect("故意做壞：泡泡裡只有 1 個項目 → 報錯", code != 0 and "2～8" in out, out)
+code, out = render(D("bubble", heads=["左", "右"], nodes=[{"text": "甲"}, {"text": "乙"}], outcomes=[{"text": "很長的實體名稱" * 6}, {"text": "乙"}]))
+expect("故意做壞：泡泡裡的項目太長放不下 → 報錯", code != 0 and "放不下" in out, out)
+code, out = render(D("bubble", heads=["左", "右"], nodes=[{"text": "很長的說明" * 40, "sub": "很長的小字" * 40}, {"text": "乙" * 200}], outcomes=BI))
+expect("故意做壞：泡泡圖的說明太長放不下 → 報錯", code != 0 and "放不下" in out, out)
+code, out = render(D("drift", heads=["問題", "第一步", "第二步", "第三步", "答案"], nodes=[{"text": "正確的推理鏈"}, {"text": "第一步偏一點", "sub": "後面每一步都在錯的基礎上繼續"}]))
+expect("正確的偏移路徑圖通過程式 B", code == 0, out)
+code, out = render(D("drift", heads=["問題", "答案"], nodes=[{"text": "正確"}, {"text": "實際"}]))
+expect("故意做壞：偏移路徑只有 2 站 → 報錯", code != 0 and "3～6" in out, out)
+code, out = render(D("drift", heads=["問題", "第一步", "答案"], nodes=[{"text": "很長的說明" * 60}, {"text": "很長的說明" * 60, "sub": "很長的小字" * 60}]))
+expect("故意做壞：偏移路徑圖的說明太長放不下 → 報錯", code != 0 and "放不下" in out, out)
+# ingest（兩段式架構圖），2026-10-24
+ING = dict(heads=["線下：上傳文件時", "線上：使用者發問時"], nodes=[{"text": "chunk"}, {"text": "事件：一對一"}, {"text": "實體：多對多"}, {"text": "資料庫"}],
+           outcomes=[{"text": "使用者發問"}, {"text": "配對", "sub": "把共用實體的，事件配起來"}, {"text": "局部的圖", "sub": "查完就丟"}])
+code, out = render(D("ingest", **ING))
+expect("正確的兩段式架構圖通過程式 B", code == 0, out)
+code, out = render(D("ingest", **{**ING, "nodes": ING["nodes"][:3]}))
+expect("故意做壞：架構圖上段只有 3 欄 → 報錯", code != 0 and "4 個" in out, out)
+code, out = render(D("ingest", **{**ING, "outcomes": [{"text": "很長的步驟說明" * 12, "sub": "很長的小字" * 30}] * 3}))
+expect("故意做壞：架構圖下段的字太多放不下 → 報錯", code != 0 and "放不下" in out, out)
+
+import sys
+sys.path.insert(0, str(ROOT / ".claude/skills/make-social-post/scripts"))
+import diagrams as DG
+o = DG.drift_offsets(5, 200)
+expect("drift_offsets：起點 0、單調遞增、終點 = dmax", o[0] == 0 and all(b > a for a, b in zip(o, o[1:])) and abs(o[-1] - 200) < 1e-9, str(o))
+
 print("\n全部通過" if not fails else f"\n{len(fails)} 項失敗")
 raise SystemExit(1 if fails else 0)

@@ -33,7 +33,7 @@ RP = PARAMS["render"]
 WD, HT, SAFE_X, PAD_X = RP["width"], RP["height"], RP["safe_x"], RP["pad_x"]
 CREAM, TEAL, DEEP, GOLD = "#F2E0C0", "#076876", "#01353F", "#DDA642"
 MID, LIGHT, ABYSS = "#1F8A8D", "#69B4AA", "#032027"
-SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD, "seesaw": GOLD}
+SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD, "seesaw": GOLD, "spotlight": GOLD}
 ALLOWED_FONT_PX = {28, 34, 38, 40, 56, 72, 76}
 ZERO_Y = 706          # 測深圖水面（0）
 
@@ -444,6 +444,60 @@ def ss_mid(idx, n):
 def ss_takeaway():
     return ss_seesaw(540, 1125, 900, 52, 10, dark=True, fh=95)
 
+
+# ---------------------------------------------------------------- 探照燈（style: spotlight，series/sag）的 SVG 元件
+# 一片暗處的點與細線（所有可能的連結），一道探照燈照亮其中一個局部：光圈裡的點變亮、連線變金；光圈外留在暗處。
+# 點的位置由固定亂數種子決定；光圈中心取「附近點最多」的幾個候選之一，落點隨則（封面、系列地圖）或張數（文字張）換。
+# 都用 class "bg"（背景層，不進程式 B 的文字與圖形重疊檢查），排版時要自己確保不壓到文字（看圖確認）。
+def sp_field(box, n, seed, pick, R, thr=190, dark=True, dim=None):
+    """box = (x0, y0, x1, y1)；pick = 第幾個密度候選（0 起，超過就繞回）。回傳 SVG 片段。"""
+    import random
+    rnd = random.Random(seed)
+    x0, y0, x1, y1 = box
+    pts = [(rnd.randint(x0, x1), rnd.randint(y0, y1)) for _ in range(n)]
+    edges = [(i, j) for i in range(n) for j in range(i + 1, n) if math.dist(pts[i], pts[j]) < thr]
+    dens = sorted(range(n), key=lambda i: -sum(1 for q in pts if math.dist(pts[i], q) < R))
+    cx, cy = pts[dens[pick % 6]]
+    inside = lambda q: math.dist(q, (cx, cy)) < R
+    dim_c, dim_o = (CREAM, .13) if dark else (MID, .30)
+    lit_node = CREAM if dark else DEEP
+    s = (f'<defs><radialGradient id="spg"><stop offset="0" stop-color="{GOLD}" stop-opacity="{.5 if dark else .42}"/>'
+         f'<stop offset="1" stop-color="{GOLD}" stop-opacity="0"/></radialGradient></defs>'
+         f'<circle class="bg" cx="{cx}" cy="{cy}" r="{R + 50}" fill="url(#spg)"/>')
+    for i, j in edges:
+        lit = inside(pts[i]) and inside(pts[j])
+        s += (f'<line class="bg" x1="{pts[i][0]}" y1="{pts[i][1]}" x2="{pts[j][0]}" y2="{pts[j][1]}" '
+              f'stroke="{GOLD if lit else dim_c}" stroke-width="{5 if lit else 2}" stroke-opacity="{1 if lit else dim_o}"/>')
+    for q in pts:
+        lit = inside(q)
+        s += f'<circle class="bg" cx="{q[0]}" cy="{q[1]}" r="{14 if lit else 9}" fill="{lit_node if lit else dim_c}" fill-opacity="{1 if lit else dim_o + .06}"/>'
+    s += (f'<circle class="bg" cx="{cx}" cy="{cy}" r="24" fill="{GOLD}"/>'
+          f'<circle class="bg" cx="{cx}" cy="{cy}" r="42" fill="none" stroke="{GOLD}" stroke-width="4"/>')
+    return s
+
+
+def sp_strip(idx, n, dark=False):
+    """內頁右下角的窄帶：n 個點連成一條線，走過的連成金線、現在這張有一圈光，還沒到的是空心點（取代一排小點）。"""
+    col = LIGHT if dark else TEAL
+    gap = min(30, 480 / max(n - 1, 1))
+    x0 = 1000 - (n - 1) * gap
+    s = ""
+    for k in range(1, n):
+        a, b = x0 + (k - 1) * gap, x0 + k * gap
+        s += (f'<line class="bg" x1="{a:.1f}" y1="1282" x2="{b:.1f}" y2="1282" '
+              + (f'stroke="{GOLD}" stroke-width="4"' if k < idx else f'stroke="{col}" stroke-opacity=".35" stroke-width="2"') + '/>')
+    for k in range(1, n + 1):
+        x = x0 + (k - 1) * gap
+        if k == idx:
+            s += (f'<circle class="bg" cx="{x:.1f}" cy="1282" r="22" fill="{GOLD}" fill-opacity=".30"/>'
+                  f'<circle class="bg" cx="{x:.1f}" cy="1282" r="10" fill="{GOLD}"/>')
+        elif k < idx:
+            s += f'<circle class="bg" cx="{x:.1f}" cy="1282" r="6" fill="{col}"/>'
+        else:
+            s += f'<circle class="bg" cx="{x:.1f}" cy="1282" r="6" fill="none" stroke="{col}" stroke-width="3"/>'
+    return s
+
+
 # ---------------------------------------------------------------- 各版型
 def build(spec: dict, series: dict, tag: str) -> dict:
     """回傳 {layout, html_body, ...}。HTML 片段以模板檔填入。"""
@@ -455,6 +509,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     cards = series.get("style") == "cards"
     horizon = series.get("style") == "horizon"
     seesaw = series.get("style") == "seesaw"
+    spot = series.get("style") == "spotlight"
     idx, n_sl = spec.get("_idx", 1), spec.get("_n", 1)          # 第幾張／共幾張（render_all 填入）
     mi, mn = spec.get("_mi", 0), spec.get("_mn", 1)            # 這則是系列的第幾則／共幾則
     kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", ""))), "FAM": "", "BODY_STYLE": "", "FOOT_CLS": ""}
@@ -468,6 +523,10 @@ def build(spec: dict, series: dict, tag: str) -> dict:
 
     if lay in ("text", "table", "chart_bars", "chart_sounding", "diagram"):   # 小標籤（例如「我的判斷」）：右上角
         kw["LABEL"] = f'<div class="t abs chip">{esc(spec["label"])}</div>' if spec.get("label") else ""
+    if lay == "cover":     # 封面圖註（例如論文網址）：模板要有 {{NOTE_BLOCK}}，有 note 卻沒有就報錯，不默默丟掉
+        if spec.get("note") and "{{NOTE_BLOCK}}" not in tpl:
+            raise ValueError(f"封面模板沒有 NOTE_BLOCK，放不下 note：{tdir / 'cover.html'}")
+        kw["NOTE_BLOCK"] = f'<div class="t abs note" style="left:80px;top:1196px">{esc(spec["note"])}</div>' if spec.get("note") else ""
     if lay == "cover" and contour:
         k = 4 + round(3 * mi / max(mn - 1, 1))                  # 越後面的一則，金點越靠近谷底
         kw["SVG"] = svg_wrap(contours(800, 1010, COVER_RADII, sc, .38) + step_path(COVER_PATH[:k], sc, rejected=[(610, 1090)]))
@@ -480,6 +539,10 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     elif lay == "cover" and horizon:   # 上半深海、下半米色，地平線上升起半個金色太陽；副標固定在地平線下面
         kw["SVG"] = svg_wrap(h_cover())
         kw["SUB_TOP"] = H_LINE + 70
+        kw["BODY"] = kw["BODY"].replace("\n", "<br>")
+    elif lay == "cover" and spot:      # 深色底，上半一片暗處的點線與一道探照燈，標題與副標在下半（位置固定）
+        kw["SVG"] = svg_wrap(sp_field((90, 180, 990, 730), 38, 7, mi, 270))
+        kw["SUB_TOP"] = 1090
         kw["BODY"] = kw["BODY"].replace("\n", "<br>")
     elif lay == "cover" and seesaw:    # 米色底，標題在上，下半一座蹺蹺板；副標固定在 y=400
         kw["SVG"] = svg_wrap(ss_cover())
@@ -500,7 +563,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             parts, cells, _ = table_block(spec["rows"], y0_ + shift, spec.get("key_w", 300))
             kw["SVG"], kw["CELLS"] = svg_wrap(parts), cells
         else:
-            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else (svg_wrap(ss_mid(idx, n_sl)) if seesaw else ""))), ""
+            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else (svg_wrap(ss_mid(idx, n_sl)) if seesaw else (svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False)) if spot else "")))), ""
             if horizon:
                 kw["FOOT_CLS"] = "light"
     elif lay == "text" and contour:
@@ -513,6 +576,8 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     elif lay == "text" and horizon:    # 底部一條地平線，半個淡太陽隨張數由左往右
         kw["SVG"] = svg_wrap(h_band(idx, n_sl))
         kw["FOOT_CLS"] = "light"
+    elif lay == "text" and spot:       # 下半一片暗處的點線，探照燈的落點隨張數換
+        kw["SVG"] = svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False))
     elif lay == "text" and seesaw:     # 中段一座蹺蹺板，傾斜角隨張數轉向
         kw["SVG"] = svg_wrap(ss_mid(idx, n_sl))
     elif lay == "text":
@@ -544,6 +609,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
                f'<rect class="g deco" x="{x2}" y="{y0 + 9}" width="28" height="28" fill="{DEEP}"/>')
         labels = (f'<div class="t abs legend" style="left:120px;top:{y0}px">{esc(l1)}</div>'
                   f'<div class="t abs legend" style="left:{x2 + 40}px;top:{y0}px">{esc(l2)}</div>')
+        dec = any(isinstance(b[k_], float) and b[k_] != int(b[k_]) for b in bars for k_ in ("value", "value2"))    # 有小數的圖：全部數字都顯示一位小數（80.0，不是 80）
         gy = y0 + 62
         step = max(140.0, min(190.0, (1150 - gy) / len(bars)))
         top, last_bottom = gy - 14, gy
@@ -558,7 +624,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
                 ln = v * s
                 svg += (f'<rect class="g bar" data-v="{v}" data-e="0" x="{x0}" y="{by}" width="{ln:.2f}" height="44" fill="{col}"/>')
                 labels += (f'<div class="t abs num2" style="left:{x0 + ln + 18:.1f}px;top:{by - 2}px;color:{DEEP}">'
-                           f'{v:g}{esc(spec.get("unit", ""))}</div>')
+                           f'{v:.1f}{esc(spec.get("unit", ""))}</div>' if dec else f'{v:g}{esc(spec.get("unit", ""))}</div>')
                 last_bottom = by + 44
             gy += step
         svg += f'<line class="g axis" x1="{x0}" y1="{top}" x2="{x0}" y2="{last_bottom + 10}" stroke="{DEEP}" stroke-width="3"/>'
@@ -646,6 +712,14 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         lab = spec.get("label")
         kw["LABEL"] = f'<div class="t abs take-label" style="top:190px">{esc(lab)}</div>' if lab else ""
         kw["SVG"] = svg_wrap(h_takeaway())
+    elif lay == "takeaway" and spot:
+        kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
+        q = spec.get("question")
+        kw["QUESTION"] = f'<div class="t abs take-q" style="top:320px">{esc(q)}</div>' if q else ""
+        kw["TAKE_STYLE"] = f"top:{320 + math.ceil(len(q) / 15.0) * 73 + 36}px" if q else ""
+        lab = spec.get("label")
+        kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
+        kw["SVG"] = svg_wrap(sp_field((90, 900, 990, 1230), 24, 5, mi, 170, thr=200))
     elif lay == "takeaway" and seesaw:
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
         q = spec.get("question")
@@ -691,11 +765,11 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         cur = [m["concept"] for m in series["members"]].index(spec["current"])
         y, svg, out = 330, "", ""
         for i, t in enumerate(items):
-            if (contour or cards) and i == cur:
+            if (contour or cards or spot) and i == cur:
                 svg += f'<rect class="bg" x="72" y="{y - 10}" width="936" height="84" rx="6" fill="{DEEP}"/>'
                 svg += f'<circle class="g mark" data-e="1" cx="100" cy="{y + 32}" r="12" fill="{GOLD}"/>'
                 out += f'<div class="t abs item cur" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
-            elif contour or cards:
+            elif contour or cards or spot:
                 svg += f'<circle class="g mark" cx="100" cy="{y + 32}" r="8" fill="{TEAL}"/>'
                 out += f'<div class="t abs item" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
             elif i == cur:
@@ -730,6 +804,8 @@ def build(spec: dict, series: dict, tag: str) -> dict:
                             f'<circle class="bg" cx="{x_:.1f}" cy="{y_:.1f}" r="22" fill="{GOLD}"/>')
                 else:
                     svg += f'<circle class="bg" cx="{x_:.1f}" cy="{y_:.1f}" r="16" fill="{CREAM}" stroke="{TEAL}" stroke-width="6"/>'
+        if spot:     # 下半部：一片暗處的點線，探照燈落在這一則（每一則落點不同）
+            svg += sp_field((90, 790, 990, 1090), 20, 3, mi, 150, thr=200, dark=False)
         if cards:    # 下半部：左邊一份來源文件，右邊一排 mn 張投影片，一張是一則（目前這則金框），相鄰兩張之間有短連線
             svg += source_doc(80, 860, 170, 230)
             cw_, cg_ = 200, 24
@@ -751,6 +827,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     if seesaw and lay not in ("cover", "takeaway", "text") and not (lay == "context" and not spec.get("rows")):
         corner = ss_corner(idx, n_sl)      # 頂端右側的小蹺蹺板（文字張與沒有名詞表的脈絡張已經有中段的大蹺蹺板）
         kw["SVG"] = kw["SVG"].replace("</svg>", corner + "</svg>", 1) if kw.get("SVG") else svg_wrap(corner)
+    if spot and lay not in ("cover", "takeaway"):
+        strip = sp_strip(idx, n_sl)
+        kw["SVG"] = kw["SVG"].replace("</svg>", strip + "</svg>") if kw.get("SVG") else svg_wrap(strip)
     if (contour or cards) and lay not in ("cover", "takeaway"):
         dots = progress_dots(idx, n_sl, panel=split)
         if cards and not split:      # 圖表類版型：右緣的索引欄（金框 = 這一張對應的版本；系列地圖用這一則）

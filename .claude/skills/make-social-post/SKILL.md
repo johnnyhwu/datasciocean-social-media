@@ -14,7 +14,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 3. **看現況**：`state.py status`（每個觀念各格式是 `not_tried`／`ready`／`published`、存量），再看 `out/README.md`（待發布與各系列狀態）。
 4. **（新系列／規劃時）** 跑 `series_deps.py <系列 id>` 並**一定要問人哪些卡要合併**（`references/batch-and-publish.md` §1）；成員定案後在 `series.md` 加 `members_locked: true`，再發第 1 則；**先把整個系列每一則的 spec 都做完、張數與 `planned_title` 定案，才鎖定並發第 1 則**（2026-10-11 人決定；鎖定後不改成員與標題）。
 4b. **決定這次做哪一則**：照系列檔 `series/<id>/series.md` 的 `members` 順序，找第一個還是 `not_tried` 的觀念；這是預設，要不要照做由人決定。
-5. 要做的觀念，**只讀它的卡**（`concept-wiki/wiki/concepts/<id>.md`），不讀 blog。同時讀 `concept-wiki/docs/card-format.md`（卡格式與 status 語意）。
+5. 要做的觀念，**只讀它的卡**（`concept-wiki/wiki/concepts/<id>.md`），不讀 blog。同時讀 `concept-wiki/docs/card-format.md`（卡格式與 status 語意）。**卡上主張若附 `figures`，用 Read 實際打開圖檔看**（路徑 `concept-wiki/wiki/<file>`），不要只看路徑或圖說；圖只是參考，貼文要用就重製（`references/anchor-writing-rules.md`「參考圖」）。
 6. 如果這次要**發布**，先看 `references/publish-flow.md` 的「發文前的前提」。
 
 ## 流程
@@ -32,11 +32,11 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 |---|---|---|
 | 1 | 選觀念、決定獨立或系列、系列檔 | `references/batch-and-publish.md` §1–3 |
 | 2 | 5～6 個大膽的 hook 候選（至少 3 種樣態），最多一次 haiku 讀者參考，**用純文字列出完整候選讓人挑（不用 AskUserQuestion）** | `references/hooks.md` |
-| 3 | **先做版型規劃**（每張選好版型、圖上術語在哪張定義，`references/ig-carousel.md` §0；**機制類的圖看 `design-series-visuals/references/brand-and-layouts.md` §4.2「機制 → 圖型」，圖要大膽、有故事，同則連續 3 張以上同圖型要換；Threads 預設輪播**；**每張帶數字的圖先用 `chart-thinking` skill 想過：要比什麼、圖有沒有直接支撐主標；每張圖寫一句「比文字多給什麼」，定義與機制類預設用具體的假設例子**；獨立貼文的轉折張、延伸閱讀、導流連結、Threads 回覆打包成一個問題先問人；機制／數學類先做概念依賴表），再寫 `out/<series>/<concept>/_build/spec.json`：投影片、Threads、caption、每個區塊標引用的 claim id | `references/spec-json.md`、`references/ig-carousel.md`、`references/threads-and-caption.md`、`references/anchor-writing-rules.md` |
+| 3 | **先做版型規劃**（每張選好版型、圖上術語在哪張定義，`references/ig-carousel.md` §0；**卡上附了圖的主張，先看圖再決定要不要重製：圖能讓觀念更好懂就用程式重畫一張（`fig_refs`，內容以主張為準），不需要就不用**；**機制類的圖看 `design-series-visuals/references/brand-and-layouts.md` §4.2「機制 → 圖型」，圖要大膽、有故事，同則連續 3 張以上同圖型要換；Threads 預設輪播**；**每張帶數字的圖先用 `chart-thinking` skill 想過：要比什麼、圖有沒有直接支撐主標；每張圖寫一句「比文字多給什麼」，定義與機制類預設用具體的假設例子**；獨立貼文的轉折張、延伸閱讀、導流連結、Threads 回覆打包成一個問題先問人；機制／數學類先做概念依賴表），再寫 `out/<series>/<concept>/_build/spec.json`：投影片、Threads、caption、每個區塊標引用的 claim id | `references/spec-json.md`、`references/ig-carousel.md`、`references/threads-and-caption.md`、`references/anchor-writing-rules.md` |
 | 4 | `check_a.py <spec.json>`，ERROR 清零 | `references/program-a.md` |
 | 5 | `render.py <spec.json>`，程式 B 全過；`contact_sheet.py <發布包資料夾>` 拼縮圖；**自己看一次渲染後的 PNG** | `references/program-b.md` |
 | 6 | （在 `contact_sheet.py` 之後）`build_package.py <spec.json>`：產生人看的 `README.md`、`ig/post.md`、`threads/post.md`、審查用的 `_build/post-with-refs.md`／`post-reader.md`，並更新 `out/README.md` 索引 | `references/threads-and-caption.md` |
-| 7 | **先照 `references/self-check.md` 自檢**，再派忠實者、讀者（一般讀者，附圖）、編輯（附圖）；`verify_faithful.py`、`verify_reader.py`。**審查通過後再新增文字或改數字，要重審改過的區塊**：`spec_diff.py` 列出範圍、`--mark` 記下通過版本 | `references/review-loop.md`、`references/self-check.md` |
+| 7 | **先照 `references/self-check.md` 自檢**，再派忠實者、讀者（一般讀者，附圖）、編輯（附圖）；**有 `fig_refs` 再派重製圖審查者**（`references/figure-prompt.md`，看原圖＋主張＋重製圖）；`verify_faithful.py`、`verify_reader.py`、`verify_figure.py`。**審查通過後再新增文字或改數字，要重審改過的區塊**：`spec_diff.py` 列出範圍、`--mark` 記下通過版本 | `references/review-loop.md`、`references/self-check.md` |
 | 8 | `batch_check.py <spec>...`（參數順序 = 預計發文順序） | `references/batch-and-publish.md` §4 |
 | 9–10 | 給人看貼文 `README.md`（含縮圖）、`ig/post.md`、`threads/post.md`，確認後 `state.py ready <觀念> <格式> <發布包>`（兩個格式各一次） | `references/batch-and-publish.md` §5–6 |
 | 11 | **發布**：`prepare` → push `ig/jpg/` → IG `preflight` → IG dry-run → 人說「發」→ `--confirm` → Threads dry-run → 人說「發」→ `--confirm`；成功後自動寫回 state | **`references/publish-flow.md`**（照做）、`references/instagram-publish.md`、`references/threads-publish.md` |
@@ -55,7 +55,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | `render.py` | 渲染引擎與程式 B：spec.json + 系列模板 → 1080×1350 PNG，並做版面檢查，寫 `_build/checks-b.json`、`alt-text.json` |
 | `build_package.py` | 由 spec.json 產生人看的入口（`README.md`、`ig/post.md`、`threads/post.md`）、審查用貼文文字，並更新 `out/README.md` 與系列索引；`--refresh` 只重寫 README 與索引（發布成功後由發布程式自動呼叫） |
 | `contact_sheet.py` | 把投影片拼成縮圖總覽 |
-| `verify_faithful.py`、`verify_reader.py` | 驗證忠實者／讀者的 JSON：引用逐字出自卡或貼文、分級、陷阱題 |
+| `verify_faithful.py`、`verify_reader.py`、`verify_figure.py` | 驗證忠實者／讀者／重製圖審查者的 JSON：引用逐字出自卡或貼文、分級、陷阱題；重製圖要有原圖位置與讀到的內容 |
 | `batch_check.py` | 批次層檢查：相鄰 hook 樣態、相鄰系列色、模板 hash、標題一致、存量 |
 | `ig_publish.py`、`ig_api.py` | IG 官方 API 發佈：prepare／preflight／publish（dry-run 預設，`--confirm` 才發）、token 管理 |
 | `threads_publish.py`、`threads_api.py` | Threads 官方 API 發佈整串：publish／rollback／delete／token-info（dry-run 預設；中途失敗可續發） |
@@ -64,7 +64,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | `series_links.py` | Threads 最後一則的「同系列」：把已發布的貼文從「（尚未發布）」補成標題＋網址（dry-run／`--write`）；發布 dry-run 會擋沒補的 |
 | `series_deps.py` | 系列規劃：列出該合併成一則的候選（輔助，不是偵測器；規劃時一定要問人） |
 | `state.py` | 各觀念各格式的狀態（`not_tried`／`ready`／`published`／`unsuitable`）、發布紀錄、回補清單（`state/`） |
-| `cardlib.py` | 共用：唯讀解析觀念卡、系列與發布包路徑、文字正規化與逐字比對 |
+| `cardlib.py` | 共用：唯讀解析觀念卡（含主張附的 `figures`：圖路徑、缺檔報錯、sha256 核對）、系列與發布包路徑、文字正規化與逐字比對 |
 
 `render.py`、`build_package.py` 對**已發布**的貼文預設拒絕，要重做才加 `--force`（發布後要更新 README 與索引用 `--refresh`，不用 `--force`）。`ig_publish.py`、`threads_publish.py` 的 `publish` 都有 `--summary`（縮短版輸出，給人看 dry-run 用）。
 

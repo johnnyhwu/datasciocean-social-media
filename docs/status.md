@@ -32,3 +32,16 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 - 模板 hash 目前是 `e6ea36d49aa3`（2026-10-10 加成對橫條圖）；前兩則記的是舊 hash，這是預期的（已發布的不重渲、`batch_check.py` 不比對）。
 - 發布流程已用真實帳號跑過三次：照 `references/publish-flow.md`。已驗證的事實與還沒驗證的事項在 `instagram-publish.md`、`threads-publish.md`。
 - **待人決定**：流程／分流圖版型與樣張（`design-series-visuals/references/principles.md` 八）；封面主標是否放寬成 3 行；`config/params.yaml` 的 `structure_text_max_chars` 與 `ai_tone_blacklist` 仍是初稿；Threads token 是否補上 `threads_delete` 權限（目前沒有，刪除只能手動）；hook 與副標偏好的整理（見 memory `feedback_hook_style`，人說之後再談）。
+
+## 卡上參考圖（`figures`）的接入與 SAG 試作（2026-10-24）
+
+上游契約（`concept-wiki/docs/card-format.md` §4.2）：主張可附 blog 的圖，圖只是參考；貼文要用就重製。這邊已同步：`cardlib.py` 讀 `figures`（缺檔報錯、sha256 核對）、程式 A 檢查 spec 的 `fig_refs`、`build_package.py` 產生 `_build/figure-review.md` 並在 caption 自動註明圖片出處、新增「重製圖審查者」（`references/figure-prompt.md`、`verify_figure.py`）、規則文件與 CLAUDE.md 規則 17、`tests/test_figures.py`、「部落格推論」新定義。新增圖型 `links`、`hops`（`tests/test_diagrams.py`）。
+**試作**：`out/standalone/sag-latent-hyperedge-one-hop/`（13 張，暫借 skillopt 等深線模板、獨立貼文形式、hook 暫定）。**不是正式貼文**：SAG 五張卡預設要組成系列，合併、視覺、hook 都要人決定；人決定後新開 `series/sag/`，刪掉 `standalone/sag-latent-hyperedge-one-hop/` 與 `out/standalone/sag-latent-hyperedge-one-hop/`（尚未發布、尚未寫入 `state/`）。
+
+
+## SAG 系列（2026-10-24 起，進行中）
+
+人決定（2026-10-24）：方案 1（5 卡合成 4 則：A＋B → C → D → E）與封面方向 S3「探照燈」。`series/sag/`：`series.md`（`status: planning`、尚未 `members_locked`；系列名「SAG：不先建圖，查詢時才連」與 `planned_title` 都是草案）、`philosophy.md`、`templates/`、`sketches/`。新視覺風格 `style: spotlight`（`render.py` 的 `sp_field`／`sp_strip`；`tests/test_spotlight_style.py`）。新圖型 `bubble`（金色泡泡圈住好幾個項目）與 `drift`（一路偏掉的路徑，純示意）（`tests/test_diagrams.py`）；2026-10-25 新增圖型 `ingest`（兩段式系統架構圖，仿論文 Figure 2：線下建索引、線上查詢；有回歸測試）；成對橫條圖有小數時整數值也顯示一位小數。
+- 第 1 則 `out/sag/sag-latent-hyperedge-one-hop/`（A＋B 雙卡、19 張）spec 做完：程式 A、B 通過；重製圖審查者通過；忠實者第 1 輪 blocker 0，第 2 輪（改過的區塊）也 blocker 0；讀者與編輯建議已採用大部分易懂與圖的項目。2026-10-25 依人的 feedback 修改：封面與第 8 張補論文 arXiv（2606.15971，外部查證，非卡；2608.12129 已撤回不用）、全篇 Multi-Hop、第 3／8 張具體例子、第 9→10 張改用 `ingest` 架構圖並拿掉圖註、不標「我的想法」；之後忠實者第 3 輪 blocker 0，再改的區塊（讀者建議：SQL／實體白話、二元圖譜、例子）由忠實者第 4 輪重審。**hook 人已挑（2026-10-25，讀者疑問式「Multi-Hop 推理，一定要先建知識圖譜嗎？」）；arXiv 連結只寫網址、不寫「Wu 等人」；說明例子改為 TSMC／張忠謀；忠實者審查全過。**
+- 第 2～4 則（C、D、E）還沒做；整個系列做完、張數與 `planned_title` 定案才鎖定並發第 1 則。
+- 試作 `out/standalone/sag-latent-hyperedge-one-hop/` 與 `standalone/sag-latent-hyperedge-one-hop/` 在系列做好後刪除（未發布、未進 `state/`）。

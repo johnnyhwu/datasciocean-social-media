@@ -4,7 +4,8 @@
 
 ## 待發布
 
-（目前沒有）
+- SAG：不先建圖，查詢時才連 第 1 則：[Multi-Hop 推理，一定要先建知識圖譜嗎？](sag/sag-latent-hyperedge-one-hop/README.md)
+- 獨立貼文：[sag-latent-hyperedge-one-hop](standalone/sag-latent-hyperedge-one-hop/README.md)
 
 ## JEV 串接 Judge 系列（`jev-cascade`）
 
@@ -22,6 +23,15 @@
 | 2 | `persona-d2s-training-design-flaws` | 80 筆資料訓出來的模型，能信嗎？ | 已發布 | 已發布 | [README](persona-d2s-training-design-flaws/README.md) |
 | 3 | `persona-d2s-what-to-borrow` | 不用訓練就能抄的兩招，各有什麼代價？ | 已發布 | 已發布 | [README](persona-d2s-what-to-borrow/README.md) |
 
+## SAG：不先建圖，查詢時才連（`sag`）
+
+| 發文順序 | 觀念 | 標題（planned_title） | IG | Threads | 打開 |
+|---|---|---|---|---|---|
+| 1 | `sag-latent-hyperedge-one-hop`＋`multihop-vector-vs-graphrag-pain-points` | Multi-Hop 推理，一定要先建知識圖譜嗎？ | 未做 | 未做 | [README](sag-latent-hyperedge-one-hop/README.md) |
+| 2 | `sag-sql-vector-llm-division-and-funnel` | SQL、向量、LLM 怎麼分工？ | 未做 | 未做 | （還沒做） |
+| 3 | `sag-results-and-gain-source` | SAG 的成績從哪來？ | 未做 | 未做 | （還沒做） |
+| 4 | `sag-tradeoffs-price-paid` | SAG 付出了什麼代價？ | 未做 | 未做 | （還沒做） |
+
 ## SkillOpt: 自動優化你的 Agent Skill（`skillopt`）
 
 | 發文順序 | 觀念 | 標題（planned_title） | IG | Threads | 打開 |
@@ -36,4 +46,5 @@
 |---|---|---|---|
 | `bradley-terry-pairwise-preference` | 已發布 | 已發布 | [README](standalone/bradley-terry-pairwise-preference/README.md) |
 | `decision-transformer-reward-conditioning` | 已發布 | 已發布 | [README](standalone/decision-transformer-reward-conditioning/README.md) |
+| `sag-latent-hyperedge-one-hop` | 未做 | 未做 | [README](standalone/sag-latent-hyperedge-one-hop/README.md) |
 

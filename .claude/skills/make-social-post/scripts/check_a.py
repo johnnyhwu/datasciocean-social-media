@@ -9,6 +9,7 @@
 spec.json 欄位：
   slides[].refs        引用的 claim id 或 ["結構"]
   slides[].quals       這個區塊帶出的限定條件，格式 "c3#1"（c3 的第 1 條 qualifiers）
+  slides[].fig_refs    （選用）這張重製圖參考了卡上哪張圖，格式 "<article>/<src>"（例如 "sag/figure1.png"）；必須是這張 refs 的主張所附的圖
   threads.body / threads.items[] / threads.last   各有 text、refs、quals（items 另有 slide；threads.mode 是 carousel 時沒有 items）
   caption.first / caption.nav / caption.hashtags / caption.nav_refs
 """
@@ -110,6 +111,17 @@ def main(spec_path: str) -> int:
             if claims[r]["status"] not in OK_STATUS:
                 err.append(f"{name}: 引用了 {r}，狀態是 {claims[r]['status']}（不得使用）")
         used_quals.update(quals)
+        # 參考圖：fig_refs 列出這張重製圖參考了卡上哪張圖；必須是這張引用的主張所附的圖，檔案要在、沒被改過
+        if sl and sl.get("fig_refs"):
+            try:
+                avail = W.slide_figures(claims, refs)
+            except FileNotFoundError as e:
+                err.append(f"{name}: {e}"); avail = {}
+            for fid in sl["fig_refs"]:
+                if fid not in avail:
+                    err.append(f"{name}: fig_refs {fid!r} 不是這張引用的主張所附的圖（可用：{sorted(avail) or '無'}）")
+                elif (prob := W.figure_hash_problem(avail[fid]["fig"])):
+                    err.append(f"{name}: {prob}")
         ref_text = " ".join(claim_text(r) for r in refs)
         ref_text_flat = re.sub(r"\s+", "", ref_text)
         # 6./7. 數字：逐欄位抽取；必須出現在引用主張裡（HINT）；必須有比較對象（ERROR）

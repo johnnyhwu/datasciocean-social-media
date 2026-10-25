@@ -1,0 +1,11 @@
+concept: multihop-vector-vs-graphrag-pain-points
+formats:
+  ig:
+    status: ready
+    pack: out/sag/sag-latent-hyperedge-one-hop
+    merged_into: sag-latent-hyperedge-one-hop
+  threads:
+    status: ready
+    pack: out/sag/sag-latent-hyperedge-one-hop
+    merged_into: sag-latent-hyperedge-one-hop
+posts: []
