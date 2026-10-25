@@ -5,7 +5,6 @@
 ## 待發布
 
 - SAG：不先建圖，查詢時才連 第 1 則：[Multi-Hop 推理，一定要先建知識圖譜嗎？](sag/sag-latent-hyperedge-one-hop/README.md)
-- 獨立貼文：[sag-latent-hyperedge-one-hop](standalone/sag-latent-hyperedge-one-hop/README.md)
 
 ## JEV 串接 Judge 系列（`jev-cascade`）
 
@@ -46,5 +45,4 @@
 |---|---|---|---|
 | `bradley-terry-pairwise-preference` | 已發布 | 已發布 | [README](standalone/bradley-terry-pairwise-preference/README.md) |
 | `decision-transformer-reward-conditioning` | 已發布 | 已發布 | [README](standalone/decision-transformer-reward-conditioning/README.md) |
-| `sag-latent-hyperedge-one-hop` | 已發布 | 已發布 | [README](standalone/sag-latent-hyperedge-one-hop/README.md) |
 
