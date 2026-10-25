@@ -6,4 +6,24 @@ formats:
   threads:
     status: ready
     pack: out/sag/sag-latent-hyperedge-one-hop
-posts: []
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: sag-latent-hyperedge-one-hop:ig_carousel
+  format: ig_carousel
+  series_id: sag
+  url: https://www.instagram.com/p/De5uaKSk-OW/
+  published_at: 2026-10-25T03:21:40+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []
+- post_id: sag-latent-hyperedge-one-hop:threads_thread
+  format: threads_thread
+  series_id: sag
+  url: https://www.threads.com/@datasciocean/post/De5vTr5E64N
+  published_at: 2026-10-25T03:27:11+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []

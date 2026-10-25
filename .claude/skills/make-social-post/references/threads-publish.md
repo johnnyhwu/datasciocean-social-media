@@ -23,18 +23,17 @@
 
 ## 流程
 
-**預設是輪播模式**（2026-10-12 起；下面的流程圖寫的是舊的逐張串文，輪播模式的做法見這節後面的「輪播模式」段落：兩則發佈）。
+**預設是輪播模式**（2026-10-12 起；沒寫 `mode` 是舊的逐張串文，只留給 jev-cascade 與測試）：
 
 ```
 （圖要先 prepare 並 push：Threads 沿用 IG 的 ig/jpg/NN.jpg，公開網址是這個 repo 的 raw 網址）
 publish  → dry-run：列出每一則的文字、字數、圖片網址、將送出的請求，檢查網址公開可抓、有沒有發布過
-人看 threads/post.md 確認
-人說「發」
-publish --confirm → 依序發 N 則：
-    第 1 則：正文（TEXT）
-    第 2…N-1 則：每則附圖（IMAGE，image_url + 描述），reply_to_id = 前一則
-    最後一則：TEXT，帶 link_attachment（文章連結預覽），reply_to_id = 前一則
-  每一則：建 container → 等約 30 秒（官方建議）並確認完成 → threads_publish → 立刻把 id 寫進 _build/threads-progress.json
+人看 threads/post.md 確認，說「發」
+publish --confirm →
+    每張圖建一個子項 container（IMAGE，is_carousel_item=true）
+    建輪播本體（CAROUSEL，children=子項、text=正文）→ 等完成 → threads_publish
+    （有 last 時）一則 TEXT，帶 link_attachment（文章連結預覽），reply_to_id = 輪播貼文
+  每一則發完立刻把 id 寫進 _build/threads-progress.json
   全部完成 → 取根貼文的 permalink → state.py record（threads_thread 變 published）→ 寫 state/threads-publish-log.jsonl
 ```
 
@@ -60,11 +59,9 @@ publish --confirm → 依序發 N 則：
 
 ## 還沒驗證（要實測）
 
-1. **每一則都回覆「前一則」，會不會在 Threads 裡形成「新增到串文」那樣的一串**，官方沒有寫。第一次實測用 3 則的測試串文確認，再用 `rollback` 刪掉。
-3. 額度查詢端點 `threads_publishing_limit` 的欄位官方頁沒寫；失敗只會在 dry-run 輸出一行說明，不影響發佈。
-4. container 的 `status` 值官方沒列全：程式把 `FINISHED`／`PUBLISHED` 視為完成，`ERROR`／`EXPIRED` 視為失敗，其餘繼續等。
-5. 圖片的替代文字：官方參數表沒有 `alt_text`，所以 Threads 附圖沒有替代文字。
-6. `graph.threads.net` 與 `graph.threads.com` 哪個較穩，實測時確認。
+1. 額度查詢端點 `threads_publishing_limit` 的欄位官方頁沒寫；失敗只會在 dry-run 輸出一行說明，不影響發佈。
+2. container 的 `status` 值官方沒列全：程式把 `FINISHED`／`PUBLISHED` 視為完成，`ERROR`／`EXPIRED` 視為失敗，其餘繼續等。
+3. 圖片的替代文字：官方參數表沒有 `alt_text`，所以 Threads 附圖沒有替代文字。
 
 ## 已實測驗證（2026-10-07，帳號 @datasciocean）
 

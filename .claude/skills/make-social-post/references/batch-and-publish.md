@@ -63,7 +63,7 @@ status: planning                 # planning | publishing | done
 
 - `README.md`：入口。縮圖、檢查結果、發布前後待辦（`- [ ]` 清單，由 `build_package.py` 產生，不用另外寫 checklist）
 - `ig/post.md`：IG 每一頁的圖與文字、替代文字、整段 caption
-- `threads/post.md`：Threads 正文、每則串文（附圖）、最後一則
+- `threads/post.md`：Threads 輪播貼文（正文＋全部投影片）、（有 last 時）一則回覆
 
 `out/README.md` 是全部貼文的總入口（待發布清單與各系列狀態），`out/<series>/README.md` 是系列的發文順序。
 
@@ -84,4 +84,4 @@ uv run python .claude/skills/make-social-post/scripts/state.py record <concept> 
 
 ## 8. 未驗證事項（結果影響參數，不影響產出內容；人不做手動驗證，所以只在有機會順便看到時記錄）
 
-限時動態精選集的連結貼紙是否仍可點、Threads 最多置頂幾則回覆、系列 hashtag 頁面能否完整顯示、平台排程能不能排 IG 輪播與 Threads 多則串文、手機上 caption 中文大約在哪裡摺疊、blog 搜尋功能是否可用、手機實機顯示。數字參數（補充 40～110 字、10 張上限、重疊率 40%、caption 第一句 50 字）皆為判斷值，非實測。
+系列 hashtag 頁面能否完整顯示、手機上 caption 中文大約在哪裡摺疊、blog 搜尋功能是否可用、手機實機顯示。數字參數（補充 40～110 字、`slides_max` 20 張、重疊率 40%、caption 第一句 50 字）皆為判斷值，非實測。

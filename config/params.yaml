@@ -1,7 +1,7 @@
 # Stage 2 所有可調參數。腳本讀這份；改數字不用動程式。
 # 標「實作新增」的是原規格沒列、實作時補的；標「待人確認」的是初稿。
 
-slides_max: 20                       # 2026-10-11 人決定：不再受限於 10 張，最多 20 張（2026-10-12 實測 IG API 建立 container 可到 20 個子項；實際發布 >10 張尚未驗證）
+slides_max: 20                       # 2026-10-11 人決定：不再受限於 10 張，最多 20 張（2026-10-12 實測 IG API 建立 container 可到 20 個子項；實發最多 19 張成功）
 title_max_lines: 2
 title_precheck_chars: 15            # 封面另設
 cover_title_precheck_chars: 16      # 實作新增

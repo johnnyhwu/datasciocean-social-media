@@ -8,4 +8,10 @@ formats:
     status: ready
     pack: out/sag/sag-latent-hyperedge-one-hop
     merged_into: sag-latent-hyperedge-one-hop
+  ig_carousel:
+    status: published
+    merged_into: sag-latent-hyperedge-one-hop
+  threads_thread:
+    status: published
+    merged_into: sag-latent-hyperedge-one-hop
 posts: []

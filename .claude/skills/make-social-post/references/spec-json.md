@@ -66,17 +66,17 @@ caption 第一句用 `first_refs`。`refs` 只證明「有對應」，不證明�
 
 ## slides[]
 
-共同欄位：`layout`、`title`（主標，結論句）、`body`（補充）、`refs`、`quals`。`label`（右上角小標籤）除了「我的判斷」，也用來標分段（例如「第一關」「第二關」）；標題已經以同樣的詞開頭時，caption 逐張摘要不會重複前綴。
+共同欄位：`layout`、`title`（主標，結論句）、`body`（補充）、`refs`、`quals`。`label`（右上角小標籤）用來標分段（例如「第一關」「第二關」）；標題已經以同樣的詞開頭時，caption 逐張摘要不會重複前綴。
 
 | layout | 用途 | 專屬欄位 |
 |---|---|---|
 | `cover` | 第 1 張 | `title`（hook 主標）、`body`（hook 副標） |
 | `context` | 第 2 張，名詞表 | `body` 最多 140 字（`context_body_max_chars`）；選用 `rows`、`key_w`：補充下面放名詞對照表（補充 1 行時表從 y≈470 起，總共約 9～10 行文字放得下；要解釋的詞多於 3 個就要拆到別張或精簡）。圖上會出現的專有名詞（含 Judge、題庫名稱）要在這一張或更早的張定義 |
-| `text` | 機制、限制、評價 | `body` 40～110 字（`body_chars`，約 5 行）；選用 `label`（右上角小標籤，例如「我的判斷」） |
+| `text` | 機制、限制、評價 | `body` 40～110 字（`body_chars`，約 5 行）；選用 `label`（右上角小標籤，例如「第一關」） |
 | `table` | 兩欄對照（最多 4 列） | `rows: [["鍵","值"], …]`（鍵最多約 7 個字，否則換行；鍵可寫「主｜小字」把指標名稱排在下面；`key_w` 調鍵欄寬，預設 300；值很長時把 `key_w` 調小、值欄變寬）、`note`（選用，圖註，單行約 32 字內）；`body` 最多 110 字（`chart_body_max_chars`，約 5 行；表會往下讓位，總高度要放得下，不然程式 B 的「不超出版面下緣」會擋）；選用 `label` |
 | `chart_bars` | 橫條圖（米色底） | `unit`、`bars`、`note`；`body` 可到約 4 行（圖會往下讓位）；選用 `label`；`subs_inline: true` 把副標籤接在名稱後面同一行（3 條時間距自動拉開；4 條橫條不要用 subs 或要用 inline） |
 | `chart_bars`（**成對橫條圖**） | 同一批對象的兩個量一起看（同單位，例如每個任務的「轉出比例」與「費用」） | 每個 bar 多一個 `value2`；spec 多 `legend: ["第一個量","第二個量"]`（圖上方的圖例）、選用 `axis_max`（比例尺的滿格，例如 100）。兩個量共用同一個 0 起點與比例尺，不用雙軸；第一個量 MID、第二個量深海色，**不用金色**；`bars[].subs` 是名稱下面的小字（例如該任務的準確度），每組最多 1 行；`body` 最多 3 行、4 組，不然放不下。`emphasize` 在這個版型不用 |
-| `diagram` | **示意圖**（2026-10-11 新增，只有 `style: contour`（skillopt）、`style: cards`（persona-aware-d2s）與 `style: spotlight`（sag）的系列有模板）。`kind` 決定畫法：`flow`（`nodes`、選用 `outcomes`／`loop`）、`compare`（`columns[{head, items[{text, sub?, gone?, muted?, emph?}]}]`）、`pairs`（`heads`、`pairs`、選用 `outcomes[0]` 底下一條橫框）、`samples`／`paths`（`nodes` 兩個）、`epochs`（`nodes` 兩個圖例）、`dotgrid`（`count`、選用 `cols`＝每列幾個點、`nodes` 圖例，第一個實心、第二個空心）、`dumbbell`（`points`、`ref`、`unit`、`axis_max`）、`range`（`ranges[{name, sub?, lo, hi, emph?}]`、`unit`、`axis_max`）、`funnel`（`nodes`）、`batches`（`count`、`group`、`nodes` 兩個）、`decay`（`start`、`end`、`unit`、`axis_max`、`nodes` 兩個）、`stops`（`nodes`、選用 `heads`）、`links`（2026-10-24 新增，左右兩排連線：`nodes` 左排、`outcomes` 右排、`edges` 連線 `[[左序號, 右序號], …]`、選用 `hot` 金色粗線的邊、選用 `heads`；連線內容會輸出到審查文字）、`hops`（2026-10-24 新增，幾跳才到答案：`nodes[{text, sub?, hops}]`，箭頭數＝`hops`，文字裡的數字必須等於 `hops`；選用 `heads`）、`bubble`（2026-10-24 新增，一個金色大泡泡圈住好幾個項目、左邊對照一條只連兩點的邊：`heads` 兩個、`nodes` 兩個 `{text, sub?}`（左右的說明）、`outcomes` 泡泡裡的項目 2～8 個 `{text}`）、`drift`（2026-10-24 新增，一路偏掉的路徑：`heads` 每一站的標籤 3～6 個、`nodes` 兩個 `{text, sub?}`（正確的路線、實際走的路線）；偏移量由程式依站序算，**純示意，圖註要標「示意」**）、`ingest`（2026-10-24 新增，兩段式架構圖，仿論文架構圖：`heads` 兩個（上段、下段標籤）、`nodes` 4 個（上段四欄的標籤：原始片段、一對一轉成的東西、多對多綁定的東西、存放處）、`outcomes` 2～3 個（下段由左到右的步驟，最後一個金色、下面畫小的局部超圖）；上段的方塊、圓點、連線是不帶文字的示意）、`fan`（`heads` 2～4 個、`nodes` 兩個：說明＋匯整結果）、`peaks`（`nodes` 三個：兩條線＋重合標籤，純示意）、`equation`（算式 A × B ＝ C，2026-10-14 新增：`nodes` 是算元 `{text 大數字, sub 單位, sub2?, emph?}`、選用 `ops`、選用 `outcomes[0]` 底下一條橫框）、`quad`（`nodes` 四格，選用 `bars`：格子上方畫一張小投影片，條列數＝bars，2026-10-14 新增）、`locked`（`heads` 兩個、`nodes` 兩個：文件名＋受保護區塊）、`seesaw`（蹺蹺板，2026-10-22 新增：`nodes` 兩個 `{text 隊名, sub?, blocks 方塊數, win 贏的機率標籤}`、選用 `outcomes[0]`；傾斜角與橫條比例由方塊數算）、`hidden`（`heads` 兩個、`nodes` 水面上的結果最多 3 個、`outcomes` 水面下藏著的東西最多 3 個 `{text, sub?}`）、`cycle`（`nodes` 三個、`heads` 三條邊的標籤、選用 `outcomes[0]`）、`tokens`（符號序列，2026-10-18 新增：`steps[{label, cells[{text, sub?, tone}]}]` 一列一步、`tone` 是 rtg／state／action／reward／mask（mask 金色＝被蓋住的那格）、選用 `more: true`（最後一列後畫省略點）、選用 `outcomes[0]` 底下一條橫框） | `body` 最多 130 字（`diagram_body_max_chars`），圖依補充行數往下讓位，放不下會直接報錯（縮短補充或圖上的字）；選用 `note`（圖註，有圖註時圖會在 y=1180 前結束）。圖上的文字與數字都要被引用的主張涵蓋（程式 A 檢查）；純示意的圖（`samples`、`paths`、`epochs`）圖上標「示意」，不得畫成實驗數據。幾何在 `scripts/diagrams.py` |
+| `diagram` | **示意圖**（2026-10-11 新增；除了最早的 jev-cascade，所有風格都有模板）。`kind` 決定畫法：`flow`（`nodes`、選用 `outcomes`／`loop`）、`compare`（`columns[{head, items[{text, sub?, gone?, muted?, emph?}]}]`）、`pairs`（`heads`、`pairs`、選用 `outcomes[0]` 底下一條橫框）、`samples`／`paths`（`nodes` 兩個）、`epochs`（`nodes` 兩個圖例）、`dotgrid`（`count`、選用 `cols`＝每列幾個點、`nodes` 圖例，第一個實心、第二個空心）、`dumbbell`（`points`、`ref`、`unit`、`axis_max`）、`range`（`ranges[{name, sub?, lo, hi, emph?}]`、`unit`、`axis_max`）、`funnel`（`nodes`）、`batches`（`count`、`group`、`nodes` 兩個）、`decay`（`start`、`end`、`unit`、`axis_max`、`nodes` 兩個）、`stops`（`nodes`、選用 `heads`）、`links`（2026-10-24 新增，左右兩排連線：`nodes` 左排、`outcomes` 右排、`edges` 連線 `[[左序號, 右序號], …]`、選用 `hot` 金色粗線的邊、選用 `heads`；連線內容會輸出到審查文字）、`hops`（2026-10-24 新增，幾跳才到答案：`nodes[{text, sub?, hops}]`，箭頭數＝`hops`，文字裡的數字必須等於 `hops`；選用 `heads`）、`bubble`（2026-10-24 新增，一個金色大泡泡圈住好幾個項目、左邊對照一條只連兩點的邊：`heads` 兩個、`nodes` 兩個 `{text, sub?}`（左右的說明）、`outcomes` 泡泡裡的項目 2～8 個 `{text}`）、`drift`（2026-10-24 新增，一路偏掉的路徑：`heads` 每一站的標籤 3～6 個、`nodes` 兩個 `{text, sub?}`（正確的路線、實際走的路線）；偏移量由程式依站序算，**純示意，圖註要標「示意」**）、`ingest`（2026-10-24 新增，兩段式架構圖，仿論文架構圖：`heads` 兩個（上段、下段標籤）、`nodes` 4 個（上段四欄的標籤：原始片段、一對一轉成的東西、多對多綁定的東西、存放處）、`outcomes` 2～3 個（下段由左到右的步驟，最後一個金色、下面畫小的局部超圖）；上段的方塊、圓點、連線是不帶文字的示意）、`fan`（`heads` 2～4 個、`nodes` 兩個：說明＋匯整結果）、`peaks`（`nodes` 三個：兩條線＋重合標籤，純示意）、`equation`（算式 A × B ＝ C，2026-10-14 新增：`nodes` 是算元 `{text 大數字, sub 單位, sub2?, emph?}`、選用 `ops`、選用 `outcomes[0]` 底下一條橫框）、`quad`（`nodes` 四格，選用 `bars`：格子上方畫一張小投影片，條列數＝bars，2026-10-14 新增）、`locked`（`heads` 兩個、`nodes` 兩個：文件名＋受保護區塊）、`seesaw`（蹺蹺板，2026-10-22 新增：`nodes` 兩個 `{text 隊名, sub?, blocks 方塊數, win 贏的機率標籤}`、選用 `outcomes[0]`；傾斜角與橫條比例由方塊數算）、`hidden`（`heads` 兩個、`nodes` 水面上的結果最多 3 個、`outcomes` 水面下藏著的東西最多 3 個 `{text, sub?}`）、`cycle`（`nodes` 三個、`heads` 三條邊的標籤、選用 `outcomes[0]`）、`tokens`（符號序列，2026-10-18 新增：`steps[{label, cells[{text, sub?, tone}]}]` 一列一步、`tone` 是 rtg／state／action／reward／mask（mask 金色＝被蓋住的那格）、選用 `more: true`（最後一列後畫省略點）、選用 `outcomes[0]` 底下一條橫框） | `body` 最多 130 字（`diagram_body_max_chars`），圖依補充行數往下讓位，放不下會直接報錯（縮短補充或圖上的字）；選用 `note`（圖註，有圖註時圖會在 y=1180 前結束）。圖上的文字與數字都要被引用的主張涵蓋（程式 A 檢查）；純示意的圖（`samples`、`paths`、`epochs`）圖上標「示意」，不得畫成實驗數據。幾何在 `scripts/diagrams.py` |
 | `chart_sounding` | 測深圖（深色海面面板，最多 3 條繩） | `unit`、`bars`、`note`；`body` 最多 2 行；選用 `label` |
 | `takeaway` | 倒數第二張，深海底金色字，一句話 | `title`（一句話，字最大；內含 `\n` 會換行，適合「第一關／第二關」這類並列結論，最多 4 行）、`question`（選用：先問的問題，較小的米色字，約 2 行內）、`label`（選用小字） |
 | `series_map` | 最後一張（獨立 post 為「延伸閱讀」） | `current`（本則的 concept id）、`nav`（導流行）；標題清單由系列檔的 `planned_title` 自動填，不要自己寫；獨立貼文改寫 `items`（見上）、不寫 `current` |
@@ -88,7 +88,7 @@ caption 第一句用 `first_refs`。`refs` 只證明「有對應」，不證明�
 ```json
 {
   "body":  { "text": "…", "refs": ["c3"], "quals": ["c3#1"] },
-  "items": [ { "slide": 4, "text": "…", "refs": ["c15"] } ],     // 內容投影片一對一
+  "mode": "carousel",                                           // 輪播；不寫 items（逐張串文是 legacy，見下）
   "last":  { "text": "帶走一句話\n文章：datasciocean.com/…\n同系列：<planned_title>（尚未發布）",
              "refs": ["c1", "c2"], "link": "https://datasciocean.com/ai-concept/<slug>/" }
 }
@@ -100,7 +100,7 @@ caption 第一句用 `first_refs`。`refs` 只證明「有對應」，不證明�
 
 ```json
 { "first": "第一句（含搜尋關鍵字）", "first_refs": ["c1"],
-  "nav": "導流行", "hashtags": ["DSO_Jev", "benchmark", "LLM"] }
+  "nav": "導流行", "hashtags": ["DSO_SAG", "SAG", "RAG"] }
 ```
 
 逐張摘要不放進 JSON，由 `build_package.py` 依最終投影片自動產生（所以必須在張數定案之後才跑）。
@@ -111,7 +111,7 @@ caption 第一句用 `first_refs`。`refs` 只證明「有對應」，不證明�
 README.md          這則貼文的唯一入口：縮圖、檢查結果、發布前後待辦        build_package.py
 ig/post.md         每一頁的圖與文字、替代文字，最後是整段 caption           build_package.py
 ig/01.png …        投影片                                                    render.py
-threads/post.md    正文、每則串文（附圖，圖在 ../ig/）、最後一則            build_package.py
+threads/post.md    輪播貼文（正文＋全部投影片）、（有 last 時）一則回覆            build_package.py
 _build/            機器用，不用看
   spec.json        內容規格（唯一的真相來源）                                人／撰寫者寫
   checks-b.json    程式 B 結果與 template_hash；alt-text.json；html/          render.py

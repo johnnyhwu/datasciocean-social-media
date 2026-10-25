@@ -12,7 +12,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 1. `git submodule update --remote`（卡要是最新的）。第一次 clone 用 `git submodule update --init --remote`。
 2. `uv sync`；Chromium 在 repo 內，沒有就 `PLAYWRIGHT_BROWSERS_PATH=$PWD/.playwright-browsers uv run playwright install chromium`（細節見 `references/setup.md`）。腳本一律 `uv run python .claude/skills/make-social-post/scripts/<name>.py`。
 3. **看現況**：`state.py status`（每個觀念各格式是 `not_tried`／`ready`／`published`、存量），再看 `out/README.md`（待發布與各系列狀態）。
-4. **（新系列／規劃時）** 跑 `series_deps.py <系列 id>` 並**一定要問人哪些卡要合併**（`references/batch-and-publish.md` §1）；成員定案後在 `series.md` 加 `members_locked: true`，再發第 1 則；**先把整個系列每一則的 spec 都做完、張數與 `planned_title` 定案，才鎖定並發第 1 則**（2026-10-11 人決定；鎖定後不改成員與標題）。
+4. **（新系列／規劃時）** 跑 `series_deps.py <系列 id>` 並**一定要問人哪些卡要合併**（`references/batch-and-publish.md` §1）；成員定案後在 `series.md` 加 `members_locked: true`，再發第 1 則；**預設先把整個系列每一則的 spec 都做完、張數與 `planned_title` 定案，才鎖定並發第 1 則**（2026-10-11 人決定；鎖定後不改成員與標題）。人明確要求先發時可以，規則與要講明的代價見 `CLAUDE.md`「工作方式」。
 4b. **決定這次做哪一則**：照系列檔 `series/<id>/series.md` 的 `members` 順序，找第一個還是 `not_tried` 的觀念；這是預設，要不要照做由人決定。
 5. 要做的觀念，**只讀它的卡**（`concept-wiki/wiki/concepts/<id>.md`），不讀 blog。同時讀 `concept-wiki/docs/card-format.md`（卡格式與 status 語意）。**卡上主張若附 `figures`，用 Read 實際打開圖檔看**（路徑 `concept-wiki/wiki/<file>`），不要只看路徑或圖說；圖只是參考，貼文要用就重製（`references/anchor-writing-rules.md`「參考圖」）。
 6. 如果這次要**發布**，先看 `references/publish-flow.md` 的「發文前的前提」。
@@ -39,7 +39,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | 7 | **先照 `references/self-check.md` 自檢**，再派忠實者、讀者（一般讀者，附圖）、編輯（附圖）；**有 `fig_refs` 再派重製圖審查者**（`references/figure-prompt.md`，看原圖＋主張＋重製圖）；`verify_faithful.py`、`verify_reader.py`、`verify_figure.py`。**審查通過後再新增文字或改數字，要重審改過的區塊**：`spec_diff.py` 列出範圍、`--mark` 記下通過版本 | `references/review-loop.md`、`references/self-check.md` |
 | 8 | `batch_check.py <spec>...`（參數順序 = 預計發文順序） | `references/batch-and-publish.md` §4 |
 | 9–10 | 給人看貼文 `README.md`（含縮圖）、`ig/post.md`、`threads/post.md`，確認後 `state.py ready <觀念> <格式> <發布包>`（兩個格式各一次） | `references/batch-and-publish.md` §5–6 |
-| 11 | **發布**：`prepare` → push `ig/jpg/` → IG `preflight` → IG dry-run → 人說「發」→ `--confirm` → Threads dry-run → 人說「發」→ `--confirm`；成功後自動寫回 state | **`references/publish-flow.md`**（照做）、`references/instagram-publish.md`、`references/threads-publish.md` |
+| 11 | **發布**：`prepare` → push `ig/jpg/` → IG `preflight` → IG dry-run → 人說「發」→ `--confirm` → `series_links.py`（系列已有發布的前幾則時）→ Threads dry-run → 人說「發」→ `--confirm`；成功後自動寫回 state | **`references/publish-flow.md`**（照做）、`references/instagram-publish.md`、`references/threads-publish.md` |
 
 第一次是新系列時，先用 `design-series-visuals` 把視覺哲學與各版型的樣張做出來、**由人審過**才量產。系列已有模板就直接用，同一系列的所有貼文用同一版模板。
 
@@ -66,6 +66,8 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | `state.py` | 各觀念各格式的狀態（`not_tried`／`ready`／`published`／`unsuitable`）、發布紀錄、回補清單（`state/`） |
 | `cardlib.py` | 共用：唯讀解析觀念卡（含主張附的 `figures`：圖路徑、缺檔報錯、sha256 核對）、系列與發布包路徑、文字正規化與逐字比對 |
 
+**腳本參數**：`check_a`、`render`、`build_package`、`spec_diff`、`series_links` 吃 `_build/spec.json`；`contact_sheet`、`ig_publish`、`threads_publish`、`state.py ready` 吃發布包資料夾。跑超過 2 分鐘的指令（`ig_publish.py preflight`、全部回歸測試）用背景執行。改 spec 的中文文字用 Python 取代，不用 `sed -i`（macOS 的 BSD sed 要 `-i ''`，中文與引號容易出錯）。
+
 `render.py`、`build_package.py` 對**已發布**的貼文預設拒絕，要重做才加 `--force`（發布後要更新 README 與索引用 `--refresh`，不用 `--force`）。`ig_publish.py`、`threads_publish.py` 的 `publish` 都有 `--summary`（縮短版輸出，給人看 dry-run 用）。
 
 改了任何腳本或審查流程，跑 `CLAUDE.md`「工作方式」列的全部回歸測試。
@@ -75,3 +77,5 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 - 提示詞在 `references/*-prompt.md`：把全文貼進派發訊息、填好檔案路徑（審查者只准讀指定的檔案，讀不到提示詞檔）；放行項逐項列出（`review-loop.md`）。審查者看不到撰寫者推理，每輪用全新 subagent。
 - 並行上限 20；派完用檔案數核對應到／實到。
 - 審查產出（JSON）放暫存目錄，不進 repo。
+- 審查者遇到用量限制或電腦睡眠中斷時，用 `SendMessage` 對同一個 subagent 說「繼續」，它會接著跑；不要重派（會多花一輪）。
+- **改動集中再派**：同一輪的文字修改（讀者建議、人的回饋）一次改完，跑完程式 A、B，再用 `spec_diff.py` 的區塊當 `{ONLY_BLOCKS}` 派一位忠實者；邊改邊審會多出好幾輪（sag 把例子換成真實公司那次，忠實者第一輪就抓出例子與機制不符，修完又審一輪）。

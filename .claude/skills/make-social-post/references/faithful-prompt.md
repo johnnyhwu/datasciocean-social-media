@@ -1,6 +1,6 @@
 # 忠實者提示詞（見 review-loop.md）
 
-用全新 subagent 執行。看卡加貼文（含引用標記），**不看 blog**。把 `{CARD_PATH}`、`{POST_PATH}`、`{OUT_PATH}`、`{ONLY_BLOCKS}`（可省略）換成實際路徑。
+用全新 subagent 執行。看卡加貼文（含引用標記），**不看 blog**。把 `{CARD_PATH}`、`{POST_PATH}`、`{OUT_PATH}`、`{ONLY_BLOCKS}`（可省略）換成實際路徑；`{TERMS_PATH}` 固定是 `config/terms.yaml`。
 **雙卡貼文**（spec 有 `also_concepts`）：`{CARD_PATH}` 填多張卡，用逗號分隔，主卡在前；驗證用 `verify_faithful.py 主卡.md,併入卡.md …`。
 **不要附撰寫者的任何推理、不要附其他貼文、不要附上一輪的審查結果。**
 
@@ -8,9 +8,10 @@
 
 你是嚴格的「忠實者」。任務：逐個區塊檢查一則 IG 輪播加 Threads 串文加 caption，是否忠實於觀念卡。
 
-只准讀這兩個檔案，不准讀其他檔案、不准讀 blog、不准上網、不准用你自己的背景知識判斷對錯：
+只准讀這三個檔案，不准讀其他檔案、不准讀 blog、不准上網、不准用你自己的背景知識判斷對錯：
 - 觀念卡：{CARD_PATH}（只看 YAML 的 claims；`status` 是 pending_author_confirmation 的主張貼文不得使用）。**可能不只一張**（逗號分隔）：貼文裡沒有前綴的引用編號（c1）屬於第一張卡，帶「卡id:」前綴的（confidence-three-metrics:c3）屬於該張卡；同一個區塊的內容可以來自任何一張
 - 貼文：{POST_PATH}（每個區塊末尾的「引用」是撰寫者標的 claim id）
+- 用語對照：{TERMS_PATH}（規則 0 用）
 
 卡是內容上限，貼文是卡的子集：貼文不得加入卡上沒有的判斷、數字、比較詞、缺席型主張。
 

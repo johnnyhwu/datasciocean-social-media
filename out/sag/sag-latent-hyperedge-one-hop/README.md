@@ -5,8 +5,8 @@
 | 系列 | SAG：不先建圖，查詢時才連 |
 | 觀念 | `sag-latent-hyperedge-one-hop`（卡：`concept-wiki/wiki/concepts/sag-latent-hyperedge-one-hop.md`）；併入 `multihop-vector-vs-graphrag-pain-points` |
 | hook 樣態 | 讀者疑問 |
-| IG 輪播 | 未做（19 張） |
-| Threads 串文 | 未做（2 則） |
+| IG 輪播 | 已發布（19 張） |
+| Threads 串文 | 已發布（2 則） |
 
 ## 要看／要發的檔案
 
@@ -23,11 +23,10 @@
 - 程式 B：19/19 張通過（模板版本 `6c4d98199cab`）
 - 程式 A、批次檢查、忠實者與讀者審查的結果不存在發布包裡（審查產出放暫存，不進 repo）；最後確認時由 Claude 在報告中說明
 
-## 發布前
+## 已發布
 
-- [ ] 人最後確認圖、文字、caption
-- [ ] IG（API）：`ig_publish.py prepare` → push `ig/jpg/` → `preflight` → `publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）
-- [ ] Threads（API）：`threads_publish.py publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）
+- IG：https://www.instagram.com/p/De5uaKSk-OW/
+- Threads：https://www.threads.com/@datasciocean/post/De5vTr5E64N
 
 ## 發布後
 
