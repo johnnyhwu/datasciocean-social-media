@@ -84,8 +84,8 @@ tests/                                  回歸測試 `test_*.py`（`test_*_style
 
 ## 目前狀態（2026-10-25；各則網址與細節：`docs/status.md`）
 
-- **已發布**：系列 `skillopt`（3 則）、`persona-aware-d2s`（3 則）、`jev-cascade`（3 則）、`sag`（第 1 則，雙卡、19 張；系列已 `members_locked`），獨立貼文 `decision-transformer-reward-conditioning` 與 `bradley-terry-pairwise-preference`（用 LaTeX）。存量（`ready`）0；Threads 回補都做完（SAG 第 2～4 則發布後才有）。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。
-- **還沒做**：SAG 第 2～4 則（卡 `sag-sql-vector-llm-division-and-funnel`、`sag-results-and-gain-source`、`sag-tradeoffs-price-paid`，標題在 `series/sag/series.md`）；3 張 `claude-code-*` 卡（新文章，要先規劃系列）。
+- **已發布**：系列 `skillopt`（3 則）、`persona-aware-d2s`（3 則）、`jev-cascade`（3 則）、`sag`（第 1、2 則；系列已 `members_locked`），獨立貼文 `decision-transformer-reward-conditioning` 與 `bradley-terry-pairwise-preference`（用 LaTeX）。存量（`ready`）0；Threads 回補都做完（SAG 第 2～4 則發布後才有）。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。
+- **還沒做**：SAG 第 3、4 則（卡 `sag-results-and-gain-source`、`sag-tradeoffs-price-paid`；第 2 頁都要有 `recap`，標題在 `series/sag/series.md`）；3 張 `claude-code-*` 卡（新文章，要先規劃系列）。
 - **獨立貼文**（沒有系列）：spec 寫 `series: null`，視覺在 `standalone/<觀念 id>/`，發布包在 `out/standalone/`（`spec-json.md`「獨立貼文」、`design-series-visuals`）。轉折張、延伸閱讀、導流連結、Threads 回覆打包問人；**沒有文章連結時 `threads.last` 不寫，只發輪播**（人的決定，2026-10-23）。
 - **待人決定**：封面主標是否放寬成 3 行；`config/params.yaml` 的 `structure_text_max_chars` 與 `ai_tone_blacklist` 仍是初稿；Threads token 是否補 `threads_delete` 權限（沒有則刪除只能手動）；系列名與標題的取名偏好（memory `feedback_series_naming`）。
 
