@@ -26,4 +26,5 @@ posts:
   published_at: 2026-10-25T03:27:11+0000
   hook_type: 讀者疑問
   mentions: []
-  backfilled: []
+  backfilled:
+  - sag-sql-vector-llm-division-and-funnel
