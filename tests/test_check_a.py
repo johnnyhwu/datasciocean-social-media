@@ -36,12 +36,30 @@ def standalone(s):
     s["slides"][-1] = {"layout": "series_map", "title": "延伸閱讀", "items": ["jev-overview"], "nav": "完整文章：datasciocean.com/ai-concept/jev-overview", "refs": ["結構"]}
 
 
-def run(spec):
+# 有「標題＋細節」（summary）的系列：把 fixtures 的系列檔每個成員補上 summary（回顧頁與系列地圖用；缺一個就要報錯）
+def series_with_summary(drop_one=False):
+    d = tempfile.mkdtemp()
+    src = FX / "series" / "jev-teardown" / "series.md"
+    (Path(d) / "jev-teardown").mkdir()
+    txt = src.read_text(encoding="utf-8")
+    for k, line in enumerate([l for l in txt.split("\n") if l.startswith("    planned_title:")]):
+        if drop_one and k == 1:
+            continue
+        txt = txt.replace(line, line + f"\n    summary: 第 {k + 1} 則的細節", 1)
+    (Path(d) / "jev-teardown" / "series.md").write_text(txt, encoding="utf-8")
+    return d
+
+
+def run(spec, series_dir=None):
     with tempfile.TemporaryDirectory() as d:
         p = Path(d) / "spec.json"
         p.write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
-        r = subprocess.run(["uv", "run", "python", str(SCRIPT), str(p)], capture_output=True, text=True, cwd=ROOT)
+        env = {**os.environ, **({"DSO_SERIES_DIR": series_dir} if series_dir else {})}
+        r = subprocess.run(["uv", "run", "python", str(SCRIPT), str(p)], capture_output=True, text=True, cwd=ROOT, env=env)
         return r.returncode, r.stdout + r.stderr
+
+
+RECAP = {"layout": "recap", "title": "前情提要", "current": "confound-three-questions", "refs": ["結構"]}
 
 
 def mut(base, fn):
@@ -82,6 +100,7 @@ CASES = [  # (名稱, 基底, 修改, 預期錯誤中要出現的字串)
     ("獨立貼文的延伸閱讀列了還沒發布的貼文", GOOD_A, lambda s: (standalone(s), s["slides"][-1].update(items=["confound-three-questions"])), "還沒發布"),
     ("圖上的拉丁字詞（網址）不在卡上也沒被 latin_allow 放行", GOOD_A, lambda s: s["slides"][4]["bars"][1].update(name="arxiv.org"), "圖上名稱"),
     ("示意圖只是把同張的補充重講一遍（HINT）", GOOD_A, lambda s: s["slides"].__setitem__(2, {**s["slides"][2], "layout": "diagram", "kind": "flow", "title": "先判再轉交", "body": "便宜的 Judge 先判斷，信心低的題目再轉交給強的 Judge 處理。", "nodes": [{"text": "便宜的 Judge 先判斷"}, {"text": "信心低的題目再轉交給強的 Judge 處理"}]}), "重述同張"),
+    ("最後一則的正文（不是「同系列」行）含卡上沒有的比較詞", GOOD_A, lambda s: s["threads"]["last"].update(text="一定要看。\n" + s["threads"]["last"]["text"]), "比較詞/全稱詞 '一定'"),
     ("caption 第一句太長", GOOD_A, lambda s: s["caption"].update(first="很長" * 30), "第一句"),
 ]
 
@@ -90,7 +109,8 @@ def main():
     fails = 0
     carousel_ok = mut(GOOD_A, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items")))
     waived_ok = mut(GOOD_A, lambda s: (s.update(waived_quals=[{"id": q, "reason": "人決定刪除"} for q in s["threads"]["body"]["quals"]]), s["threads"]["body"].update(quals=[])))
-    for base, name in ((waived_ok, "正確的貼文 A：限定條件有寫理由地放行（必須通過，測誤殺）"), (GOOD_A, "正確的貼文 A（必須通過）"), (GOOD_B, "正確的貼文 B（必須通過）"), (carousel_ok, "正確的貼文 A 改成 Threads 輪播模式（必須通過，測誤殺）"), (mut(GOOD_A, standalone), "正確的獨立貼文（series: null，延伸閱讀列已發布的貼文；必須通過，測誤殺）"), (mut(GOOD_A, lambda s: (standalone(s), s["slides"].pop())), "正確的獨立貼文：最後一張是帶走、沒有延伸閱讀（必須通過，測誤殺）"), (mut(GOOD_A, lambda s: (standalone(s), s["slides"].pop(), s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["threads"].pop("last"))), "正確的獨立貼文：Threads 輪播沒有最後一則回覆（必須通過，測誤殺）")):
+    series_title_ok = mut(GOOD_A, lambda s: s["threads"]["last"].update(text=s["threads"]["last"]["text"] + "\n同系列：這一定要看（尚未發布）"))
+    for base, name in ((series_title_ok, "正確的貼文 A：最後一則「同系列」的標題含比較詞（標題是系列檔的，不檢查；必須通過，測誤殺）"), (waived_ok, "正確的貼文 A：限定條件有寫理由地放行（必須通過，測誤殺）"), (GOOD_A, "正確的貼文 A（必須通過）"), (GOOD_B, "正確的貼文 B（必須通過）"), (carousel_ok, "正確的貼文 A 改成 Threads 輪播模式（必須通過，測誤殺）"), (mut(GOOD_A, standalone), "正確的獨立貼文（series: null，延伸閱讀列已發布的貼文；必須通過，測誤殺）"), (mut(GOOD_A, lambda s: (standalone(s), s["slides"].pop())), "正確的獨立貼文：最後一張是帶走、沒有延伸閱讀（必須通過，測誤殺）"), (mut(GOOD_A, lambda s: (standalone(s), s["slides"].pop(), s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["threads"].pop("last"))), "正確的獨立貼文：Threads 輪播沒有最後一則回覆（必須通過，測誤殺）")):
         code, out = run(base)
         ok = code == 0
         fails += not ok
@@ -104,6 +124,21 @@ def main():
             caught = False
         fails += not caught
         print(("PASS " if caught else "FAIL ") + f"抓得到：{name}" + ("" if caught else f"  [預期含 {expect!r}]\n{out}"))
+    # 回顧頁（系列第 2 則以後的第 2 頁，2026-10-25）
+    SS, SS_DROP = series_with_summary(), series_with_summary(drop_one=True)
+    recap_ok = mut(GOOD_B, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["slides"].insert(1, copy.deepcopy(RECAP))))
+    for name, spec, sd, expect in (
+            ("正確的貼文：系列第 2 則、第 2 頁是回顧頁、系列檔有 summary（必須通過，測誤殺）", recap_ok, SS, None),
+            ("正確的貼文：系列第 1 則不需要回顧頁（必須通過，測誤殺）", GOOD_A, SS, None),
+            ("抓得到：系列第 2 則沒有回顧頁", mut(GOOD_B, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items"))), SS, "第 2 頁要是回顧頁"),
+            ("抓得到：系列第 1 則放了回顧頁", mut(GOOD_A, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["slides"].insert(1, {**RECAP, "current": "jev-overview"}))), SS, "沒有「前面介紹過」"),
+            ("抓得到：回顧頁不在第 2 頁", mut(GOOD_B, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["slides"].insert(3, copy.deepcopy(RECAP)))), SS, "回顧頁固定放第 2 頁"),
+            ("抓得到：回顧頁的 current 不是這一則", mut(recap_ok, lambda s: s["slides"][1].update(current="jev-overview")), SS, "current 要是這一則"),
+            ("抓得到：系列檔有成員沒有 summary", recap_ok, SS_DROP, "沒有 summary")):
+        code, out = run(spec, sd)
+        ok = (code == 0) if expect is None else (code != 0 and expect in out)
+        fails += not ok
+        print(("PASS " if ok else "FAIL ") + name + ("" if ok else f"  [預期含 {expect!r}]\n{out}"))
     print(f"\n{'全部通過' if not fails else f'{fails} 項失敗'}")
     return 1 if fails else 0
 

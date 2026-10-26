@@ -142,6 +142,46 @@ expect("故意做壞：架構圖上段只有 3 欄 → 報錯", code != 0 and "4
 code, out = render(D("ingest", **{**ING, "outcomes": [{"text": "很長的步驟說明" * 12, "sub": "很長的小字" * 30}] * 3}))
 expect("故意做壞：架構圖下段的字太多放不下 → 報錯", code != 0 and "放不下" in out, out)
 
+# 2026-10-25 新增（SAG 第 2 則）：roles／embed／online／gate／concat／joint／rails
+ROLES = [{"text": "資料庫", "sub": "確定", "sub2": "精確比對，一步接一步串下去。", "icon": "db"}, {"text": "向量庫", "sub": "模糊", "sub2": "別名、錯字也找得到。", "icon": "vec"}, {"text": "大模型", "sub": "判斷", "sub2": "只看縮小後的候選。", "icon": "llm"}]
+code, out = render(D("roles", nodes=ROLES))
+expect("正確的三列角色卡通過程式 B", code == 0, out)
+code, out = render(D("roles", nodes=[{**n, "sub2": "很長的說明" * 40} for n in ROLES]))
+expect("故意做壞：角色卡的說明太長放不下 → 報錯", code != 0 and "放不下" in out, out)
+EMB = dict(heads=["精確", "向量"], nodes=[{"text": "甲＝甲", "sub": "確定相等", "ok": True}, {"text": "甲＝乙？", "sub": "沒辦法判斷", "ok": False}],
+           outcomes=[{"text": "甲"}, {"text": "乙", "sub": "別名也找得到"}, {"text": "丙", "sub": "錯字也找得到"}])
+code, out = render(D("embed", **EMB))
+expect("正確的精確比對 vs 向量空間圖通過程式 B", code == 0, out)
+code, out = render(D("embed", **{**EMB, "outcomes": EMB["outcomes"][:2]}))
+expect("故意做壞：向量空間只有 2 個點 → 報錯", code != 0 and "3 個點" in out, out)
+code, out = render(D("embed", **{**EMB, "nodes": [{"text": "很長的比對說明" * 20, "sub": "很長的小字" * 20, "ok": True}] * 2}))
+expect("故意做壞：比對列的字太多放不下 → 報錯", code != 0 and "放不下" in out, out)
+ONL = dict(heads=["發問", "10 個結果"], nodes=[{"text": "第一路", "sub": "先抽"}, {"text": "第二路", "sub": "整句"}],
+           outcomes=[{"text": "擴展", "sub": "沿著實體撈"}, {"text": "精選", "sub": "挑 5 個"}, {"text": "直接", "sub": "挑 5 個"}])
+code, out = render(D("online", **ONL))
+expect("正確的線上檢索路線圖通過程式 B", code == 0, out)
+code, out = render(D("online", **{**ONL, "outcomes": [{"text": "很長的步驟說明" * 12, "sub": "很長的小字" * 30}] * 3}))
+expect("故意做壞：路線圖的字太多放不下 → 報錯", code != 0 and "放不下" in out, out)
+code, out = render(D("gate", count=50, nodes=[{"text": "上游", "sub": "來多少先排在這裡"}, {"text": "只留前 50 名", "sub": "下游控制得住"}]))
+expect("正確的水庫閘門圖通過程式 B（名額數字在閘門上）", code == 0, out)
+code, out = render(D("gate", count=50, nodes=[{"text": "很長的上游說明" * 20, "sub": "很長的小字" * 20}, {"text": "下游"}]))
+expect("故意做壞：閘門圖的標題太長放不下 → 報錯", code != 0 and "放不下" in out, out)
+CAT = dict(heads=["左路", "右路"], nodes=[{"text": "兩路各挑 5 個"}, {"text": "合成 10 個", "sub": "交給下一步"}])
+code, out = render(D("concat", **CAT))
+expect("正確的兩路合成一排圖通過程式 B", code == 0, out)
+code, out = render(D("concat", **{**CAT, "nodes": [{"text": "很長的說明" * 60}, {"text": "很長的結果" * 60, "sub": "很長的小字" * 60}]}))
+expect("故意做壞：合成圖的字太多放不下 → 報錯", code != 0 and "放不下" in out, out)
+JNT = dict(heads=["逐一", "一起"], nodes=[{"text": "一個一個打分", "sub": "例：各拿一個分數", "sub2": "看不到互補"}, {"text": "一起評估", "sub": "例：合起來才答得出", "sub2": "看得到互補"}])
+code, out = render(D("joint", **JNT))
+expect("正確的逐一打分 vs 一起評估圖通過程式 B", code == 0, out)
+code, out = render(D("joint", **{**JNT, "nodes": [{"text": "很長的說明" * 30, "sub": "很長的例子" * 30, "sub2": "很長的結論" * 30}] * 2}))
+expect("故意做壞：打分圖的字太多放不下 → 報錯", code != 0 and "放不下" in out, out)
+RAI = dict(heads=["A 路", "B 路"], nodes=[{"text": "用實體", "sub": "先抽再撈"}, {"text": "用整句", "sub": "直接撈"}], outcomes=[{"text": "取聯集、去重"}])
+code, out = render(D("rails", **RAI))
+expect("正確的兩條軌道合併圖通過程式 B", code == 0, out)
+code, out = render(D("rails", **{**RAI, "nodes": [{"text": "很長的做法" * 20, "sub": "很長的小字" * 30}] * 2}))
+expect("故意做壞：軌道圖的字太多放不下 → 報錯", code != 0 and "放不下" in out, out)
+
 import sys
 sys.path.insert(0, str(ROOT / ".claude/skills/make-social-post/scripts"))
 import diagrams as DG

@@ -498,6 +498,50 @@ def sp_strip(idx, n, dark=False):
     return s
 
 
+
+def series_journey(members, cur, jy):
+    """整個系列的路線：走過的是實心點，這一則是金色，後續是空心點；每個點下面一行「第 N 則」。回傳 (svg, html)。"""
+    svg, out = "", ""
+    n_ = len(members)
+    xs_ = [160 + k * (700 / max(n_ - 1, 1)) for k in range(n_)]
+    svg += f'<line class="bg" x1="{xs_[0]}" y1="{jy}" x2="{xs_[cur]}" y2="{jy}" stroke="{GOLD}" stroke-width="6"/>'
+    svg += f'<line class="bg" x1="{xs_[cur]}" y1="{jy}" x2="{xs_[-1]}" y2="{jy}" stroke="{TEAL}" stroke-width="4" stroke-dasharray="4 12" stroke-linecap="round"/>'
+    for k_, x_ in enumerate(xs_):
+        if k_ < cur:
+            svg += f'<circle class="bg" cx="{x_:.1f}" cy="{jy}" r="16" fill="{TEAL}"/>'
+        elif k_ == cur:
+            svg += f'<circle class="bg" cx="{x_:.1f}" cy="{jy}" r="40" fill="{GOLD}" fill-opacity=".30"/><circle class="bg" cx="{x_:.1f}" cy="{jy}" r="22" fill="{GOLD}"/>'
+        else:
+            svg += f'<circle class="bg" cx="{x_:.1f}" cy="{jy}" r="14" fill="{CREAM}" stroke="{TEAL}" stroke-width="5"/>'
+        lab_ = f"第 {k_ + 1} 則" + ("" if k_ != cur else "（這一則）")
+        out += f'<div class="t abs ilab{" cur2" if k_ == cur else ""}" style="left:{x_ - 150:.1f}px;top:{jy + 50}px;width:300px;text-align:center">{esc(lab_)}</div>'
+    return svg, out
+
+
+def series_rows(members, cur, y0, labels=False, upto=None):
+    """系列地圖與回顧頁的列：一則一列，標題（第一層）加一段細節（第二層，series.md 的 summary）。
+    labels=True 時標題上方多一行「第 N 則・…」（回顧頁用）；目前這則是深色塊加金色圓點。回傳 (svg, html, 下緣 y)。"""
+    svg, out, y = "", "", y0
+    for i, m in enumerate(members[:upto]):
+        isc = i == cur
+        sl_ = est_lines(m["summary"], 836 / 28 + 0.6)
+        lab_h = 39 if labels else 0
+        h = lab_h + 48 + sl_ * 39 + 24
+        top = y - 10
+        if isc:
+            svg += f'<rect class="bg" x="72" y="{top}" width="936" height="{h}" rx="6" fill="{DEEP}"/>'
+            svg += f'<circle class="g mark" data-e="1" cx="100" cy="{y + lab_h + 24}" r="12" fill="{GOLD}"/>'
+        else:
+            svg += f'<circle class="g mark" cx="100" cy="{y + lab_h + 24}" r="8" fill="{TEAL}"/>'
+        cc = " cur" if isc else ""
+        if labels:
+            lab = f"第 {i + 1} 則・這一則" if isc else f"第 {i + 1} 則・前面介紹過"
+            out += f'<div class="t abs ilab{cc}" style="left:132px;top:{y}px">{esc(lab)}</div>'
+        out += f'<div class="t abs item{cc}" style="left:132px;top:{y + lab_h}px">{esc(m["planned_title"])}</div>'
+        out += f'<div class="t abs isum{cc}" style="left:132px;top:{y + lab_h + 48}px">{esc(bind_nums(m["summary"]))}</div>'
+        y += h + 14
+    return svg, out, y - 14
+
 # ---------------------------------------------------------------- 各版型
 def build(spec: dict, series: dict, tag: str) -> dict:
     """回傳 {layout, html_body, ...}。HTML 片段以模板檔填入。"""
@@ -760,6 +804,23 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             svg += h_band(idx, n_sl, y=1020)
         kw["SVG"] = svg_wrap(svg)
         kw["ITEMS"], kw["NAV"], kw["FOOT_CLS"] = out, esc(spec.get("nav", "")), "light" if horizon else ""
+    elif lay == "recap":      # 第 2 頁：前面介紹過什麼、這一則要講什麼（內容由系列檔填，不是主張）
+        cur = [m["concept"] for m in series["members"]].index(spec["current"])
+        svg, out, yend = series_rows(series["members"], cur, 330, labels=True, upto=cur + 1)
+        if yend > 1170:
+            raise ValueError(f"回顧頁放不下：列到 y={yend}，上限 1170；縮短 summary 或減少列數")
+        jsvg, jout = series_journey(series["members"], cur, max(yend + 130, 900))
+        svg, out = svg + jsvg, out + jout
+        kw["SVG"], kw["ITEMS"] = svg_wrap(svg), out
+    elif lay == "series_map" and all(m.get("summary") for m in series["members"]):     # 標題加細節
+        cur = [m["concept"] for m in series["members"]].index(spec["current"])
+        svg, out, yend = series_rows(series["members"], cur, 330)
+        if yend > 1150:
+            raise ValueError(f"系列地圖放不下：列到 y={yend}，上限 1150；縮短 summary")
+        if yend < 960:      # 下半部有空間：放整個系列的路線
+            jsvg, jout = series_journey(series["members"], cur, max(yend + 110, 1000))
+            svg, out = svg + jsvg, out + jout
+        kw["SVG"], kw["ITEMS"], kw["NAV"] = svg_wrap(svg), out, esc(spec.get("nav", ""))
     elif lay == "series_map":
         items = [m["planned_title"] for m in series["members"]]
         cur = [m["concept"] for m in series["members"]].index(spec["current"])
@@ -1046,8 +1107,11 @@ def render_all(spec_path: Path, only: set[int] | None = None, force: bool = Fals
                     print(f"      FAIL {n}  [{d}]")
             report.append({"slide": i, "layout": sl["layout"], "checks": [{"name": n, "ok": ok, "detail": d} for n, ok, d in res]})
             body = plain(sl.get("body", ""))
-            if sl["layout"] == "series_map":
-                names = [planned_title_of(c_) for c_ in sl["items"]] if series.get("standalone") else [m_["planned_title"] for m_ in series["members"]]
+            if sl["layout"] == "recap":
+                cu = [m_["concept"] for m_ in series["members"]].index(sl["current"])
+                alts[f"{i:02d}.png"] = plain(sl["title"]) + "。" + "；".join(f"第 {k + 1} 則「{m_['planned_title']}」：{m_['summary']}" for k, m_ in enumerate(series["members"][:cu + 1]))
+            elif sl["layout"] == "series_map":
+                names = [planned_title_of(c_) for c_ in sl["items"]] if series.get("standalone") else [m_["planned_title"] + ("：" + m_["summary"] if m_.get("summary") else "") for m_ in series["members"]]
                 alts[f"{i:02d}.png"] = plain(sl["title"]) + "。" + "、".join(names)
             else:
                 alts[f"{i:02d}.png"] = ((sl["question"] + "　" if sl.get("question") else "") + plain(sl.get("title", "")) + ("。" + body if body else "")

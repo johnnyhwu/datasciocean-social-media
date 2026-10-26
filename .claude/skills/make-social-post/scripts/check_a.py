@@ -83,7 +83,9 @@ def main(spec_path: str) -> int:
     for j, it in enumerate(th.get("items", []), 1):
         blocks.append((f"threads.item{j}(slide{it['slide']})", [it["text"]], it.get("refs"), it.get("quals", []), None))
     if th.get("last"):      # 沒有文章連結的獨立貼文不發最後一則回覆（只發輪播）
-        blocks.append(("threads.last", [th["last"]["text"]], th["last"].get("refs"), th["last"].get("quals", []), None))
+        # 「同系列：<planned_title>」與下一行網址是系列檔的標題（人決定、鎖定後不改，batch_check 另驗），不是主張的內容，不做比較詞等內容檢查
+        last_lines = [l for l in th["last"]["text"].split("\n") if not l.startswith(("同系列：", "http"))]
+        blocks.append(("threads.last", ["\n".join(last_lines)], th["last"].get("refs"), th["last"].get("quals", []), None))
     cap = doc["caption"]
     blocks.append(("caption.first", [cap["first"]], cap.get("first_refs"), [], None))
     blocks.append(("hook", [strip_marks(doc["hook"]["title"]), doc["hook"]["subtitle"]], doc["hook"].get("refs"), doc["hook"].get("quals", []), None))
@@ -245,6 +247,32 @@ def main(spec_path: str) -> int:
         err.append(f"系列貼文必須含系列標籤 #{series['hashtag']}")
     if "podcast" in json.dumps(doc, ensure_ascii=False).lower():
         err.append("貼文內容出現 podcast")
+    # 回顧頁（recap，第 2 頁）：只用在系列第 2 則以後；標題與細節（summary）由系列檔填入，鎖定後不改
+    for i, sl in enumerate(doc["slides"], 1):
+        if sl["layout"] != "recap" and not (sl["layout"] == "series_map" and sl.get("current") and series.get("members") and any(m.get("summary") for m in series["members"])):
+            continue
+        mids = [m["concept"] for m in series.get("members", [])]
+        if series.get("standalone") or sl.get("current") not in mids:
+            err.append(f"slide{i:02d}({sl['layout']}): 要有 current，而且是這個系列的成員"); continue
+        if sl["layout"] == "recap":
+            if i != 2:
+                err.append(f"slide{i:02d}(recap): 回顧頁固定放第 2 頁")
+            if mids.index(sl["current"]) == 0:
+                err.append(f"slide{i:02d}(recap): 系列第 1 則沒有「前面介紹過」的內容，不用回顧頁")
+            if sl["current"] != doc["concept"]:
+                err.append(f"slide{i:02d}(recap): current 要是這一則（{doc['concept']}）")
+        for m in series["members"]:
+            if not m.get("summary"):
+                err.append(f"slide{i:02d}({sl['layout']}): 系列檔成員 {m['concept']} 沒有 summary（標題下的細節）")
+            else:
+                for old_, new_ in terms.items():
+                    if old_ in m["summary"]:
+                        err.append(f"系列檔 summary {m['concept']}: 用語 {old_!r} 應寫成 {new_!r}（config/terms.yaml）")
+    # 系列第 2 則以後：第 2 頁要有回顧頁（人的規定，2026-10-25）；系列檔沒有 summary 的舊系列不要求
+    mids_ = [m["concept"] for m in series.get("members", [])]
+    if doc["concept"] in mids_ and mids_.index(doc["concept"]) > 0 and all(m.get("summary") for m in series["members"]):
+        if len(doc["slides"]) < 2 or doc["slides"][1]["layout"] != "recap":
+            err.append("系列第 2 則以後，第 2 頁要是回顧頁（layout: recap）：前面介紹過什麼、這一則要講什麼")
     # 系列標籤與標題一致（由渲染引擎從 wiki 填入；這裡確認 series_map 的 current 存在）
     cur = [s.get("current") for s in doc["slides"] if s["layout"] == "series_map"]
     if cur and not series.get("standalone") and cur[0] not in [m["concept"] for m in series["members"]]:

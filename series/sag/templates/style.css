@@ -61,3 +61,9 @@ html,body{margin:0;width:1080px;height:1350px;overflow:hidden;background:#F2E0C0
 .dv{font-size:56px;font-weight:700;line-height:1.15;white-space:nowrap}
 .dv2{font-size:40px;font-weight:700;line-height:1.2;white-space:nowrap}
 .gone{text-decoration:line-through;text-decoration-thickness:3px}
+/* 系列地圖與回顧頁的細節（一則一行標題加一段細節；2026-10-25 人要求「標題＋細節」） */
+.isum{font-size:28px;font-weight:400;line-height:1.4;word-break:keep-all;width:836px}
+.isum.cur{color:#F2E0C0}
+.ilab{font-size:28px;font-weight:400;line-height:1.4;color:#076876;white-space:nowrap}
+.ilab.cur{color:#DDA642;font-weight:700}
+.ilab.cur2{color:#01353F;font-weight:700}

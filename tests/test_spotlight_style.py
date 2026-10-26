@@ -81,6 +81,17 @@ _, _, hq = render([{"layout": "chart_bars", "title": "成對橫條圖", "body": 
                     "bars": [{"name": "一", "value": 30, "value2": 40}, {"name": "二", "value": 60, "value2": 80}]}])
 expect("成對橫條圖全是整數時維持原樣（80%）", "80%" in hq and "80.0%" not in hq, "")
 
+# 回顧頁與「標題＋細節」的系列地圖（2026-10-25）：標題與細節來自系列檔（planned_title、summary）
+C2 = "sag-sql-vector-llm-division-and-funnel"
+code, out, hr = render([{"layout": "recap", "title": "前情提要與這一則重點", "current": C2},
+                        {"layout": "series_map", "title": "一次看完這個系列", "current": C2, "nav": "示範導流行"}], concept=C2)
+expect("回顧頁與標題＋細節的系列地圖通過程式 B", code == 0 and "2/2 張通過" in out, out)
+expect("回顧頁：列出前面的一則與這一則（第 1 則・前面介紹過、第 2 則・這一則），不列後面的", "第 1 則・前面介紹過" in hr and "第 2 則・這一則" in hr and "第 3 則・" not in hr, "")
+expect("回顧頁與系列地圖都有系列檔的細節（summary）", hr.count("線下不建圖，只存事件和實體標籤") == 2 and hr.count("SQL 串事件、向量補語意") == 2, "")
+expect("系列地圖列出 4 則的標題", all(x in hr for x in ("SAG 的成績從哪來？", "SAG 付出了什麼代價？")), "")
+code, out, _ = render([{"layout": "recap", "title": "前情提要", "current": "不存在的觀念"}], concept=C2)
+expect("故意做壞：回顧頁的 current 不在成員裡 → 報錯", code != 0, out)
+
 # 故意做壞
 code, out, _ = render([{"layout": "text", "title": "故意做壞", "body": "很長的補充文字，" * 40}])
 expect("故意做壞：補充文字太長 → 抓得到", code != 0 and "FAIL" in out, out)

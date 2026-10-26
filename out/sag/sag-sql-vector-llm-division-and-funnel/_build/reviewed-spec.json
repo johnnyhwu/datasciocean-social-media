@@ -1,0 +1,516 @@
+{
+  "series": "sag",
+  "concept": "sag-sql-vector-llm-division-and-funnel",
+  "also_concepts": [],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "反直覺斷言",
+    "title": "SAG 不靠[[更強的模型]]，靠[[分工]]",
+    "subtitle": "這個 RAG 做法：SQL 串事件、向量補語意，\nLLM 只在候選縮到 100 個以內才出場。\n論文：arxiv.org/abs/2606.15971",
+    "refs": [
+      "c1",
+      "c3",
+      "c4",
+      "c6"
+    ],
+    "candidate": "暫定（待人挑）"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "SAG 不靠[[更強的模型]]，靠[[分工]]",
+      "body": "這個 RAG 做法：SQL 串事件、向量補語意，\nLLM 只在候選縮到 100 個以內才出場。\n論文：arxiv.org/abs/2606.15971",
+      "refs": [
+        "c1",
+        "c3",
+        "c4",
+        "c6"
+      ]
+    },
+    {
+      "layout": "recap",
+      "title": "[[前情提要]]與這一則重點",
+      "current": "sag-sql-vector-llm-division-and-funnel",
+      "refs": [
+        "結構"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "SAG 先把資料轉成事件，再貼上實體標籤",
+      "body": "SAG 是一種 RAG（讓 AI 先查資料再回答）做法：線下（事先處理資料時）不建圖，只存事件加實體標籤；線上（使用者發問時）用 SQL JOIN 把共用實體的事件配起來。三個詞：",
+      "rows": [
+        [
+          "事件",
+          "LLM 把一個 chunk（長文件切出的一小段文字）轉成的一句話。"
+        ],
+        [
+          "實體標籤",
+          "綁在事件上的標籤，例如「2014年」。"
+        ],
+        [
+          "Multi-Hop 推理",
+          "答案要靠好幾份資料，一步步串起來才推得出來。"
+        ]
+      ],
+      "key_w": 260,
+      "refs": [
+        "c2",
+        "c5",
+        "c6",
+        "c13"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "roles",
+      "title": "查資料這件事，SAG 拆給三個元件各做一段",
+      "body": "SAG 的核心不是發明更強的模型，而是重新分配檢索管線裡的職責。",
+      "nodes": [
+        {
+          "text": "SQL 資料庫",
+          "sub": "確定性關聯",
+          "sub2": "「A 是否等於 B」的精確比對是確定的，一步接一步串下去也不會打折；但它不懂語意。",
+          "icon": "db"
+        },
+        {
+          "text": "向量資料庫",
+          "sub": "語意模糊擴展",
+          "sub2": "專門處理別名、同義詞、錯字、換句話說，換個說法也找得到。",
+          "icon": "vec"
+        },
+        {
+          "text": "LLM",
+          "sub": "高價值的聯合判斷",
+          "sub2": "線下抽出事件與實體；線上對縮小後的候選做聯合評估（joint assessment）。",
+          "icon": "llm"
+        }
+      ],
+      "refs": [
+        "c1",
+        "c3",
+        "c4",
+        "c5"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "embed",
+      "title": "SQL 精準但不懂語意，向量剛好補上",
+      "body": "SQL 只問「A 是否等於 B」，答案是確定的；向量資料庫把文字轉成向量，比誰的意思像。下面是假設的例子：",
+      "heads": [
+        "SQL：精確比對",
+        "向量：語意模糊擴展"
+      ],
+      "nodes": [
+        {
+          "text": "「台積電」＝「台積電」",
+          "sub": "一模一樣，確定相等",
+          "ok": true
+        },
+        {
+          "text": "「台積電」＝「TSMC」？",
+          "sub": "不懂語意，沒辦法判斷同義",
+          "ok": false
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "台積電"
+        },
+        {
+          "text": "TSMC",
+          "sub": "別名、同義詞也找得到"
+        },
+        {
+          "text": "台機電",
+          "sub": "打錯字也找得到"
+        }
+      ],
+      "note": "例子是假設的；右邊靠得近的點，代表意思像",
+      "refs": [
+        "c3",
+        "c4"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "online",
+      "title": "線上三步找出資料，不走預先建好的全域圖譜",
+      "body": "線上只跑三個步驟，細節接下來一張一張看。",
+      "heads": [
+        "使用者發問",
+        "10 個 chunk 交給生成模組"
+      ],
+      "nodes": [
+        {
+          "text": "Step 1・路徑 A",
+          "sub": "輕量 LLM 抽實體，SQL 精確撈事件"
+        },
+        {
+          "text": "Step 1・路徑 B",
+          "sub": "整個問題轉向量，撈相似度大於 0.4 的事件"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "Step 2：用 SQL 擴展",
+          "sub": "沿著共用的實體，撈回新的相關事件"
+        },
+        {
+          "text": "Step 3・LLM 精選",
+          "sub": "先粗篩到 100 個，LLM 挑 5 個"
+        },
+        {
+          "text": "Step 3・直接檢索",
+          "sub": "問題直接去原始 chunk 向量庫，挑 5 個"
+        }
+      ],
+      "fig_refs": [
+        "sag/figure2.png"
+      ],
+      "refs": [
+        "c8",
+        "c9",
+        "c10",
+        "c12",
+        "c14",
+        "c15",
+        "c17",
+        "c18"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "pairs",
+      "title": "Multi-Hop 推理交給 SQL，向量不做、LLM 也不走圖",
+      "body": "LLM 只在候選集縮到 100 個以內，才會出場。Step 1 抽實體那一步是例外，它發生在候選集形成之前。",
+      "heads": [
+        "不拿來做的",
+        "改成這樣"
+      ],
+      "pairs": [
+        [
+          "向量檢索：不做 Multi-Hop 推理",
+          "交給 SQL，串起共用實體的事件"
+        ],
+        [
+          "LLM：不拿來走圖（沿著圖一步步找）",
+          "候選縮到 100 個以內，才讓它判斷"
+        ]
+      ],
+      "outcomes": [
+        {
+          "text": "整套系統的 token 消耗與 API 成本，因此壓得很低",
+          "tone": "good"
+        }
+      ],
+      "refs": [
+        "c5",
+        "c6",
+        "c7"
+      ],
+      "quals": [
+        "c5#1",
+        "c6#1",
+        "c7#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "title": "Step 1 路徑 A：先抽實體，再用 SQL 精確撈事件",
+      "body": "兩條路同時進行，路徑 A 先從問題裡抽出實體，再精確撈事件。下面是假設的例子：",
+      "nodes": [
+        {
+          "text": "輕量 LLM 從問題裡抽出實體",
+          "sub": "例：問題「TSMC 創辦人的母校，在哪？」→ 抽出「TSMC」"
+        },
+        {
+          "text": "拿實體去向量索引找相似的，擴充出別名集合",
+          "sub": "相似度門檻 0.9 以上。例：擴充出「TSMC」「台積電」"
+        },
+        {
+          "text": "用 SQL 的 OR 邏輯，精確撈出事件",
+          "sub": "關聯到集合裡任何一個實體的事件，就撈出來"
+        }
+      ],
+      "note": "例子是假設的，只說明做法",
+      "refs": [
+        "c9",
+        "c10"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "rails",
+      "title": "Step 1 路徑 B 保底：直接拿整個問題去撈事件",
+      "body": "兩條路取聯集、去重。B 的存在是為了保底，預防 A 的實體提取漏接。",
+      "heads": [
+        "路徑 A：用實體",
+        "路徑 B：用整個問題"
+      ],
+      "nodes": [
+        {
+          "text": "問題裡抽出的實體",
+          "sub": "先抽實體，再用 SQL 精確撈事件"
+        },
+        {
+          "text": "整個問題轉成向量",
+          "sub": "直接在事件向量庫裡撈，相似度大於門檻（預設 0.4）的事件"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "取聯集、去重，當作起點（種子事件）"
+        }
+      ],
+      "note": "虛線格是 A 漏接的，金格是 B 補上的；兩條路的結果合併後，進入 Step 2",
+      "refs": [
+        "c9",
+        "c10"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "links",
+      "title": "Step 2：先收集實體，再撈回新事件",
+      "body": "先把種子事件（Step 1 撈到的第一批事件）綁定的實體全部提出來，叫實體前線；再用 SQL JOIN 一次撈回跟這些實體有關的新事件，一起放進候選池。",
+      "heads": [
+        "事件",
+        "實體前線"
+      ],
+      "nodes": [
+        {
+          "text": "撈回：張忠謀拿到史丹佛博士"
+        },
+        {
+          "text": "種子事件：張忠謀創立了 TSMC",
+          "emph": true
+        },
+        {
+          "text": "撈回：TSMC 推出新製程"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "張忠謀"
+        },
+        {
+          "text": "TSMC"
+        }
+      ],
+      "edges": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "hot": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "note": "假設的例子：金線是種子事件提出的實體，其餘是新撈回的事件",
+      "fig_refs": [
+        "sag/figure2.png"
+      ],
+      "refs": [
+        "c12"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "gate",
+      "title": "兩道名額把量壓住：各只留前 50 個",
+      "body": "前線實體若混進「2014年」這種高頻通用字（很常出現的字），會撈回海量無關事件，所以也設上限。代價是 Multi-Hop 串聯並非完全沒有損失。",
+      "nodes": [
+        {
+          "text": "種子事件超過 50 個時",
+          "sub": "依向量相似度排序，只留前 50 名"
+        },
+        {
+          "text": "前線實體超過 50 個時",
+          "sub": "依向量相似度排序，只留前 50 名"
+        }
+      ],
+      "note": "示意：只表示「超過 50 就只留 50」，左邊的點不是實際數量",
+      "refs": [
+        "c11",
+        "c13",
+        "c3"
+      ],
+      "quals": [
+        "c3#1"
+      ],
+      "count": 50
+    },
+    {
+      "layout": "diagram",
+      "kind": "funnel",
+      "title": "Step 3：先粗篩到 100 個，LLM 才開始挑",
+      "body": "SAG 的粗篩是個工程妥協：算所有候選事件跟問題的相似度，只留前 100 名，用便宜的方式，把 LLM 要看的量壓到可負擔範圍。",
+      "nodes": [
+        {
+          "text": "Step 2 撈出來的候選事件"
+        },
+        {
+          "text": "向量粗篩：只留前 100 名",
+          "sub": "便宜，先把量壓小"
+        },
+        {
+          "text": "LLM 挑出 5 個",
+          "sub": "還原成原始 chunk"
+        }
+      ],
+      "note": "另一條路也挑 5 個，兩路合成 10 個（下一張）",
+      "refs": [
+        "c14",
+        "c15"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "joint",
+      "title": "LLM 是 100 個事件一起看，不是一個一個打分",
+      "body": "SAG 把這 100 個事件一起送進推理 LLM，做聯合評估：看哪幾個事件湊起來，能構成一條 Multi-Hop 推論鏈。",
+      "heads": [
+        "pointwise：逐一打分",
+        "joint assessment"
+      ],
+      "nodes": [
+        {
+          "text": "一個一個打分",
+          "sub": "例：「張忠謀創立了 TSMC」、「張忠謀拿到史丹佛博士」各拿一個分數",
+          "sub2": "看不到互補關係"
+        },
+        {
+          "text": "100 個事件一起評估",
+          "sub": "例：這兩個事件合起來，才答得出「TSMC 創辦人的母校在哪」",
+          "sub2": "看得到互補關係"
+        }
+      ],
+      "note": "例子是假設的，只說明差別",
+      "refs": [
+        "c15",
+        "c16"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "concat",
+      "title": "兩路合成 10 個 chunk，交給生成模組",
+      "body": "兩路的設計用意是互補：LLM 精選那一路，撈需要跨文件拼湊、字面相似度低的邏輯證據；直接檢索那一路，拿問題直接去原始 chunk 向量庫，撈跟問題高度相關的直球證據。",
+      "heads": [
+        "LLM 精選",
+        "直接檢索"
+      ],
+      "nodes": [
+        {
+          "text": "兩路各挑 5 個 chunk"
+        },
+        {
+          "text": "聯集去重，輸出 10 個 chunk",
+          "sub": "交給生成模組"
+        }
+      ],
+      "fig_refs": [
+        "sag/figure2.png"
+      ],
+      "refs": [
+        "c15",
+        "c17",
+        "c18"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "SQL、向量、LLM，在 SAG 裡怎麼分工？",
+      "title": "SQL 負責連，\n向量負責模糊找，\nLLM 只在候選\n縮到 100 個以內才出場。",
+      "refs": [
+        "c1",
+        "c3",
+        "c4",
+        "c6"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "一次看完這個系列",
+      "current": "sag-sql-vector-llm-division-and-funnel",
+      "nav": "完整文章：datasciocean.com/paper-intro/sag",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "SAG 不靠更強的模型，靠分工。\n\nRAG 是讓 AI 先查資料再回答。SAG 把查資料這件事拆給三個元件：SQL 資料庫負責確定性的精確比對、把事件串起來；向量資料庫負責別名、同義詞、錯字這類模糊的部分；LLM 負責高價值的聯合判斷。\n\nLLM 只在候選縮到 100 個以內才出場（Step 1 先用輕量 LLM 從問題抽出實體，是例外），所以 token 與 API 成本壓得很低。\n\n代價：實體超過 50 個時只留前 50 名，Multi-Hop 串聯並非完全沒有損失。這是系列的第二則。論文：arxiv.org/abs/2606.15971",
+      "refs": [
+        "c1",
+        "c3",
+        "c4",
+        "c5",
+        "c6",
+        "c7",
+        "c13"
+      ],
+      "quals": [
+        "c3#1",
+        "c5#1",
+        "c6#1",
+        "c7#1"
+      ]
+    },
+    "last": {
+      "text": "分工之後，SAG 的成績到底從哪來？此系列的後續 post 會講。\n文章：datasciocean.com/paper-intro/sag\n同系列：Multi-Hop 推理，一定要先建知識圖譜嗎？\nhttps://www.threads.com/@datasciocean/post/De5vTr5E64N\n同系列：SAG 的成績從哪來？（尚未發布）\n同系列：SAG 付出了什麼代價？（尚未發布）",
+      "refs": [
+        "c1"
+      ],
+      "link": "https://datasciocean.com/paper-intro/sag/"
+    }
+  },
+  "caption": {
+    "first": "SAG 是一種 RAG 檢索做法：SQL 串事件、向量補語意、LLM 只在候選縮小後才出場",
+    "first_refs": [
+      "c1",
+      "c3",
+      "c4",
+      "c6"
+    ],
+    "nav": "完整文章請在 datasciocean.com 搜尋「SAG：拋開離線知識圖譜，查詢時用 SQL 連事件」",
+    "hashtags": [
+      "DSO_SAG",
+      "SAG",
+      "RAG",
+      "MultiHop",
+      "SQL"
+    ]
+  },
+  "latin_allow": [
+    "arxiv.org",
+    "abs",
+    "TSMC",
+    "Multi-Hop"
+  ]
+}

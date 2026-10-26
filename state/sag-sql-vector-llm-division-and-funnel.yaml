@@ -1,0 +1,23 @@
+concept: sag-sql-vector-llm-division-and-funnel
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: sag-sql-vector-llm-division-and-funnel:ig_carousel
+  format: ig_carousel
+  series_id: sag
+  url: https://www.instagram.com/p/De8MXyVGDo8/
+  published_at: 2026-10-26T02:20:30+0000
+  hook_type: 反直覺斷言
+  mentions: []
+  backfilled: []
+- post_id: sag-sql-vector-llm-division-and-funnel:threads_thread
+  format: threads_thread
+  series_id: sag
+  url: https://www.threads.com/@datasciocean/post/De8MzobmMZi
+  published_at: 2026-10-26T02:23:25+0000
+  hook_type: 反直覺斷言
+  mentions: []
+  backfilled: []

@@ -42,7 +42,7 @@ def check_fields(d: dict) -> None:
     if bad:
         raise ValueError(f"投影片有不認得的欄位（要新增欄位，請先讓 build_package 輸出它並加測試）：{bad}")
 LAYOUT_NAME = {"cover": "封面", "context": "脈絡", "text": "文字", "table": "對照表", "chart_bars": "橫條圖",
-               "chart_sounding": "測深圖", "diagram": "示意圖", "takeaway": "帶走", "series_map": "系列地圖"}
+               "chart_sounding": "測深圖", "diagram": "示意圖", "takeaway": "帶走", "series_map": "系列地圖", "recap": "前情回顧"}
 mark = lambda s: re.sub(r"\[\[(.+?)\]\]", r"\1", s)
 
 
@@ -124,6 +124,8 @@ def slide_lines(sl: dict, with_refs: bool) -> list[str]:
         out.append(f"圖註：{sl['note']}")
     for cid in sl.get("items", []):
         out.append(f"延伸閱讀：{planned_title_of(cid)}")
+    if sl["layout"] in ("recap", "series_map") and sl.get("current"):     # 標題與細節來自系列檔（結構，不是主張），審查者要看得到
+        out += [f"系列第 {k} 則：{m['planned_title']}" + (f"｜細節：{m['summary']}" if m.get("summary") else "") + ("（這一則）" if m["concept"] == sl["current"] else "") for k, m in recap_members(_CUR_DOC, sl, all_=sl["layout"] == "series_map")]
     if sl.get("nav"):
         out.append(f"導流行：{sl['nav']}")
     if with_refs:
@@ -131,7 +133,19 @@ def slide_lines(sl: dict, with_refs: bool) -> list[str]:
     return out
 
 
+_CUR_DOC: dict = {}      # slide_lines 要查系列檔時用的目前貼文（review_files 設定）
+
+
+def recap_members(d: dict, sl: dict, all_: bool = False):
+    """回顧頁：這一則與它之前的各則；系列地圖：全部（all_）。回傳 [(第幾則, 系列檔成員)]。"""
+    s = load_series(d.get("series"))
+    ms = s["members"]
+    cu = [m["concept"] for m in ms].index(sl["current"])
+    return [(k + 1, m) for k, m in enumerate(ms) if all_ or k <= cu]
+
+
 def review_files(d: dict, build: Path) -> None:
+    _CUR_DOC.clear(); _CUR_DOC.update(d)
     for with_refs, name in ((True, "post-with-refs.md"), (False, "post-reader.md")):
         L = [f"# 貼文：{d['concept']}（{d['lang']}）", "", f"## IG 輪播（共 {len(d['slides'])} 張）"]
         for i, sl in enumerate(d["slides"], 1):
@@ -205,8 +219,12 @@ def ig_md(d: dict, title: str, series_name: str | None, alts: dict) -> str:
             if sl.get("question"):
                 L.append(f"- **先問的問題**：{sl['question']}")
             L.append(f"- **一句話**：{mark(sl['title'])}")
+        elif sl["layout"] == "recap":
+            L += [f"- **主標**：{mark(sl['title'])}"] + [f"- **第 {k} 則**：{m['planned_title']}　{m['summary']}" for k, m in recap_members(d, sl)]
         elif sl["layout"] == "series_map":
             L += [f"- **主標**：{mark(sl['title'])}"] + [f"- **延伸閱讀**：{planned_title_of(c)}" for c in sl.get("items", [])] + [f"- **導流行**：{sl.get('nav', '')}"]
+            if not sl.get("items"):
+                L += [f"- **第 {k} 則**：{m['planned_title']}" + (f"　{m['summary']}" if m.get("summary") else "") for k, m in recap_members(d, sl, all_=True)]
         else:
             if sl.get("label"):
                 L.append(f"- **小標籤**：{sl['label']}")
