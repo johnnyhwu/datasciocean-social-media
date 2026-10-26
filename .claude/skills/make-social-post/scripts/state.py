@@ -88,6 +88,7 @@ def status() -> None:
 def set_format(concept: str, fmt: str, **fields) -> None:
     assert concept in concept_ids(), f"觀念不存在：{concept}"
     assert fields["status"] in STATUSES
+    assert fmt in FORMATS, f"格式名不對：{fmt}（要用 {' 或 '.join(FORMATS)}）"
     d = load(concept)
     d["formats"][fmt] = fields
     save(d)
@@ -100,6 +101,7 @@ def set_format(concept: str, fmt: str, **fields) -> None:
 
 def record(concept: str, fmt: str, url: str, published_at: str, series_id: str | None, hook_type: str | None,
            mentions: list[str]) -> None:
+    assert fmt in FORMATS, f"格式名不對：{fmt}（要用 {' 或 '.join(FORMATS)}）"
     d = load(concept)
     pid = f"{concept}:{fmt}"
     d["posts"] = [p for p in d["posts"] if p["post_id"] != pid]

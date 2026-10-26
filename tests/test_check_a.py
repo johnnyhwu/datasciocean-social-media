@@ -37,7 +37,7 @@ def standalone(s):
 
 
 # 有「標題＋細節」（summary）的系列：把 fixtures 的系列檔每個成員補上 summary（回顧頁與系列地圖用；缺一個就要報錯）
-def series_with_summary(drop_one=False):
+def series_with_summary(drop_one=False, long_one=False):
     d = tempfile.mkdtemp()
     src = FX / "series" / "jev-teardown" / "series.md"
     (Path(d) / "jev-teardown").mkdir()
@@ -45,7 +45,7 @@ def series_with_summary(drop_one=False):
     for k, line in enumerate([l for l in txt.split("\n") if l.startswith("    planned_title:")]):
         if drop_one and k == 1:
             continue
-        txt = txt.replace(line, line + f"\n    summary: 第 {k + 1} 則的細節", 1)
+        txt = txt.replace(line, line + f"\n    summary: 第 {k + 1} 則的細節" + ("很長" * 40 if long_one and k == 1 else ""), 1)
     (Path(d) / "jev-teardown" / "series.md").write_text(txt, encoding="utf-8")
     return d
 
@@ -125,7 +125,7 @@ def main():
         fails += not caught
         print(("PASS " if caught else "FAIL ") + f"抓得到：{name}" + ("" if caught else f"  [預期含 {expect!r}]\n{out}"))
     # 回顧頁（系列第 2 則以後的第 2 頁，2026-10-25）
-    SS, SS_DROP = series_with_summary(), series_with_summary(drop_one=True)
+    SS, SS_DROP, SS_LONG = series_with_summary(), series_with_summary(drop_one=True), series_with_summary(long_one=True)
     recap_ok = mut(GOOD_B, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["slides"].insert(1, copy.deepcopy(RECAP))))
     for name, spec, sd, expect in (
             ("正確的貼文：系列第 2 則、第 2 頁是回顧頁、系列檔有 summary（必須通過，測誤殺）", recap_ok, SS, None),
@@ -134,7 +134,8 @@ def main():
             ("抓得到：系列第 1 則放了回顧頁", mut(GOOD_A, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["slides"].insert(1, {**RECAP, "current": "jev-overview"}))), SS, "沒有「前面介紹過」"),
             ("抓得到：回顧頁不在第 2 頁", mut(GOOD_B, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["slides"].insert(3, copy.deepcopy(RECAP)))), SS, "回顧頁固定放第 2 頁"),
             ("抓得到：回顧頁的 current 不是這一則", mut(recap_ok, lambda s: s["slides"][1].update(current="jev-overview")), SS, "current 要是這一則"),
-            ("抓得到：系列檔有成員沒有 summary", recap_ok, SS_DROP, "沒有 summary")):
+            ("抓得到：系列檔有成員沒有 summary", recap_ok, SS_DROP, "沒有 summary"),
+            ("抓得到：系列檔 summary 太長（第 4 則放不下）", recap_ok, SS_LONG, "超過")):
         code, out = run(spec, sd)
         ok = (code == 0) if expect is None else (code != 0 and expect in out)
         fails += not ok

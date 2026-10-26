@@ -14,10 +14,10 @@ members:
     summary: SQL 串事件、向量補語意，候選縮到 100 個以內後，才由 LLM 決選。   # 系列地圖與第 2 頁回顧顯示的細節；依該則的卡寫，發布前由忠實者審過一次
   - concept: sag-results-and-gain-source
     planned_title: SAG 的成績從哪來？
-    summary: 績效大頭來自 SQL 檢索管線，不是超邊本身（MuSiQue 上的實驗）；最難的 MuSiQue 上，同樣的 embedding 下領先 HippoRAG 2 近 15 個百分點。   # 系列地圖與第 2 頁回顧顯示的細節；依該則的卡寫，發布前由忠實者審過一次
+    summary: MuSiQue 上，成績主要靠 SQL 檢索流程、不是超邊本身；同樣向量模型下，找回率領先對照組近 15 個百分點。   # 系列地圖與第 2 頁回顧顯示的細節；依該則的卡寫，發布前由忠實者審過一次
   - concept: sag-tradeoffs-price-paid
     planned_title: SAG 付出了什麼代價？
-    summary: 固定剪枝預算會漏掉罕見實體、不做別名合併會稀釋連結、目前不支援更新。   # 系列地圖與第 2 頁回顧顯示的細節；依該則的卡寫，發布前由忠實者審過一次
+    summary: 為了簡單、寫入快，SAG 付了三個代價：固定名額漏掉罕見實體、同實體寫法不同時連結可能變少、目前不能更新資料。   # 系列地圖與第 2 頁回顧顯示的細節；依該則的卡寫，發布前由忠實者審過一次
 hashtag: DSO_SAG
 members_locked: true   # 2026-10-25 鎖定：人要求先發第 1 則（第 2～4 則 spec 尚未做）；成員與 planned_title 之後不能再動
 status: planning

@@ -22,6 +22,7 @@ hook_min_styles: 3
 review_max_rounds: 3
 min_stock: 7
 lang: zh-TW
+series_summary_max_chars: 58     # 系列檔每則的 summary 上限（回顧頁與系列地圖每則最多 2 行；第 4 則要放得下 4 列）
 structure_text_max_chars: 12        # 實作新增（待人確認）：「結構」區塊字數上限
 # 比較詞與全稱詞詞表。出現在貼文卻不在引用主張原文中就退回
 comparative_words: [更, 最, 都, 全, 幾乎, 常常, 總是, 從不, 沒贏, 遠不如, 大幅, 完全, 一定]

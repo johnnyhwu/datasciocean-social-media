@@ -264,6 +264,8 @@ def main(spec_path: str) -> int:
         for m in series["members"]:
             if not m.get("summary"):
                 err.append(f"slide{i:02d}({sl['layout']}): 系列檔成員 {m['concept']} 沒有 summary（標題下的細節）")
+            elif len(m["summary"]) > P["series_summary_max_chars"]:
+                err.append(f"系列檔 summary {m['concept']}: {len(m['summary'])} 字，超過 {P['series_summary_max_chars']}（回顧頁要放得下 4 列）")
             else:
                 for old_, new_ in terms.items():
                     if old_ in m["summary"]:

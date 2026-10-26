@@ -809,8 +809,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         svg, out, yend = series_rows(series["members"], cur, 330, labels=True, upto=cur + 1)
         if yend > 1170:
             raise ValueError(f"回顧頁放不下：列到 y={yend}，上限 1170；縮短 summary 或減少列數")
-        jsvg, jout = series_journey(series["members"], cur, max(yend + 130, 900))
-        svg, out = svg + jsvg, out + jout
+        if yend + 130 <= 1190:       # 列多（第 4 則）時下面放不下路線，就不放；最後一頁的系列地圖有
+            jsvg, jout = series_journey(series["members"], cur, max(yend + 130, 900))
+            svg, out = svg + jsvg, out + jout
         kw["SVG"], kw["ITEMS"] = svg_wrap(svg), out
     elif lay == "series_map" and all(m.get("summary") for m in series["members"]):     # 標題加細節
         cur = [m["concept"] for m in series["members"]].index(spec["current"])

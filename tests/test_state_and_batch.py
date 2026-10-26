@@ -122,5 +122,28 @@ with tempfile.TemporaryDirectory() as d:
         sp.write_text(json.dumps(_new, ensure_ascii=False), encoding="utf-8")
         check("spec_diff：改了之後結束碼 1", SD.main(["x", str(sp)]) == 1)
 
+# spec_diff：審查後圖變了（改圖型程式、數量、符號）也要被抓到
+with tempfile.TemporaryDirectory() as d:
+    pack = Path(d)
+    (pack / "_build").mkdir()
+    (pack / "ig").mkdir()
+    sp = pack / "_build" / "spec.json"
+    sp.write_text(json.dumps(_old, ensure_ascii=False), encoding="utf-8")
+    (pack / "ig" / "01.png").write_bytes(b"a")
+    (pack / "ig" / "02.png").write_bytes(b"b")
+    with contextlib.redirect_stdout(io.StringIO()) as _buf:
+        SD.main(["x", str(sp), "--mark"])
+        check("spec_diff：圖沒變 → 結束碼 0", SD.main(["x", str(sp)]) == 0)
+        (pack / "ig" / "02.png").write_bytes(b"c")
+        rc = SD.main(["x", str(sp)])
+    check("spec_diff：圖變了 → 結束碼 1 並列出哪一張", rc == 1 and "圖變了：02" in _buf.getvalue(), _buf.getvalue())
+
+# state：格式名打錯要報錯（曾經默默建出錯誤的 state 檔）
+try:
+    S.set_format("schema-valid-not-correct", "ig", status="ready", pack="x")
+    check("state：格式名打錯會報錯", False)
+except AssertionError:
+    check("state：格式名打錯會報錯", True)
+
 print(f"\n{'全部通過' if not fails else f'{len(fails)} 項失敗：' + '; '.join(fails)}")
 sys.exit(1 if fails else 0)
