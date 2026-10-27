@@ -1,0 +1,12 @@
+{"slides":[{"slide":7,"items":[
+{"what":"資料集與指標範圍：MuSiQue、Recall@5","reproduced":"補充「MuSiQue 上看 Recall@5」；圖註「Recall@5：前 5 筆找回的比例；MuSiQue 上」","original_position":"表頭最上方跨欄標題；第二列欄位標題的第三欄","original":"表頭 MuSiQue；欄位 R@1、R@2、R@5、R@10；取用的是 R@5 欄","in_claim":"這個消融（完整事件對三元組）是在 MuSiQue 上做的（來源：圖說）","verdict":"一致"},
+{"what":"橫條「SAG 拆成三元組」77.1%","reproduced":"強調橫條，標 77.1%，補充文字「拆成三元組的 SAG 仍有 77.1%」","original_position":"表格資料第一列「Triple」、R@5 欄","original":"77.1（非粗體；同列 35.6、61.5、77.1、81.2）","in_claim":"把 SAG 強行拆成三元組來跑，Recall@5 從 80.0% 掉到 77.1%","verdict":"一致"},
+{"what":"橫條「SAG 完整事件」80%","reproduced":"橫條標 80%","original_position":"表格資料第二列「Hyperedge」、R@5 欄（粗體）","original":"80.0（同列 36.2、64.1、80.0、83.4）","in_claim":"Recall@5 從 80.0% 掉到 77.1%","verdict":"一致"},
+{"what":"列名對應：Triple → 「SAG 拆成三元組」；Hyperedge → 「SAG 完整事件」；主標「拆掉超邊」","reproduced":"「SAG 拆成三元組」「SAG 完整事件」「拆掉超邊」","original_position":"表格第一欄列名 Triple、Hyperedge","original":"Triple、Hyperedge（欄名 Configuration）","in_claim":"把 SAG 強行拆成三元組來跑；這個消融（完整事件對三元組）","verdict":"僅來自主張"},
+{"what":"橫條「HippoRAG 2」65.1%","reproduced":"橫條標 65.1%","original_position":"原圖表二沒有 HippoRAG 2 這一列","original":"沒有","in_claim":"就算拆成三元組，77.1% 依然大幅贏過 HippoRAG 2 的 65.1%","verdict":"僅來自主張"},
+{"what":"主標與補充「大幅贏過 HippoRAG 2」","reproduced":"主標「拆掉超邊，SAG 依然大幅贏過 HippoRAG 2」；補充「大幅贏過 HippoRAG 2 的 65.1%」","original_position":"原圖沒有 HippoRAG 2，也沒有「贏過」的比較","original":"沒有","in_claim":"就算拆成三元組，77.1% 依然大幅贏過 HippoRAG 2 的 65.1%","verdict":"僅來自主張"},
+{"what":"補充句「就算拆掉超邊，這套用 SQL JOIN 連事件的檢索管線本身仍有系統性優勢」","reproduced":"補充文字最後一句","original_position":"原圖是只有兩列四欄數字的表，無此判斷","original":"沒有","in_claim":"SAG 這套 SQL 檢索管線本身就有系統性優勢，跟用不用超邊無關（c13）；SAG 的結構收益主要來自字串精確匹配的 SQL JOIN（c1）","verdict":"僅來自主張"},
+{"what":"圖註「Recall@5：前 5 筆找回的比例」","reproduced":"圖註名詞解釋","original_position":"原圖沒有此說明","original":"沒有","in_claim":"（名詞說明，what 註明；非主張數字或關係）","verdict":"僅來自主張"},
+{"what":"橫條長度與軸（從 0 起、長度與數值成正比）","reproduced":"三條橫條自同一左緣起，長度比例與 65.1／77.1／80 相符","original_position":"原圖為表格，無長條","original":"沒有（純排版呈現，數值皆取自上列表格或主張）","in_claim":"","verdict":"一致"},
+{"what":"省略原圖 R@1、R@2、R@10 三欄","reproduced":"只呈現 R@5，圖註與補充已標明「Recall@5」","original_position":"原圖第二列欄位標題全部四欄","original":"R@1、R@2、R@5、R@10；Hyperedge 在四欄皆高於 Triple","in_claim":"Recall@5 從 80.0% 掉到 77.1%","verdict":"一致"}
+],"errors":[]}]}

@@ -1,0 +1,40 @@
+{
+  "slides": [
+    {"slide": 5,
+     "items": [
+       {"what": "MuSiQue 的 SAG Recall@2 / Recall@5", "reproduced": "64.1 / 80.0", "original_position": "表一 Graph-based Methods 區、SAG (Ours) 列、MuSiQue 欄", "original": "64.1 / 80.0", "in_claim": "MuSiQue 上 SAG 的 Recall@2 / Recall@5 是 64.1 / 80.0", "verdict": "一致"},
+       {"what": "MuSiQue 的 HippoRAG 2 Recall@2 / Recall@5", "reproduced": "49.5 / 65.1", "original_position": "表一 Graph-based Methods 區、HippoRAG 2 (BGE-Large-EN-v1.5) 列、MuSiQue 欄", "original": "49.5 / 65.1", "in_claim": "HippoRAG 2 是 49.5 / 65.1", "verdict": "一致"},
+       {"what": "HotpotQA 的 SAG Recall@2 / Recall@5", "reproduced": "91.6 / 96.5", "original_position": "表一 SAG (Ours) 列、HotpotQA 欄", "original": "91.6 / 96.5", "in_claim": "HotpotQA 上 SAG 的 Recall@2 / Recall@5 是 91.6 / 96.5", "verdict": "一致"},
+       {"what": "HotpotQA 的 HippoRAG 2 Recall@2 / Recall@5", "reproduced": "78.4 / 94.4", "original_position": "表一 HippoRAG 2 列、HotpotQA 欄", "original": "78.4 / 94.4", "in_claim": "HippoRAG 2 是 78.4 / 94.4", "verdict": "一致"},
+       {"what": "2WikiMultiHopQA 的 SAG Recall@2 / Recall@5", "reproduced": "82.3 / 88.0", "original_position": "表一 SAG (Ours) 列、2Wiki 欄", "original": "82.3（粗體）/ 88.0（非粗體）", "in_claim": "SAG 的 Recall@2 領先（82.3 對 76.6），Recall@5 卻落後（88.0 對 90.4）", "verdict": "一致"},
+       {"what": "2WikiMultiHopQA 的 HippoRAG 2 Recall@2 / Recall@5", "reproduced": "76.6 / 90.4", "original_position": "表一 HippoRAG 2 列、2Wiki 欄", "original": "76.6 / 90.4（90.4 粗體）", "in_claim": "82.3 對 76.6 ... 88.0 對 90.4", "verdict": "一致"},
+       {"what": "虛線框標示 2Wiki Recall@5 是 SAG 唯一輸的一格", "reproduced": "2WikiMultiHopQA Recall@5 格為虛線框，圖註「虛線框＝SAG 唯一輸的一格」", "original_position": "表一 2Wiki 欄：HippoRAG 2 的 90.4 粗體、SAG 的 88.0 非粗體；其餘各欄 SAG 粗體", "original": "只有這一格 SAG 不是粗體（落後 HippoRAG 2）", "in_claim": "2WikiMultiHopQA 是 SAG 唯一輸的一格", "verdict": "一致"},
+       {"what": "列標籤「最難的一組」「只要連 2 跳」「實體鏈很長」", "reproduced": "MuSiQue 最難的一組；HotpotQA 只要連 2 跳；2WikiMultiHopQA 實體鏈很長", "original_position": "表一沒有這類描述", "original": "沒有", "in_claim": "MuSiQue 最難（4 跳且經反事實過濾）、HotpotQA 是 2 跳、2WikiMultiHopQA 是長實體鏈", "verdict": "僅來自主張"},
+       {"what": "圖註 80.0 − 65.1 ≈ 15 個百分點", "reproduced": "80.0 − 65.1 ≈ 15 個百分點", "original_position": "表一 MuSiQue 欄 SAG 80.0、HippoRAG 2 65.1（差 14.9）", "original": "80.0 與 65.1", "in_claim": "領先近 15 個百分點", "verdict": "一致"},
+       {"what": "圖例與範圍（只畫 SAG 與 HippoRAG 2、只取 Recall@2/@5）", "reproduced": "圖例標明 SAG 與 HippoRAG 2；欄標 Recall@2、Recall@5；補充文字註明同一個 BGE-Large embedding；未畫 Simple Baselines、Large Embedding Models、Avg 欄", "original_position": "表一全表（含三組 baseline 與 Avg 欄）", "original": "原表另有其他 baseline 與 Avg 欄；SAG 在 2Wiki Recall@5 只輸 HippoRAG 2，仍勝其他 baseline", "in_claim": "主要對照是 HippoRAG 2，兩者用同一個 BGE-Large embedding", "verdict": "一致"},
+       {"what": "橫條長度與數值成正比（逐條量過，Recall@2 欄約 1.7 px/單位、Recall@5 欄約 1.7 px/單位，各條一致）", "reproduced": "各條長度與印出的數字成正比，同單位跨列可比", "original_position": "原圖為表格、無長條", "original": "沒有（長條是示意）", "in_claim": "", "verdict": "僅來自主張"}
+     ],
+     "errors": []},
+    {"slide": 8,
+     "items": [
+       {"what": "SAG 完整事件（Hyperedge）Recall@5", "reproduced": "80.0%", "original_position": "表二 MuSiQue、Hyperedge 列、R@5 欄", "original": "80.0（粗體）", "in_claim": "Recall@5 從 80.0% 掉到 77.1%", "verdict": "一致"},
+       {"what": "SAG 拆成三元組（Triple）Recall@5", "reproduced": "77.1%", "original_position": "表二 MuSiQue、Triple 列、R@5 欄", "original": "77.1", "in_claim": "77.1% 依然大幅贏過 HippoRAG 2 的 65.1%", "verdict": "一致"},
+       {"what": "HippoRAG 2 的 Recall@5", "reproduced": "65.1%", "original_position": "表二沒有 HippoRAG 2（表二只有 Triple 與 Hyperedge 兩列）", "original": "沒有", "in_claim": "77.1% 依然大幅贏過 HippoRAG 2 的 65.1%", "verdict": "僅來自主張"},
+       {"what": "三條橫條的大小關係與比例", "reproduced": "HippoRAG 2 < SAG 拆成三元組 < SAG 完整事件；長度與數值成正比（65.1 : 77.1 : 80.0，軸從 0 起，量過一致）", "original_position": "表二 R@5 欄（Triple 77.1 < Hyperedge 80.0）", "original": "77.1 < 80.0；65.1 在主張中", "in_claim": "Recall@5 從 80.0% 掉到 77.1%；77.1% 依然大幅贏過 HippoRAG 2 的 65.1%", "verdict": "一致"},
+       {"what": "範圍（只取 MuSiQue、只取 R@5，省略 R@1/R@2/R@10）", "reproduced": "補充文字與圖註標明 MuSiQue 與 Recall@5；不含其他指標", "original_position": "表二欄頭 MuSiQue 下 R@1、R@2、R@5、R@10", "original": "原表四個指標，皆為 MuSiQue", "in_claim": "這個消融（完整事件對三元組）是在 MuSiQue 上做的", "verdict": "一致"},
+       {"what": "圖註：Recall@5 的白話說明", "reproduced": "Recall@5：前 5 筆結果裡，抓到幾成答案需要的資料", "original_position": "表二欄頭 R@5", "original": "只有縮寫 R@5", "in_claim": "", "verdict": "僅來自主張"}
+     ],
+     "errors": []},
+    {"slide": 10,
+     "items": [
+       {"what": "SAG 換成 NV-Embed-v2 的 Recall@5", "reproduced": "81.7%", "original_position": "表四 MuSiQue、SAG (NV-Embed-v2) 列、R@5 欄", "original": "81.7（粗體）", "in_claim": "SAG 從 80.0 升到 81.7（+1.7）", "verdict": "一致"},
+       {"what": "HippoRAG 2 換成 NV-Embed-v2 的 Recall@5", "reproduced": "74.6%", "original_position": "表四 MuSiQue、HippoRAG 2 (NV-Embed-v2) 列、R@5 欄", "original": "74.6", "in_claim": "HippoRAG 2 的 Recall@5 從 65.1 升到 74.6（+9.5）", "verdict": "一致"},
+       {"what": "原本 BGE-Large 的 HippoRAG 2 Recall@5", "reproduced": "65.1%", "original_position": "表四沒有 BGE-Large 的數字", "original": "沒有（表四只有 NV-Embed-v2 兩列）", "in_claim": "HippoRAG 2 的 Recall@5 從 65.1 升到 74.6", "verdict": "僅來自主張"},
+       {"what": "原本 BGE-Large 的 SAG Recall@5", "reproduced": "80.0%", "original_position": "表四沒有 BGE-Large 的數字", "original": "沒有", "in_claim": "SAG 從 80.0 升到 81.7", "verdict": "僅來自主張"},
+       {"what": "進步幅度標示", "reproduced": "HippoRAG 2 進步 9.5 個百分點；SAG 進步 1.7 個百分點", "original_position": "表四兩列 R@5（74.6、81.7）", "original": "原圖沒有差值欄", "in_claim": "（+9.5）...（+1.7）", "verdict": "僅來自主張"},
+       {"what": "兩對橫條長度與圖例", "reproduced": "圖例淺青＝原本 BGE-Large、深色＝換成 NV-Embed-v2；每組上條淺、下條深；長度與數值成正比（65.1 : 74.6 : 80.0 : 81.7，軸從 0 起，量過一致）", "original_position": "表四欄頭 MuSiQue、R@5", "original": "兩列皆為 NV-Embed-v2；BGE-Large 的值不在表四", "in_claim": "把 embedding 從 BGE-Large 換成更強的 NV-Embed-v2", "verdict": "一致"},
+       {"what": "範圍（MuSiQue、只取 R@5）", "reproduced": "補充文字標明 MuSiQue 上；圖註標明 Recall@5", "original_position": "表四欄頭 MuSiQue，R@1/R@2/R@5/R@10", "original": "MuSiQue，四個指標", "in_claim": "這個換 embedding 的實驗是在 MuSiQue 上做的", "verdict": "一致"}
+     ],
+     "errors": []}
+  ]
+}

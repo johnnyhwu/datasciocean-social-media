@@ -1,0 +1,597 @@
+{
+  "post": "sag-results-and-gain-source",
+  "blocks": [
+    {
+      "block": "封面 hook",
+      "atoms": [
+        {
+          "text": "主標「SAG 贏在超邊，還是贏在 SQL？」是在問功勞歸誰（疑問式）",
+          "verdict": "完全支持",
+          "card_quote": "論文的招牌是超邊，但績效的大頭其實來自管線設計",
+          "note": "疑問式 hook，答案在內文由 c1/c13 支持"
+        },
+        {
+          "text": "MuSiQue 上 SAG 的找回率領先 HippoRAG 2 近 15 個百分點",
+          "verdict": "完全支持",
+          "card_quote": "MuSiQue 上領先近 15 個百分點",
+          "note": "Recall@2 差 14.6、Recall@5 差 14.9，與卡的「近 15」一致；比較對象與資料集都寫明"
+        },
+        {
+          "text": "這個 RAG 做法的績效大頭來自 SQL 檢索流程",
+          "verdict": "完全支持",
+          "card_quote": "也就是說，SAG 這套 SQL 檢索管線本身就有系統性優勢，跟用不用超邊無關",
+          "note": "c1 寫「管線設計」、c13 寫「SQL 檢索管線」，流程＝管線，意思相同；為部落格判斷，直述可；封面未重述 MuSiQue 範圍，但 MuSiQue 消融限定在第 7、9 張與 Threads 正文出現，符合 (a)(c)"
+        },
+        {
+          "text": "論文網址 arxiv.org/abs/2606.15971",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "放行項（書目資訊），不對證"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 1 張",
+      "atoms": [
+        {
+          "text": "（同封面）SAG 贏在超邊，還是贏在 SQL？",
+          "verdict": "完全支持",
+          "card_quote": "論文的招牌是超邊，但績效的大頭其實來自管線設計",
+          "note": "同封面 hook"
+        },
+        {
+          "text": "MuSiQue 找回率領先 HippoRAG 2 近 15 個百分點",
+          "verdict": "完全支持",
+          "card_quote": "MuSiQue 上領先近 15 個百分點",
+          "note": "同封面"
+        },
+        {
+          "text": "績效大頭來自 SQL 檢索流程",
+          "verdict": "完全支持",
+          "card_quote": "也就是說，SAG 這套 SQL 檢索管線本身就有系統性優勢，跟用不用超邊無關",
+          "note": "同封面"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 2 張",
+      "atoms": [
+        {
+          "text": "第 3 則細節：MuSiQue 上，成績主要靠 SQL 檢索流程、不是超邊本身",
+          "verdict": "完全支持",
+          "card_quote": "也就是說，SAG 這套 SQL 檢索管線本身就有系統性優勢，跟用不用超邊無關",
+          "note": "c1「績效的大頭」＝主要；c13「跟用不用超邊無關」；限定在 MuSiQue，與 c1/c13 的消融範圍一致"
+        },
+        {
+          "text": "同樣向量模型下，找回率領先對照組近 15 個百分點",
+          "verdict": "完全支持",
+          "card_quote": "MuSiQue 上領先近 15 個百分點",
+          "note": "對照組＝HippoRAG 2，同一個 BGE-Large（c4/c5），數字與卡一致"
+        },
+        {
+          "text": "第 1、2 則的細節",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "屬別張卡，依指示不對證"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 3 張",
+      "atoms": [
+        {
+          "text": "SAG 線下不建圖，只存事件加實體標籤；查詢時才用 SQL JOIN 把共用實體的事件連起來",
+          "verdict": "完全支持",
+          "card_quote": "線下不建圖，只把每個 chunk 轉成一個保留完整語意的「事件」加上一組實體標籤，寫進標準 SQL 資料庫；線上查詢時再用 SQL JOIN 把共用實體的事件動態串起來",
+          "note": "c2 原句"
+        },
+        {
+          "text": "HippoRAG 2 是 GraphRAG 這類做法：線下建全域知識圖譜，並在圖上傳分數",
+          "verdict": "部分支持",
+          "card_quote": "GraphRAG、HippoRAG 這類方法在線下用 LLM 抽三元組、建全域知識圖譜。",
+          "note": "c3 說的是「HippoRAG」，卡沒有說 HippoRAG 2 也是同一類、同樣機制；表列標題寫 HippoRAG 2 卻套 c3 的描述"
+        },
+        {
+          "text": "Recall@K 白話定義、embedding 白話定義",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "放行項 2（通用名詞說明，卡的名詞補充小節也有）"
+        },
+        {
+          "text": "SAG 的成績要拿來跟 HippoRAG 2 比",
+          "verdict": "完全支持",
+          "card_quote": "重點看跟 HippoRAG 2 的差距（兩者用同一個 BGE-Large embedding）",
+          "note": "c4：主要對照是 HippoRAG 2"
+        }
+      ],
+      "errors": [
+        "其他"
+      ]
+    },
+    {
+      "block": "第 4 張",
+      "atoms": [
+        {
+          "text": "MuSiQue 上 SAG 領先近 15 個百分點，且 MuSiQue 是最難的一組",
+          "verdict": "完全支持",
+          "card_quote": "MuSiQue 上領先近 15 個百分點",
+          "note": "c5 領先近 15；c4「MuSiQue | 最難，4 跳且經反事實過濾」"
+        },
+        {
+          "text": "三個 Multi-Hop 問答資料集：MuSiQue、HotpotQA（2 跳，橋樑與比較型問題）、2WikiMultiHopQA（長實體鏈，含罕見橋樑）",
+          "verdict": "完全支持",
+          "card_quote": "HotpotQA | 2 跳，橋樑與比較型問題",
+          "note": "c4 三筆說明逐項對得上；多跳→Multi-Hop 為用語替換"
+        },
+        {
+          "text": "兩邊用同一個 BGE-Large embedding",
+          "verdict": "完全支持",
+          "card_quote": "兩者用同一個 BGE-Large embedding",
+          "note": "c4"
+        },
+        {
+          "text": "MuSiQue：SAG 64.1 / 80.0，HippoRAG 2 49.5 / 65.1",
+          "verdict": "完全支持",
+          "card_quote": "MuSiQue | 最難，4 跳且經反事實過濾 | 64.1 / 80.0 | 49.5 / 65.1",
+          "note": "六格順序與 Recall@2、Recall@5 欄位對應正確"
+        },
+        {
+          "text": "HotpotQA：SAG 91.6 / 96.5，HippoRAG 2 78.4 / 94.4",
+          "verdict": "完全支持",
+          "card_quote": "HotpotQA | 2 跳，橋樑與比較型問題 | 91.6 / 96.5 | 78.4 / 94.4",
+          "note": "數字對得上"
+        },
+        {
+          "text": "2WikiMultiHopQA：SAG 82.3 / 88.0，HippoRAG 2 76.6 / 90.4；SAG 只輸 Recall@5 一格",
+          "verdict": "完全支持",
+          "card_quote": "2Wiki 是唯一輸的一格，而且輸得很有意思。 SAG 的 Recall@2 領先（82.3 對 76.6），Recall@5 卻落後（88.0 對 90.4）。",
+          "note": "唯一輸的一格＝2Wiki 的 Recall@5；虛線框位置（Recall@5 的 2Wiki 那格）一致；比較對象是 HippoRAG 2"
+        },
+        {
+          "text": "領先幾個百分點，就是兩個百分比相減",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "放行項 3（名詞說明）"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 5 張",
+      "atoms": [
+        {
+          "text": "MuSiQue 有 4 步邏輯鏈",
+          "verdict": "完全支持",
+          "card_quote": "它有 4 步邏輯鏈，還經過反事實過濾防止單步語意作弊",
+          "note": "c6；限定「有些題要跳 4 次，不是每題都 4 跳」在補充中一併寫出"
+        },
+        {
+          "text": "MuSiQue 有些題在二元圖譜上要跳 4 次，不是每題都 4 跳",
+          "verdict": "完全支持",
+          "card_quote": "MuSiQue 裡有些問題在二元圖譜上要跳 4 次才到得了答案",
+          "note": "c4#1／c6#1 限定條件；「一條邊只連兩點」為放行項 3 的白話"
+        },
+        {
+          "text": "MuSiQue 是最考驗連結能力的一組，經過反事實過濾、擋掉單步語意作弊",
+          "verdict": "完全支持",
+          "card_quote": "而且這是最考驗連結能力的一組——它有 4 步邏輯鏈，還經過反事實過濾防止單步語意作弊。",
+          "note": "c6 白話重述，意思相同；部落格判斷直述可"
+        },
+        {
+          "text": "HotpotQA 只有 2 跳，圖傳播的衰減本來就弱，所以 SAG 在 Recall@5 的領先縮小",
+          "verdict": "完全支持",
+          "card_quote": "HotpotQA 只有 2 跳，圖傳播的衰減效應本來就弱，所以 Recall@5 的差距縮到 2.1 個百分點。",
+          "note": "c9，部落格推論，貼文以直述句照卡寫，未寫成已驗證"
+        },
+        {
+          "text": "示意圖：MuSiQue 畫 4 跳、HotpotQA 畫 2 跳，箭頭越淡分數越弱",
+          "verdict": "部分支持",
+          "card_quote": "HotpotQA 只有 2 跳，圖傳播的衰減效應本來就弱，所以 Recall@5 的差距縮到 2.1 個百分點。",
+          "note": "跳數與 c4/c6/c9 一致；箭頭逐跳變淡表示衰減，卡只說 HotpotQA 因 2 跳衰減弱，未直接說 MuSiQue 的衰減程度；圖註已標「示意」，形狀未暗示卡上沒有的數據，僅屬輕微延伸"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 6 張",
+      "atoms": [
+        {
+          "text": "把 SAG 強行拆成三元組來跑，看成績掉多少，實驗在 MuSiQue 上",
+          "verdict": "完全支持",
+          "card_quote": "事件層級索引 vs. 三元組拆解索引的消融比較（MuSiQue）",
+          "note": "c12#1；c12 原文「強行拆成三元組」"
+        },
+        {
+          "text": "SAG 原本是一個事件綁住好幾個實體，這個綁定就是一條超邊",
+          "verdict": "完全支持",
+          "card_quote": "這個「事件 ↔ 實體集合」的綁定關係，本身就定義了一條超邊。",
+          "note": "c19"
+        },
+        {
+          "text": "三元組：一條邊只連兩個點；超邊：圈住好幾個實體",
+          "verdict": "完全支持",
+          "card_quote": "一條超邊可以同時包含任意數量的節點",
+          "note": "c19；「三元組＝兩點」為用白話重述二元（c4#1），不改意思"
+        },
+        {
+          "text": "例：張忠謀創立 TSMC／台灣三個實體",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "放行項 4：假設例子，圖註已標，沒有被寫成實驗內容，也未違背 c19 的機制"
+        },
+        {
+          "text": "標題「功勞是超邊嗎？」（疑問式）",
+          "verdict": "完全支持",
+          "card_quote": "也就是說，SAG 這套 SQL 檢索管線本身就有系統性優勢，跟用不用超邊無關",
+          "note": "答案在第 7 張，c13 支持"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 7 張",
+      "atoms": [
+        {
+          "text": "拆成三元組後 SAG 的 Recall@5 還有 77.1%，依然大幅贏過 HippoRAG 2 的 65.1%（MuSiQue）",
+          "verdict": "完全支持",
+          "card_quote": "就算拆成三元組，77.1% 依然大幅贏過 HippoRAG 2 的 65.1%",
+          "note": "c12，比較對象與資料集都寫明"
+        },
+        {
+          "text": "SAG 完整事件 Recall@5 為 80%",
+          "verdict": "完全支持",
+          "card_quote": "Recall@5 從 80.0% 掉到 77.1%",
+          "note": "c12；圖上寫 80 %（＝80.0），一致"
+        },
+        {
+          "text": "標題「拆掉超邊」＝把 SAG 拆成三元組",
+          "verdict": "部分支持",
+          "card_quote": "也就是說，SAG 這套 SQL 檢索管線本身就有系統性優勢，跟用不用超邊無關",
+          "note": "c13「跟用不用超邊無關」支持這個解讀，但「拆掉超邊」是貼文的簡稱，卡說的是「強行拆成三元組」；不改意思，僅提醒"
+        },
+        {
+          "text": "SAG 這套 SQL 檢索管線本身就有系統性優勢，跟用不用超邊無關",
+          "verdict": "完全支持",
+          "card_quote": "也就是說，SAG 這套 SQL 檢索管線本身就有系統性優勢，跟用不用超邊無關",
+          "note": "c13 原句，部落格判斷，直述可；MuSiQue 限定（c13#1）在補充與圖註出現"
+        },
+        {
+          "text": "圖註 Recall@5：前 5 筆找回的比例",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "放行項 2"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 8 張",
+      "atoms": [
+        {
+          "text": "在 MuSiQue 上，保留完整事件比拆成三元組的 SAG 另外多 2.9 個百分點",
+          "verdict": "完全支持",
+          "card_quote": "保留完整事件另外帶來 2.9 個百分點，因為一個事件記錄的是 N 元關係，不必像三元組那樣經歷多次 JOIN 走訪，也就少掉每一跳的剪枝損失。",
+          "note": "c14；80.0-77.1=2.9；MuSiQue 限定在補充中；補充未寫明指標是 Recall@5（見 gaps）"
+        },
+        {
+          "text": "一個事件記錄的是 N 元關係，不必像三元組那樣經歷多次 JOIN 走訪",
+          "verdict": "完全支持",
+          "card_quote": "保留完整事件另外帶來 2.9 個百分點，因為一個事件記錄的是 N 元關係，不必像三元組那樣經歷多次 JOIN 走訪，也就少掉每一跳的剪枝損失。",
+          "note": "c14 原句"
+        },
+        {
+          "text": "保留完整事件少掉每一跳的剪枝損失，漏掉的比較少",
+          "verdict": "完全支持",
+          "card_quote": "保留完整事件另外帶來 2.9 個百分點，因為一個事件記錄的是 N 元關係，不必像三元組那樣經歷多次 JOIN 走訪，也就少掉每一跳的剪枝損失。",
+          "note": "c14 部落格推論，貼文直述未寫成已驗證；「漏掉的比較少」是對「損失」的白話"
+        },
+        {
+          "text": "示意圖：拆成三元組「每走一跳 JOIN，就剪枝一次」",
+          "verdict": "部分支持",
+          "card_quote": "保留完整事件另外帶來 2.9 個百分點，因為一個事件記錄的是 N 元關係，不必像三元組那樣經歷多次 JOIN 走訪，也就少掉每一跳的剪枝損失。",
+          "note": "卡說「少掉每一跳的剪枝損失」，隱含每一跳都有損失；「就剪枝一次」把剪枝寫成每跳必發生，而卡 c1 的限定條件說實體剪枝是前線實體超過 50 個時才觸發（見 gaps）"
+        },
+        {
+          "text": "剪枝：只留排名靠前的候選，其他丟掉",
+          "verdict": "完全支持",
+          "card_quote": "前線實體超過 50 個時，計算它們跟 query 的向量相似度，強制只留 Top 50",
+          "note": "放行項 3 的白話說明，與卡的「只留 Top 50」一致"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 9 張",
+      "atoms": [
+        {
+          "text": "embedding 從 BGE-Large 換成更強的 NV-Embed-v2（MuSiQue、Recall@5）",
+          "verdict": "完全支持",
+          "card_quote": "把 embedding 從 BGE-Large 換成更強的 NV-Embed-v2：",
+          "note": "c15 與 c15#1"
+        },
+        {
+          "text": "HippoRAG 2 Recall@5 從 65.1 升到 74.6，進步 9.5 個百分點",
+          "verdict": "完全支持",
+          "card_quote": "HippoRAG 2 | 65.1 | 74.6 | +9.5",
+          "note": "74.6-65.1=9.5"
+        },
+        {
+          "text": "SAG 從 80（80.0）升到 81.7，只進步 1.7 個百分點",
+          "verdict": "完全支持",
+          "card_quote": "SAG | 80.0 | 81.7 | +1.7",
+          "note": "81.7-80.0=1.7；「只」是與 9.5 相比的語氣，數字有比較對象，卡的結論亦同（c1、c17）"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 10 張",
+      "atoms": [
+        {
+          "text": "HippoRAG 做 Multi-Hop 極度依賴向量打分；模型一弱，誤差會沿著傳播路徑放大",
+          "verdict": "完全支持",
+          "card_quote": "HippoRAG 的多跳極度依賴向量打分（圖上節點的初始分數就是向量相似度給的），模型一弱，誤差會沿著傳播路徑放大",
+          "note": "c16，部落格推論，貼文直述未寫成已驗證；多跳→Multi-Hop 為用語替換"
+        },
+        {
+          "text": "HippoRAG 圖上節點的初始分數是向量相似度給的",
+          "verdict": "完全支持",
+          "card_quote": "HippoRAG 的多跳極度依賴向量打分（圖上節點的初始分數就是向量相似度給的），模型一弱，誤差會沿著傳播路徑放大",
+          "note": "c16"
+        },
+        {
+          "text": "SAG 串事件靠的是字串精確匹配的 SQL JOIN；字串一模一樣才算共用同一個實體；確定性的精確比對",
+          "verdict": "完全支持",
+          "card_quote": "SAG 的結構收益主要來自字串精確匹配的 SQL JOIN，跟 embedding 品質基本無關。",
+          "note": "c1；「確定性」見 c7「用 SQL 做確定性的局部超邊鏈接」；範圍限於「串事件」，第二條等寬帶沒有暗示「SAG 完全不受向量影響」，向量的其他用途在第 11 張補上"
+        },
+        {
+          "text": "示意：楔形越寬，誤差越大；不是實驗數據",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "放行項 5；形狀只表達 c16 的放大，未暗示卡上沒有的結果"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 11 張",
+      "atoms": [
+        {
+          "text": "在 MuSiQue 上換 embedding 的實驗裡，SAG 依然維持得住",
+          "verdict": "完全支持",
+          "card_quote": "用比較弱、比較便宜的 embedding 模型，SAG 依然維持得住多步檢索的水準。",
+          "note": "c17；MuSiQue 限定（c17#4）寫明；「多步檢索的水準」被省略為較弱的說法，不放大"
+        },
+        {
+          "text": "結構收益跟 embedding 品質基本無關，不是整套都不用向量",
+          "verdict": "完全支持",
+          "card_quote": "SAG 的結構收益主要來自字串精確匹配的 SQL JOIN，跟 embedding 品質基本無關。",
+          "note": "c1 與其 qualifiers 一致"
+        },
+        {
+          "text": "串事件的結構收益靠字串精確匹配的 SQL JOIN",
+          "verdict": "完全支持",
+          "card_quote": "SAG 的結構收益主要來自字串精確匹配的 SQL JOIN，跟 embedding 品質基本無關。",
+          "note": "c1"
+        },
+        {
+          "text": "別名對齊（同一個東西不同寫法）推遲到線上，交給向量的模糊匹配",
+          "verdict": "完全支持",
+          "card_quote": "別名對齊的壓力被推遲到線上，交給向量的模糊匹配去處理。",
+          "note": "c1#1"
+        },
+        {
+          "text": "起點事件、擴展用的實體，超過上限時依向量相似度排序，只留排名靠前的",
+          "verdict": "部分支持",
+          "card_quote": "前線實體超過 50 個時，計算它們跟 query 的向量相似度，強制只留 Top 50",
+          "note": "擴展用實體剪枝（Top 50）與種子預算（超過 50 只留 Top 50）有對應；但卡的原句只說「種子預算」，沒有說種子是「起點事件」，也沒寫出上限是 50"
+        }
+      ],
+      "errors": [
+        "其他"
+      ]
+    },
+    {
+      "block": "第 12 張",
+      "atoms": [
+        {
+          "text": "先問：SAG 的成績，功勞到底是誰的？（疑問式）",
+          "verdict": "完全支持",
+          "card_quote": "論文的招牌是超邊，但績效的大頭其實來自管線設計",
+          "note": "帶走張先問問題再回答"
+        },
+        {
+          "text": "招牌是超邊，績效的大頭卻來自 SQL 檢索管線",
+          "verdict": "完全支持",
+          "card_quote": "論文的招牌是超邊，但績效的大頭其實來自管線設計",
+          "note": "c1 原句，管線設計＝SQL 檢索管線（c13）；為部落格判斷，直述可；MuSiQue 範圍在前幾張已寫明，符合封面可沒說完整原則"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 13 張",
+      "atoms": [
+        {
+          "text": "第 3 則細節：MuSiQue 上，成績主要靠 SQL 檢索流程、不是超邊本身；同樣向量模型下，找回率領先對照組近 15 個百分點",
+          "verdict": "完全支持",
+          "card_quote": "MuSiQue 上領先近 15 個百分點",
+          "note": "同第 2 張，c1/c13/c5"
+        },
+        {
+          "text": "第 1、2、4 則細節與標題、導流行",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "結構／別張卡，不對證"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "Threads 正文",
+      "atoms": [
+        {
+          "text": "SAG 在 MuSiQue 上找回率領先 HippoRAG 2 近 15 個百分點，兩邊用同一個 BGE-Large embedding",
+          "verdict": "完全支持",
+          "card_quote": "MuSiQue 上領先近 15 個百分點",
+          "note": "c5、c4"
+        },
+        {
+          "text": "論文的招牌是超邊，但績效的大頭其實來自管線設計",
+          "verdict": "完全支持",
+          "card_quote": "論文的招牌是超邊，但績效的大頭其實來自管線設計",
+          "note": "c1 逐字"
+        },
+        {
+          "text": "把 SAG 強行拆成三元組，Recall@5 從 80.0% 掉到 77.1%，依然大幅贏過 HippoRAG 2 的 65.1%",
+          "verdict": "完全支持",
+          "card_quote": "作者把 SAG 強行拆成三元組來跑，Recall@5 從 80.0% 掉到 77.1%。",
+          "note": "c12，80.0-77.1=2.9 掉幅，77.1>65.1；MuSiQue 限定在第二段「這些實驗都在 MuSiQue 上做」"
+        },
+        {
+          "text": "embedding 換成更強的，HippoRAG 2 進步 9.5 個百分點，SAG 只進步 1.7 個百分點",
+          "verdict": "完全支持",
+          "card_quote": "SAG | 80.0 | 81.7 | +1.7",
+          "note": "c15；Recall@5 於前句已寫明"
+        },
+        {
+          "text": "SAG 仍要用到向量：別名對齊、候選超過上限時的排序，都靠向量",
+          "verdict": "完全支持",
+          "card_quote": "別名對齊的壓力被推遲到線上，交給向量的模糊匹配去處理。",
+          "note": "c1#1–#3；「候選」對應卡上的「種子預算／實體剪枝」，意思相近"
+        },
+        {
+          "text": "Recall@5（前 5 筆找回的比例）、論文網址",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "放行項"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "Threads 最後一則",
+      "atoms": [
+        {
+          "text": "SAG 的成績從哪來？招牌是超邊，績效的大頭卻來自 SQL 檢索管線",
+          "verdict": "完全支持",
+          "card_quote": "論文的招牌是超邊，但績效的大頭其實來自管線設計",
+          "note": "c1；管線設計＝SQL 檢索管線（c13）"
+        },
+        {
+          "text": "它付出了什麼代價，此系列的後續 post 會講",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "系列結構，不對證"
+        },
+        {
+          "text": "文章網址、同系列連結",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "結構"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "caption",
+      "atoms": [
+        {
+          "text": "SAG 的績效大頭來自 SQL 檢索管線，不是超邊，跟 embedding 品質基本無關",
+          "verdict": "部分支持",
+          "card_quote": "SAG 的結構收益主要來自字串精確匹配的 SQL JOIN，跟 embedding 品質基本無關。",
+          "note": "卡的「跟 embedding 品質基本無關」限定在「結構收益」（字串精確匹配的 SQL JOIN）；caption 標題句把它接在「績效大頭」後面，讀起來像整體績效與 embedding 無關，並省略 MuSiQue；卡 c1 qualifiers 另說別名對齊、種子預算、實體剪枝仍靠向量，c15 顯示 SAG 換 embedding 仍進步 1.7"
+        },
+        {
+          "text": "條列：各張標題（最難的 MuSiQue 領先近 15、4 步邏輯鏈 vs 2 跳、拆成三元組仍大幅贏過 HippoRAG 2、保留完整事件、SAG 只進步 1.7、HippoRAG 誤差放大、較弱 embedding 維持得住）",
+          "verdict": "完全支持",
+          "card_quote": "MuSiQue 上領先近 15 個百分點",
+          "note": "各條與對應張數的支持一致；括號內有標 MuSiQue、Recall@5"
+        },
+        {
+          "text": "圖片來源行與導流行、hashtag",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "結構，不對證"
+        }
+      ],
+      "errors": [
+        "範圍被放大"
+      ]
+    }
+  ],
+  "recalculations": [
+    {
+      "block": "第 4 張／第 1 張／第 2 張",
+      "expression": "64.1-49.5（MuSiQue Recall@2）",
+      "result": "14.6，近 15"
+    },
+    {
+      "block": "第 4 張",
+      "expression": "80.0-65.1（MuSiQue Recall@5）",
+      "result": "14.9，近 15"
+    },
+    {
+      "block": "第 4 張",
+      "expression": "91.6-78.4（HotpotQA Recall@2）",
+      "result": "13.2，與 c8 一致"
+    },
+    {
+      "block": "第 4 張／第 5 張",
+      "expression": "96.5-94.4（HotpotQA Recall@5）",
+      "result": "2.1，領先縮小，與 c8 一致"
+    },
+    {
+      "block": "第 4 張",
+      "expression": "82.3-76.6（2Wiki Recall@2）",
+      "result": "5.7，SAG 領先"
+    },
+    {
+      "block": "第 4 張",
+      "expression": "88.0-90.4（2Wiki Recall@5）",
+      "result": "-2.4，SAG 落後，唯一落後一格"
+    },
+    {
+      "block": "第 8 張／Threads 正文",
+      "expression": "80.0-77.1",
+      "result": "2.9，與 c14 一致"
+    },
+    {
+      "block": "第 7 張",
+      "expression": "77.1-65.1",
+      "result": "12.0，拆成三元組仍領先 HippoRAG 2（大幅贏過）"
+    },
+    {
+      "block": "第 9 張／Threads 正文",
+      "expression": "74.6-65.1",
+      "result": "9.5，與 c15 一致"
+    },
+    {
+      "block": "第 9 張／Threads 正文",
+      "expression": "81.7-80.0",
+      "result": "1.7，與 c15 一致"
+    }
+  ],
+  "gaps": [
+    {
+      "description": "第 8 張補充的「多 2.9 個百分點」沒有寫明指標是 Recall@5（卡的 c14 比較對象是拆成三元組的 SAG「Recall@5 77.1%」）；同張圖也沒標指標",
+      "card_quote": "拆成三元組的 SAG（Recall@5 77.1%）"
+    },
+    {
+      "description": "第 8 張示意圖寫「每走一跳 JOIN，就剪枝一次」，卡的限定條件說實體剪枝只在前線實體超過 50 個時才發生",
+      "card_quote": "前線實體超過 50 個時，計算它們跟 query 的向量相似度，強制只留 Top 50"
+    },
+    {
+      "description": "第 7 張 HippoRAG 2 的 65.1 未標明與 SAG 用同一個 BGE-Large embedding（第 4 張有寫）",
+      "card_quote": "重點看跟 HippoRAG 2 的差距（兩者用同一個 BGE-Large embedding）"
+    },
+    {
+      "description": "caption 標題句與第 12 張未帶出「跟 embedding 品質基本無關」限於結構收益、別名對齊與剪枝仍靠向量（第 11 張與 Threads 正文有寫）",
+      "card_quote": "別名對齊的壓力被推遲到線上，交給向量的模糊匹配去處理。"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "slides": [
+    {"slide": 4,
+     "items": [
+       {"what": "MuSiQue SAG Recall@2 / Recall@5", "reproduced": "64.1 / 80.0 (深色長條)", "original_position": "表一 SAG (Ours) 列、MuSiQue 欄", "original": "64.1 / 80.0", "in_claim": "MuSiQue 上 SAG 的 Recall@2 / Recall@5 是 64.1 / 80.0", "verdict": "一致"},
+       {"what": "MuSiQue HippoRAG 2 Recall@2 / Recall@5", "reproduced": "49.5 / 65.1 (淺色長條)", "original_position": "表一 HippoRAG 2 (BGE-Large-EN-v1.5) 列、MuSiQue 欄", "original": "49.5 / 65.1", "in_claim": "HippoRAG 2 是 49.5 / 65.1", "verdict": "一致"},
+       {"what": "HotpotQA SAG Recall@2 / Recall@5", "reproduced": "91.6 / 96.5", "original_position": "表一 SAG (Ours) 列、HotpotQA 欄", "original": "91.6 / 96.5", "in_claim": "SAG 的 Recall@2 / Recall@5 是 91.6 / 96.5", "verdict": "一致"},
+       {"what": "HotpotQA HippoRAG 2 Recall@2 / Recall@5", "reproduced": "78.4 / 94.4", "original_position": "表一 HippoRAG 2 列、HotpotQA 欄", "original": "78.4 / 94.4", "in_claim": "HippoRAG 2 是 78.4 / 94.4", "verdict": "一致"},
+       {"what": "2WikiMultiHopQA SAG Recall@2 / Recall@5", "reproduced": "82.3 / 88.0", "original_position": "表一 SAG (Ours) 列、2Wiki 欄", "original": "82.3 / 88.0", "in_claim": "SAG 的 Recall@2 領先（82.3 對 76.6），Recall@5 卻落後（88.0 對 90.4）", "verdict": "一致"},
+       {"what": "2WikiMultiHopQA HippoRAG 2 Recall@2 / Recall@5", "reproduced": "76.6 / 90.4", "original_position": "表一 HippoRAG 2 列、2Wiki 欄（90.4 粗體）", "original": "76.6 / 90.4", "in_claim": "82.3 對 76.6 ... 88.0 對 90.4", "verdict": "一致"},
+       {"what": "虛線框標在 2Wiki 的 Recall@5 格（SAG 輸）", "reproduced": "2WikiMultiHopQA 的 Recall@5 格用虛線框，圖註「SAG 唯一輸的一格」", "original_position": "表一 2Wiki 欄：SAG 88.0（未粗體）、HippoRAG 2 90.4（粗體）；其他五格 SAG 都較高", "original": "SAG 只在此格低於 HippoRAG 2", "in_claim": "2WikiMultiHopQA 是 SAG 唯一輸的一格", "verdict": "一致"},
+       {"what": "比較對象僅 SAG 與 HippoRAG 2，圖例已標示；省略表一其他 baseline", "reproduced": "圖例：SAG、HippoRAG 2；補充寫「都用同一個 BGE-Large embedding」", "original_position": "表一 Graph-based Methods 兩列；caption「統一底層設定（BGE-Large-EN-v1.5…）」", "original": "表一另有 Simple Baselines 與 Large Embedding Models 多列，HippoRAG 2 與 SAG 同用 BGE-Large-EN-v1.5", "in_claim": "主要對照是 HippoRAG 2，兩者用同一個 BGE-Large embedding", "verdict": "一致"},
+       {"what": "資料集小字「最難的一組」（MuSiQue）", "reproduced": "MuSiQue｜最難的一組", "original_position": "原圖沒有此描述", "original": "沒有", "in_claim": "MuSiQue 最難（4 跳且經反事實過濾）", "verdict": "僅來自主張"},
+       {"what": "資料集小字「只要連 2 跳」（HotpotQA）", "reproduced": "HotpotQA｜只要連 2 跳", "original_position": "原圖沒有", "original": "沒有", "in_claim": "HotpotQA 是 2 跳（橋樑與比較型問題）", "verdict": "僅來自主張"},
+       {"what": "資料集小字「實體鏈很長」（2WikiMultiHopQA）", "reproduced": "2WikiMultiHopQA｜實體鏈很長", "original_position": "原圖沒有", "original": "沒有", "in_claim": "2WikiMultiHopQA 是長實體鏈（含罕見橋樑）", "verdict": "僅來自主張"},
+       {"what": "欄標 Recall@2 / Recall@5", "reproduced": "Recall@2、Recall@5", "original_position": "表一欄內「a / b」格式，caption 寫 Recall@2/5", "original": "每格 Recall@2 / Recall@5 成對（caption 說明）", "in_claim": "SAG 的 Recall@2 / Recall@5 是 64.1 / 80.0", "verdict": "一致"},
+       {"what": "圖註「領先幾個百分點＝兩個百分比相減」", "reproduced": "領先幾個百分點＝兩個百分比相減", "original_position": "原圖沒有", "original": "沒有", "in_claim": "", "verdict": "僅來自主張", "note": "名詞說明（算法說明，不改變關係）；64.1-49.5=14.6、91.6-78.4=13.2 與 c5、c8 相符"},
+       {"what": "主標與補充「領先近 15 個百分點」「領先最多」「六格只輸…」", "reproduced": "MuSiQue 領先近 15 個百分點；MuSiQue 領先最多；六格只輸 2Wiki 的 Recall@5", "original_position": "表一 MuSiQue 差 14.6 / 14.9；HotpotQA 差 13.2 / 2.1；2Wiki 差 5.7 / -2.4（由圖上數字相減）", "original": "MuSiQue 差距最大，只有 2Wiki R@5 SAG 較低", "in_claim": "領先近 15 個百分點；2WikiMultiHopQA 是 SAG 唯一輸的一格", "verdict": "一致"}
+     ],
+     "errors": []},
+    {"slide": 7,
+     "items": [
+       {"what": "SAG 完整事件 Recall@5", "reproduced": "80%（深色長條）", "original_position": "表二 Hyperedge 列、MuSiQue R@5 欄", "original": "80.0", "in_claim": "Recall@5 從 80.0% 掉到 77.1%", "verdict": "一致"},
+       {"what": "SAG 拆成三元組 Recall@5", "reproduced": "77.1%（金色強調長條）", "original_position": "表二 Triple 列、MuSiQue R@5 欄", "original": "77.1", "in_claim": "77.1% 依然大幅贏過 HippoRAG 2 的 65.1%", "verdict": "一致"},
+       {"what": "完整事件 = Hyperedge、拆成三元組 = Triple 的對應", "reproduced": "SAG 完整事件／SAG 拆成三元組", "original_position": "表二 Configuration：Hyperedge、Triple", "original": "Hyperedge、Triple（Hyperedge 粗體較高）", "in_claim": "把 SAG 強行拆成三元組來跑", "verdict": "一致"},
+       {"what": "HippoRAG 2 Recall@5 = 65.1%", "reproduced": "HippoRAG 2 65.1%", "original_position": "表二沒有 HippoRAG 2（數值見表一 HippoRAG 2 列 MuSiQue R@5 = 65.1，與主張一致）", "original": "表二沒有此列；表一為 65.1", "in_claim": "77.1% 依然大幅贏過 HippoRAG 2 的 65.1%", "verdict": "僅來自主張"},
+       {"what": "長條長度與數值成比例、軸從 0", "reproduced": "65.1 / 77.1 / 80 的長條約 521 / 617 / 640 px，每點約 8 px", "original_position": "（長條為重製元素，數值依表二與主張）", "original": "沒有長條", "in_claim": "", "verdict": "僅來自主張", "note": "純排版元素，比例正確；以印出的數字為準"},
+       {"what": "範圍：MuSiQue", "reproduced": "補充「MuSiQue 的 Recall@5」", "original_position": "表二欄頭 MuSiQue；caption「（MuSiQue）」", "original": "MuSiQue", "in_claim": "這個消融（完整事件對三元組）是在 MuSiQue 上做的", "verdict": "一致"},
+       {"what": "圖註「Recall@5：前 5 筆結果裡，抓到幾成答案需要的資料」", "reproduced": "Recall@5 名詞說明", "original_position": "表二 R@5 欄", "original": "R@5", "in_claim": "", "verdict": "僅來自主張", "note": "名詞說明，非圖的內容；正確性由忠實者查"},
+       {"what": "「所以呢」：SAG 的大頭成績不是靠超邊，用 SQL JOIN 連事件的這套管線本身就有優勢", "reproduced": "同左", "original_position": "原圖沒有", "original": "沒有", "in_claim": "績效的大頭其實來自管線設計；SAG 這套 SQL 檢索管線本身就有系統性優勢，跟用不用超邊無關", "verdict": "僅來自主張"},
+       {"what": "表二的 R@1、R@2、R@10 欄未放入", "reproduced": "只放 Recall@5", "original_position": "表二 R@1 / R@2 / R@5 / R@10", "original": "四欄，Hyperedge 在每欄都較高", "in_claim": "Recall@5 從 80.0% 掉到 77.1%", "verdict": "一致", "note": "只取與主張相符的一欄並已標 Recall@5，不致放大範圍或誤解"}
+     ],
+     "errors": []},
+    {"slide": 9,
+     "items": [
+       {"what": "SAG 換 NV-Embed-v2 後 Recall@5", "reproduced": "81.7%（換成：NV-Embed-v2）", "original_position": "表四 SAG (NV-Embed-v2) 列、MuSiQue R@5 欄", "original": "81.7", "in_claim": "SAG 從 80.0 升到 81.7（+1.7）", "verdict": "一致"},
+       {"what": "HippoRAG 2 換 NV-Embed-v2 後 Recall@5", "reproduced": "74.6%（換成：NV-Embed-v2）", "original_position": "表四 HippoRAG 2 (NV-Embed-v2) 列、MuSiQue R@5 欄", "original": "74.6", "in_claim": "HippoRAG 2 的 Recall@5 從 65.1 升到 74.6（+9.5）", "verdict": "一致"},
+       {"what": "SAG 原本（BGE-Large）Recall@5", "reproduced": "80.0%", "original_position": "表四沒有 BGE-Large 的數字（表一 SAG MuSiQue R@5 = 80.0，與主張一致）", "original": "表四沒有此值", "in_claim": "SAG 從 80.0 升到 81.7（+1.7）", "verdict": "僅來自主張"},
+       {"what": "HippoRAG 2 原本（BGE-Large）Recall@5", "reproduced": "65.1%", "original_position": "表四沒有此值（表一 HippoRAG 2 MuSiQue R@5 = 65.1，與主張一致）", "original": "表四沒有此值", "in_claim": "HippoRAG 2 的 Recall@5 從 65.1 升到 74.6", "verdict": "僅來自主張"},
+       {"what": "進步幅度 9.5 與 1.7 個百分點", "reproduced": "HippoRAG 2 進步 9.5 個百分點；SAG 進步 1.7 個百分點", "original_position": "表四 R@5：74.6、81.7（相減得出）", "original": "74.6 與 81.7，與原本值相減與主張一致", "in_claim": "（+9.5）...（+1.7）", "verdict": "一致"},
+       {"what": "範圍：MuSiQue、Recall@5", "reproduced": "補充「MuSiQue 上」；圖註 Recall@5", "original_position": "表四欄頭 MuSiQue；R@5 欄", "original": "MuSiQue、R@5", "in_claim": "這個換 embedding 的實驗是在 MuSiQue 上做的", "verdict": "一致"},
+       {"what": "長條長度與數值成比例、軸從 0", "reproduced": "65.1 / 74.6 / 80.0 / 81.7 長條約 259 / 297 / 319 / 326 px，每點約 4 px", "original_position": "（長條為重製元素）", "original": "沒有長條", "in_claim": "", "verdict": "僅來自主張", "note": "純排版元素，比例正確"},
+       {"what": "圖註「Recall@5：前 5 筆結果裡，抓到幾成答案需要的資料」", "reproduced": "Recall@5 名詞說明", "original_position": "表四 R@5", "original": "R@5", "in_claim": "", "verdict": "僅來自主張", "note": "名詞說明；正確性由忠實者查"},
+       {"what": "「所以呢」：SAG 的成績比較不受 embedding 左右，別的步驟仍會用到向量", "reproduced": "同左", "original_position": "原圖沒有", "original": "沒有", "in_claim": "SAG 的結構收益…跟 embedding 品質基本無關；別名對齊…交給向量的模糊匹配；種子預算與實體剪枝也靠向量相似度排序", "verdict": "僅來自主張"},
+       {"what": "表四 R@1、R@2、R@10 欄未放入", "reproduced": "只放 Recall@5", "original_position": "表四 R@1 / R@2 / R@5 / R@10", "original": "四欄，SAG 在每欄皆較高", "in_claim": "Recall@5 從 65.1 升到 74.6、從 80.0 升到 81.7", "verdict": "一致", "note": "只取與主張相符的一欄並已標 Recall@5，不致放大範圍"}
+     ],
+     "errors": []}
+  ]
+}

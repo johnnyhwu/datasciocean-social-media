@@ -655,7 +655,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
                   f'<div class="t abs legend" style="left:{x2 + 40}px;top:{y0}px">{esc(l2)}</div>')
         dec = any(isinstance(b[k_], float) and b[k_] != int(b[k_]) for b in bars for k_ in ("value", "value2"))    # 有小數的圖：全部數字都顯示一位小數（80.0，不是 80）
         gy = y0 + 62
-        step = max(140.0, min(190.0, (1150 - gy) / len(bars)))
+        few = len(bars) <= 2                    # 只有 1～2 組時（2026-10-26）：條放粗、組距拉開，圖面用滿
+        bh_, bgap = (66, 86) if few else (44, 60)
+        step = max(140.0, min(340.0 if few else 190.0, (1150 - gy) / len(bars)))
         top, last_bottom = gy - 14, gy
         for b in bars:
             subs = b.get("subs", [])           # 名稱下面的小字（例如這個任務的準確度）；有小字時名稱上移
@@ -664,12 +666,12 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             for k_, sline in enumerate(subs):
                 labels += f'<div class="t abs sub" style="left:80px;top:{ny + 51 + k_ * 42}px">{esc(bind_nums(sline))}</div>'
             for j, (v, col) in enumerate(((b["value"], MID), (b["value2"], DEEP))):
-                by = gy + j * 60
+                by = gy + j * bgap
                 ln = v * s
-                svg += (f'<rect class="g bar" data-v="{v}" data-e="0" x="{x0}" y="{by}" width="{ln:.2f}" height="44" fill="{col}"/>')
-                labels += (f'<div class="t abs num2" style="left:{x0 + ln + 18:.1f}px;top:{by - 2}px;color:{DEEP}">'
+                svg += (f'<rect class="g bar" data-v="{v}" data-e="0" x="{x0}" y="{by}" width="{ln:.2f}" height="{bh_}" fill="{col}"/>')
+                labels += (f'<div class="t abs num2" style="left:{x0 + ln + 18:.1f}px;top:{by + (bh_ - 44) / 2 - 2:.1f}px;color:{DEEP}">'
                            f'{v:.1f}{esc(spec.get("unit", ""))}</div>' if dec else f'{v:g}{esc(spec.get("unit", ""))}</div>')
-                last_bottom = by + 44
+                last_bottom = by + bh_
             gy += step
         svg += f'<line class="g axis" x1="{x0}" y1="{top}" x2="{x0}" y2="{last_bottom + 10}" stroke="{DEEP}" stroke-width="3"/>'
         kw["SVG"] = svg_wrap(svg)
@@ -679,6 +681,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         bars = spec["bars"]
         x0, maxlen = 72, 640
         s = maxlen / max(b["value"] for b in bars)
+        dec1 = any(isinstance(b["value"], float) and b["value"] != int(b["value"]) for b in bars)    # 有小數的圖：全部數字都顯示一位小數（80.0，不是 80）
         y = max(500, body_end(spec.get("body", "")) + 44)   # 補充排成多行時，圖往下讓出空間
         inline = bool(spec.get("subs_inline"))              # 副標籤接在名稱後面同一行（省 42px，長條才排得下）
         labels, svg = "", ""
@@ -705,6 +708,8 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             svg += (f'<rect class="g bar" data-v="{b["value"]}" data-e="{int(bool(b.get("emphasize")))}" x="{x0}" y="{by}" '
                     f'width="{ln:.2f}" height="44" fill="{col}"/>')
             labels += (f'<div class="t abs num" style="left:{x0 + ln + 22:.1f}px;top:{by - 11}px;color:{DEEP}">'
+                       f'{b["value"]:.1f}{esc(spec.get("unit", ""))}</div>' if dec1 else
+                       f'<div class="t abs num" style="left:{x0 + ln + 22:.1f}px;top:{by - 11}px;color:{DEEP}">'
                        f'{b["value"]:g}{esc(spec.get("unit", ""))}</div>')
             last_bottom = by + 44
             y = (y + step) if inline else (by + 44 + 50)

@@ -1,0 +1,71 @@
+{
+  "post": "sag-results-and-gain-source",
+  "blocks": [
+    {
+      "block": "caption",
+      "atoms": [
+        {
+          "text": "第一句 hook：RAG 論文 SAG：招牌是超邊，Multi-Hop 檢索的績效大頭卻來自 SQL 檢索管線",
+          "verdict": "完全支持",
+          "card_quote": "論文的招牌是超邊，但績效的大頭其實來自管線設計。｜…SAG 這套 SQL 檢索管線本身就有系統性優勢，跟用不用超邊無關",
+          "note": "作為 hook，字面為真，錨點為部落格判斷、以作者口吻寫可接受；沒有暗示卡上沒有的範圍。MuSiQue 範圍在內文第 7、9 張帶出（c1/c13 的限定條件）。"
+        },
+        {
+          "text": "・最難的 MuSiQue，SAG 領先近 15 個百分點",
+          "verdict": "完全支持",
+          "card_quote": "MuSiQue 上領先近 15 個百分點",
+          "note": "數字與資料集對得上；但這一行沒有寫出比較對象（HippoRAG 2）與指標（Recall），見 errors。"
+        },
+        {
+          "text": "・MuSiQue 有些題要連 4 跳，HotpotQA 只有 2 跳",
+          "verdict": "完全支持",
+          "card_quote": "MuSiQue 裡有些問題在二元圖譜上要跳 4 次才到得了答案｜HotpotQA | 2 跳，橋樑與比較型問題",
+          "note": "「有些」保留了 c4 限定條件，沒有寫成每題都 4 跳。"
+        },
+        {
+          "text": "・功勞是超邊嗎？把 SAG 強行拆成三元組來跑",
+          "verdict": "完全支持",
+          "card_quote": "作者把 SAG 強行拆成三元組來跑，Recall@5 從 80.0% 掉到 77.1%。",
+          "note": "疑問句加實驗描述，沒有下結論，沒有誤導。"
+        },
+        {
+          "text": "・拆掉超邊，SAG 依然大幅贏過 HippoRAG 2（MuSiQue 上看 Recall@5）",
+          "verdict": "完全支持",
+          "card_quote": "就算拆成三元組，77.1% 依然大幅贏過 HippoRAG 2 的 65.1%｜也就是說，SAG 這套 SQL 檢索管線本身就有系統性優勢，跟用不用超邊無關",
+          "note": "範圍（MuSiQue、Recall@5）與比較對象都在；「拆掉超邊」等於「拆成三元組」，由 c13「跟用不用超邊無關」支撐。"
+        },
+        {
+          "text": "・保留完整事件，少掉每一跳的剪枝損失",
+          "verdict": "部分支持",
+          "card_quote": "保留完整事件另外帶來 2.9 個百分點，因為一個事件記錄的是 N 元關係，不必像三元組那樣經歷多次 JOIN 走訪，也就少掉每一跳的剪枝損失。",
+          "note": "卡上是部落格推論，且是相對於「拆成三元組的 SAG」、在 MuSiQue 上的消融。這一行寫成無比較對象、無範圍的平述句，見 errors。"
+        },
+        {
+          "text": "・換更強的 embedding，SAG 進步 1.7 個百分點（在 MuSiQue 上看 Recall@5）",
+          "verdict": "完全支持",
+          "card_quote": "把 embedding 從 BGE-Large 換成更強的 NV-Embed-v2：｜SAG | 80.0 | 81.7 | +1.7",
+          "note": "數字、範圍、指標、「更強」都與卡一致。"
+        },
+        {
+          "text": "・向量模型一弱，HippoRAG 的誤差沿路放大",
+          "verdict": "完全支持",
+          "card_quote": "HippoRAG 的多跳極度依賴向量打分（圖上節點的初始分數就是向量相似度給的），模型一弱，誤差會沿著傳播路徑放大",
+          "note": "卡上為部落格推論，這裡語氣沒有比卡強。"
+        },
+        {
+          "text": "・串事件基本不受向量影響，別的步驟仍用向量",
+          "verdict": "部分支持",
+          "card_quote": "SAG 的結構收益主要來自字串精確匹配的 SQL JOIN，跟 embedding 品質基本無關。｜別名對齊的壓力被推遲到線上，交給向量的模糊匹配去處理。",
+          "note": "卡說的是「結構收益跟 embedding 品質基本無關」；這一行改成「串事件基本不受向量影響」，見 errors。「別的步驟仍用向量」有卡上限定條件支撐。"
+        }
+      ],
+      "errors": [
+        "圖上缺單位或比較對象：要點 1「最難的 MuSiQue，SAG 領先近 15 個百分點」沒有寫出比較對象（HippoRAG 2）與指標（Recall），整段 caption 只有第 4 個要點才出現 HippoRAG 2，且那是另一個數字。",
+        "限定條件掉了：要點 5「保留完整事件，少掉每一跳的剪枝損失」是卡上的部落格推論，原文限定為「相對於拆成三元組的 SAG、在 MuSiQue 上多 2.9 個百分點」的原因；這一行沒有比較對象（三元組）與資料集，讀起來像普遍性的機制事實。",
+        "措辭與卡不同：要點 8「串事件基本不受向量影響」比卡的「結構收益……跟 embedding 品質基本無關」寬；卡限定在 embedding 品質，且依據的換 embedding 實驗在 MuSiQue 上，而別名對齊（向量模糊匹配）本來就會影響哪些事件被串起來。這一行沒有 MuSiQue 範圍。"
+      ]
+    }
+  ],
+  "recalculations": [],
+  "gaps": []
+}

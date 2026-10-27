@@ -1,0 +1,488 @@
+{
+  "series": "sag",
+  "concept": "sag-results-and-gain-source",
+  "also_concepts": [],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "讀者疑問",
+    "title": "SAG 贏在[[超邊]]，還是贏在 [[SQL]]？",
+    "subtitle": "MuSiQue 上 Recall 贏 HippoRAG 2 近 15 個百分點\n但成績的大頭，其實來自 SQL 檢索管線。\n論文：arxiv.org/abs/2606.15971",
+    "refs": [
+      "c1",
+      "c5"
+    ],
+    "candidate": "暫定（待人挑）"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "SAG 贏在[[超邊]]，還是贏在 [[SQL]]？",
+      "body": "MuSiQue 上 Recall 贏 HippoRAG 2 近 15 個百分點\n但成績的大頭，其實來自 SQL 檢索管線。\n論文：arxiv.org/abs/2606.15971",
+      "refs": [
+        "c1",
+        "c5"
+      ]
+    },
+    {
+      "layout": "recap",
+      "title": "[[前情提要]]與這一則重點",
+      "current": "sag-results-and-gain-source",
+      "refs": [
+        "結構"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "先認識 SAG 的三個詞",
+      "body": "SAG 不先建圖，只在查詢的那一瞬間把資料連起來。下面三個詞，是看懂這一則的基礎：",
+      "rows": [
+        [
+          "事件",
+          "一段文字轉成一個保留完整語意的「事件」，再貼上人事物（實體）標籤。"
+        ],
+        [
+          "超邊",
+          "一個事件同時綁住好幾個實體，這個綁定就叫超邊。"
+        ],
+        [
+          "SQL 檢索管線",
+          "SAG 的整套做法：查詢時用 SQL JOIN（資料庫的表格比對）連起共用實體的事件。"
+        ]
+      ],
+      "key_w": 260,
+      "refs": [
+        "c2",
+        "c19"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "再認識成績單上的三個詞",
+      "body": "這一則拿 SAG 跟 HippoRAG 2 比成績。要看懂成績單，先懂這三個詞：",
+      "rows": [
+        [
+          "HippoRAG",
+          "GraphRAG 這類做法：先建知識圖譜（關係網），再在圖上傳分數。"
+        ],
+        [
+          "Recall@K",
+          "前 K 筆裡抓到幾成答案需要的資料；假設要 2 段、抓到 1 段，就是一半。"
+        ],
+        [
+          "embedding",
+          "把文字轉成向量的模型，意思相近，向量就靠近。"
+        ]
+      ],
+      "key_w": 260,
+      "refs": [
+        "c3",
+        "c5",
+        "c15"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "scoreboard",
+      "title": "最難的 MuSiQue，SAG 領先近 15 個百分點",
+      "body": "三個 Multi-Hop 資料集各比 Recall@2 和 Recall@5，都用同一個 BGE-Large embedding。最難的 MuSiQue 領先最多；六組比較只輸 2WikiMultiHopQA 的 Recall@5。",
+      "heads": [
+        "Recall@2",
+        "Recall@5"
+      ],
+      "outcomes": [
+        {
+          "text": "SAG"
+        },
+        {
+          "text": "HippoRAG 2"
+        }
+      ],
+      "nodes": [
+        {
+          "text": "MuSiQue",
+          "sub": "最難的一組",
+          "emph": true
+        },
+        {
+          "text": "HotpotQA",
+          "sub": "只要連 2 跳"
+        },
+        {
+          "text": "2WikiMultiHopQA",
+          "sub": "實體鏈很長"
+        }
+      ],
+      "cells": [
+        [
+          [
+            "64.1",
+            "49.5"
+          ],
+          [
+            "80.0",
+            "65.1"
+          ]
+        ],
+        [
+          [
+            "91.6",
+            "78.4"
+          ],
+          [
+            "96.5",
+            "94.4"
+          ]
+        ],
+        [
+          [
+            "82.3",
+            "76.6"
+          ],
+          [
+            "88.0",
+            "90.4"
+          ]
+        ]
+      ],
+      "note": "虛線框＝SAG 唯一輸的一格。MuSiQue：80.0 − 65.1 ≈ 15 個百分點",
+      "fig_refs": [
+        "sag/table1.png"
+      ],
+      "refs": [
+        "c4",
+        "c5",
+        "c8",
+        "c11"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "hops",
+      "fade": true,
+      "title": "MuSiQue 有些題要連 4 跳，HotpotQA 只有 2 跳",
+      "body": "MuSiQue 有些題在二元圖譜（一條邊只連兩點）上要跳 4 次，SAG 在這裡領先最多；HotpotQA 只有 2 跳，Recall@5 的領先就縮小。",
+      "heads": [
+        "問題",
+        "答案"
+      ],
+      "nodes": [
+        {
+          "text": "MuSiQue",
+          "sub": "最考驗連結能力的一組",
+          "sub2": "經過反事實過濾：擋掉單步就能猜中的捷徑",
+          "shortcut": true,
+          "hops": 4
+        },
+        {
+          "text": "HotpotQA",
+          "sub": "只有 2 跳，圖傳播的衰減本來就弱",
+          "hops": 2
+        }
+      ],
+      "note": "示意：箭頭越淡，圖傳播的分數越弱；虛線是被擋掉的捷徑",
+      "refs": [
+        "c4",
+        "c6",
+        "c9"
+      ],
+      "quals": [
+        "c4#1",
+        "c6#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "bubble",
+      "chain": true,
+      "title": "功勞是超邊嗎？硬把它拆成三元組看看",
+      "body": "SAG 把一個事件綁住好幾個實體，這個綁定就是一條超邊。想知道功勞是不是它的，作者在 MuSiQue 上把超邊拆成一條條只連兩點的邊，看成績掉多少。",
+      "heads": [
+        "拆成三元組",
+        "SAG 原本的做法"
+      ],
+      "nodes": [
+        {
+          "text": "三元組：一條邊只連兩個點",
+          "sub": "例：同樣三個實體，要拆成兩條邊"
+        },
+        {
+          "text": "超邊：圈住好幾個實體",
+          "sub": "例：「張忠謀在台灣創立了 TSMC」這個事件，一次綁住三個實體"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "張忠謀"
+        },
+        {
+          "text": "TSMC"
+        },
+        {
+          "text": "台灣"
+        }
+      ],
+      "note": "例子是假設的，只說明差別",
+      "refs": [
+        "c12",
+        "c19"
+      ],
+      "quals": [
+        "c12#1"
+      ]
+    },
+    {
+      "layout": "chart_bars",
+      "title": "拆掉超邊，SAG 還是大幅贏過 HippoRAG 2",
+      "body": "MuSiQue 的 Recall@5：拆成三元組的 SAG 有 77.1%，比 HippoRAG 2 的 65.1% 高 12 個百分點。拿掉超邊還贏這麼多，可見大頭不是靠超邊，而是靠 SQL JOIN 連事件的管線。",
+      "unit": "%",
+      "bars": [
+        {
+          "name": "HippoRAG 2",
+          "value": 65.1
+        },
+        {
+          "name": "SAG 拆成三元組",
+          "value": 77.1,
+          "emphasize": true
+        },
+        {
+          "name": "SAG 完整事件",
+          "value": 80.0
+        }
+      ],
+      "note": "Recall@5：前 5 筆結果裡，抓到幾成答案需要的資料",
+      "fig_refs": [
+        "sag/table2.png"
+      ],
+      "refs": [
+        "c1",
+        "c12",
+        "c13"
+      ],
+      "quals": [
+        "c1#4",
+        "c12#1",
+        "c13#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "leak",
+      "title": "超邊也有用，完整事件多拿 2.9 個百分點",
+      "body": "完整事件比三元組版多 2.9 個百分點（MuSiQue 的 Recall@5），因為不用一跳一跳 JOIN。超邊算加分項，成績的大頭還是在管線。",
+      "heads": [
+        "剪枝"
+      ],
+      "nodes": [
+        {
+          "text": "拆成三元組：每走一跳 JOIN，可能就剪枝一次",
+          "sub": "剪枝：只留排名靠前的候選，其他丟掉"
+        },
+        {
+          "text": "完整事件：不必多次 JOIN 走訪",
+          "sub": "少掉每一跳的剪枝損失，漏掉的比較少"
+        }
+      ],
+      "note": "示意：每個點是一個候選；實心留下、虛線被剪掉",
+      "refs": [
+        "c14"
+      ],
+      "quals": [
+        "c14#1"
+      ]
+    },
+    {
+      "layout": "chart_bars",
+      "title": "換更強的 embedding，SAG 只進步 1.7 個百分點",
+      "body": "MuSiQue 上換成更強的 NV-Embed-v2，HippoRAG 2 進步 9.5 個百分點，SAG 只進步 1.7，但仍然領先。SAG 的成績比較不被 embedding 左右。",
+      "unit": "%",
+      "axis_max": 100,
+      "legend": [
+        "原本：BGE-Large",
+        "換成：NV-Embed-v2"
+      ],
+      "bars": [
+        {
+          "name": "HippoRAG 2",
+          "subs": [
+            "進步 9.5 個百分點"
+          ],
+          "value": 65.1,
+          "value2": 74.6
+        },
+        {
+          "name": "SAG",
+          "subs": [
+            "進步 1.7 個百分點"
+          ],
+          "value": 80.0,
+          "value2": 81.7
+        }
+      ],
+      "note": "Recall@5：前 5 筆結果裡，抓到幾成答案需要的資料",
+      "fig_refs": [
+        "sag/table4.png"
+      ],
+      "refs": [
+        "c1",
+        "c15"
+      ],
+      "quals": [
+        "c1#1",
+        "c1#2",
+        "c1#3",
+        "c1#4",
+        "c1#5",
+        "c15#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "amplify",
+      "title": "HippoRAG 吃向量打分，誤差會一路放大",
+      "body": "HippoRAG 做 Multi-Hop 很吃向量打分，向量模型一弱，誤差就沿著傳播路徑放大。SAG 串事件靠的是字串精確匹配的 SQL JOIN。",
+      "heads": [
+        "向量打分",
+        "誤差越傳越大"
+      ],
+      "nodes": [
+        {
+          "text": "HippoRAG：先用向量給節點打分",
+          "sub": "圖上節點的初始分數，是向量相似度給的"
+        },
+        {
+          "text": "SAG：SQL JOIN",
+          "sub": "字串一模一樣，才算共用同一個實體"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "精確比對，字一模一樣才算"
+        }
+      ],
+      "note": "示意：楔形越寬，誤差越大；＝ 是字串一樣；非實驗數據",
+      "refs": [
+        "c1",
+        "c7",
+        "c16"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "pairs",
+      "title": "串事件基本不受向量影響，但別的步驟還是靠它",
+      "body": "MuSiQue 換 embedding 的實驗裡，SAG 用比較弱的 embedding 也撐得住。不過向量在 SAG 裡不是沒工作：",
+      "heads": [
+        "SAG 的哪一步",
+        "靠誰"
+      ],
+      "pairs": [
+        [
+          "把事件串起來",
+          "字串精確匹配的 SQL JOIN"
+        ],
+        [
+          "別名對齊，同一個東西不同寫法",
+          "推遲到查詢時，交給向量的模糊匹配"
+        ],
+        [
+          "找到的候選太多，超過上限時",
+          "用向量相似度排序，只留排名靠前的"
+        ]
+      ],
+      "outcomes": [
+        {
+          "text": "串事件跟 embedding 品質基本無關；別名對齊和挑候選，還是靠向量",
+          "tone": "good"
+        }
+      ],
+      "refs": [
+        "c1",
+        "c17"
+      ],
+      "quals": [
+        "c1#1",
+        "c1#2",
+        "c1#3",
+        "c17#1",
+        "c17#2",
+        "c17#3",
+        "c17#4"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "所以 SAG 的成績，功勞到底是誰的？",
+      "title": "招牌是超邊，\n績效的大頭\n卻來自 SQL 檢索管線。",
+      "refs": [
+        "c1"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "一次看完這個系列",
+      "current": "sag-results-and-gain-source",
+      "nav": "完整文章：datasciocean.com/paper-intro/sag",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "SAG 這篇 RAG 論文最響亮的招牌是「超邊」，但成績的大頭，其實來自它的 SQL 檢索管線。\n\n在最難的 MuSiQue 上，SAG 的 Recall 比 HippoRAG 2 高出近 15 個百分點（兩邊用同一個 BGE-Large embedding）。作者把 SAG 硬拆成三元組、拿掉超邊，Recall@5（前 5 筆結果抓到答案所需資料的比例）從 80.0% 掉到 77.1%，還是大幅贏過 HippoRAG 2 的 65.1%。\n\n另一個實驗換成更強的 embedding（向量模型）：HippoRAG 2 進步 9.5 個百分點，SAG 只進步 1.7 個百分點，用比較弱的 embedding 也撐得住。不過 SAG 並不是不用向量，別名對齊（同一個東西不同寫法）、候選太多時的排序，還是靠向量。以上都是 MuSiQue 上的實驗。\n\n論文：arxiv.org/abs/2606.15971",
+      "refs": [
+        "c1",
+        "c4",
+        "c5",
+        "c12",
+        "c13",
+        "c15",
+        "c17"
+      ],
+      "quals": [
+        "c1#1",
+        "c1#2",
+        "c1#3",
+        "c1#4",
+        "c1#5",
+        "c12#1",
+        "c13#1",
+        "c15#1",
+        "c17#1",
+        "c17#2",
+        "c17#3",
+        "c17#4"
+      ]
+    },
+    "last": {
+      "text": "SAG 的成績從哪來？招牌是超邊，績效的大頭卻來自 SQL 檢索管線。它付出了什麼代價，之後的貼文會講。\n文章：datasciocean.com/paper-intro/sag\n同系列：Multi-Hop 推理，一定要先建知識圖譜嗎？\nhttps://www.threads.com/@datasciocean/post/De5vTr5E64N\n同系列：SQL、向量、LLM 怎麼分工？\nhttps://www.threads.com/@datasciocean/post/De8MzobmMZi\n同系列：SAG 付出了什麼代價？（尚未發布）",
+      "refs": [
+        "c1"
+      ],
+      "link": "https://datasciocean.com/paper-intro/sag/"
+    }
+  },
+  "caption": {
+    "first": "RAG 論文 SAG：招牌是超邊，Multi-Hop 檢索的績效大頭卻來自 SQL 檢索管線",
+    "first_refs": [
+      "c1"
+    ],
+    "nav": "完整文章請在 datasciocean.com 搜尋「SAG：拋開離線知識圖譜，查詢時用 SQL 連事件」",
+    "hashtags": [
+      "DSO_SAG",
+      "SAG",
+      "RAG",
+      "MultiHop",
+      "SQL"
+    ]
+  },
+  "latin_allow": [
+    "arxiv.org",
+    "abs",
+    "TSMC",
+    "Multi-Hop"
+  ]
+}

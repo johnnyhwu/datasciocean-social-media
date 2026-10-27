@@ -1,0 +1,23 @@
+concept: sag-results-and-gain-source
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: sag-results-and-gain-source:ig_carousel
+  format: ig_carousel
+  series_id: sag
+  url: https://www.instagram.com/p/De-hkrKE_VA/
+  published_at: 2026-10-27T00:04:12+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []
+- post_id: sag-results-and-gain-source:threads_thread
+  format: threads_thread
+  series_id: sag
+  url: https://www.threads.com/@datasciocean/post/De-h-d2k-fB
+  published_at: 2026-10-27T00:06:54+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []

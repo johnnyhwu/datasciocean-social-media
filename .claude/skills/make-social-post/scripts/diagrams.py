@@ -25,7 +25,7 @@
   cycle     三個節點繞成一圈（A→B→C→A，最後一條箭頭金色）：nodes = 3 個 [{text, sub?}]、heads = 3 條邊的標籤（依序 A→B、B→C、C→A）、選用 outcomes[0]（底下一條橫框）
   links     左右兩排節點之間的連線（二部圖，2026-10-24，SAG 的「事件↔實體」）：nodes = 左排 [{text, sub?, emph?}]、outcomes = 右排 [{text, sub?, emph?}]、edges = [[左序號, 右序號], …]（0 起）、選用 hot = 要畫成金色粗線的邊、選用 heads = [左標籤, 右標籤]；連線全由 edges 決定，純示意時圖註要標「示意」
   hops      幾跳才到答案（2026-10-24，SAG 的「4 跳 vs 1 跳」）：nodes = 每一列 [{text, sub?, hops}]（hops＝箭頭數，圖上就畫幾條；text／sub 若有數字，必須等於 hops）、選用 heads = [起點標籤, 終點標籤]；每一跳等長，所以越多跳越長
-  bubble    一個大泡泡圈住好幾個東西（2026-10-24，SAG 的「超邊」）：heads = [左標籤, 右標籤]、nodes = [{text, sub?}（左：一般的邊，只連兩點）, {text, sub?}（右：泡泡的說明）]、outcomes = 泡泡裡的項目 [{text}]（2～8 個，畫成小標籤）；左邊固定畫兩個點與一條線，右邊畫金色泡泡
+  bubble    一個大泡泡圈住好幾個東西（2026-10-24，SAG 的「超邊」）：heads = [左標籤, 右標籤]、nodes = [{text, sub?}（左：一般的邊，只連兩點）, {text, sub?}（右：泡泡的說明）]、outcomes = 泡泡裡的項目 [{text}]（2～8 個，畫成小標籤）；左邊預設畫兩個點與一條線（`chain: true` 時改畫一串只連兩點的邊，用 outcomes 的名字標點，2～4 個）；右邊畫金色泡泡
   drift     一路偏掉的路徑（2026-10-24，SAG 的「誤差沿推理鏈放大」）：heads = 每一站的標籤（3～6 個，第一個是起點、最後一個是答案）、nodes = [{text}（正確的路線）, {text, sub?}（實際走的路線）]；實際路線每一站偏得更多（偏移量由程式依站序算，只示意，不是數據）
   ingest    兩段式架構圖（2026-10-24，SAG 論文圖二的版型）：heads = [上段標籤, 下段標籤]；nodes = 上段四欄的標籤 4 個 [{text, sub?}]（原始片段、一對一轉成的東西、多對多綁定的東西、存放處）；
             outcomes = 下段由左到右的步驟 2～3 個 [{text, sub?}]（最後一個金色，下面畫一個小的局部超圖）。上段的方塊、圓點、連線是固定的示意（不帶文字）
@@ -36,6 +36,11 @@
   concat    兩路各一排、匯成一排：heads = [左路, 右路]、nodes = [{text}（上方一句話）, {text, sub?}（結果）]；每路 5 個、匯整後 10 個，純示意
   rails     兩條軌道各撈一排、合併成一排（A 漏掉的一格由 B 補上）：heads = [A 路, B 路]、nodes = [{text, sub?}, {text, sub?}]、outcomes[0] = {text}（合併後）；純示意
   joint     逐一打分 vs 一起評估：heads = [左標, 右標]、nodes = 兩邊 [{text, sub（例子）, sub2（結論）}]；純示意
+  hops 的選用欄位（2026-10-26）：spec 頂層 fade: true＝箭頭一跳比一跳淡（圖上傳遞的分數越來越弱，純示意，圖註要說明）；每列 shortcut: true＝鏈上方畫一條被叉掉的虛線捷徑，標籤用該列的 sub2
+  scoreboard 戰績表（2026-10-26，SAG 第 3 則）：nodes = 每列一個資料集 [{text, sub?, emph?}]、heads = 兩個欄標籤、outcomes = 圖例 [{text（深色那一方）}, {text（淺色那一方）}]、cells = 每列每欄的 [深色值, 淺色值]（字串，例 "64.1"）；
+            每格兩條橫條，軸從 0 起、長度與數值成正比（axis_max 預設 100）；深色值小於淺色值的格子畫虛線框（圖註要說明）；emph 的列底下墊金色淡底
+  leak      每一跳都漏一些（2026-10-26）：nodes = 兩條路 [{text, sub?}（走很多跳的）, {text, sub?}（一次到位的）]、heads = 兩條路箭頭上的標籤（例：剪枝）；兩條路從同一個起點到同一個終點，每個站畫一格點，漏掉的畫成虛線空點；點數是固定示意，圖註要標「示意」
+  amplify   誤差沿路放大 vs 精確比對（2026-10-26）：nodes = 兩條路 [{text, sub?}, {text, sub?}]、heads = 第一條的兩端標籤（起點、終點）、outcomes[0] = 第二條的標籤；第一條畫一個越來越寬的楔形，第二條是一條等寬的金色帶；純示意
   stops     由上往下三個停靠點（不按比例）：nodes = [{text, sub?, emph?}]、選用 heads = [上端標籤, 下端標籤]
 
 規則：圖形全部用 class "bg"（不進程式 B 的文字與圖形重疊檢查），所以排版由這裡負責避開文字；框內的文字由程式 B 的「框內文字不超出框」檢查；
@@ -87,12 +92,12 @@ class Canvas:
         tag = "polygon" if closed else "polyline"
         self.svg.append(f'<{tag} class="bg" points="{d}" fill="{fill}"{a}/>')
 
-    def arrow(self, x1, y1, x2, y2, color=TEAL, sw=4, head=14):
-        self.line(x1, y1, x2, y2, color, sw)
+    def arrow(self, x1, y1, x2, y2, color=TEAL, sw=4, head=14, op=None):
+        self.line(x1, y1, x2, y2, color, sw, op=op)
         ang = math.atan2(y2 - y1, x2 - x1)
         p = [(x2, y2), (x2 - head * math.cos(ang - .45), y2 - head * math.sin(ang - .45)),
              (x2 - head * math.cos(ang + .45), y2 - head * math.sin(ang + .45))]
-        self.poly(p, fill=color, closed=True)
+        self.poly(p, fill=color, closed=True, op=op)
 
     def raw(self, svg: str):
         self.svg.append(svg)
@@ -1075,8 +1080,10 @@ def links(c: Canvas, spec: dict, y0: float) -> float:
 
 # ------------------------------------------------------------------ hops（幾跳才到答案）
 def hops(c: Canvas, spec: dict, y0: float) -> float:
-    """nodes = 每一列 [{text, sub?, hops}]；heads = [起點標籤, 終點標籤]（選用）。每一跳等長，箭頭數 = hops。"""
+    """nodes = 每一列 [{text, sub?, sub2?, shortcut?, hops}]；heads = [起點標籤, 終點標籤]（選用）。每一跳等長，箭頭數 = hops。
+    fade: true（頂層）＝箭頭一跳比一跳淡；shortcut: true（每列）＝鏈上方畫一條被叉掉的虛線捷徑，標籤是該列的 sub2。"""
     rows, heads = spec["nodes"], spec.get("heads", [])
+    fade = bool(spec.get("fade"))
     r, w = 26, X1 - X0
     hmax = max(n["hops"] for n in rows)
     for n in rows:
@@ -1085,9 +1092,12 @@ def hops(c: Canvas, spec: dict, y0: float) -> float:
         nums = re.findall(r"\d+", n["text"] + " " + n.get("sub", ""))
         if nums and str(n["hops"]) not in nums:
             raise ValueError(f"hops 圖上的數字 {nums} 與箭頭數 {n['hops']} 不符（圖上畫幾跳，文字就要寫幾跳）")
+        if n.get("shortcut") and not n.get("sub2"):
+            raise ValueError("hops 的 shortcut 那一列要有 sub2（捷徑被叉掉的標籤）")
     step = (w - 2 * r) / hmax
     lab_h = 40 if heads else 0
-    hs = [c.lines(n["text"], w, 34) * 44.2 + (c.lines(n["sub"], w, 28) * 39.2 + 6 if n.get("sub") else 0) + 2 * r + lab_h + 30 for n in rows]
+    SC = 120                                    # 捷徑弧線與標籤佔的高度
+    hs = [c.lines(n["text"], w, 34) * 44.2 + (c.lines(n["sub"], w, 28) * 39.2 + 6 if n.get("sub") else 0) + 2 * r + lab_h + 30 + (SC if n.get("shortcut") else 0) for n in rows]
     total = sum(hs) + 36 * (len(rows) - 1)
     _fit(total, BOTTOM - y0, "hops")
     extra = min((BOTTOM - y0 - total) / len(rows), 90)
@@ -1099,10 +1109,20 @@ def hops(c: Canvas, spec: dict, y0: float) -> float:
         ty = y + l1 * 44.2
         if n.get("sub"):
             c.text(X0, ty + 4, w, n["sub"], "ds", TEAL, "left"); ty += c.lines(n["sub"], w, 28) * 39.2 + 6
-        cy = ty + 18 + r + (h - (ty - y) - 18 - 2 * r - lab_h) / 2
+        sc = SC if n.get("shortcut") else 0
+        cy = ty + 18 + sc + r + (h - (ty - y) - 18 - sc - 2 * r - lab_h) / 2
         xs = [X0 + r + i * step for i in range(n["hops"] + 1)]
-        for a, b in zip(xs, xs[1:]):
-            c.arrow(a + r + 4, cy, b - r - 8, cy, DEEP, 6, 20)
+        if sc:                                  # 捷徑：從起點直接跳到答案，被叉掉
+            top = cy - r - 54
+            c.line(xs[0], cy - r - 6, xs[0] + 40, top, TEAL, 4, dash="10 10")
+            c.line(xs[0] + 40, top, xs[-1] - 40, top, TEAL, 4, dash="10 10")
+            c.line(xs[-1] - 40, top, xs[-1], cy - r - 6, TEAL, 4, dash="10 10")
+            mx = (xs[0] + xs[-1]) / 2
+            c.circle(mx, top, 22, fill=CREAM, stroke=DEEP, sw=4)
+            c.line(mx - 11, top - 11, mx + 11, top + 11, DEEP, 5); c.line(mx - 11, top + 11, mx + 11, top - 11, DEEP, 5)
+            c.text(mx - 330, top - 68, 660, n["sub2"], "ds", DEEP, "center")
+        for k, (a, b) in enumerate(zip(xs, xs[1:])):
+            c.arrow(a + r + 4, cy, b - r - 8, cy, DEEP, 6, 20, op=(round(1 - 0.2 * k, 2) if fade else None))
         for i, x in enumerate(xs):
             last = i == len(xs) - 1
             c.circle(x, cy, r, fill=GOLD if last else DEEP)
@@ -1146,9 +1166,18 @@ def bubble(c: Canvas, spec: dict, y0: float) -> float:
     c.text(X0, y0, lw, heads[0], "ds", TEAL, "left")
     c.text(rx0, y0, rw, heads[1], "ds", TEAL, "left")
     cy = top + bh / 2
-    c.line(X0 + 36, cy, X0 + lw - 36, cy, DEEP, 6)                  # 左：一條邊只連兩個點
-    c.circle(X0 + 36, cy, 24, fill=DEEP)
-    c.circle(X0 + lw - 36, cy, 24, fill=DEEP)
+    if spec.get("chain"):                                           # 左：同一批實體拆成一串「只連兩點」的邊，每個點標名字
+        m = len(items)
+        cxs = [X0 + 40 + k * (lw - 80) / (m - 1) for k in range(m)]
+        for a, b in zip(cxs, cxs[1:]):
+            c.line(a, cy, b, cy, DEEP, 6)
+        for x_, it in zip(cxs, items):
+            c.circle(x_, cy, 20, fill=DEEP)
+            c.text(x_ - 55, cy + 32, 110, it["text"], "ds", DEEP, "center")
+    else:
+        c.line(X0 + 36, cy, X0 + lw - 36, cy, DEEP, 6)              # 左：一條邊只連兩個點
+        c.circle(X0 + 36, cy, 24, fill=DEEP)
+        c.circle(X0 + lw - 36, cy, 24, fill=DEEP)
     c.rect(rx0, top, rw, bh, fill=GOLD, stroke=GOLD, sw=6, rx=int(min(bh / 2, 90)), op=.22)      # 右：金色泡泡
     y = top + (bh - (len(rows) * ch + (len(rows) - 1) * 16)) / 2
     for r in rows:
@@ -1671,11 +1700,149 @@ def rails(c: Canvas, spec: dict, y0: float) -> float:
     return y + rh
 
 
+# ------------------------------------------------------------------ scoreboard（戰績表：資料集 × 欄，每格兩條橫條）
+def scoreboard(c: Canvas, spec: dict, y0: float) -> float:
+    """nodes = 每列一個資料集 [{text, sub?, emph?}]；heads = 兩個欄標籤；outcomes = 圖例 [{text（深色）}, {text（淺色）}]；
+    cells[列][欄] = [深色值, 淺色值]（字串）。每格兩條橫條，軸從 0 起（axis_max 預設 100），長度與數值成正比；深色值小於淺色值的格子畫虛線框。"""
+    rows, heads, leg, cells = spec["nodes"], spec["heads"], spec["outcomes"], spec["cells"]
+    amax = float(spec.get("axis_max", 100))
+    if len(cells) != len(rows) or any(len(r_) != len(heads) for r_ in cells):
+        raise ValueError(f"scoreboard 的 cells 要 {len(rows)} 列 × {len(heads)} 欄")
+    if len(leg) != 2:
+        raise ValueError("scoreboard 的 outcomes 要 2 個（圖例：深色、淺色）")
+    w = X1 - X0
+    lw = 340
+    cw = (w - lw) / len(heads)
+    bh_, bg_, pad = 44, 14, 18
+    head_h = 56
+    gap = 14
+    need_text = [c.lines(n["text"], lw - 28, 34) * 44.2 + (c.lines(n["sub"], lw - 28, 28) * 39.2 + 6 if n.get("sub") else 0) + 2 * pad for n in rows]
+    rh = [max(2 * bh_ + bg_ + 2 * pad, t) for t in need_text]
+    total = head_h + 10 + sum(rh) + gap * (len(rows) - 1)
+    _fit(total, BOTTOM - y0, "scoreboard")
+    add = min((BOTTOM - y0 - total) / len(rows), 40)
+    rh = [h + add for h in rh]
+    # 圖例（左上）與欄標籤
+    lx = X0
+    for col, n in zip((DEEP, LIGHT), leg):
+        c.rect(lx, y0 + 14, 26, 26, fill=col, rx=5)
+        c.text(lx + 36, y0 + 8, 200, n["text"], "dl", DEEP, "left")
+        lx += 36 + (len(n["text"]) * 17 + 20)
+    for j, hd in enumerate(heads):
+        c.text(X0 + lw + j * cw, y0 + 8, cw, hd, "dl", TEAL, "center")
+    y = y0 + head_h + 10
+    barmax = cw - 2 * 18 - 84
+    for i, (n, h) in enumerate(zip(rows, rh)):
+        if n.get("emph"):
+            c.rect(X0 - 12, y - 8, w + 24, h + 16, fill=GOLD, op=.22, rx=18)
+        box = (X0, y, lw, h)
+        th = c.lines(n["text"], lw - 28, 34) * 44.2 + (c.lines(n["sub"], lw - 28, 28) * 39.2 + 6 if n.get("sub") else 0)
+        ty = y + (h - th) / 2
+        c.text(X0 + 6, ty, lw - 28, n["text"], "dn", DEEP, "left", box)
+        if n.get("sub"):
+            c.text(X0 + 6, ty + c.lines(n["text"], lw - 28, 34) * 44.2 + 6, lw - 28, n["sub"], "ds", DEEP if n.get("emph") else TEAL, "left", box)
+        for j in range(len(heads)):
+            a, b = cells[i][j]
+            cx = X0 + lw + j * cw + 8
+            lose = float(a) < float(b)
+            c.rect(cx, y, cw - 16, h, fill="none", stroke=DEEP, sw=3, rx=14, dash="9 8" if lose else None, op=None)
+            by = y + (h - (2 * bh_ + bg_)) / 2
+            for k, (val, col, tc) in enumerate(((a, DEEP, DEEP), (b, LIGHT, TEAL))):
+                L = float(val) / amax * barmax
+                yy = by + k * (bh_ + bg_)
+                c.rect(cx + 14, yy, L, bh_, fill=col, rx=6)
+                c.text(cx + 14 + L + 10, yy + (bh_ - 28 * 1.4) / 2, 84, val, "dl", DEEP if n.get("emph") else tc, "left")
+        y += h + gap
+    return y - gap
+
+
+# ------------------------------------------------------------------ leak（每一跳都漏一些）
+def leak(c: Canvas, spec: dict, y0: float) -> float:
+    """nodes = 兩條路 [{text, sub?}（走很多跳的）, {text, sub?}（一次到位的）]；heads = 箭頭上的標籤（例：剪枝，兩條路共用）。
+    兩條路從同一個起點走到同一個終點：第一條分 3 跳（4 格），第二條一跳（2 格）。每一格是 2 × 5 個點，實心＝留下、虛線空點＝漏掉；點數是固定示意。"""
+    A, B = spec["nodes"]
+    lab = spec["heads"][0]
+    w = X1 - X0
+    cols, rows_, pitch, rr = 2, 5, 30, 11
+    binw, binh = cols * pitch + 18, rows_ * pitch + 18
+    def th(n):
+        return c.lines(n["text"], w, 34) * 44.2 + (c.lines(n["sub"], w, 28) * 39.2 + 6 if n.get("sub") else 0)
+    lane = lambda n: th(n) + 14 + binh + 12
+    total = lane(A) + lane(B) + 30
+    _fit(total, BOTTOM - y0, "leak")
+    extra = min((BOTTOM - y0 - total) / 2, 50)
+    y = y0
+    xs_a = [X0 + i * ((w - binw) / 3) for i in range(4)]
+    xs_b = [X0, X0 + w - binw]
+    plans = ((A, xs_a, [10, 8, 6, 5], TEAL, False), (B, xs_b, [10, 9], DEEP, True))
+    for n, xs, keep, col, win in plans:
+        c.text(X0, y, w, n["text"], "dn", DEEP, "left")
+        if n.get("sub"):
+            c.text(X0, y + c.lines(n["text"], w, 34) * 44.2 + 4, w, n["sub"], "ds", TEAL, "left")
+        by = y + th(n) + 14 + extra / 2
+        for k, (x, kp) in enumerate(zip(xs, keep)):
+            last = k == len(xs) - 1
+            c.rect(x, by, binw, binh, fill=GOLD if (win and last) else "none", stroke=col, sw=3, rx=10, op=.25 if (win and last) else None)
+            for q in range(cols * rows_):
+                px, py = x + 9 + pitch / 2 + (q % cols) * pitch, by + 9 + pitch / 2 + (q // cols) * pitch
+                if q < kp:
+                    c.circle(px, py, rr, fill=col)
+                else:
+                    c.circle(px, py, rr, fill="none", stroke=col, sw=2, dash="4 4")
+            if k:
+                x0_, x1_ = xs[k - 1] + binw + 10, x - 10
+                c.arrow(x0_, by + binh / 2, x1_, by + binh / 2, col, 5, 18)
+                c.text((x0_ + x1_) / 2 - 60, by + binh / 2 - 46, 120, lab, "ds", col, "center")
+        y = by + binh + 12 + extra / 2 + 30
+    return y - 30
+
+
+# ------------------------------------------------------------------ amplify（誤差沿路放大 vs 精確比對）
+def amplify(c: Canvas, spec: dict, y0: float) -> float:
+    """nodes = 兩條路 [{text, sub?}, {text, sub?}]；heads = 第一條兩端的標籤 [起點, 終點]；outcomes[0] = 第二條帶子的標籤。
+    第一條畫成越來越寬的楔形（誤差越傳越大），第二條是等寬的金色帶（精確比對）；沿路四個站；純示意。"""
+    A, B = spec["nodes"]
+    h0, h1 = spec["heads"]
+    lb = spec["outcomes"][0]["text"]
+    w = X1 - X0
+    th = lambda n: c.lines(n["text"], w, 34) * 44.2 + (c.lines(n["sub"], w, 28) * 39.2 + 6 if n.get("sub") else 0)
+    band, lab_h = 170, 44
+    total = th(A) + band + lab_h + 30 + th(B) + 120 + lab_h
+    _fit(total, BOTTOM - y0, "amplify")
+    extra = min((BOTTOM - y0 - total) / 2, 50)
+    stations = [X0 + 30 + i * ((w - 60) / 3) for i in range(4)]
+    # 第一條：楔形
+    y = y0
+    c.text(X0, y, w, A["text"], "dn", DEEP, "left")
+    if A.get("sub"):
+        c.text(X0, y + c.lines(A["text"], w, 34) * 44.2 + 4, w, A["sub"], "ds", TEAL, "left")
+    cy = y + th(A) + 14 + band / 2 + extra / 2
+    c.poly([(X0 + 30, cy - 8), (X1 - 10, cy - band / 2), (X1 - 10, cy + band / 2), (X0 + 30, cy + 8)], fill=TEAL, closed=True, op=.30)
+    c.line(X0 + 30, cy, X1 - 10, cy, DEEP, 5)
+    for i, x in enumerate(stations):
+        c.circle(x, cy, 16, fill=DEEP)
+    ly = cy + band / 2 + 8
+    c.text(X0, ly, 400, h0, "ds", TEAL, "left")
+    c.text(X1 - 400, ly, 400, h1, "ds", DEEP, "right")
+    # 第二條：等寬帶
+    y2 = ly + lab_h + 30 + extra / 2
+    c.text(X0, y2, w, B["text"], "dn", DEEP, "left")
+    if B.get("sub"):
+        c.text(X0, y2 + c.lines(B["text"], w, 34) * 44.2 + 4, w, B["sub"], "ds", TEAL, "left")
+    cy2 = y2 + th(B) + 14 + 40
+    c.rect(X0 + 30, cy2 - 20, w - 40, 40, fill=GOLD, op=.55, stroke=GOLD, sw=3, rx=8)
+    for x in stations:
+        c.circle(x, cy2, 16, fill=DEEP)
+        c.line(x - 7, cy2 - 4, x + 7, cy2 - 4, CREAM, 3); c.line(x - 7, cy2 + 4, x + 7, cy2 + 4, CREAM, 3)     # 等號：精確相等才連上
+    c.text(X0, cy2 + 40, w, lb, "ds", DEEP, "left")
+    return cy2 + 40 + 39.2
+
+
 KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "paths": paths, "epochs": epochs,
          "dotgrid": dotgrid, "dumbbell": dumbbell, "range": range_chart, "funnel": funnel,
          "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation, "tokens": tokens,
          "seesaw": seesaw, "hidden": hidden, "cycle": cycle, "links": links, "hops": hops, "bubble": bubble, "drift": drift, "ingest": ingest,
-         "roles": roles, "embed": embed, "online": online, "gate": gate, "concat": concat, "joint": joint, "rails": rails}
+         "roles": roles, "embed": embed, "online": online, "gate": gate, "concat": concat, "joint": joint, "rails": rails, "scoreboard": scoreboard, "leak": leak, "amplify": amplify}
 
 
 def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:
@@ -1695,6 +1862,9 @@ def texts(sl: dict) -> list[str]:
             out.append(cell["text"]); out += [cell["sub"]] if cell.get("sub") else []
     for n in sl.get("nodes", []) + sl.get("outcomes", []):
         out.append(n["text"]); out += [n["sub"]] if n.get("sub") else []; out += [n["sub2"]] if n.get("sub2") else []; out += [n["win"]] if n.get("win") else []
+    for row in sl.get("cells", []):
+        for pair in row:
+            out += list(pair)
     if sl.get("loop"):
         out.append(sl["loop"])
     for col in sl.get("columns", []):

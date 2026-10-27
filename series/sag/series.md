@@ -14,7 +14,7 @@ members:
     summary: SQL 串事件、向量補語意，候選縮到 100 個以內後，才由 LLM 決選。   # 系列地圖與第 2 頁回顧顯示的細節；依該則的卡寫，發布前由忠實者審過一次
   - concept: sag-results-and-gain-source
     planned_title: SAG 的成績從哪來？
-    summary: MuSiQue 上，成績主要靠 SQL 檢索流程、不是超邊本身；同樣向量模型下，找回率領先對照組近 15 個百分點。   # 系列地圖與第 2 頁回顧顯示的細節；依該則的卡寫，發布前由忠實者審過一次
+    summary: MuSiQue 成績主要靠 SQL 檢索流程、不是超邊；同樣向量模型下，Recall 領先對手近 15 個百分點。   # 系列地圖與第 2 頁回顧顯示的細節；依該則的卡寫，發布前由忠實者審過一次
   - concept: sag-tradeoffs-price-paid
     planned_title: SAG 付出了什麼代價？
     summary: 為了簡單、寫入快，SAG 付了三個代價：固定名額漏掉罕見實體、同實體寫法不同時連結可能變少、目前不能更新資料。   # 系列地圖與第 2 頁回顧顯示的細節；依該則的卡寫，發布前由忠實者審過一次

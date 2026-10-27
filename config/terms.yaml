@@ -10,3 +10,5 @@ replace:
   目標模型: 目標 Agent       # skillopt 系列用「目標 Agent」（2026-10-12 人確認）
   多步: Multi-Hop            # SAG 系列（2026-10-24 人的用語）：多步推理 -> Multi-Hop 推理、多步依賴 -> Multi-Hop 依賴；台灣讀者習慣說 Multi-Hop
   多跳: Multi-Hop            # 同上：多跳傳播 -> Multi-Hop 傳播
+  找回率: Recall        # SAG 第 3 則（2026-10-27 人的回饋）：指標名一律寫英文 Recall、Recall@5，台灣讀者較看得懂；不寫找回率
+  召回率: Recall        # 同上
