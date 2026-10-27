@@ -27,4 +27,5 @@ posts:
   hook_type: 讀者疑問
   mentions: []
   backfilled:
+  - sag-results-and-gain-source
   - sag-sql-vector-llm-division-and-funnel
