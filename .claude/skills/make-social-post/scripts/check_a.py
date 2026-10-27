@@ -206,6 +206,11 @@ def main(spec_path: str) -> int:
             err.append(f"slide{i:02d}: 圖表版型補充 {len(body)} 字，超過 {P['chart_body_max_chars']}（補充行數預檢）")
         if sl["layout"] == "context" and len(body) > P["context_body_max_chars"]:
             err.append(f"slide{i:02d}: 脈絡張補充 {len(body)} 字，超過 {P['context_body_max_chars']}")
+        note = strip_marks(sl.get("note", "")).strip()      # 圖註、腳註要是完整的一句，不是為了塞進字數而截斷的片段（人的回饋，2026-10-27）
+        if note and re.search(r"[；：、，與和在]$", note):
+            err.append(f"slide{i:02d}: 圖註「{note}」以「{note[-1]}」結尾，像被截斷的片段；寫成完整的一句，或搬到別頁")
+        elif note and re.search(r"[的上]$", note):
+            hint.append(f"slide{i:02d}: 圖註「{note}」以「{note[-1]}」結尾，確認是完整的一句，不是被截斷的片段")
         if sl["layout"] == "diagram":      # 圖只是把同張的標題與補充重講一遍：要換成文字沒有的資訊（具體的假設例子、關係、對比）
             dtxt = re.sub(r"\s+", "", " ".join(D.texts(sl)))
             btxt = re.sub(r"\s+", "", " ".join(strip_marks(sl.get(k, "")) for k in ("title", "body")))

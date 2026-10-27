@@ -12,7 +12,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 1. `git submodule update --remote`（卡要是最新的）。第一次 clone 用 `git submodule update --init --remote`。
 2. `uv sync`；Chromium 在 repo 內，沒有就 `PLAYWRIGHT_BROWSERS_PATH=$PWD/.playwright-browsers uv run playwright install chromium`（細節見 `references/setup.md`）。腳本一律 `uv run python .claude/skills/make-social-post/scripts/<name>.py`。
 3. **看現況**：`state.py status`（每個觀念各格式是 `not_tried`／`ready`／`published`、存量），再看 `out/README.md`（待發布與各系列狀態）。
-4. **（新系列／規劃時）** 跑 `series_deps.py <系列 id>` 並**一定要問人哪些卡要合併**（`references/batch-and-publish.md` §1）；成員定案後在 `series.md` 加 `members_locked: true`，再發第 1 則；**預設先把整個系列每一則的 spec 都做完、張數與 `planned_title` 定案，才鎖定並發第 1 則**（2026-10-11 人決定；鎖定後不改成員與標題）。人明確要求先發時可以，規則與要講明的代價見 `CLAUDE.md`「工作方式」。
+4. **（新系列／規劃時）** 跑 `series_deps.py <系列 id>` 並**一定要問人哪些卡要合併**（`references/batch-and-publish.md` §1）；成員與 `planned_title` 定案後在 `series.md` 加 `members_locked: true`，再發第 1 則（預設先做完整個系列的 spec；人要求先發的例外與要講明的代價見 `CLAUDE.md`「工作方式」）。
 4b. **決定這次做哪一則**：照系列檔 `series/<id>/series.md` 的 `members` 順序，找第一個還是 `not_tried` 的觀念；這是預設，要不要照做由人決定。
 5. 要做的觀念，**只讀它的卡**（`concept-wiki/wiki/concepts/<id>.md`），不讀 blog。同時讀 `concept-wiki/docs/card-format.md`（卡格式與 status 語意）。**卡上主張若附 `figures`，用 Read 實際打開圖檔看**（路徑 `concept-wiki/wiki/<file>`），不要只看路徑或圖說；圖只是參考，貼文要用就重製（`references/anchor-writing-rules.md`「參考圖」）。
 6. 如果這次要**發布**，先看 `references/publish-flow.md` 的「發文前的前提」。
@@ -22,7 +22,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 ```
 [1] 選觀念、系列規劃 → [2] hook 候選（人挑）→ [3] 寫內容規格 spec.json
  → [4] 程式 A（check_a）→ [5] 渲染 + 程式 B（render）→ [6] 組發布文字（build_package）
- → [7] 自檢 + 審查：忠實者（嚴格）、讀者（預設一般讀者，要看圖）、編輯（只給建議，要看圖）→ [8] 批次層檢查（batch_check）
+ → [7] 自檢 + 審查：忠實者（嚴格）、讀者（預設一般讀者，要看圖）、編輯（不擋，但易懂／圖／所以呢／制式要處理；要看圖）→ [8] 批次層檢查（batch_check）
  → [9] 人最後確認 → [10] state.py ready → [11] 發布到 IG 與 Threads（人確認後）→ 寫回狀態
 ```
 

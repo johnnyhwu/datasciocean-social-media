@@ -145,5 +145,25 @@ try:
 except AssertionError:
     check("state：格式名打錯會報錯", True)
 
+# state ready：暫用的 hook 沒有人明講接受就不能標 ready
+with tempfile.TemporaryDirectory() as d:
+    pack = Path(d) / "pack"
+    (pack / "_build").mkdir(parents=True)
+    spec = {"hook": {"candidate": "暫定（待人挑）"}}
+    (pack / "_build" / "spec.json").write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
+    S.STATE = Path(d) / "state"
+    cid = S.concept_ids()[0]
+    with contextlib.redirect_stdout(io.StringIO()) as _buf:
+        rc = S.main(["ready", cid, "ig_carousel", str(pack)])
+    check("state ready：hook 暫定 → 拒絕且不寫狀態", rc == 1 and not S.path_of(cid).exists() and "暫用" in _buf.getvalue(), _buf.getvalue())
+    with contextlib.redirect_stdout(io.StringIO()):
+        rc = S.main(["ready", cid, "ig_carousel", str(pack), "--hook-accepted"])
+    check("state ready：加 --hook-accepted → 通過並寫 ready", rc == 0 and S.load(cid)["formats"]["ig_carousel"]["status"] == "ready")
+    spec["hook"]["candidate"] = "A（人挑）"
+    (pack / "_build" / "spec.json").write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
+    with contextlib.redirect_stdout(io.StringIO()):
+        rc = S.main(["ready", cid, "threads_thread", str(pack)])
+    check("state ready：hook 已定案 → 不需旗標", rc == 0)
+
 print(f"\n{'全部通過' if not fails else f'{len(fails)} 項失敗：' + '; '.join(fails)}")
 sys.exit(1 if fails else 0)

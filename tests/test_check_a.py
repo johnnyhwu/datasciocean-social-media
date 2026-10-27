@@ -93,6 +93,8 @@ CASES = [  # (名稱, 基底, 修改, 預期錯誤中要出現的字串)
     ("投影片超過上限張數（slides_max）", GOOD_A, lambda s: s["slides"].extend([copy.deepcopy(s["slides"][2]) for _ in range(SLIDES_MAX)]), "超過 %d" % SLIDES_MAX),
     ("用語：貼文寫了「判官」而不是 Judge", GOOD_A, lambda s: s["threads"]["items"][0].update(text=s["threads"]["items"][0]["text"] + "這個判官很快。"), "用語"),
     ("用語：貼文寫了「找回率」而不是 Recall", GOOD_A, lambda s: s["threads"]["items"][0].update(text=s["threads"]["items"][0]["text"] + "找回率提高了。"), "用語"),
+    ("圖註被截斷成片段（以「；」結尾）", GOOD_A, lambda s: s["slides"][4].update(note="Recall@5：前 5 筆找回的比例；"), "像被截斷"),
+    ("圖註以「上」結尾（HINT）", GOOD_A, lambda s: s["slides"][4].update(note="Recall@5：前 5 筆找回的比例；MuSiQue 上"), "確認是完整的一句"),
     ("Threads 輪播模式卻還有逐張 items", GOOD_A, lambda s: s["threads"].update(mode="carousel"), "不該有 items"),
     ("Threads 輪播超過 20 張", GOOD_A, lambda s: (s["threads"].update(mode="carousel", items=[]), s["slides"].extend([copy.deepcopy(s["slides"][2]) for _ in range(20)])), "輪播要 2～20 張"),
     ("獨立貼文的延伸閱讀沒有 items", GOOD_A, lambda s: (standalone(s), s["slides"][-1].pop("items")), "要有 items"),

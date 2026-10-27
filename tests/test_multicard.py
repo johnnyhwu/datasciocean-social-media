@@ -304,6 +304,13 @@ buf = io.StringIO()
 with contextlib.redirect_stdout(buf):
     rc3 = VR.main(str(post_txt), str(rj), [2])
 check("verify_reader：答對又補一句「貼文沒有…」不被誤判成漏看", rc3 == 0, buf.getvalue())
+good_reader["takeaways"] = [{"slide": 3, "takeaway": "講不出來", "quote": "差距在 2% 內", "no_takeaway": True}]
+rj.write_text(json.dumps(good_reader, ensure_ascii=False), encoding="utf-8")
+buf = io.StringIO()
+with contextlib.redirect_stdout(buf):
+    rc_tk = VR.main(str(post_txt), str(rj), [2])
+check("verify_reader：實驗頁讀者講不出結論（no_takeaway）→ 退回", rc_tk != 0 and "缺「所以呢」" in buf.getvalue(), buf.getvalue())
+del good_reader["takeaways"]
 good_reader["post_only_questions"][0]["answer"] = "貼文沒寫"
 rj.write_text(json.dumps(good_reader, ensure_ascii=False), encoding="utf-8")
 buf = io.StringIO()

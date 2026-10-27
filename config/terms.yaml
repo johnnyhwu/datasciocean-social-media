@@ -12,3 +12,7 @@ replace:
   多跳: Multi-Hop            # 同上：多跳傳播 -> Multi-Hop 傳播
   找回率: Recall        # SAG 第 3 則（2026-10-27 人的回饋）：指標名一律寫英文 Recall、Recall@5，台灣讀者較看得懂；不寫找回率
   召回率: Recall        # 同上
+  精確率: Precision      # 同上：指標名寫英文（2026-10-27）
+  精準率: Precision
+  嵌入向量: embedding    # 同上：embedding 不翻譯
+  向量嵌入: embedding

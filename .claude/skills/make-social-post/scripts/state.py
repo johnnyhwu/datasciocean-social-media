@@ -6,8 +6,9 @@
 用法（repo 根目錄）：
   uv run python .claude/skills/make-social-post/scripts/state.py status
       列出每個觀念的論點、各格式狀態（新格式與沒有狀態檔的觀念都算 not_tried）
-  uv run python .claude/skills/make-social-post/scripts/state.py ready <concept> <format> <pack-dir>
-      發布包完成、等人確認後發布（存量就是 ready 的數量）
+  uv run python .claude/skills/make-social-post/scripts/state.py ready <concept> <format> <pack-dir> [--hook-accepted]
+      發布包完成、等人確認後發布（存量就是 ready 的數量）。spec 的 hook.candidate 還寫著「暫定／待人挑」時會拒絕；
+      人明講接受 hook（「目前可以」不算）後才加 --hook-accepted
   uv run python .claude/skills/make-social-post/scripts/state.py unsuitable <concept> <format> "<原因>"
       這個格式做不出合格版本（pipeline 不再自動嘗試；觀念卡不動）
   uv run python .claude/skills/make-social-post/scripts/state.py record <concept> <format> --url URL
@@ -21,6 +22,7 @@ posts[] 必須記錄的識別碼（成效分析系統事後很難補）：觀念
 """
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -83,6 +85,16 @@ def status() -> None:
     ready = sum(1 for cid in cards if any((v or {}).get("status") == "ready" and not (v or {}).get("merged_into")
                                           for v in load(cid)["formats"].values()))
     print(f"\n存量（ready）：{ready} 則")
+
+
+def provisional_hook(pack: str) -> str | None:
+    """發布包的 hook 還是暫用的（spec.json 的 hook.candidate 含「暫定」或「待人」）就回傳該文字，否則 None。
+    暫用的 hook 要人明講接受才能標 ready（規則 12；發布不能撤回）。找不到 spec.json 不擋。"""
+    sp = Path(pack) / "_build" / "spec.json"
+    if not sp.exists():
+        return None
+    cand = str((json.loads(sp.read_text(encoding="utf-8")).get("hook") or {}).get("candidate") or "")
+    return cand if re.search(r"暫定|待人", cand) else None
 
 
 def set_format(concept: str, fmt: str, **fields) -> None:
@@ -183,6 +195,11 @@ def main(a: list[str]) -> int:
     if cmd == "status":
         status()
     elif cmd == "ready":
+        cand = provisional_hook(a[3])
+        if cand and "--hook-accepted" not in a:
+            print(f"拒絕標 ready：hook 還是暫用的（hook.candidate＝「{cand}」）。\n"
+                  "先單獨問人是否接受這個 hook（要明講接受，「目前可以」不算）；人接受後加 --hook-accepted 重跑。")
+            return 1
         set_format(a[1], a[2], status="ready", pack=a[3])
     elif cmd == "unsuitable":
         set_format(a[1], a[2], status="unsuitable", reason=a[3])
