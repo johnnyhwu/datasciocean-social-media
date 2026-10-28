@@ -41,6 +41,12 @@
             每格兩條橫條，軸從 0 起、長度與數值成正比（axis_max 預設 100）；深色值小於淺色值的格子畫虛線框（圖註要說明）；emph 的列底下墊金色淡底
   leak      每一跳都漏一些（2026-10-26）：nodes = 兩條路 [{text, sub?}（走很多跳的）, {text, sub?}（一次到位的）]、heads = 兩條路箭頭上的標籤（例：剪枝）；兩條路從同一個起點到同一個終點，每個站畫一格點，漏掉的畫成虛線空點；點數是固定示意，圖註要標「示意」
   amplify   誤差沿路放大 vs 精確比對（2026-10-26）：nodes = 兩條路 [{text, sub?}, {text, sub?}]、heads = 第一條的兩端標籤（起點、終點）、outcomes[0] = 第二條的標籤；第一條畫一個越來越寬的楔形，第二條是一條等寬的金色帶；純示意
+  receipt   帳單（2026-10-27，SAG 第 4 則）：heads = [抬頭, 「換來的」標籤]、nodes = 品項 2～4 個 [{text, sub?}]（自動編號）、outcomes = 換來的東西 1～3 個 [{text}]（金色小標籤）；米色紙、下緣鋸齒
+  squeeze   名額線擠掉了誰（2026-10-27）：heads = [左端標, 右端標, 名額線標]、nodes = [{text, sub?}（上方說明）, {text, sub?}（被擠出去的金點）]、outcomes = 推理鏈兩端 [{text}, {text}]；排隊的點是固定示意，圖註要標「示意」
+  alias     別名對齊：傳統合併、SAG 不合併（2026-10-27）：heads = [上段標, 下段標]、outcomes = 同一個東西的 3 種寫法 [{text}]、nodes = [{text, sub?}（合併後）, {text, sub?}（下段說明）]；純示意
+  handoff   把工作從線下搬到線上（2026-10-27）：heads = [上帶標, 下帶標, 箭頭標]、nodes = [{text, sub?}（線下不做的事）, {text, sub?}（線上接手的做法）]、outcomes[0] = {text}（線下因此得到的好處）；純示意
+  mismatch  同一個東西寫法不同就接不起來（2026-10-27）：heads = [上段標, 下段標, 缺口標]、nodes = [{text, sub?}（共同寫法＋上段說明）, {text, sub?}（另一種寫法＋下段說明）]、outcomes = 兩個事件 [{text, sub?}]；純示意
+  ledger    只能往後新增的記錄簿（2026-10-27）：heads = [時間軸標籤]、nodes = 依時間排的紀錄 2～5 筆 [{text, sub?, new?, ask?}]（舊的畫鎖、new 金色加「＋」、ask 左邊釘金色「？」表示分不出誰有效）、outcomes[0] = {text, sub?}（右邊說明）；例子要標「假設」
   stops     由上往下三個停靠點（不按比例）：nodes = [{text, sub?, emph?}]、選用 heads = [上端標籤, 下端標籤]
 
 規則：圖形全部用 class "bg"（不進程式 B 的文字與圖形重疊檢查），所以排版由這裡負責避開文字；框內的文字由程式 B 的「框內文字不超出框」檢查；
@@ -1838,11 +1844,341 @@ def amplify(c: Canvas, spec: dict, y0: float) -> float:
     return cy2 + 40 + 39.2
 
 
+# ------------------------------------------------------------------ 2026-10-27（SAG 第 4 則）：receipt／squeeze／alias／handoff／mismatch／ledger
+def _th(c: Canvas, n: dict, w: float) -> float:
+    """一個 {text, sub?} 在寬 w 內的文字高度（text 34 px、sub 28 px）。"""
+    return c.lines(n["text"], w, 34) * 44.2 + (c.lines(n["sub"], w, 28) * 39.2 + 6 if n.get("sub") else 0)
+
+
+def _cross(c: Canvas, x: float, y: float, r: float, color: str = DEEP, sw: int = 5) -> None:
+    c.line(x - r, y - r, x + r, y + r, color, sw)
+    c.line(x - r, y + r, x + r, y - r, color, sw)
+
+
+def receipt(c: Canvas, spec: dict, y0: float) -> float:
+    """帳單（SAG 第 4 則「付的帳」）：heads = [抬頭, 「換來的」標籤]；nodes = 品項 2～4 個 [{text, sub?}]（每項前面自動編號）；
+    outcomes = 換來的東西 1～3 個 [{text}]（畫成金色小標籤）。一張米色紙，下緣鋸齒；純示意。"""
+    head, got = spec["heads"]
+    items, gains = spec["nodes"], spec["outcomes"]
+    if not 2 <= len(items) <= 4 or not 1 <= len(gains) <= 3:
+        raise ValueError(f"receipt 的 nodes 要 2～4 個品項、outcomes 要 1～3 個，現在是 {len(items)}、{len(gains)}")
+    w = X1 - X0
+    px, pw = X0 + 20, w - 40                             # 紙比版心窄一點
+    tw = pw - 150
+    rows = [max(_th(c, n, tw) + 26, 76) for n in items]
+    gain_h = 60
+    total = 84 + sum(rows) + 8 * (len(rows) - 1) + 34 + 50 + gain_h + 56
+    _fit(total, BOTTOM - y0, "receipt")
+    add = min((BOTTOM - y0 - total) / len(items), 30)
+    rows = [r + add for r in rows]
+    total += add * len(items)
+    zig = []
+    bot = y0 + total
+    steps = 24
+    for i in range(steps + 1):
+        zig.append((px + i * pw / steps, bot if i % 2 == 0 else bot - 16))
+    c.poly([(px, y0), (px + pw, y0)] + zig[::-1], fill=GOLD, closed=True, op=.14)
+    c.poly([(px, bot), (px, y0), (px + pw, y0), (px + pw, bot)], stroke=DEEP, sw=3)
+    c.poly(zig, stroke=DEEP, sw=3)
+    c.text(px + 28, y0 + 14, pw - 56, head, "dl", TEAL, "left")
+    c.line(px + 28, y0 + 70, px + pw - 28, y0 + 70, DEEP, 3, dash="3 9")
+    y = y0 + 86
+    for k, (n, h) in enumerate(zip(items, rows), 1):
+        c.circle(px + 64, y + h / 2, 28, fill=DEEP)
+        c.text(px + 64 - 25, y + h / 2 - 19, 50, str(k), "dl", CREAM, "center")
+        ty = y + (h - _th(c, n, tw)) / 2
+        c.text(px + 120, ty, tw, n["text"], "dn", DEEP, "left")
+        if n.get("sub"):
+            c.text(px + 120, ty + c.lines(n["text"], tw, 34) * 44.2 + 6, tw, n["sub"], "ds", TEAL, "left")
+        y += h + 8
+    y += 4
+    c.line(px + 28, y, px + pw - 28, y, DEEP, 3, dash="3 9")
+    y += 18
+    c.text(px + 28, y, 220, got, "dl", TEAL, "left")
+    y += 50
+    gw = (pw - 56 - 16 * (len(gains) - 1)) / len(gains)
+    for k, g in enumerate(gains):
+        x = px + 28 + k * (gw + 16)
+        c.rect(x, y, gw, gain_h, fill=GOLD, rx=14)
+        c.text(x + 10, y + (gain_h - 44.2) / 2, gw - 20, g["text"], "dn", DEEP, "center", (x, y, gw, gain_h))
+    return bot
+
+
+def squeeze(c: Canvas, spec: dict, y0: float) -> float:
+    """名額線擠掉了誰（SAG 第 4 則：50 個名額擠掉罕見的橋樑實體）：
+    heads = [排隊的左端標籤, 右端標籤, 名額線標籤]；nodes = [{text, sub?}（上方說明）, {text, sub?}（金點：被擠出去的那個）]；
+    outcomes = 底下一條推理鏈的兩端 [{text}（起點）, {text}（終點）]，中間是金色的橋樑點，過了橋就斷（虛線打叉）。
+    排隊的點是固定示意（不是實際數量），圖註要標「示意」。"""
+    hl, hr, hcut = spec["heads"]
+    top, bridge = spec["nodes"]
+    a, b = spec["outcomes"]
+    w = X1 - X0
+    cols, rows_, pitch = 20, 3, 40
+    keep = 12                                            # 前 12 欄留下，其餘被擠出去
+    boxw, boxh = cols * pitch + 40, rows_ * pitch + 40
+    th_top = _th(c, top, w)
+    bh = _th(c, bridge, 560)
+    chain_h = 40
+    total = th_top + 14 + 54 + boxh + 18 + 44 + bh + 40 + chain_h + 34 + 39.2
+    _fit(total, BOTTOM - y0, "squeeze")
+    extra = min((BOTTOM - y0 - total) / 3, 40)
+    y = y0
+    c.text(X0, y, w, top["text"], "dn", DEEP, "left")
+    if top.get("sub"):
+        c.text(X0, y + c.lines(top["text"], w, 34) * 44.2 + 4, w, top["sub"], "ds", TEAL, "left")
+    y += th_top + 14 + extra
+    c.text(X0, y, 400, hl, "dl", TEAL, "left")
+    c.text(X1 - 400, y, 400, hr, "dl", TEAL, "right")
+    by = y + 54
+    bx = X0 + (w - boxw) / 2
+    c.rect(bx, by, boxw, boxh, fill="none", stroke=DEEP, sw=3, rx=18)
+    cutx = bx + 20 + keep * pitch
+    c.rect(bx + 6, by + 6, cutx - bx - 6 - pitch / 2 + 20, boxh - 12, fill=MID, rx=12, op=.14)
+    for r in range(rows_):
+        for k in range(cols):
+            px, py = bx + 20 + pitch / 2 + k * pitch, by + 20 + pitch / 2 + r * pitch
+            if k < keep:
+                c.circle(px, py, 14, fill=MID)
+            elif (r, k) == (2, 16):
+                c.circle(px, py, 19, fill=GOLD, stroke=DEEP, sw=4)
+            else:
+                c.circle(px, py, 13, fill="none", stroke=TEAL, sw=2, dash="4 4")
+    c.line(cutx, by - 14, cutx, by + boxh + 14, GOLD, 6, dash="12 8")
+    c.text(cutx - 200, by + boxh + 18, 400, hcut, "dl", DEEP, "center")
+    gx = bx + 20 + pitch / 2 + 16 * pitch
+    gy = by + 20 + pitch / 2 + 2 * pitch
+    ly = by + boxh + 18 + 44 + extra
+    c.line(gx, gy + 22, gx, ly - 6, GOLD, 4)
+    bw = 560
+    bxl = min(max(gx - bw / 2, X0), X1 - bw)
+    c.text(bxl, ly, bw, bridge["text"], "dn", DEEP, "center")
+    if bridge.get("sub"):
+        c.text(bxl, ly + c.lines(bridge["text"], bw, 34) * 44.2 + 4, bw, bridge["sub"], "ds", TEAL, "center")
+    cy = ly + bh + 40 + chain_h / 2 + extra
+    x1_, xm, x2_ = X0 + 40, X0 + 40 + w * .42, X1 - 40
+    c.circle(x1_, cy, 20, fill=DEEP)
+    c.circle(x2_, cy, 20, fill=DEEP)
+    c.arrow(x1_ + 28, cy, xm - 28, cy, DEEP, 6, 18)
+    c.circle(xm, cy, 24, fill=GOLD, stroke=DEEP, sw=4)
+    c.line(xm + 30, cy, x2_ - 30, cy, TEAL, 5, dash="10 9")
+    _cross(c, (xm + x2_) / 2, cy, 15, DEEP, 6)
+    c.text(x1_ - 40, cy + 34, 220, a["text"], "ds", DEEP, "left")
+    c.text(x2_ - 220 + 40, cy + 34, 220, b["text"], "ds", DEEP, "right")
+    return cy + 34 + 39.2
+
+
+def alias(c: Canvas, spec: dict, y0: float) -> float:
+    """別名對齊：傳統做法合併、SAG 不合併（SAG 第 4 則）。heads = [上段標籤, 下段標籤]；
+    outcomes = 同一個東西的 3 種寫法 [{text}]（上下兩段都畫）；nodes = [{text, sub?}（上段：合併後的那一個）, {text, sub?}（下段的說明）]。純示意。"""
+    h1, h2 = spec["heads"]
+    chips = spec["outcomes"]
+    merged, plain = spec["nodes"]
+    if len(chips) != 3:
+        raise ValueError(f"alias 的 outcomes 要 3 種寫法，現在是 {len(chips)} 個")
+    w = X1 - X0
+    gap = 44
+    cw = (w - 2 * gap) / 3
+    chh = 64
+    mh = _th(c, merged, w - 120) + 36
+    ph = _th(c, plain, w)
+    total = 44 + chh + 60 + mh + 40 + 44 + chh + 16 + ph
+    _fit(total, BOTTOM - y0, "alias")
+    extra = min((BOTTOM - y0 - total) / 3, 40)
+    y = y0
+    c.text(X0, y, w, h1, "dl", TEAL, "left")
+    cy_ = y + 44
+    cxs = [X0 + k * (cw + gap) + cw / 2 for k in range(3)]
+    for k, ch in enumerate(chips):
+        c.rect(cxs[k] - cw / 2, cy_, cw, chh, fill=DEEP, rx=14)
+        c.text(cxs[k] - cw / 2 + 12, cy_ + (chh - 39.2) / 2, cw - 24, ch["text"], "ds", CREAM, "center", (cxs[k] - cw / 2, cy_, cw, chh))
+    my = cy_ + chh + 60 + extra
+    mx, mw = X0 + 60, w - 120
+    for k in range(3):
+        c.arrow(cxs[k], cy_ + chh + 4, X0 + w / 2 + (k - 1) * 150, my - 6, GOLD, 5, 16)
+    c.rect(mx, my, mw, mh, fill=GOLD, op=.30, stroke=GOLD, sw=4, rx=18)
+    mt = _th(c, merged, mw - 40)
+    c.text(mx + 20, my + (mh - mt) / 2, mw - 40, merged["text"], "dn", DEEP, "center", (mx, my, mw, mh))
+    if merged.get("sub"):
+        c.text(mx + 20, my + (mh - mt) / 2 + c.lines(merged["text"], mw - 40, 34) * 44.2 + 6, mw - 40, merged["sub"], "ds", DEEP, "center", (mx, my, mw, mh))
+    y = my + mh + 40 + extra
+    c.line(X0, y - 18, X1, y - 18, TEAL, 2, dash="3 9")
+    c.text(X0, y, w, h2, "dl", TEAL, "left")
+    cy2 = y + 44
+    for k, ch in enumerate(chips):
+        c.rect(cxs[k] - cw / 2, cy2, cw, chh, fill="none", stroke=DEEP, sw=3, rx=14)
+        c.text(cxs[k] - cw / 2 + 12, cy2 + (chh - 39.2) / 2, cw - 24, ch["text"], "ds", DEEP, "center", (cxs[k] - cw / 2, cy2, cw, chh))
+    ty = cy2 + chh + 16
+    c.text(X0, ty, w, plain["text"], "dn", DEEP, "left")
+    if plain.get("sub"):
+        c.text(X0, ty + c.lines(plain["text"], w, 34) * 44.2 + 4, w, plain["sub"], "ds", TEAL, "left")
+    return ty + ph
+
+
+def handoff(c: Canvas, spec: dict, y0: float) -> float:
+    """把工作從線下搬到線上（SAG 第 4 則：別名對齊的壓力推遲到線上）。heads = [上帶標籤, 下帶標籤, 箭頭標籤]；
+    nodes = [{text, sub?}（被搬走、線下不做的事）, {text, sub?}（線上接手的做法）]；outcomes[0] = {text}（線下因此得到的好處，金色）。純示意。"""
+    ht, hb, ha = spec["heads"]
+    gone, took = spec["nodes"]
+    gain = spec["outcomes"][0]
+    w = X1 - X0
+    bw = 420
+    top_h = max(_th(c, gone, bw - 40) + 40, c.lines(gain["text"], w - bw - 140, 34) * 44.2 + 40) + 66
+    bot_h = _th(c, took, w - 84) + 40 + 66
+    gap = 70
+    total = top_h + gap + bot_h
+    _fit(total, BOTTOM - y0, "handoff")
+    extra = min((BOTTOM - y0 - total) / 2, 50)
+    top_h += extra * .5; bot_h += extra * .5; gap += extra * .0
+    y = y0
+    c.rect(X0, y, w, top_h, fill="none", stroke=DEEP, sw=3, rx=18)
+    c.text(X0 + 22, y + 12, w - 44, ht, "dl", TEAL, "left")
+    ih = top_h - 66 - 12
+    iy = y + 66
+    c.rect(X0 + 22, iy, bw, ih, fill="none", stroke=DEEP, sw=4, rx=14, dash="10 8")
+    gt = _th(c, gone, bw - 40)
+    c.text(X0 + 42, iy + (ih - gt) / 2, bw - 40, gone["text"], "dn", TEAL, "left", (X0 + 22, iy, bw, ih))
+    if gone.get("sub"):
+        c.text(X0 + 42, iy + (ih - gt) / 2 + c.lines(gone["text"], bw - 40, 34) * 44.2 + 6, bw - 40, gone["sub"], "ds", TEAL, "left", (X0 + 22, iy, bw, ih))
+    _cross(c, X0 + 22 + bw - 30, iy + 30, 14, DEEP, 5)
+    gx = X0 + 22 + bw + 50
+    gw = X1 - 22 - gx
+    c.rect(gx, iy, gw, ih, fill=GOLD, rx=14)
+    c.text(gx + 20, iy + (ih - c.lines(gain["text"], gw - 40, 34) * 44.2) / 2, gw - 40, gain["text"], "dn", DEEP, "left", (gx, iy, gw, ih))
+    y += top_h
+    c.arrow(X0 + 22 + bw / 2, y - 6, X0 + 22 + bw / 2, y + gap - 4, GOLD, 8, 24)
+    c.text(X0 + 22 + bw / 2 + 24, y + gap / 2 - 22, 440, ha, "ds", DEEP, "left")
+    y += gap
+    c.rect(X0, y, w, bot_h, fill=DEEP, rx=18)
+    c.text(X0 + 22, y + 12, w - 44, hb, "dl", LIGHT, "left")
+    bw = w - 44
+    c.rect(X0 + 22, y + 66, bw, bot_h - 66 - 12, fill=TEAL, rx=14)
+    tt = _th(c, took, bw - 40)
+    ty = y + 66 + (bot_h - 66 - 12 - tt) / 2
+    c.text(X0 + 42, ty, bw - 40, took["text"], "dn", CREAM, "left", (X0 + 22, y + 66, bw, bot_h - 78))
+    if took.get("sub"):
+        c.text(X0 + 42, ty + c.lines(took["text"], bw - 40, 34) * 44.2 + 6, bw - 40, took["sub"], "ds", CREAM, "left", (X0 + 22, y + 66, bw, bot_h - 78))
+    return y + bot_h
+
+
+def mismatch(c: Canvas, spec: dict, y0: float) -> float:
+    """同一個東西寫法不同，SQL 就接不起來（SAG 第 4 則）。heads = [上段標籤, 下段標籤, 缺口標籤]；
+    nodes = [{text（共同的寫法）, sub（上段說明）}, {text（另一種寫法）, sub（下段說明）}]；outcomes = 兩個事件 [{text, sub?}]。
+    上段：兩個事件掛在同一個寫法上，金色粗線串起來；下段：兩個事件各掛不同寫法，中間斷開、標缺口標籤。純示意。"""
+    h1, h2, hgap = spec["heads"]
+    same, other = spec["nodes"]
+    ea, eb = spec["outcomes"]
+    w = X1 - X0
+    evw, evh = 190, 112
+    chw, chh = 190, 64
+    ph = max(_th(c, {"text": same["sub"]}, w), 0) if same.get("sub") else 0
+    qh = _th(c, {"text": other["sub"]}, w) if other.get("sub") else 0
+    gh = c.lines(hgap, 300, 28) * 39.2
+    total = 44 + evh + 14 + ph + 46 + 44 + evh + 14 + max(qh, gh)
+    _fit(total, BOTTOM - y0, "mismatch")
+    extra = min((BOTTOM - y0 - total) / 2, 50)
+    y = y0
+
+    def ev(x, yy, e):
+        c.rect(x, yy, evw, evh, fill=DEEP, rx=14)
+        t = _th(c, e, evw - 30)
+        c.text(x + 15, yy + (evh - t) / 2, evw - 30, e["text"], "dn", CREAM, "center", (x, yy, evw, evh))
+        if e.get("sub"):
+            c.text(x + 15, yy + (evh - t) / 2 + c.lines(e["text"], evw - 30, 34) * 44.2 + 4, evw - 30, e["sub"], "ds", LIGHT, "center", (x, yy, evw, evh))
+
+    def chip(cx, cy, label):
+        c.rect(cx - chw / 2, cy - chh / 2, chw, chh, fill=GOLD, rx=32)
+        c.text(cx - chw / 2 + 10, cy - 22, chw - 20, label, "dn", DEEP, "center", (cx - chw / 2, cy - chh / 2, chw, chh))
+
+    c.text(X0, y, w, h1, "dl", TEAL, "left")
+    cy = y + 44 + evh / 2
+    ev(X0, y + 44, ea); ev(X1 - evw, y + 44, eb)
+    mid = X0 + w / 2
+    c.line(X0 + evw, cy, mid - chw / 2, cy, GOLD, 10)
+    c.line(mid + chw / 2, cy, X1 - evw, cy, GOLD, 10)
+    chip(mid, cy, same["text"])
+    ty = y + 44 + evh + 14
+    if same.get("sub"):
+        c.text(X0, ty, w, same["sub"], "ds", TEAL, "center")
+    y = ty + ph + 46 + extra
+    c.line(X0, y - 24, X1, y - 24, TEAL, 2, dash="3 9")
+    c.text(X0, y, w, h2, "dl", TEAL, "left")
+    cy2 = y + 44 + evh / 2
+    ev(X0, y + 44, ea); ev(X1 - evw, y + 44, eb)
+    lx, rx_ = X0 + evw + 40 + chw / 2, X1 - evw - 40 - chw / 2
+    c.line(X0 + evw, cy2, lx - chw / 2, cy2, GOLD, 10)
+    c.line(rx_ + chw / 2, cy2, X1 - evw, cy2, GOLD, 10)
+    chip(lx, cy2, same["text"]); chip(rx_, cy2, other["text"])
+    c.line(lx + chw / 2 + 8, cy2, rx_ - chw / 2 - 8, cy2, TEAL, 4, dash="8 8")
+    _cross(c, (lx + rx_) / 2, cy2, 13, DEEP, 5)
+    ty2 = y + 44 + evh + 14
+    c.text((lx + rx_) / 2 - 150, ty2, 300, hgap, "ds", DEEP, "center")
+    if other.get("sub"):
+        c.text(X0, ty2 + gh + 6, w, other["sub"], "ds", TEAL, "center")
+        return ty2 + gh + 6 + qh
+    return ty2 + gh
+
+
+def _lock(c: Canvas, cx: float, cy: float, s: float, color: str) -> None:
+    c.rect(cx - s * .55, cy - s * .1, s * 1.1, s * .85, fill=color, rx=6)
+    c.raw(f'<path class="bg" d="M {cx - s * .32:.1f} {cy - s * .1:.1f} v {-s * .22:.1f} a {s * .32:.1f} {s * .32:.1f} 0 0 1 {s * .64:.1f} 0 v {s * .22:.1f}" fill="none" stroke="{color}" stroke-width="5"/>')
+
+
+def ledger(c: Canvas, spec: dict, y0: float) -> float:
+    """只能往後新增的記錄簿（SAG 第 4 則：append-only）。heads = [時間軸標籤]；
+    nodes = 依時間由上到下的紀錄 2～5 筆 [{text, sub?, new?: true}]（舊的畫鎖，new 的畫金色與「＋」）；
+    outcomes[0] = {text, sub?}（右邊一塊說明：舊的改不了、只能再加新的）。純示意，例子要標「假設」。"""
+    hd = spec["heads"][0]
+    rows = spec["nodes"]
+    note = spec["outcomes"][0]
+    if not 2 <= len(rows) <= 5:
+        raise ValueError(f"ledger 的 nodes 要 2～5 筆，現在是 {len(rows)}")
+    w = X1 - X0
+    cw, ax = 500, X0 + 52
+    rh = [max(_th(c, r, cw - (140 if r.get('ask') else 120)) + 28, 84) for r in rows]
+    nw = X1 - (ax + cw) - 36
+    nh = _th(c, note, nw - 36) + 40
+    total = 44 + sum(rh) + 16 * (len(rows) - 1)
+    _fit(max(total, 44 + nh), BOTTOM - y0, "ledger")
+    add = min((BOTTOM - y0 - total) / len(rows), 50 if len(rows) >= 3 else 110)   # 只有 2 筆時讓每列撐高，圖才用得滿
+    rh = [h + add for h in rh]
+    total += add * len(rows)
+    c.text(X0, y0, 300, hd, "dl", TEAL, "left")
+    c.arrow(X0 + 16, y0 + 50, X0 + 16, y0 + total - 4, TEAL, 5, 16)
+    y = y0 + 44
+    for k, (r, h) in enumerate(zip(rows, rh)):
+        new = bool(r.get("new"))
+        c.rect(ax, y, cw, h, fill=GOLD if new else "none", stroke=DEEP, sw=3, rx=14, op=.35 if new else None)
+        tx, tw = (ax + 70, cw - 140) if r.get("ask") else (ax + 24, cw - 120)   # 有 ask 的，字往右讓出「？」
+        t = _th(c, r, tw)
+        c.text(tx, y + (h - t) / 2, tw, r["text"], "dn", DEEP, "left", (ax, y, cw, h))
+        if r.get("sub"):
+            c.text(tx, y + (h - t) / 2 + c.lines(r["text"], tw, 34) * 44.2 + 6, tw, r["sub"], "ds", DEEP if new else TEAL, "left", (ax, y, cw, h))   # 金色底的列用深色字，對比度才夠
+        if r.get("ask"):                                  # 新舊衝突、分不出誰有效的那幾筆：左邊放一個金色「？」
+            c.circle(ax + 38, y + h / 2, 22, fill=GOLD, stroke=DEEP, sw=3)
+            c.text(ax + 24, y + h / 2 - 20, 28, "？", "dl", DEEP, "center")
+        if new:
+            c.circle(ax + cw - 48, y + h / 2, 24, fill=GOLD, stroke=DEEP, sw=3)
+            c.line(ax + cw - 60, y + h / 2, ax + cw - 36, y + h / 2, DEEP, 5)
+            c.line(ax + cw - 48, y + h / 2 - 12, ax + cw - 48, y + h / 2 + 12, DEEP, 5)
+        else:
+            _lock(c, ax + cw - 48, y + h / 2 - 4, 34, DEEP)
+        y += h + 16
+    ny = y0 + 44 + (total - 44 - nh) / 2
+    nx = ax + cw + 36
+    c.rect(nx, ny, nw, nh, fill=DEEP, rx=14)
+    c.text(nx + 18, ny + 20, nw - 36, note["text"], "dn", CREAM, "left", (nx, ny, nw, nh))
+    if note.get("sub"):
+        c.text(nx + 18, ny + 20 + c.lines(note["text"], nw - 36, 34) * 44.2 + 6, nw - 36, note["sub"], "ds", LIGHT, "left", (nx, ny, nw, nh))
+    c.arrow(nx - 6, ny + nh / 2, ax + cw + 6, ny + nh / 2, GOLD, 6, 18)
+    return y0 + total
+
+
 KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "paths": paths, "epochs": epochs,
          "dotgrid": dotgrid, "dumbbell": dumbbell, "range": range_chart, "funnel": funnel,
          "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation, "tokens": tokens,
          "seesaw": seesaw, "hidden": hidden, "cycle": cycle, "links": links, "hops": hops, "bubble": bubble, "drift": drift, "ingest": ingest,
-         "roles": roles, "embed": embed, "online": online, "gate": gate, "concat": concat, "joint": joint, "rails": rails, "scoreboard": scoreboard, "leak": leak, "amplify": amplify}
+         "roles": roles, "embed": embed, "online": online, "gate": gate, "concat": concat, "joint": joint, "rails": rails, "scoreboard": scoreboard, "leak": leak, "amplify": amplify,
+         "receipt": receipt, "squeeze": squeeze, "alias": alias, "handoff": handoff, "mismatch": mismatch, "ledger": ledger}
 
 
 def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:

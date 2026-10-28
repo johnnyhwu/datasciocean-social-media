@@ -17,7 +17,7 @@ members:
     summary: MuSiQue 成績主要靠 SQL 檢索流程、不是超邊；同樣向量模型下，Recall 領先對手近 15 個百分點。   # 系列地圖與第 2 頁回顧顯示的細節；依該則的卡寫，發布前由忠實者審過一次
   - concept: sag-tradeoffs-price-paid
     planned_title: SAG 付出了什麼代價？
-    summary: 為了簡單、寫入快，SAG 付了三個代價：固定名額漏掉罕見實體、同實體寫法不同時連結可能變少、目前不能更新資料。   # 系列地圖與第 2 頁回顧顯示的細節；依該則的卡寫，發布前由忠實者審過一次
+    summary: 為了簡單、寫入快，SAG 付了三個代價：固定名額漏掉罕見實體、同實體寫法不同時連結可能變少、新舊衝突沒有內建判斷。   # 系列地圖與第 2 頁回顧顯示的細節；依該則的卡寫，發布前由忠實者審過一次
 hashtag: DSO_SAG
 members_locked: true   # 2026-10-25 鎖定：人要求先發第 1 則（第 2～4 則 spec 尚未做）；成員與 planned_title 之後不能再動
 status: planning

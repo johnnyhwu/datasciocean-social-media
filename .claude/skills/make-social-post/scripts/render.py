@@ -1006,7 +1006,7 @@ def program_b(spec: dict, m: dict, img: Image.Image, series_name: str, tag_texts
     chk(f"文字對比度 >= {RP['min_contrast']}（取文字框外緣四角的實際背景色）", worst[0] >= RP["min_contrast"], f"最低 {worst[0]:.1f}（{worst[1]}）")
     ti = m["chk"].get("title")
     if ti:
-        mx = 4 if lay == "takeaway" else (3 if spec.get("_split") else PARAMS["title_max_lines"])
+        mx = 4 if lay == "takeaway" else (3 if spec.get("_split") else (PARAMS.get("cover_title_max_lines", PARAMS["title_max_lines"]) if lay == "cover" else PARAMS["title_max_lines"]))
         chk(f"標題最多 {mx} 行", ti["lines"] <= mx, f"{ti['lines']} 行")
         chk("標題末行 >= 2 字、換行不拆詞", ti["lastChars"] >= 2 and not ti["bad"], {"lastChars": ti["lastChars"], "bad": ti["bad"]})
         chk("標題的數字與單位不拆成兩行", not ti["badNum"], ti["badNum"])
@@ -1096,6 +1096,9 @@ def render_all(spec_path: Path, only: set[int] | None = None, force: bool = Fals
             pg.goto(hp.as_uri())
             pg.evaluate("document.fonts.ready")
             pg.wait_for_timeout(300 if doc.get("math") else 200)
+            if sl["layout"] == "cover" and series.get("style") == "spotlight":    # 探照燈封面主標排到第 3 行時：字縮成 56px（規定字級之一），多半就回到 2 行，副標才放得下（2026-10-28，人決定封面主標可放寬）
+                pg.evaluate("() => {const t=document.getElementById('title'); const lh=parseFloat(getComputedStyle(t).lineHeight); "
+                            "if (t.getBoundingClientRect().height > lh*2.5) {t.style.fontSize='56px'}}")
             if (sl["layout"] == "cover" and not series.get("standalone")) or built.get("dyn"):    # 封面與直切版面：補充文字接在標題下面（獨立貼文的封面副標固定在地平線下）
                 pg.evaluate("() => {const t=document.getElementById('title'), s=document.getElementById('body'); "
                             "if(s) s.style.top=(t.getBoundingClientRect().bottom+36)+'px'}")

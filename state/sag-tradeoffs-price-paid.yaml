@@ -1,0 +1,23 @@
+concept: sag-tradeoffs-price-paid
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: sag-tradeoffs-price-paid:ig_carousel
+  format: ig_carousel
+  series_id: sag
+  url: https://www.instagram.com/p/DfCZvP4k6tz/
+  published_at: 2026-10-28T12:12:45+0000
+  hook_type: 代價與取捨
+  mentions: []
+  backfilled: []
+- post_id: sag-tradeoffs-price-paid:threads_thread
+  format: threads_thread
+  series_id: sag
+  url: https://www.threads.com/@datasciocean/post/DfCaIIyk0dJ
+  published_at: 2026-10-28T12:15:17+0000
+  hook_type: 代價與取捨
+  mentions: []
+  backfilled: []
