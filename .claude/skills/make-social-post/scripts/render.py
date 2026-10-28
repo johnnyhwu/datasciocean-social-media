@@ -33,7 +33,7 @@ RP = PARAMS["render"]
 WD, HT, SAFE_X, PAD_X = RP["width"], RP["height"], RP["safe_x"], RP["pad_x"]
 CREAM, TEAL, DEEP, GOLD = "#F2E0C0", "#076876", "#01353F", "#DDA642"
 MID, LIGHT, ABYSS = "#1F8A8D", "#69B4AA", "#032027"
-SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD, "seesaw": GOLD, "spotlight": GOLD}
+SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD, "seesaw": GOLD, "spotlight": GOLD, "window": GOLD}
 ALLOWED_FONT_PX = {28, 34, 38, 40, 56, 72, 76}
 ZERO_Y = 706          # 測深圖水面（0）
 
@@ -499,6 +499,83 @@ def sp_strip(idx, n, dark=False):
 
 
 
+# ---------------------------------------------------------------- 視窗（style: window，series/claude-code）的 SVG 元件
+# 米色紙面上一個深色的終端機視窗：封面是歪三度、從右下角探出、裡面一小段工作紀錄；內頁與帶走張是文字下方一個端正的視窗，
+# 裡面是一行一行的紀錄（用圓角長條示意），金色游標停在第 k 行（k 隨張數往下走）。
+# 都用 class "bg"（背景層，不進程式 B 的文字與圖形重疊檢查），排版時要自己確保不壓到文字（看圖確認）。
+# 封面視窗裡的字（SVG text）只用 28／34 兩種字級，都是示意的假紀錄。
+WN_ROW_PITCH = 70
+WN_COVERS = [      # 每一則封面的假紀錄：(圖示, 標籤, 文字, 附註)；圖示 chev＝提示符號、dot＝工具呼叫、cur＝游標行
+    [("chev", "", "fix the failing tests", ""), ("dot", "Bash", "npm test", "3 failed"), ("dot", "Read", "src/auth.ts", ""),
+     ("dot", "Edit", "src/auth.ts", ""), ("dot", "Bash", "npm test", "all passed"), ("cur", "", "", "")],
+    [("chev", "", "add a lint hook", ""), ("dot", "Read", "CLAUDE.md", ""), ("dot", "Edit", ".claude/settings.json", ""),
+     ("dot", "Bash", "npm run lint", "passed"), ("dot", "Task", "search the repo", "summary back"), ("cur", "", "", "")],
+]
+
+
+def wn_icon(kind, x, y):
+    if kind == "chev":
+        return f'<polyline class="bg" points="{x},{y - 14} {x + 18},{y} {x},{y + 14}" fill="none" stroke="{CREAM}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>'
+    return f'<circle class="bg" cx="{x + 9}" cy="{y}" r="11" fill="{LIGHT}"/>'
+
+
+def wn_frame(x, y, w, h, rot=0, title="claude", dark=False):
+    """視窗外框：深海底圓角、最深海的標題列、三顆淡淡的點、標題。回傳 (開頭, 結尾)；中間放以視窗左上角為原點的內容。"""
+    bar = ABYSS if not dark else DEEP
+    head = (f'<g transform="translate({x} {y}) rotate({rot})">'
+            f'<rect class="bg" x="0" y="0" width="{w}" height="{h}" rx="22" fill="{DEEP}"' + (f' stroke="{LIGHT}" stroke-opacity=".5" stroke-width="3"' if dark else "") + '/>'
+            f'<path class="bg" d="M0 72 V22 Q0 0 22 0 H{w - 22} Q{w} 0 {w} 22 V72 Z" fill="{bar}"/>'
+            + "".join(f'<circle class="bg" cx="{40 + 36 * i}" cy="36" r="10" fill="{CREAM}" fill-opacity=".35"/>' for i in range(3))
+            + f'<text class="bg" x="{w / 2}" y="46" text-anchor="middle" font-family="DSO" font-size="28" fill="{CREAM}" fill-opacity=".75">{title}</text>')
+    return head, "</g>"
+
+
+def wn_cover(mi):
+    rows = WN_COVERS[mi % len(WN_COVERS)]
+    head, tail = wn_frame(20, 760, 1100, 700, rot=-3)
+    s = head
+    for i, (ic, lab, txt, note) in enumerate(rows):
+        y = 100 + i * WN_ROW_PITCH
+        if ic == "cur":
+            s += f'<rect class="bg" x="44" y="{y - 24}" width="26" height="48" fill="{GOLD}"/>'
+            continue
+        s += wn_icon(ic, 46, y)
+        x = 92
+        if lab:
+            s += f'<text class="bg" x="{x}" y="{y + 12}" font-family="DSO" font-size="34" font-weight="700" fill="{LIGHT}">{lab}</text>'
+            x += 34 * 0.62 * len(lab) + 30
+        s += f'<text class="bg" x="{x:.0f}" y="{y + 12}" font-family="DSO" font-size="34" fill="{CREAM}">{esc(txt)}</text>'
+        if note:
+            x += 34 * 0.58 * len(txt) + 24
+            s += f'<text class="bg" x="{x:.0f}" y="{y + 11}" font-family="DSO" font-size="28" fill="{CREAM}" fill-opacity=".7">{esc(note)}</text>'
+    return s + tail
+
+
+WN_BARS = [(.62, 1), (.40, 0), (.72, 0), (.30, 0), (.55, 0)]      # 一行一行的長條（相對寬度，第一行是提示符號）
+
+
+def wn_deco(idx, dark=False, y0=800, h=370, x0=80, w=920):
+    """文字下方的視窗：一行一行的圓角長條示意紀錄，金色游標（深色底改用米色）停在第 k 行行尾，k 隨張數往下走。"""
+    head, tail = wn_frame(x0, y0, w, h, dark=dark)
+    s = head
+    nrow = min(len(WN_BARS), (h - 96) // WN_ROW_PITCH)
+    cur = idx % nrow
+    col = CREAM
+    for i in range(nrow):
+        y = 112 + i * WN_ROW_PITCH
+        frac = WN_BARS[i][0]
+        s += wn_icon("chev" if i == 0 else "dot", 46, y)
+        bw = (w - 150) * frac
+        s += f'<rect class="bg" x="92" y="{y - 8}" width="{bw:.0f}" height="16" rx="8" fill="{col}" fill-opacity="{.55 if i == 0 else .28}"/>'
+        if i == cur:
+            s += f'<rect class="bg" x="{92 + bw + 16:.0f}" y="{y - 24}" width="26" height="48" fill="{CREAM if dark else GOLD}"/>'
+    return s + tail
+
+
+def wn_takeaway():
+    return wn_deco(0, dark=True, y0=930, h=290)
+
+
 def series_journey(members, cur, jy):
     """整個系列的路線：走過的是實心點，這一則是金色，後續是空心點；每個點下面一行「第 N 則」。回傳 (svg, html)。"""
     svg, out = "", ""
@@ -554,6 +631,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     horizon = series.get("style") == "horizon"
     seesaw = series.get("style") == "seesaw"
     spot = series.get("style") == "spotlight"
+    win = series.get("style") == "window"
     idx, n_sl = spec.get("_idx", 1), spec.get("_n", 1)          # 第幾張／共幾張（render_all 填入）
     mi, mn = spec.get("_mi", 0), spec.get("_mn", 1)            # 這則是系列的第幾則／共幾則
     kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", ""))), "FAM": "", "BODY_STYLE": "", "FOOT_CLS": ""}
@@ -588,6 +666,10 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["SVG"] = svg_wrap(sp_field((90, 180, 990, 730), 38, 7, mi, 270))
         kw["SUB_TOP"] = 1090
         kw["BODY"] = kw["BODY"].replace("\n", "<br>")
+    elif lay == "cover" and win:       # 米色底，標題與副標在上、下半一個歪三度的視窗從右下角探出（視窗位置固定）
+        kw["SVG"] = svg_wrap(wn_cover(mi))
+        kw["SUB_TOP"] = 560
+        kw["BODY"] = kw["BODY"].replace("\n", "<br>")
     elif lay == "cover" and seesaw:    # 米色底，標題在上，下半一座蹺蹺板；副標固定在 y=400
         kw["SVG"] = svg_wrap(ss_cover())
         kw["SUB_TOP"] = 400
@@ -607,7 +689,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             parts, cells, _ = table_block(spec["rows"], y0_ + shift, spec.get("key_w", 300))
             kw["SVG"], kw["CELLS"] = svg_wrap(parts), cells
         else:
-            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else (svg_wrap(ss_mid(idx, n_sl)) if seesaw else (svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False)) if spot else "")))), ""
+            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else (svg_wrap(ss_mid(idx, n_sl)) if seesaw else (svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False)) if spot else (svg_wrap(wn_deco(idx)) if win else ""))))), ""
             if horizon:
                 kw["FOOT_CLS"] = "light"
     elif lay == "text" and contour:
@@ -622,6 +704,8 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["FOOT_CLS"] = "light"
     elif lay == "text" and spot:       # 下半一片暗處的點線，探照燈的落點隨張數換
         kw["SVG"] = svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False))
+    elif lay == "text" and win:        # 下半一個端正的視窗，游標停的行隨張數往下走
+        kw["SVG"] = svg_wrap(wn_deco(idx))
     elif lay == "text" and seesaw:     # 中段一座蹺蹺板，傾斜角隨張數轉向
         kw["SVG"] = svg_wrap(ss_mid(idx, n_sl))
     elif lay == "text":
@@ -769,6 +853,14 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         lab = spec.get("label")
         kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
         kw["SVG"] = svg_wrap(sp_field((90, 900, 990, 1230), 24, 5, mi, 170, thr=200))
+    elif lay == "takeaway" and win:
+        kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
+        q = spec.get("question")
+        kw["QUESTION"] = f'<div class="t abs take-q" style="top:320px">{esc(q)}</div>' if q else ""
+        kw["TAKE_STYLE"] = f"top:{320 + math.ceil(len(q) / 15.0) * 73 + 36}px" if q else ""
+        lab = spec.get("label")
+        kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
+        kw["SVG"] = svg_wrap(wn_takeaway())
     elif lay == "takeaway" and seesaw:
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
         q = spec.get("question")
@@ -832,11 +924,11 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         cur = [m["concept"] for m in series["members"]].index(spec["current"])
         y, svg, out = 330, "", ""
         for i, t in enumerate(items):
-            if (contour or cards or spot) and i == cur:
+            if (contour or cards or spot or win) and i == cur:
                 svg += f'<rect class="bg" x="72" y="{y - 10}" width="936" height="84" rx="6" fill="{DEEP}"/>'
                 svg += f'<circle class="g mark" data-e="1" cx="100" cy="{y + 32}" r="12" fill="{GOLD}"/>'
                 out += f'<div class="t abs item cur" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
-            elif contour or cards or spot:
+            elif contour or cards or spot or win:
                 svg += f'<circle class="g mark" cx="100" cy="{y + 32}" r="8" fill="{TEAL}"/>'
                 out += f'<div class="t abs item" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
             elif i == cur:
@@ -897,6 +989,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     if spot and lay not in ("cover", "takeaway"):
         strip = sp_strip(idx, n_sl)
         kw["SVG"] = kw["SVG"].replace("</svg>", strip + "</svg>") if kw.get("SVG") else svg_wrap(strip)
+    if win and lay not in ("cover", "takeaway"):
+        dots = progress_dots(idx, n_sl)
+        kw["SVG"] = kw["SVG"].replace("</svg>", dots + "</svg>") if kw.get("SVG") else svg_wrap(dots)
     if (contour or cards) and lay not in ("cover", "takeaway"):
         dots = progress_dots(idx, n_sl, panel=split)
         if cards and not split:      # 圖表類版型：右緣的索引欄（金框 = 這一張對應的版本；系列地圖用這一則）

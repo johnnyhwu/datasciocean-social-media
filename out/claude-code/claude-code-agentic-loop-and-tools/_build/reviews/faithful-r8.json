@@ -1,0 +1,82 @@
+{
+  "post": "claude-code-agentic-loop-and-tools",
+  "blocks": [
+    {
+      "block": "第 12 張",
+      "atoms": [
+        {
+          "text": "回應是最終答案就結束（圖：最終答案：結束）",
+          "verdict": "完全支持",
+          "card_quote": "if response.is_final_answer: done = True",
+          "note": "c11 範例碼。"
+        },
+        {
+          "text": "每一輪，模型的回應不是最終答案，就是工具呼叫（二選一，無第三種）",
+          "verdict": "部分支持",
+          "card_quote": "if response.is_final_answer: done = True",
+          "note": "c11 的範例碼是「最終答案就結束，否則走工具呼叫」，二分可由碼結構推得；但這是 blog 給的 agent_loop 範例（錨點：部落格舉例），貼文正文與圖都寫成 Claude Code 每一輪的通則，沒有交代是 blog 的範例流程。"
+        },
+        {
+          "text": "工具呼叫先過權限檢查（所有工具呼叫都先過這一關）",
+          "verdict": "部分支持",
+          "card_quote": "if requires_confirmation(response.tool_call): approved = ask_user(response.tool_call)",
+          "note": "c11 的碼是每個工具呼叫先判斷 requires_confirmation（確認檢查），「權限檢查」這個詞與「在動作發生前執行權限檢查」出自 loop c8：「可以在任何動作真正發生前，執行權限檢查、記錄 log、或觸發 Hooks」，但本張引用只列 c6、c9、c11，沒有列 c8。"
+        },
+        {
+          "text": "要確認的工具呼叫，先問使用者（圖：要確認的先問你）",
+          "verdict": "完全支持",
+          "card_quote": "if requires_confirmation(response.tool_call): approved = ask_user(response.tool_call)",
+          "note": "c11。範圍限於 blog 範例。「你」指使用者，已由委託方說明。"
+        },
+        {
+          "text": "不需要確認的，其餘放行、直接執行（圖：其餘放行）",
+          "verdict": "部分支持",
+          "card_quote": "result = execute(response.tool_call, cwd) transcript.append(observation(response.tool_call, result))",
+          "note": "c11 的碼裡，沒進 requires_confirmation 分支就走到 execute，所以「不需確認就直接執行」可由碼結構推得，但卡的文字沒有明說這條路；且這是 blog 範例碼的流程，圖把它畫成 Claude Code 的通則（同一貼文第 6、10 張另有 deny 規則與 dontAsk 直接拒絕，圖上「其餘放行」沒有交代這是範例的簡化）。"
+        },
+        {
+          "text": "使用者核准後執行工具（放行：執行）",
+          "verdict": "完全支持",
+          "card_quote": "result = execute(response.tool_call, cwd) transcript.append(observation(response.tool_call, result))",
+          "note": "c11：approved 為真時繼續往下執行。"
+        },
+        {
+          "text": "使用者拒絕就不執行（你拒絕：不執行）",
+          "verdict": "完全支持",
+          "card_quote": "if requires_confirmation(response.tool_call): approved = ask_user(response.tool_call) if not approved: transcript.append(denial_feedback(response.tool_call)) continue",
+          "note": "c11：not approved 時 continue，跳過 execute。"
+        },
+        {
+          "text": "執行後，結果（observation）寫進對話紀錄（transcript）",
+          "verdict": "完全支持",
+          "card_quote": "result = execute(response.tool_call, cwd) transcript.append(observation(response.tool_call, result))",
+          "note": "c11。「對話紀錄」是 transcript 的白話譯名，卡上只有 transcript；解釋為到目前為止的對話紀錄屬白話說明，未改變意思，採納委託方說明。"
+        },
+        {
+          "text": "拒絕時，拒絕的回饋寫進對話紀錄（transcript）",
+          "verdict": "完全支持",
+          "card_quote": "if not approved: transcript.append(denial_feedback(response.tool_call)) continue",
+          "note": "c11。"
+        },
+        {
+          "text": "放行或拒絕的結果，帶進下一輪（模型再給出新的回應）",
+          "verdict": "完全支持",
+          "card_quote": "**失敗只是另一種觀察結果。** 測試失敗、語法錯誤、被拒絕的權限請求——這些都不會讓迴圈中止，而是變成下一輪的輸入，模型會據此重新規劃。",
+          "note": "拒絕的結果帶進下一輪由 c9 直接支持；執行結果帶進下一輪由 c6「一次失敗測試的 stderr 會直接成為下一輪 prompt 的輸入」及 c11 的 transcript.append 後迴圈繼續支持。上一輪指出的依據缺口已補。"
+        }
+      ],
+      "errors": ["錨點寫法不符", "其他"]
+    }
+  ],
+  "recalculations": [],
+  "gaps": [
+    {
+      "description": "c11 是 blog 給的 agent_loop 範例（部落格舉例），卡的主張文字寫「blog 給的 agent_loop 範例裡」；第 12 張正文與圖把範例流程寫成 Claude Code 每一輪的通則，掉了「這是 blog 範例」的限定。",
+      "card_quote": "blog 給的 agent_loop 範例裡，模型的回應若是最終答案就結束；否則需要確認的工具呼叫先問使用者，使用者不核准就把拒絕的回饋附進 transcript 並繼續下一輪；核准後執行工具，把觀察結果附進 transcript"
+    },
+    {
+      "description": "「權限檢查」一詞與「動作發生前」的位置出自 loop c8，本張引用沒有列 c8（其他錯誤：引用與內容來源不一致）。",
+      "card_quote": "可以在任何動作真正發生前，執行權限檢查、記錄 log、或觸發 Hooks"
+    }
+  ]
+}

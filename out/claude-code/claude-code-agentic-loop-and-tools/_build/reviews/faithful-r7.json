@@ -1,0 +1,43 @@
+{
+  "post": "claude-code-agentic-loop-and-tools",
+  "blocks": [
+    {
+      "block": "第 9 張",
+      "atoms": [
+        {"text": "標題、補充與表格（六種權限模式的說明表）只用來支撐「權限做法漸進式、由使用者選權限模式」", "verdict": "完全支持", "card_quote": "Claude Code 的做法是漸進式的，而非二元的；由使用者選擇模式，而非模型自己決定。", "note": "依指示，表格內各模式名稱與說明、Shift+Tab、2026 年 10 月官方文件字樣為已驗證補充，放行。與 perm c8、c10 無矛盾；「這三種還是由你把關」與 c10（使用者選模式）不衝突。未搬入 pending 的 perm c9（三種模式說法）：表中是官方六種模式，不是 c9 的『每個非瑣碎動作都先詢問／明確清單內自動核准／隔離環境完全自主』三分法。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 10 張",
+      "atoms": [
+        {"text": "標題、補充與表格（後三種權限模式）", "verdict": "完全支持", "card_quote": "Claude Code 的做法是漸進式的，而非二元的；由使用者選擇模式，而非模型自己決定。", "note": "依指示，auto／dontAsk／bypassPermissions 的說明與「官方提醒」為已驗證補充，放行。與 perm c8、c10 無矛盾，未搬入 pending 的 perm c9。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 12 張",
+      "atoms": [
+        {"text": "模型給出的回應若是最終答案，就結束（圖：最終答案：結束）", "verdict": "完全支持", "card_quote": "if response.is_final_answer: done = True", "note": "c11 第 1 條引文。"},
+        {"text": "每一輪，模型給出的回應不是最終答案，就是一個工具呼叫（圖：最終答案，還是工具呼叫？／是工具呼叫）", "verdict": "完全支持", "card_quote": "if requires_confirmation(response.tool_call): approved = ask_user(response.tool_call)", "note": "c11 範例碼中，非最終答案的分支一律對 response.tool_call 處理；二分法由程式碼結構隱含，c11 text 的『否則』也是這個意思。"},
+        {"text": "工具呼叫要先過權限檢查；需要確認的，先問你（使用者）", "verdict": "完全支持", "card_quote": "if requires_confirmation(response.tool_call): approved = ask_user(response.tool_call)", "note": "『需要確認的先問使用者』與 c11 一致。『權限檢查』是貼文對 requires_confirmation 的稱呼（卡上其他主張 c8 用此詞，但本張只引 c11）；意思相符，不判錯。"},
+        {"text": "權限檢查之後分成『你同意』與『你拒絕』兩個結果（補充：『你同意或拒絕，結果會寫進對話紀錄』；圖：權限檢查分出打勾與打叉兩條）", "verdict": "部分支持", "card_quote": "result = execute(response.tool_call, cwd) transcript.append(observation(response.tool_call, result))", "note": "c11 的範例碼中，只有 requires_confirmation 為真的工具呼叫才會問使用者；不需要確認的呼叫不經 ask_user，直接進入 execute 並附上觀察結果。圖與補充把『權限檢查』畫成每個工具呼叫都分成同意／拒絕兩條，沒有畫出『不需要確認、直接執行』這條路；雖然圖上寫了『需要確認的，先問你』，但整體讀起來像每個工具呼叫都要使用者同意或拒絕。"},
+        {"text": "你同意：執行（核准後執行工具）", "verdict": "完全支持", "card_quote": "result = execute(response.tool_call, cwd)", "note": "核准後（未被 continue 跳過）才執行。"},
+        {"text": "你拒絕：不執行（只附上拒絕的回饋）", "verdict": "完全支持", "card_quote": "if not approved: transcript.append(denial_feedback(response.tool_call)) continue", "note": "『不執行』由 continue 跳過 execute 隱含；c11 text 只說附回饋並繼續下一輪，未明說不執行，但程式碼結構一致。"},
+        {"text": "執行的結果寫進對話紀錄（transcript）一行", "verdict": "完全支持", "card_quote": "transcript.append(observation(response.tool_call, result))", "note": "c11 第 3 條引文。"},
+        {"text": "拒絕的回饋寫進對話紀錄（transcript）一行", "verdict": "完全支持", "card_quote": "transcript.append(denial_feedback(response.tool_call))", "note": "c11 第 2 條引文。"},
+        {"text": "對話紀錄會帶進下一輪，模型再給出新的回應（含執行／核准那條路也帶進下一輪）", "verdict": "部分支持", "card_quote": "transcript.append(denial_feedback(response.tool_call)) continue", "note": "c11 引文只在拒絕分支明示 continue（繼續下一輪）；執行分支只到 transcript.append(observation…)，引文沒有顯示迴圈回頭、也沒有顯示模型讀 transcript 後給出新回應。『被帶進下一輪的輸入』是卡上 c9／c6 的內容，本張未引用。"},
+        {"text": "對話紀錄（transcript）＝到目前為止的對話紀錄；『你』指使用者", "verdict": "完全支持", "card_quote": "approved = ask_user(response.tool_call)", "note": "依指示放行的詞義說明。"}
+      ],
+      "errors": [
+        {"type": "限定條件掉了", "atom": "權限檢查之後分成『你同意』與『你拒絕』兩個結果", "description": "c11 範例碼顯示只有需要確認的工具呼叫才問使用者；不需要確認的直接執行。圖與補充把權限檢查畫成每個工具呼叫都分同意／拒絕，沒有畫出直接執行的路徑。"},
+        {"type": "其他", "atom": "對話紀錄會帶進下一輪，模型再給出新的回應", "description": "c11 引文未顯示執行分支回到下一輪、也未顯示模型讀 transcript 給出新回應；本張只引 c11，這句的依據在未引用的 c9／c6。"}
+      ]
+    }
+  ],
+  "recalculations": [],
+  "gaps": [
+    {"description": "c11 範例碼中，requires_confirmation 為假的工具呼叫不問使用者、直接 execute 並附上觀察結果；第 12 張的圖沒有這條路徑，只畫同意／拒絕。", "card_quote": "if requires_confirmation(response.tool_call): approved = ask_user(response.tool_call) if not approved: transcript.append(denial_feedback(response.tool_call)) continue"},
+    {"description": "c11 只在拒絕分支明示 continue（繼續下一輪）；執行分支『帶進下一輪』在 c11 引文中沒有明示。", "card_quote": "result = execute(response.tool_call, cwd) transcript.append(observation(response.tool_call, result))"}
+  ]
+}

@@ -47,6 +47,13 @@
   handoff   把工作從線下搬到線上（2026-10-27）：heads = [上帶標, 下帶標, 箭頭標]、nodes = [{text, sub?}（線下不做的事）, {text, sub?}（線上接手的做法）]、outcomes[0] = {text}（線下因此得到的好處）；純示意
   mismatch  同一個東西寫法不同就接不起來（2026-10-27）：heads = [上段標, 下段標, 缺口標]、nodes = [{text, sub?}（共同寫法＋上段說明）, {text, sub?}（另一種寫法＋下段說明）]、outcomes = 兩個事件 [{text, sub?}]；純示意
   ledger    只能往後新增的記錄簿（2026-10-27）：heads = [時間軸標籤]、nodes = 依時間排的紀錄 2～5 筆 [{text, sub?, new?, ask?}]（舊的畫鎖、new 金色加「＋」、ask 左邊釘金色「？」表示分不出誰有效）、outcomes[0] = {text, sub?}（右邊說明）；例子要標「假設」
+  turn      一輪怎麼走（2026-10-28，Claude Code 第 1 則）：nodes = [回應, 權限檢查, 對話紀錄第一行, 第二行]、heads = [箭頭標籤, 紀錄標題]、outcomes = [最終答案, 同意, 拒絕]、選用 loop
+  transcript 終端機視窗裡的對話紀錄（2026-10-28，Claude Code 第 1 則）：heads[0] 視窗標題、nodes 一列一個動作 [{text, tone: prompt／tool／fail／ok, feeds?}]（「　」分開工具名與內容；feeds 的列畫金色箭頭繞到下一列）、outcomes[0] 箭頭標籤
+  oneloop   一個圈、圈裡兩個框，兩側各一個被打叉的虛線框：nodes 兩個、outcomes 兩個、heads[0] 圈下面的說明
+  intercept 上下兩條路，下面那條要過一道金框的關卡才到檔案：heads 4 個（上排、下排、關卡、檔案）、nodes 兩個（只用文字說的話、工具呼叫）、outcomes 關卡裡的檢查項目 2～3 個
+  dial      有刻度的軌道與金色旋鈕：人轉旋鈕、模型被打叉：nodes 兩個（人、模型）、heads[0] 說明、選用 heads[1]／heads[2] 軌道左右端的標籤
+  lanes     一個問題分成兩欄：nodes[0] 問題、nodes[1:] 左欄項目、heads 兩欄標題、outcomes 兩欄結果（左金色）
+  layers    兩排各一道防線：上排指令過關卡、下排指令在虛線容器裡碰不到外面：heads 三個、nodes 兩個（工作目錄、指令）、outcomes[0] 關卡旁的字
   stops     由上往下三個停靠點（不按比例）：nodes = [{text, sub?, emph?}]、選用 heads = [上端標籤, 下端標籤]
 
 規則：圖形全部用 class "bg"（不進程式 B 的文字與圖形重疊檢查），所以排版由這裡負責避開文字；框內的文字由程式 B 的「框內文字不超出框」檢查；
@@ -2173,12 +2180,344 @@ def ledger(c: Canvas, spec: dict, y0: float) -> float:
     return y0 + total
 
 
+# ------------------------------------------------------------------ Claude Code 系列（2026-10-28）：視窗風格的六種示意圖
+DESC = {      # 給審查者與人看的「畫面」描述（build_package 輸出）：文字以外，圖上畫了什麼
+    "transcript": "一個終端機視窗，一列一個動作（提示符號、工具呼叫、失敗、通過）；有標 feeds 的列，金色箭頭從那一列繞到下一列並寫上標籤",
+    "oneloop": "中間一個圈，圈裡是兩個框（規劃、執行）；兩側各一個被打叉的虛線框（規劃模組、執行模組）；圈下一行說明",
+    "intercept": "上下兩條路：上面是一句話直接通到檔案；下面是工具呼叫先過一道金框的關卡（關卡裡列出檢查項目）才到檔案",
+    "dial": "一條有刻度的軌道，金色旋鈕停在其中一格；左上的人伸手轉旋鈕（金色箭頭），右上的模型要伸手但被打叉；軌道下一行說明",
+    "lanes": "最上面一個問題，分成兩欄：左欄是兩個項目，一個向下的箭頭指向金色的「自動核准」；右欄是一個深色框，寫另一種動作的處理方式",
+    "turn": "左上是「模型給出回應」，金色箭頭指向右邊金色的「最終答案：結束」；往下的箭頭通向金框的「權限檢查」，再分成打勾（同意）與打叉（拒絕）兩個結果；兩個結果各有箭頭，指向右邊一張「對話紀錄」紙上各自新增的一行；最下面一個虛線框說明回到下一輪",
+    "layers": "兩排各一道防線：上排是指令先經過一道關卡；下排是指令在一個虛線容器裡，容器裡有金色的工作目錄，指令想往外走被叉掉、碰不到容器外的框",
+}
+
+
+def _win(c: Canvas, x, y, w, h, title="") -> None:
+    c.rect(x, y, w, h, fill=DEEP, rx=22)
+    c.raw(f'<path class="bg" d="M{x} {y + 60} V{y + 22} Q{x} {y} {x + 22} {y} H{x + w - 22} Q{x + w} {y} {x + w} {y + 22} V{y + 60} Z" fill="{ABYSS}"/>')
+    for i in range(3):
+        c.circle(x + 36 + 34 * i, y + 30, 9, fill=CREAM, op=.35)
+    if title:
+        c.text(x + 150, y + 10, w - 300, title, "ds", CREAM, "center")
+
+
+def _tick(c: Canvas, x, y, color=LIGHT, sw=6) -> None:
+    c.poly([(x - 12, y), (x - 3, y + 11), (x + 13, y - 11)], stroke=color, sw=sw)
+
+
+def _cross2(c: Canvas, x, y, r=11, color=CREAM, sw=6) -> None:
+    c.line(x - r, y - r, x + r, y + r, color, sw)
+    c.line(x + r, y - r, x - r, y + r, color, sw)
+
+
+def _tw(s: str, size: int = 34) -> float:
+    return sum(size if ord(ch) > 127 else size * .62 for ch in s)
+
+
+def transcript(c: Canvas, spec: dict, y0: float) -> float:
+    """heads[0] = 視窗標題（例：假設的例子）；nodes = 一列一個動作 [{text, tone}]，tone = prompt／tool／fail／ok；
+    text 裡的全形空白「　」把工具名（淺藍綠粗體）和內容分開；有 feeds: true 的列（通常是 fail）會畫金色箭頭繞到下一列，
+    outcomes[0].text 是箭頭的標籤（下一輪的輸入）。純示意，圖上要標假設。"""
+    rows = spec["nodes"]
+    n = len(rows)
+    if not 3 <= n <= 7:
+        raise ValueError(f"transcript 的 nodes 要 3～7 列，現在是 {n}")
+    w, bar = X1 - X0, 60
+    _fit(bar + 40 + n * 66, BOTTOM - y0, "transcript")
+    pitch = min(84.0, (BOTTOM - y0 - bar - 40) / n)
+    H = bar + 24 + n * pitch + 16
+    _win(c, X0, y0, w, H, (spec.get("heads") or [""])[0])
+    cys = [y0 + bar + 24 + i * pitch + pitch / 2 for i in range(n)]
+    tx, tw = X0 + 96, 500
+    for r, cy in zip(rows, cys):
+        tone = r.get("tone", "tool")
+        ix = X0 + 44
+        if tone == "prompt":
+            c.poly([(ix - 8, cy - 14), (ix + 10, cy), (ix - 8, cy + 14)], stroke=CREAM, sw=6)
+        elif tone == "tool":
+            c.circle(ix + 2, cy, 11, fill=LIGHT)
+        elif tone == "fail":
+            _cross2(c, ix + 2, cy)
+        elif tone == "ok":
+            _tick(c, ix + 2, cy)
+        txt = r["text"]
+        if "　" in txt:
+            lab, rest = txt.split("　", 1)
+            lw = _tw(lab) + 14
+            c.text(tx, cy - 22, lw, lab, "dn", LIGHT, "left", (X0, y0, w, H))
+            c.text(tx + lw + 12, cy - 22, tw - lw - 12, rest, "dt", CREAM, "left", (X0, y0, w, H))
+        else:
+            c.text(tx, cy - 22, tw, txt, "dn" if tone in ("prompt", "ok") else "dt", CREAM, "left", (X0, y0, w, H))
+    for i, r in enumerate(rows):
+        if r.get("feeds") and i + 1 < n:
+            ax, bx = X0 + tx - X0 + tw + 20, X0 + 700
+            c.line(ax, cys[i], bx, cys[i], GOLD, 6)
+            c.line(bx, cys[i], bx, cys[i + 1], GOLD, 6)
+            c.arrow(bx, cys[i + 1], ax + 14, cys[i + 1], GOLD, 6, 18)
+            lab = spec["outcomes"][0]["text"]
+            lw_ = X1 - (bx + 22) - 16
+            lh = c.lines(lab, lw_, 28) * 39.2
+            c.text(bx + 22, (cys[i] + cys[i + 1]) / 2 - lh / 2, lw_, lab, "dl", GOLD, "left", (X0, y0, w, H))
+    return y0 + H
+
+
+def _arc_arrow(c: Canvas, cx, cy, r, a0, a1, color=TEAL, sw=8) -> None:
+    """順時針的圓弧（角度，度；0 在右邊、90 在下面），末端畫箭頭。"""
+    p0 = (cx + r * math.cos(math.radians(a0)), cy + r * math.sin(math.radians(a0)))
+    p1 = (cx + r * math.cos(math.radians(a1)), cy + r * math.sin(math.radians(a1)))
+    large = 1 if (a1 - a0) % 360 > 180 else 0
+    c.raw(f'<path class="bg" d="M{p0[0]:.1f} {p0[1]:.1f} A{r} {r} 0 {large} 1 {p1[0]:.1f} {p1[1]:.1f}" fill="none" stroke="{color}" stroke-width="{sw}" stroke-linecap="round"/>')
+    a = math.radians(a1)
+    tx, ty = -math.sin(a), math.cos(a)           # 順時針的切線方向
+    nx, ny = math.cos(a), math.sin(a)
+    tip = (p1[0] + tx * 30, p1[1] + ty * 30)
+    c.poly([(p1[0] + nx * 22, p1[1] + ny * 22), (p1[0] - nx * 22, p1[1] - ny * 22), tip], fill=color, closed=True)
+
+
+def oneloop(c: Canvas, spec: dict, y0: float) -> float:
+    """nodes = 圈裡的兩個框 [{text}（規劃）, {text}（執行）]；outcomes = 兩側被打叉的虛線框 [{text}, {text}]；heads[0] = 圈下面的一行說明。"""
+    chips, ghosts, cap = spec["nodes"], spec["outcomes"], spec["heads"][0]
+    caph = c.lines(cap, 760, 34) * 44.2
+    _fit(30 + 2 * 150 + 30 + caph, BOTTOM - y0, "oneloop")
+    R = min(200, (BOTTOM - y0 - 60 - caph) / 2)
+    cx, cy = 540, y0 + 30 + R
+    _arc_arrow(c, cx, cy, R, -62, 268, TEAL)
+    gx, gy = cx + R * math.cos(math.radians(100)), cy + R * math.sin(math.radians(100))
+    c.circle(gx, gy, 17, fill=GOLD)
+    for k, ch in enumerate(chips):
+        c.textbox(cx - 115, cy - 36 - 44 + k * 88, 230, ch["text"], None, h=64, align="center", pad=10)
+    for k, gh in enumerate(ghosts):
+        gx0 = X0 if k == 0 else X1 - 220
+        gy0 = cy - 55
+        c.rect(gx0, gy0, 220, 110, fill="none", stroke=TEAL, sw=3, dash="10 8", rx=16)
+        c.text(gx0 + 10, gy0 + 33, 200, gh["text"], "dt", TEAL, "center", (gx0, gy0, 220, 110))
+        c.circle(gx0 + 220 - 6, gy0 + 6, 22, fill=CREAM, stroke=TEAL, sw=4)
+        _cross2(c, gx0 + 214, gy0 + 6, 9, TEAL, 5)
+    c.text(X0 + 80, cy + R + 28, 760, cap, "dt", DEEP, "center")
+    return cy + R + 28 + caph
+
+
+def _doc(c: Canvas, x, y, w, h, label: str) -> None:
+    fold = 28
+    c.poly([(x, y), (x + w - fold, y), (x + w, y + fold), (x + w, y + h), (x, y + h)], fill=CREAM, stroke=DEEP, sw=4, closed=True)
+    c.poly([(x + w - fold, y), (x + w - fold, y + fold), (x + w, y + fold)], stroke=DEEP, sw=4)
+    c.text(x + 6, y + h / 2 - 22, w - 12, label, "dn", DEEP, "center", (x, y, w, h))
+
+
+def intercept(c: Canvas, spec: dict, y0: float) -> float:
+    """heads = [上排標籤, 下排標籤, 關卡標籤, 檔案]；nodes = [{text}（只用文字說的那句話）, {text}（工具呼叫）]；outcomes = 關卡裡的檢查項目 2～3 個 [{text}]。"""
+    h0, h1, hg, hf = spec["heads"][:4]
+    say, call = spec["nodes"][0], spec["nodes"][1]
+    checks = spec["outcomes"]
+    if not 2 <= len(checks) <= 3:
+        raise ValueError("intercept 的 outcomes 要 2～3 個檢查項目")
+    gh = 70 + 56 * len(checks)
+    total = 44 + 130 + 40 + 44 + max(gh, 130)
+    _fit(total, BOTTOM - y0, "intercept")
+    ex = min(70.0, (BOTTOM - y0 - total) / 3)
+    fx, fw = X1 - 170, 170
+    c.text(X0, y0, 600, h0, "dl", TEAL)
+    ry = y0 + 44
+    c.rect(X0, ry, 440, 130 + ex, fill="none", stroke=TEAL, sw=3, dash="10 8", rx=18)
+    c.text(X0 + 22, ry + (130 + ex - c.lines(say["text"], 396, 34) * 44.2) / 2, 396, say["text"], "dt", DEEP, "left", (X0, ry, 440, 130 + ex))
+    c.arrow(X0 + 456, ry + (130 + ex) / 2, fx - 14, ry + (130 + ex) / 2, TEAL, 5, 16)
+    _doc(c, fx, ry + ex / 2, fw, 130, hf)
+    y2 = ry + 130 + ex + 40 + ex
+    c.text(X0, y2, 600, h1, "dl", TEAL)
+    ry2 = y2 + 44
+    rh = max(gh, 130) + ex
+    c.textbox(X0, ry2 + (rh - 130) / 2, 300, call["text"], None, h=130, align="center", pad=14)
+    gx = X0 + 380
+    c.arrow(X0 + 316, ry2 + rh / 2, gx - 12, ry2 + rh / 2, TEAL, 5, 16)
+    c.rect(gx, ry2, 300, rh, fill="none", stroke=GOLD, sw=7, rx=18)
+    c.text(gx + 14, ry2 + 12, 272, hg, "dl", DEEP, "center")
+    for k, ck in enumerate(checks):
+        yy = ry2 + 66 + k * 56
+        _tick(c, gx + 40, yy + 20, TEAL, 6)
+        c.text(gx + 70, yy, 214, ck["text"], "dt", DEEP, "left", (gx, ry2, 300, rh))
+    c.arrow(gx + 316, ry2 + rh / 2, fx - 14, ry2 + rh / 2, TEAL, 5, 16)
+    _doc(c, fx, ry2 + (rh - 130) / 2, fw, 130, hf)
+    return ry2 + rh
+
+
+def dial(c: Canvas, spec: dict, y0: float) -> float:
+    """nodes = [{text}（人）, {text}（模型）]；heads[0] = 軌道下面的一行說明；選用 heads[1]、heads[2] = 軌道左、右端的標籤。人伸手轉旋鈕（金色箭頭），模型的箭頭被打叉。"""
+    me, model = spec["nodes"][0], spec["nodes"][1]
+    cap = spec["heads"][0]
+    ends = spec["heads"][1:3] if len(spec["heads"]) >= 3 else None
+    caph = c.lines(cap, 760, 34) * 44.2
+    gap = 58 + (46 if ends else 0)
+    _fit(250 + gap - 8 + caph + 20, BOTTOM - y0, "dial")
+    ty = y0 + 250 + min(90.0, (BOTTOM - y0 - 250 - gap - caph - 12) / 2)
+    xs = [X0 + 40 + k * (X1 - X0 - 80) / 7 for k in range(8)]
+    kx = xs[2]
+    c.line(xs[0], ty, xs[-1], ty, DEEP, 8)
+    for x in xs:
+        c.line(x, ty - 18, x, ty + 18, DEEP, 4)
+    c.circle(kx, ty, 32, fill=GOLD, stroke=DEEP, sw=5)
+    px = X0 + 120
+    c.circle(px, y0 + 38, 28, fill=TEAL)
+    c.raw(f'<path class="bg" d="M{px - 56} {y0 + 128} Q{px - 56} {y0 + 76} {px} {y0 + 76} Q{px + 56} {y0 + 76} {px + 56} {y0 + 128} Z" fill="{TEAL}"/>')
+    c.text(px - 80, y0 + 134, 160, me["text"], "dn", DEEP, "center")
+    c.arrow(px + 66, y0 + 100, kx - 26, ty - 40, GOLD, 7, 20)
+    mx = X1 - 190
+    c.textbox(mx - 80, y0 + 30, 220, model["text"], None, h=76, align="center", pad=10)
+    sx, sy, ex, ey = mx - 20, y0 + 118, kx + 34, ty - 40
+    c.line(sx, sy, ex, ey, TEAL, 5, dash="12 10")
+    mxp, myp = (sx + ex) / 2, (sy + ey) / 2
+    c.circle(mxp, myp, 24, fill=CREAM, stroke=TEAL, sw=4)
+    _cross2(c, mxp, myp, 10, TEAL, 5)
+    cy = ty + 58
+    if ends:
+        c.text(xs[0] - 30, ty + 34, 300, ends[0], "dl", TEAL, "left")
+        c.text(xs[-1] - 270, ty + 34, 300, ends[1], "dl", TEAL, "right")
+        cy = ty + 104
+    c.text(X0 + 80, cy, 760, cap, "dt", DEEP, "center")
+    return cy + caph
+
+
+def lanes(c: Canvas, spec: dict, y0: float) -> float:
+    """nodes = [{text}（最上面的問題）, 左欄的項目…（1～3 個 {text}）]；heads = [左欄標題, 右欄標題]；outcomes = [{text}（左欄結果，金色，項目下方有箭頭指向它）, {text}（右欄結果，深色大框）]。"""
+    q, items = spec["nodes"][0], spec["nodes"][1:]
+    hl, hr = spec["heads"][:2]
+    left, right = spec["outcomes"][:2]
+    cw = 430
+    qh = c.lines(q["text"], 620 - 44, 34) * 44.2 + 36
+    ih, rh, ag = 66, 100, 40
+    stack = len(items) * (ih + 14) + ag + rh
+    total = qh + 70 + 54 + stack
+    _fit(total, BOTTOM - y0, "lanes")
+    ex = min(34.0, (BOTTOM - y0 - total) / (len(items) + 2))
+    ih, rh = ih + ex, rh + ex
+    stack = len(items) * (ih + 14) + ag + rh
+    qx = 540 - 310
+    c.textbox(qx, y0, 620, q["text"], None, h=qh, align="center", pad=22)
+    lx, rx = X0, X1 - cw
+    top = y0 + qh + 70
+    c.arrow(540 - 120, y0 + qh + 4, lx + cw / 2, top - 6, TEAL, 5, 16)
+    c.arrow(540 + 120, y0 + qh + 4, rx + cw / 2, top - 6, TEAL, 5, 16)
+    c.text(lx, top, cw, hl, "dl", TEAL, "center")
+    c.text(rx, top, cw, hr, "dl", TEAL, "center")
+    y = top + 54
+    for it in items:
+        c.rect(lx, y, cw, ih, fill=CREAM, stroke=DEEP, sw=3, rx=14)
+        c.text(lx + 20, y + (ih - 44) / 2, cw - 40, it["text"], "dt", DEEP, "center", (lx, y, cw, ih))
+        y += ih + 14
+    c.arrow(lx + cw / 2, y - 10, lx + cw / 2, y + ag - 4, DEEP, 5, 16)
+    y += ag
+    c.rect(lx, y, cw, rh, fill=GOLD, rx=16)
+    c.text(lx + 20, y + (rh - 44) / 2, cw - 40, left["text"], "dn", DEEP, "center", (lx, y, cw, rh))
+    rbh = len(items) * (ih + 14) - 14
+    c.rect(rx, top + 54, cw, rbh, fill=DEEP, rx=16)
+    c.text(rx + 24, top + 54 + (rbh - c.lines(right["text"], cw - 48, 34) * 44.2) / 2, cw - 48, right["text"], "dn", CREAM, "center", (rx, top + 54, cw, rbh))
+    return top + 54 + stack
+
+
+def layers(c: Canvas, spec: dict, y0: float) -> float:
+    """heads = [上排標籤, 下排標籤, 容器外的框]；nodes = [{text}（工作目錄，金色）, {text}（錯誤的指令）]；outcomes[0] = {text}（關卡旁的字）。
+    上排：指令 → 關卡；下排：指令在虛線容器裡，往外走被叉掉。"""
+    ha, hb, hout = spec["heads"][:3]
+    wd, cmd = spec["nodes"][0], spec["nodes"][1]
+    gate = spec["outcomes"][0]
+    total = 44 + 90 + 56 + 54 + 140
+    _fit(total, BOTTOM - y0, "layers")
+    c.text(X0, y0, 700, ha, "dl", TEAL)
+    ay = y0 + 44
+    c.textbox(X0, ay, 400, cmd["text"], None, h=90, align="center", pad=10)
+    c.arrow(X0 + 416, ay + 45, X0 + 492, ay + 45, TEAL, 5, 16)
+    gx = X0 + 510
+    c.rect(gx, ay - 12, 26, 114, fill=TEAL, rx=6)
+    c.rect(gx + 100, ay - 12, 26, 114, fill=TEAL, rx=6)
+    c.line(gx + 26, ay + 45, gx + 100, ay + 45, TEAL, 5, dash="8 8")
+    c.text(gx + 146, ay + 45 - 22, X1 - (gx + 146), gate["text"], "dn", DEEP, "left")
+    by = ay + 90 + 56
+    c.text(X0, by, 700, hb, "dl", TEAL)
+    cy0 = by + 54
+    cwid, ch_ = 640, 140
+    c.rect(X0, cy0, cwid, ch_, fill="none", stroke=TEAL, sw=5, dash="12 9", rx=20)
+    c.rect(X0 + 16, cy0 + 20, 220, ch_ - 40, fill=GOLD, rx=14)
+    c.text(X0 + 22, cy0 + (ch_ - 44) / 2, 208, wd["text"], "dn", DEEP, "center", (X0 + 16, cy0 + 20, 220, ch_ - 40))
+    c.textbox(X0 + 252, cy0 + 25, 356, cmd["text"], None, h=ch_ - 50, align="center", pad=6)
+    ox = X0 + cwid + 40
+    c.line(X0 + 608, cy0 + ch_ / 2, X0 + cwid, cy0 + ch_ / 2, TEAL, 5)
+    c.line(X0 + cwid, cy0 + ch_ / 2, ox - 6, cy0 + ch_ / 2, TEAL, 5, dash="8 8")
+    c.circle(X0 + cwid, cy0 + ch_ / 2, 24, fill=CREAM, stroke=TEAL, sw=4)
+    _cross2(c, X0 + cwid, cy0 + ch_ / 2, 10, TEAL, 5)
+    c.rect(ox, cy0 + 20, X1 - ox, ch_ - 40, fill="none", stroke=TEAL, sw=3, dash="8 8", rx=14)
+    c.text(ox + 6, cy0 + (ch_ - c.lines(hout, X1 - ox - 12, 28) * 39.2) / 2, X1 - ox - 12, hout, "ds", TEAL, "center", (ox + 8, cy0 + 28, X1 - ox - 16, ch_ - 56))
+    return cy0 + ch_
+
+
+def turn(c: Canvas, spec: dict, y0: float) -> float:
+    """一輪怎麼走（2026-10-28，Claude Code 第 1 則）：nodes = [{text, sub?}（模型給出回應）, {text, sub?}（權限檢查）, {text}（對話紀錄裡的第一行）, {text}（第二行）]；
+    heads = [走向權限檢查的箭頭標籤, 對話紀錄的標題]；outcomes = [{text}（最終答案，金色，直接結束）, {text}（同意，打勾）, {text}（拒絕，打叉）]；loop = 底部虛線框的說明（選用）。
+    同意與拒絕的結果各寫進對話紀錄一行；金色是結束。"""
+    resp, gate, l1, l2 = spec["nodes"][:4]
+    h_arrow, h_paper = spec["heads"][:2]
+    fin, yes, no = spec["outcomes"][:3]
+    loop = spec.get("loop")
+    bw, gap = 420, 80
+    bh = 110
+    lh = (c.lines(loop, X1 - X0 - 44, 28) * 39.2 + 36) if loop else 0
+    rh, rg = 76, 16
+    ah = 54                                              # 回應 → 權限檢查 的箭頭段
+    gi = bw - 40
+    gh = max(100.0, c.lines(gate["text"], gi, 34) * 44.2 + ((c.lines(gate["sub"], gi, 28) * 39.2 + 6) if gate.get("sub") else 0) + 36)
+    total = bh + ah + gh + 46 + 2 * rh + rg + (24 + lh if loop else 0)
+    _fit(total, BOTTOM - y0, "turn")
+    X2 = X0 + bw + gap
+    c.textbox(X0, y0, bw, resp["text"], resp.get("sub"), h=bh)
+    c.arrow(X0 + bw + 8, y0 + bh / 2, X2 - 8, y0 + bh / 2, GOLD, 7, 20)
+    c.textbox(X2, y0, bw, fin["text"], None, fill=GOLD, tcolor=DEEP, h=bh, align="center")
+    gy = y0 + bh + ah
+    c.arrow(X0 + 60, y0 + bh + 6, X0 + 60, gy - 6, TEAL, 5, 16)
+    c.text(X0 + 84, y0 + bh + 6, 330, h_arrow, "dl", TEAL, "left")
+    c.rect(X0, gy, bw, gh, fill="none", stroke=GOLD, sw=7, rx=18)
+    iw = bw - 40
+    t1 = c.lines(gate["text"], iw, 34) * 44.2
+    t2 = (c.lines(gate["sub"], iw, 28) * 39.2 + 6) if gate.get("sub") else 0
+    gty = gy + (gh - t1 - t2) / 2
+    c.text(X0 + 20, gty, iw, gate["text"], "dn", DEEP, "center", (X0, gy, bw, gh))
+    if gate.get("sub"):
+        c.text(X0 + 20, gty + t1 + 6, iw, gate["sub"], "ds", DEEP, "center", (X0, gy, bw, gh))
+    ry = gy + gh + 46
+    sx = X0 + 20                                         # 左邊的脊線，由權限檢查往下接到兩個結果
+    c.line(sx, gy + gh, sx, ry + rh + rg + rh / 2, TEAL, 5)
+    rows = [(yes, True), (no, False)]
+    mids = []
+    for k, (o, ok) in enumerate(rows):
+        yy = ry + k * (rh + rg)
+        mid = yy + rh / 2
+        mids.append(mid)
+        c.arrow(sx, mid, X0 + 62, mid, TEAL, 5, 14)
+        c.rect(X0 + 66, yy, bw - 66, rh, fill="none", stroke=TEAL, sw=4, rx=16)
+        if ok:
+            _tick(c, X0 + 98, mid, TEAL, 6)
+        else:
+            _cross2(c, X0 + 98, mid, 10, TEAL, 5)
+        c.text(X0 + 124, mid - 22, bw - 66 - 70, o["text"], "dn", DEEP, "left", (X0 + 66, yy, bw - 66, rh))
+    py, ph = gy, ry + 2 * rh + rg - gy
+    c.rect(X2, py, bw, ph, fill=CREAM, stroke=DEEP, sw=4, rx=10)
+    c.text(X2 + 20, py + 12, bw - 40, h_paper, "dl", TEAL, "left")
+    for k, (ln, m) in enumerate(zip((l1, l2), mids)):
+        c.arrow(X0 + bw + 6, m, X2 + 22, m, TEAL, 5, 14)
+        c.text(X2 + 36, m - 22, bw - 56, "＋ " + ln["text"], "dn", DEEP, "left", (X2, py, bw, ph))
+    y = ry + 2 * rh + rg
+    if loop:
+        y += 24
+        c.rect(X0, y, X1 - X0, lh, fill="none", stroke=TEAL, sw=3, dash="10 8", rx=16)
+        c.text(X0 + 22, y + 18, X1 - X0 - 44, loop, "dt", TEAL, "left", (X0, y, X1 - X0, lh))
+        y += lh
+    return y
+
+
 KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "paths": paths, "epochs": epochs,
          "dotgrid": dotgrid, "dumbbell": dumbbell, "range": range_chart, "funnel": funnel,
          "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation, "tokens": tokens,
          "seesaw": seesaw, "hidden": hidden, "cycle": cycle, "links": links, "hops": hops, "bubble": bubble, "drift": drift, "ingest": ingest,
          "roles": roles, "embed": embed, "online": online, "gate": gate, "concat": concat, "joint": joint, "rails": rails, "scoreboard": scoreboard, "leak": leak, "amplify": amplify,
-         "receipt": receipt, "squeeze": squeeze, "alias": alias, "handoff": handoff, "mismatch": mismatch, "ledger": ledger}
+         "receipt": receipt, "squeeze": squeeze, "alias": alias, "handoff": handoff, "mismatch": mismatch, "ledger": ledger,
+         "transcript": transcript, "oneloop": oneloop, "intercept": intercept, "dial": dial, "lanes": lanes, "layers": layers, "turn": turn}
 
 
 def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:

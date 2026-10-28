@@ -115,6 +115,8 @@ def slide_lines(sl: dict, with_refs: bool) -> list[str]:
             out.append(f"圖表項目：{b['name']}｜{'／'.join(b.get('subs', []))}｜{(sl['legend'][0] + ' ') if v2 else ''}{b['value']:g} {sl.get('unit', '')}{v2}" + ("｜強調" if b.get("emphasize") else ""))
     if sl["layout"] == "diagram":
         out.append(f"示意圖（{sl['kind']}）上的文字與數字：" + "｜".join(D.texts(sl)))
+        if sl["kind"] in D.DESC:
+            out.append(f"示意圖的畫面（{sl['kind']}）：{D.DESC[sl['kind']]}" + ("；" + "；".join(f"第 {i + 1} 列「{n['text']}」的金色箭頭接到下一列" for i, n in enumerate(sl["nodes"]) if n.get("feeds")) if sl["kind"] == "transcript" else ""))
     if sl.get("edges"):      # links 圖的連線是內容（誰跟誰相連），審查者要看得到
         hot = {tuple(e) for e in sl.get("hot", [])}
         out.append("示意圖的連線（左—右）：" + "｜".join(f"{sl['nodes'][l]['text']}—{sl['outcomes'][r]['text']}" + ("（金色）" if (l, r) in hot else "") for l, r in sl["edges"]))
@@ -235,6 +237,8 @@ def ig_md(d: dict, title: str, series_name: str | None, alts: dict) -> str:
                 L.append(f"- **表列**：{r[0]}｜{r[1]}")
             if sl["layout"] == "diagram":
                 L.append(f"- **示意圖（{sl['kind']}）上的文字與數字**：" + "｜".join(D.texts(sl)))
+                if sl["kind"] in D.DESC:
+                    L.append(f"- **示意圖的畫面**：{D.DESC[sl['kind']]}")
             for b in sl.get("bars", []):
                 v2 = f"；{sl['legend'][1]} {b['value2']:g} {sl.get('unit', '')}" if "value2" in b else ""
                 L.append(f"- **圖上項目**：{b['name']}（{'、'.join(b.get('subs', []))}）＝ {(sl['legend'][0] + ' ') if v2 else ''}{b['value']:g} {sl.get('unit', '')}{v2}" + ("　★強調" if b.get("emphasize") else ""))

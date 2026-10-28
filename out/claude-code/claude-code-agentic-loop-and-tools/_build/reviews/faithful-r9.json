@@ -1,0 +1,10 @@
+{"post":"claude-code-agentic-loop-and-tools","blocks":[{"block":"第 12 張","atoms":[
+{"text":"正文開頭標明「範例流程」（流程取自 blog 的 agent_loop 範例，不是宣稱 Claude Code 實際一定這樣寫）","verdict":"完全支持","card_quote":"if response.is_final_answer: done = True","note":"c11 錨點為部落格舉例，標「範例流程」符合錨點寫法；c11 text 明寫「blog 給的 agent_loop 範例」。"},
+{"text":"回應若是最終答案就結束","verdict":"完全支持","card_quote":"if response.is_final_answer: done = True","note":"c11 text：模型的回應若是最終答案就結束。"},
+{"text":"否則是工具呼叫","verdict":"完全支持","card_quote":"if requires_confirmation(response.tool_call): approved = ask_user(response.tool_call) if not approved: transcript.append(denial_feedback(response.tool_call)) continue","note":"c11 text「否則……工具呼叫」；其後程式碼都以 response.tool_call 處理；c8 也寫模型必須明確發出工具呼叫。"},
+{"text":"需要確認的先問使用者（圖：權限檢查（需要確認的，先問使用者），標題「需要確認的，先問你」；你＝使用者）","verdict":"完全支持","card_quote":"if requires_confirmation(response.tool_call): approved = ask_user(response.tool_call)","note":"「需要確認的」限定條件有保留，沒有寫成所有工具呼叫都先問。「權限檢查」一詞依放行項對 c8（動作發生前執行權限檢查）。"},
+{"text":"不核准時，拒絕的回饋附進對話紀錄（圖：拒絕的回饋 → transcript 一行；你不核准：不執行）","verdict":"完全支持","card_quote":"if not approved: transcript.append(denial_feedback(response.tool_call)) continue","note":"continue 跳過 execute，故「不執行」成立；c11 text：使用者不核准就把拒絕的回饋附進 transcript 並繼續下一輪。"},
+{"text":"核准後執行，執行的結果（觀察結果）附進對話紀錄（圖：你核准：執行 → 觀察結果 → transcript 一行）","verdict":"完全支持","card_quote":"result = execute(response.tool_call, cwd) transcript.append(observation(response.tool_call, result))","note":"c11 text：核准後執行工具，把觀察結果附進 transcript。正文「不核准或核准後執行的結果」語法略含糊，但圖明確區分為「拒絕的回饋」與「觀察結果」，不致讀成不核准也有執行結果。"},
+{"text":"最終答案：結束（圖）","verdict":"完全支持","card_quote":"if response.is_final_answer: done = True","note":""},
+{"text":"對話紀錄會帶進下一輪，模型再給出新的回應（圖下方虛線框；transcript＝到目前為止的對話紀錄）","verdict":"完全支持","card_quote":"這些都不會讓迴圈中止，而是變成下一輪的輸入，模型會據此重新規劃。","note":"c9（被拒絕的權限請求變成下一輪輸入）與 c6（stderr 成為下一輪 prompt 輸入）支持觀察／拒絕回饋進入下一輪；c11 的 continue 為下一輪。依放行項 transcript＝對話紀錄。"}
+],"errors":[]}],"recalculations":[],"gaps":[]}

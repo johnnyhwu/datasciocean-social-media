@@ -1,0 +1,483 @@
+{
+ "series": "claude-code",
+ "concept": "claude-code-agentic-loop-and-tools",
+ "also_concepts": [
+  "claude-code-permission-blast-radius"
+ ],
+ "lang": "zh-TW",
+ "status": "draft",
+ "hook": {
+  "style": "讀者疑問",
+  "title": "讓 Claude Code 自己改檔案、下指令，不會出事嗎？",
+  "subtitle": "Claude Code 的做法：一個迴圈讀、改、驗證；\n安全機制的目標，是讓犯錯便宜又可逆。",
+  "refs": [
+   "c1",
+   "c17",
+   "claude-code-permission-blast-radius:c1"
+  ],
+  "candidate": "人挑定（2026-10-28）：A2 主標；副標改成保守寫法，不用「只求」"
+ },
+ "slides": [
+  {
+   "layout": "cover",
+   "title": "讓 Claude Code 自己改檔案、下指令，不會出事嗎？",
+   "body": "Claude Code 的做法：一個迴圈讀、改、驗證；\n安全機制的目標，是讓犯錯便宜又可逆。",
+   "refs": [
+    "c1",
+    "c17",
+    "claude-code-permission-blast-radius:c1"
+   ]
+  },
+  {
+   "layout": "context",
+   "title": "Claude Code 是什麼？",
+   "body": "Claude Code 是 Anthropic 推出的 AI 編碼工具：給它一個目標，它自己讀檔、下指令、改程式碼、驗證成果（正式名稱是 agentic 編碼 CLI）。",
+   "rows": [
+    [
+     "Agent",
+     "被交付一個目標後，就自行主導全局的 AI。"
+    ],
+    [
+     "迴圈",
+     "呼叫工具、觀察結果、決定下一步，反覆做到它自己判斷任務完成。"
+    ],
+    [
+     "工具呼叫",
+     "模型明確發出的動作，例如讀檔。"
+    ]
+   ],
+   "key_w": 240,
+   "refs": [
+    "c1",
+    "c2",
+    "c8",
+    "c13",
+    "claude-code-permission-blast-radius:c2"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "oneloop",
+   "title": "規劃和執行，在同一個迴圈裡完成",
+   "body": "Claude Code 沒有另外掛「規劃模組」或「執行模組」。規劃與執行都發生在同一個迴圈裡，由模型對剛觀察到的結果進行推理來驅動。官方文件把一輪描述成蒐集脈絡、動手、驗證三個階段，而且階段會混在一起。",
+   "heads": [
+    "一個迴圈，兩件事在裡面一起做"
+   ],
+   "nodes": [
+    {
+     "text": "規劃"
+    },
+    {
+     "text": "執行"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "規劃模組"
+    },
+    {
+     "text": "執行模組"
+    }
+   ],
+   "refs": [
+    "c1",
+    "c5"
+   ]
+  },
+  {
+   "layout": "table",
+   "title": "它動手靠這幾組工具：讀、改、跑",
+   "body": "官方文件分成五類：檔案操作、搜尋、執行、網路、程式碼智慧。另有 Task（交給另一個 Agent）、WebFetch／WebSearch（查檔案系統之外的資訊）。",
+   "rows": [
+    [
+     "讀程式碼｜Read／Glob／Grep",
+     "讀檔案、找檔案、搜尋內容，不必把整個專案塞給模型。"
+    ],
+    [
+     "改程式碼｜Edit／Write",
+     "Edit 精確替換字串，Write 寫新檔案或整檔重寫。"
+    ],
+    [
+     "跑指令｜Bash",
+     "執行任意 shell 指令（直接下給電腦的指令），是專用工具涵蓋不到時的通用逃生門。"
+    ]
+   ],
+   "key_w": 250,
+   "refs": [
+    "c13",
+    "c14"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "transcript",
+   "title": "失敗不會讓迴圈中止，只會變成下一輪的輸入",
+   "body": "觀察和行動走同一個管道：測試失敗的錯誤訊息（stderr），會直接成為下一輪 prompt（給模型的指示）的輸入，不需要人類轉達。語法錯誤、被拒絕的權限請求也一樣。",
+   "heads": [
+    "假設的例子"
+   ],
+   "nodes": [
+    {
+     "text": "把失敗的測試修好",
+     "tone": "prompt"
+    },
+    {
+     "text": "Bash　跑測試",
+     "tone": "tool"
+    },
+    {
+     "text": "stderr：有一個測試沒過",
+     "tone": "fail",
+     "feeds": true
+    },
+    {
+     "text": "Edit　改程式碼",
+     "tone": "tool"
+    },
+    {
+     "text": "測試通過，任務完成",
+     "tone": "ok"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "下一輪的輸入"
+    }
+   ],
+   "note": "例子是假設的，用來示意流程，不是 Claude Code 實際的輸出。",
+   "refs": [
+    "c6",
+    "c9",
+    "c13"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "intercept",
+   "title": "工具呼叫，是動作發生前的攔截點",
+   "body": "模型必須明確發出一個工具呼叫，而不是用自由文字說「我現在要去改檔案了」。這樣在動作真正發生前，就有一個乾淨的攔截點，可做權限檢查、記錄 log。官方文件說規則的檢查順序是 deny、ask、allow，第一個命中的決定結果。",
+   "heads": [
+    "只用自由文字說（沒有乾淨的攔截點）",
+    "發出工具呼叫",
+    "攔截點",
+    "檔案"
+   ],
+   "nodes": [
+    {
+     "text": "「我現在要去改檔案了」"
+    },
+    {
+     "text": "Edit　改檔案"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "權限檢查"
+    },
+    {
+     "text": "記錄 log"
+    }
+   ],
+   "refs": [
+    "c8",
+    "c13"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "transcript",
+   "title": "犯錯不可怕，改得回來就好",
+   "body": "無人看管的 Agent，安全不能單純仰賴模型「每次都猜對」；目標是讓犯錯的代價低廉且可逆。官方文件補充：改檔前會先快照，按兩下 Esc 倒回；資料庫、API、部署這類對外動作倒不回來。",
+   "heads": [
+    "假設的例子"
+   ],
+   "nodes": [
+    {
+     "text": "把設定檔整理一下",
+     "tone": "prompt"
+    },
+    {
+     "text": "Edit　改設定檔",
+     "tone": "tool"
+    },
+    {
+     "text": "改錯了，程式跑不起來",
+     "tone": "fail"
+    },
+    {
+     "text": "Edit　改回原來的樣子",
+     "tone": "tool"
+    },
+    {
+     "text": "迴圈繼續，人不必出手",
+     "tone": "ok"
+    }
+   ],
+   "note": "例子是假設的，用來說明「代價低廉且可逆」的意思。",
+   "refs": [
+    "claude-code-permission-blast-radius:c1",
+    "c13"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "dial",
+   "title": "權限是一路可調的刻度",
+   "body": "Claude Code 的權限做法是漸進式的（不是只有開和關兩種）。要放寬到哪裡，由使用者選擇權限模式，不是模型自己決定，所以放多寬是你說了算。",
+   "heads": [
+    "旋鈕在你手上，模型自己不能轉"
+   ],
+   "nodes": [
+    {
+     "text": "你"
+    },
+    {
+     "text": "模型"
+    }
+   ],
+   "note": "圖上畫了幾格只是示意，不代表實際有幾種模式。",
+   "refs": [
+    "claude-code-permission-blast-radius:c8",
+    "claude-code-permission-blast-radius:c10"
+   ]
+  },
+  {
+   "layout": "table",
+   "title": "權限模式有六種，先看前三種",
+   "body": "用 Shift+Tab 切換。名稱依 2026 年 10 月的官方文件。這三種還是由你把關。",
+   "rows": [
+    [
+     "逐步把關｜Manual",
+     "讀檔不用問；要改檔、下 shell 指令（例如跑 npm test）前，會先問你。"
+    ],
+    [
+     "自動改檔｜acceptEdits",
+     "改檔和 mkdir、mv 這類常見檔案指令直接做；其他指令還是會問你。"
+    ],
+    [
+     "只規劃｜plan",
+     "只探索程式碼、提出計畫，不改你的原始碼。"
+    ]
+   ],
+   "key_w": 300,
+   "refs": [
+    "claude-code-permission-blast-radius:c8",
+    "claude-code-permission-blast-radius:c10"
+   ]
+  },
+  {
+   "layout": "table",
+   "title": "後三種：交給分類器，或直接放行",
+   "body": "官方提醒：auto 模式減少權限提示，但不是萬無一失。",
+   "rows": [
+    [
+     "分類器把關｜auto",
+     "背景分類器審查動作，擋下危險的（例如 force push），不會一個個問你。"
+    ],
+    [
+     "不問就拒絕｜dontAsk",
+     "需要問你的動作一律直接拒絕，不跳提示；適合 CI 和自動化腳本。"
+    ],
+    [
+     "跳過提示｜bypassPermissions",
+     "跳過權限提示，但 deny 規則仍會擋。官方說只該用在隔離環境。"
+    ]
+   ],
+   "key_w": 300,
+   "refs": [
+    "claude-code-permission-blast-radius:c8",
+    "claude-code-permission-blast-radius:c10"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "lanes",
+   "title": "做錯了救得回來嗎？決定要不要先問你",
+   "body": "可逆性（做錯了能不能復原）決定是否需要確認提示。讀取檔案、執行測試，在幾乎所有權限模式下都會自動核准（直接放行、不用問你），因為就算判斷錯了，代價也很低。",
+   "heads": [
+    "代價低的動作",
+    "較難復原的動作"
+   ],
+   "nodes": [
+    {
+     "text": "這個動作要先問你嗎？"
+    },
+    {
+     "text": "讀取檔案"
+    },
+    {
+     "text": "執行測試"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "自動核准"
+    },
+    {
+     "text": "需要確認提示，先問你"
+    }
+   ],
+   "refs": [
+    "claude-code-permission-blast-radius:c11",
+    "claude-code-permission-blast-radius:c12"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "turn",
+   "title": "一輪怎麼走：需要確認的，先問你",
+   "body": "範例流程：回應若是最終答案就結束，否則是工具呼叫。需要確認的先問使用者，不核准或核准後執行的結果，會附進對話紀錄（transcript）。",
+   "heads": [
+    "是工具呼叫",
+    "對話紀錄（transcript）"
+   ],
+   "nodes": [
+    {
+     "text": "模型給出回應",
+     "sub": "最終答案，還是工具呼叫？"
+    },
+    {
+     "text": "權限檢查",
+     "sub": "需要確認的，先問使用者"
+    },
+    {
+     "text": "觀察結果"
+    },
+    {
+     "text": "拒絕的回饋"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "最終答案：結束"
+    },
+    {
+     "text": "你核准：執行"
+    },
+    {
+     "text": "你不核准：不執行"
+    }
+   ],
+   "loop": "對話紀錄會帶進下一輪，模型再給出新的回應",
+   "refs": [
+    "c6",
+    "c8",
+    "c9",
+    "c11"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "layers",
+   "title": "權限和沙盒，是兩道各自獨立的防線",
+   "body": "沙盒是在容器或範圍受限的環境中執行：就算權限設得寬鬆，一個錯誤的 shell 指令也碰不到任務工作目錄（這次任務所在的資料夾）以外的地方。權限機制與執行邊界是兩道獨立的防線，不是互相替代。",
+   "heads": [
+    "權限機制",
+    "沙盒（執行邊界）",
+    "工作目錄以外"
+   ],
+   "nodes": [
+    {
+     "text": "工作目錄"
+    },
+    {
+     "text": "錯誤的 shell 指令"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "先問你"
+    }
+   ],
+   "refs": [
+    "claude-code-permission-blast-radius:c14",
+    "claude-code-permission-blast-radius:c15"
+   ],
+   "note": "兩根直條代表關卡，虛線框代表沙盒圍起來的範圍。"
+  },
+  {
+   "layout": "diagram",
+   "kind": "pairs",
+   "title": "沙盒要同時隔離檔案和網路",
+   "body": "Anthropic 工程部落格說，沙盒讓他們內部使用時的權限提示減少 84%。官方文件說，沙盒由作業系統強制執行，只管 shell 指令；Read、Edit 這類內建檔案工具仍走權限規則。",
+   "heads": [
+    "少了這一種隔離",
+    "會發生什麼"
+   ],
+   "pairs": [
+    [
+     "沒有網路隔離",
+     "被入侵的 Agent 可以外傳敏感檔案"
+    ],
+    [
+     "沒有檔案系統隔離",
+     "容易逃出沙箱，取得網路"
+    ]
+   ],
+   "outcomes": [
+    {
+     "text": "所以兩種隔離要同時有",
+     "tone": "good"
+    }
+   ],
+   "refs": [
+    "claude-code-permission-blast-radius:c14",
+    "claude-code-permission-blast-radius:c15"
+   ]
+  },
+  {
+   "layout": "takeaway",
+   "question": "讓 Claude Code 自己改檔案、下指令，不會出事嗎？",
+   "title": "一個迴圈，自己看結果、自己修；\n權限與沙盒另外擋著，\n目標是讓犯錯便宜又可逆。",
+   "refs": [
+    "c1",
+    "c9",
+    "claude-code-permission-blast-radius:c1",
+    "claude-code-permission-blast-radius:c14",
+    "claude-code-permission-blast-radius:c15"
+   ]
+  },
+  {
+   "layout": "series_map",
+   "title": "一次看完這個系列",
+   "current": "claude-code-agentic-loop-and-tools",
+   "nav": "完整文章：datasciocean.com/ai-concept/claude-code",
+   "refs": [
+    "結構"
+   ]
+  }
+ ],
+ "threads": {
+  "mode": "carousel",
+  "body": {
+   "text": "讓 Claude Code 自己改檔案、下指令，不會出事嗎？\n\n它的核心只有一個迴圈：呼叫工具、觀察結果、自己決定下一步，一直做到它判斷任務完成。測試失敗了？錯誤訊息會直接變成下一輪的輸入，它看著錯誤自己修。\n\n安全上，不能單純靠模型每次都猜對，目標是讓犯錯的代價低廉、而且能復原。輪播裡有圖解，一張一張講。\n\n這是系列第 1 則。",
+   "refs": [
+    "c1",
+    "c6",
+    "c9",
+    "claude-code-permission-blast-radius:c1"
+   ]
+  },
+  "last": {
+   "text": "還想知道 Claude Code 怎麼擴充？\n文章：datasciocean.com/ai-concept/claude-code\n同系列：Skills、Hooks、MCP 怎麼組成一套 Harness？（尚未發布）",
+   "refs": [
+    "c1"
+   ],
+   "link": "https://datasciocean.com/ai-concept/claude-code/"
+  }
+ },
+ "caption": {
+  "first": "Claude Code 運作原理：一個迴圈，讓 AI 自己讀、改、驗證程式碼",
+  "first_refs": [
+   "c1",
+   "c17"
+  ],
+  "nav": "完整文章請在 datasciocean.com 搜尋「拆解 Claude Code：Agentic Loop、工具系統、Skills 與權限機制」",
+  "hashtags": [
+   "DSO_ClaudeCode",
+   "ClaudeCode",
+   "AIAgent",
+   "Anthropic"
+  ]
+ }
+}

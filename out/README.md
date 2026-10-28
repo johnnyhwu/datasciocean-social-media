@@ -6,6 +6,13 @@
 
 - SAG：不先建圖，查詢時才連 第 1 則：[Multi-Hop 推理，一定要先建知識圖譜嗎？](sag/sag-latent-hyperedge-one-hop/README.md)
 
+## 拆解 Claude Code（`claude-code`）
+
+| 發文順序 | 觀念 | 標題（planned_title） | IG | Threads | 打開 |
+|---|---|---|---|---|---|
+| 1 | `claude-code-agentic-loop-and-tools`＋`claude-code-permission-blast-radius` | Claude Code 為什麼敢自己動手改程式？ | 未做 | 未做 | [README](claude-code-agentic-loop-and-tools/README.md) |
+| 2 | `claude-code-extension-and-context` | Skills、Hooks、MCP 怎麼組成一套 Harness？ | 未做 | 未做 | （還沒做） |
+
 ## JEV 串接 Judge 系列（`jev-cascade`）
 
 | 發文順序 | 觀念 | 標題（planned_title） | IG | Threads | 打開 |

@@ -16,7 +16,7 @@ description: 設計 IG 輪播與 Threads 附圖的視覺：新系列的視覺哲
 1. `references/principles.md`：IG 圖片設計原則（先哲學後畫面、暗藏主題參照、文字是視覺元素、工藝感、不重疊不出框、最後一步只減不加、多張是同一哲學的變奏）。
 2. `references/brand-and-layouts.md`：畫布與邊界、品牌色與字型字級、對比度、九種版型、依內容選圖、測深圖。
 3. `references/series-philosophy-and-templates.md`：兩層視覺哲學、模板怎麼來、做新系列的步驟。
-4. 想看範例：最新的系列 `series/sag/`（探照燈 `spotlight`：`philosophy.md`、`templates/`、`series.md`）與它的成品 `out/sag/sag-latent-hyperedge-one-hop/`；另有 `series/skillopt/`（等深線 `contour`）。jev-cascade 是最早的系列，版型與寫法已過時。
+4. 想看範例：最新的系列 `series/sag/`（探照燈 `spotlight`：`philosophy.md`、`templates/`、`series.md`）與它的成品 `out/sag/sag-latent-hyperedge-one-hop/`；另有 `series/skillopt/`（等深線 `contour`）、`series/claude-code/`（視窗 `window`：終端機視窗，金色只給游標；`render.py` 的 `wn_*` 與 `tests/test_window_style.py`）。jev-cascade 是最早的系列，版型與寫法已過時。
 5. 需要原始設計哲學時再讀 `references/canvas-design-original.md`（上游 skill 原文；授權見 `references/canvas-design-LICENSE.txt`）。
 
 ## 鐵則
