@@ -1,0 +1,140 @@
+{
+  "post": "claude-code-extension-and-context",
+  "skim": {
+    "conclusion": "快滑可以抓到大意：Claude Code 靠六個機制（擴充：Skills、Hooks、MCP；管理：CLAUDE.md、壓縮、Subagent）來加能力、管住 context，而且這些機制單獨都不新，自動組合起來才是 Harness 的關鍵。但只看主標，「Harness」「context」「Hook」是什麼完全不知道，所以只知道結論的形狀，不懂內容。",
+    "citations": [
+      {"quote": "Claude Code 靠六個機制，擴充能力又管住 context"},
+      {"quote": "只靠固定的工具，不夠應付實際任務"},
+      {"quote": "Skill 平常只佔一行，用到才整份讀進來"},
+      {"quote": "固定節點一到，Hook 就自動執行"},
+      {"quote": "要保證規則被遵守，Hook 是對的位置"},
+      {"quote": "對話快滿時，壓成摘要再繼續"},
+      {"quote": "搜尋派給 Subagent，主對話只收摘要"},
+      {"quote": "單獨都不新，自動組合才成為 Harness"}
+    ]
+  },
+  "core": {
+    "thesis": {
+      "answer": "Claude Code 用六個機制（Skills、Hooks、MCP 負責擴充能力；CLAUDE.md、壓縮、Subagent 負責管理模型看得到的內容），這些機制單獨都不新，能自動彼此組合才是 Harness 的關鍵。",
+      "citations": [
+        {"quote": "六個機制單獨都不新，能自動彼此組合，才是 Harness 的關鍵。"},
+        {"quote": "擴充：Skills、Hooks、MCP\n管理：CLAUDE.md、壓縮、Subagent"}
+      ]
+    },
+    "mechanism": {
+      "answer": "每個機制各補一個缺口：只靠固定工具太僵化，所以多開三個擴充點（Skill 只佔一行、用到才整份讀；Hook 在固定節點自動執行、是程式碼所以能保證規則；MCP 用共通介面接外部服務）。管理 context 則是 CLAUDE.md 每場開頭自動讀入、對話快滿時壓成摘要、搜尋派給 Subagent 讓雜訊留在它那邊。組合那一段只給了兩個例子，說明它們會互相銜接。",
+      "citations": [
+        {"quote": "只靠模型加固定的工具清單，對編碼 Agent 實際遇到的任務太過僵化，所以 Harness 多開三個擴充點。"},
+        {"quote": "Hook 是一般程式碼、不是模型呼叫，所以適合用來保證「模型本身無法被信任會可靠遵守」的規則。"},
+        {"quote": "雜訊多的中間輸出留在它那邊，主對話只收到最後的摘要。"},
+        {"quote": "能自動彼此組合，才成為 Harness。看兩個例子。"}
+      ]
+    },
+    "evidence": {
+      "answer": "貼文沒有數據、實驗或外部佐證。「單獨都不新」只是斷言，沒說跟什麼比、誰說的。唯一的支撐是第 14 張的兩個示意例子（Subagent 摘要被收進壓縮摘要；不論這一輪從哪來都套用同一份 CLAUDE.md 慣例），以及第 13 張的對照表。第 14 張兩個例子只是示意，並沒有證明「組合」帶來什麼好處，讀者得自己腦補。",
+      "citations": [
+        {"quote": "單獨看都不算新；能自動彼此組合，才成為 Harness。"},
+        {"quote": "例二：不論這一輪從哪來，都套用同一份慣例"}
+      ]
+    }
+  },
+  "terms": [
+    {"term": "context", "blocks_core": false, "note": "封面主標就用，到第 3 張才定義（「模型這一輪看得到的所有內容，像攤在桌上的資料」）。封面讀者會卡一下，第 3 張後補上，不擋核心。"},
+    {"term": "Harness", "blocks_core": false, "note": "第 3 張有白話定義（包在模型外面那一層：給模型工具，並管理它看到什麼）。但結論「才是 Harness 的關鍵」整個押在這個詞上，定義只出現一次，離第 14、15 張很遠，讀者容易忘。"},
+    {"term": "Agent", "blocks_core": false, "note": "第 4 張「編碼 Agent」、第 6 張「Agent 回覆完成後」直接用，沒有定義。對沒背景的人是模糊的，但不影響大意。"},
+    {"term": "Skills / Hooks / MCP / CLAUDE.md / Subagent", "blocks_core": false, "note": "封面直接列名，各自在後面的張有白話定義（Skill 是資料夾、Hook 是固定節點自動執行的指令、MCP 是共通介面、CLAUDE.md 是給 Claude 讀的說明檔、Subagent 是派出去的幫手）。"},
+    {"term": "輪（「這一輪」）", "blocks_core": true, "note": "第 14 張「使用者這一輪」「Hook 讓這一輪再試一次」，全篇沒定義「一輪」是什麼（一次請求與回覆？）。而且兩個例子的圖正好靠這個詞，讀者看不懂例二。"},
+    {"term": "Hook 觸發的重試", "blocks_core": true, "note": "第 6～8 張只講 Hook 會擋下、整理格式、檢查失敗，從沒說 Hook 能讓這一輪再試一次。第 14 張例二突然出現，前面沒鋪墊。"},
+    {"term": "壓縮後的摘要 / 後續壓縮", "blocks_core": false, "note": "第 11 張有講壓縮成摘要，但例一的「摘要被再次收進壓縮」要讀者自己推：Subagent 的摘要之後又被壓進壓縮摘要。"},
+    {"term": "lint", "blocks_core": false, "note": "第 8 張括號寫「檢查（lint）」，等於沒解釋 lint 是什麼，只當作檢查的別名。"},
+    {"term": "結束碼", "blocks_core": false, "note": "第 8 張用「回報一個數字」白話說明，算有定義，但「其他通常照樣進行」的後果沒講清楚。"},
+    {"term": "shell 指令", "blocks_core": false, "note": "第 6 張括號補「直接下給電腦的指令」，有定義。"},
+    {"term": "終端機 / repo / API / GitHub / 工單系統", "blocks_core": false, "note": "第 9 張與圖上直接用，沒解釋；一般讀者模糊，但不影響核心。"}
+  ],
+  "post_only_questions": [
+    {
+      "q": "Q1 規則寫在提示裡和寫成 Hook 差別？",
+      "answer": "寫在提示（例如 CLAUDE.md）裡只是請求，要靠模型自己遵守；寫成 Hook 是一般程式碼，在工具執行前先檢查，受保護就擋下，所以能保證。",
+      "citations": [
+        {"quote": "寫在 CLAUDE.md（專案裡給 Claude 讀的說明檔）的規則只是請求。"},
+        {"quote": "Hook 是一般程式碼、不是模型呼叫，所以適合用來保證「模型本身無法被信任會可靠遵守」的規則。"},
+        {"quote": "只寫在提示裡，靠模型遵守｜寫成 Hook，執行前檢查"}
+      ]
+    },
+    {
+      "q": "Q2 Hook 結束碼是什麼、用錯會怎樣？",
+      "answer": "結束碼是 Hook 回報的一個數字：2 代表阻擋，0 代表沒意見，其他數字通常照樣進行。用錯（想擋卻回了別的碼）會變成沒擋住、動作照樣做下去，但貼文只用「其他通常照樣進行」帶過，沒有明講「用錯會怎樣」的後果，是我從標題「要擋就得用對碼」推出來的。",
+      "citations": [
+        {"quote": "回報一個數字（結束碼）：2 阻擋，0 沒意見，其他通常照樣進行。"},
+        {"quote": "要擋就得用對碼"}
+      ]
+    },
+    {
+      "q": "Q3 對話快塞滿時 Claude Code 怎麼處理？",
+      "answer": "不盲目截斷，而是把較早的對話摘要成精簡版本後繼續，使用者不必重新解釋先前的決策；但早期的詳細指示可能在壓縮時遺失，長期要遵守的規則請放進 CLAUDE.md。",
+      "citations": [
+        {"quote": "對話快塞滿時，Claude Code 不盲目截斷，而是把較早的對話摘要成精簡版本後繼續，使用者不必重新解釋先前的決策。"},
+        {"quote": "早期的詳細指示可能在壓縮時遺失，長期要遵守的規則請放進 CLAUDE.md。"}
+      ]
+    },
+    {
+      "q": "Q4 Subagent 是什麼、做完事主對話收到什麼？",
+      "answer": "Subagent 是 Claude Code 派出去的幫手，在自己獨立的 context 裡工作；主對話只收到最後的摘要，中間的雜訊輸出留在它那邊。",
+      "citations": [
+        {"quote": "Subagent 是 Claude Code 派出去的幫手，在自己獨立的 context 裡工作。"},
+        {"quote": "雜訊多的中間輸出留在它那邊，主對話只收到最後的摘要。"}
+      ]
+    },
+    {
+      "q": "Q5 封面說「六個機制」，是哪六個？",
+      "answer": "擴充三個：Skills、Hooks、MCP；管理三個：CLAUDE.md、壓縮、Subagent。注意第 13 張表格只列五個（沒有壓縮），讀者數表格會以為是五個。",
+      "citations": [
+        {"quote": "擴充：Skills、Hooks、MCP\n管理：CLAUDE.md、壓縮、Subagent"}
+      ]
+    },
+    {
+      "q": "Q6 一個 Skill 的完整指示最多幾行？",
+      "answer": "貼文沒寫。只寫了平常一行描述、用到才整份讀進來，沒有行數上限。",
+      "citations": []
+    }
+  ],
+  "feel": {
+    "felt_misled": "有一點。「單獨都不新」這個斷言沒有比較對象與證據，第 14 張的兩個例子也看不出「組合」到底帶來什麼好處，結論有點是被宣告的。另外封面與第 15 張說「六個機制」，但第 13 張表只有五個，會讓人覺得數字對不上。第 8 張標題說 Hook 能「讓檢查失敗」，下面又說非 2 的碼「通常照樣進行」，讀起來像矛盾。",
+    "unclear_slides": [8, 14]
+  },
+  "takeaways": [
+    {
+      "slide": 8,
+      "takeaway": "Hook 要真的擋下動作，必須回報結束碼 2；回 0 是沒意見、其他碼通常照樣進行。不過「檢查不過就失敗」與「其他碼照樣進行」放在一起，所以呢的邏輯不夠順，讀者要猜失敗跟結束碼的關係。",
+      "quote": "要擋就得用對碼｜回報一個數字（結束碼）：2 阻擋，0 沒意見，其他通常照樣進行。",
+      "no_takeaway": false
+    },
+    {
+      "slide": 13,
+      "takeaway": "每個機制載入 context 的時機不同：每次請求都帶著的規則要寫精簡，偶爾才用的參考資料放進 Skill，這樣才不浪費空間。",
+      "quote": "跟著每次請求的規則要寫精簡，偶爾才用的參考資料放進 Skill。",
+      "no_takeaway": false
+    },
+    {
+      "slide": 14,
+      "takeaway": "標題講了結論：這些機制要能自動彼此組合才算 Harness。但只讀這一頁，兩個例子的意義（Subagent 摘要被壓進壓縮摘要、Hook 重試與使用者這一輪都套同一份 CLAUDE.md 慣例）看不出它們為什麼重要，所以結論只是被宣告、不是被例子證明。",
+      "quote": "能自動彼此組合，才成為 Harness。看兩個例子。",
+      "no_takeaway": false
+    }
+  ],
+  "hard_to_understand": [
+    {"slide": 1, "quote": "擴充：Skills、Hooks、MCP\n管理：CLAUDE.md、壓縮、Subagent", "why": "封面是一串陌生名詞，沒人知道這些是什麼，也不知道「context」是什麼；圖上的 add a lint hook、Task search the repo、summary back 全是英文行話，對一般人只是裝飾。這是封面，影響可接受，但「前面沒鋪墊就出現」的東西很多：context、Skills、Hooks、MCP、Subagent、CLAUDE.md 全在封面直接丟出來。"},
+    {"slide": 8, "quote": "檢查不過就失敗｜改完自動跑檢查（lint），沒過就失敗。", "why": "lint 只是括號帶過，沒說是什麼；「失敗」是誰失敗、失敗之後會怎樣沒說。"},
+    {"slide": 8, "quote": "回報一個數字（結束碼）：2 阻擋，0 沒意見，其他通常照樣進行。", "why": "沒說「其他」是什麼數字、誰決定它照樣進行、為什麼要用數字回報。且和上一列「沒過就失敗」讀起來互相衝突：既然失敗，為什麼別的碼會照樣進行？"},
+    {"slide": 14, "quote": "Hook 觸發的重試｜Hook 讓這一輪再試一次", "why": "前面第 6～8 張從沒講過 Hook 能觸發重試，這裡才突然出現，前面沒鋪墊；「這一輪」也沒定義。"},
+    {"slide": 14, "quote": "例一：摘要被再次收進壓縮", "why": "要先記得第 12 張的 Subagent 摘要與第 11 張的壓縮摘要，才懂「再次收進」；圖上只有兩個同名框和一條箭頭，看不出為什麼這件事值得一提。"},
+    {"slide": 14, "quote": "例二：不論這一輪從哪來，都套用同一份慣例", "why": "「這一輪從哪來」「慣例」都沒鋪墊；不知道為什麼套用同一份慣例是組合的證明。"},
+    {"slide": 15, "quote": "六個機制單獨都不新，", "why": "「單獨都不新」沒說跟什麼比；本頁只是重述，沒有新資訊；圖上的終端機是空的，是裝飾。"}
+  ],
+  "charts": [
+    {"slide": 1, "can_state_claim": false, "issue": "封面圖是一個深色終端機視窗，列出 add a lint hook、Read CLAUDE.md、Edit .claude/settings.json、Bash npm run lint passed、Task search the repo summary back。對沒背景的人是看不懂的英文指令，只能當氛圍圖，不能支撐主標；字大小夠、不擠。注意：圖上 passed、summary back 字小、對比偏低（灰綠在深底上）。"},
+    {"slide": 8, "can_state_claim": true, "issue": "這是文字表格，不是圖。字夠大、排版乾淨、行距足夠，讀起來沒問題；只是內容的邏輯（失敗與結束碼的關係）需要文字解釋而表格沒有。標籤清楚、不擠。"},
+    {"slide": 14, "can_state_claim": true, "issue": "兩個例子都能讀出一句話：例一是「Subagent 的摘要之後又被收進壓縮後的摘要」（箭頭標「後續壓縮」）；例二是「使用者這一輪」與「Hook 觸發的重試」兩條線都匯到同一個金色的「CLAUDE.md 的慣例：一致套用」。畫面本身看得出「例一在說摘要被包進摘要」「例二在說兩個來源共用同一份慣例」。但看不出為什麼這代表組合、也看不出差別所在，因為兩個例子都沒有前後對照（沒有『沒組合會怎樣』）。小問題：「Hook 讓這一輪再試一次」是小字、深底上的淺青色，對比偏低；例一的「後續壓縮」標籤緊貼箭頭與視窗邊，略擠；例一、例二標題是小字、很容易被略過；下方約 130px 留白。第二組的兩條箭頭有點歪斜，但不影響閱讀。"},
+    {"slide": 15, "can_state_claim": true, "issue": "金色大字結論清楚、對比好、不擠，單看就能講出「六個機制單獨都不新，自動組合才是 Harness 關鍵」。下方空的終端機圖只是裝飾，沒有任何資訊；上方重複放了封面標題，所以這一頁其實是在重述。"}
+  ]
+}

@@ -1,4 +1,4 @@
-# Threads：Claude Code 為什麼敢自己動手改程式？
+# Threads：讓 Claude Code 自己改檔案、下指令，不會出事嗎？
 
 - 發文方式：**一則輪播貼文**（正文＋全部 16 張圖，順序與 IG 相同），再用一則回覆放連結與系列（連結只放那則回覆）
 - 圖檔在 `../ig/`（與 IG 輪播共用同一套）
@@ -39,5 +39,5 @@
 ```text
 還想知道 Claude Code 怎麼擴充？
 文章：datasciocean.com/ai-concept/claude-code
-同系列：Skills、Hooks、MCP 怎麼組成一套 Harness？（尚未發布）
+同系列：Claude Code 靠六個機制，擴充能力又管住 context（尚未發布）
 ```

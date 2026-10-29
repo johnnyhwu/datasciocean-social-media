@@ -1,0 +1,486 @@
+{
+  "series": "claude-code",
+  "concept": "claude-code-extension-and-context",
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "並列式",
+    "title": "Claude Code 靠六個機制，擴充能力又管住 context",
+    "subtitle": "擴充：Skills、Hooks、MCP\n管理：CLAUDE.md、壓縮、Subagent",
+    "refs": [
+      "c1",
+      "c5",
+      "c16",
+      "c17",
+      "c18"
+    ],
+    "candidate": "人挑定（2026-10-29）：C1"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "Claude Code 靠六個機制，擴充能力又管住 context",
+      "body": "擴充：Skills、Hooks、MCP\n管理：CLAUDE.md、壓縮、Subagent",
+      "refs": [
+        "c1",
+        "c5",
+        "c16",
+        "c17",
+        "c18"
+      ]
+    },
+    {
+      "layout": "recap",
+      "title": "[[前情提要]]與這一則重點",
+      "current": "claude-code-extension-and-context",
+      "refs": [
+        "結構"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "先搞懂三個詞：模型、Harness、Context",
+      "body": "Claude Code 是 Anthropic 推出的 AI 編碼工具，可以看成三層：固定不變的模型、包在外面的 Harness、動態組裝的 Context。這一則看後兩層。",
+      "rows": [
+        [
+          "模型",
+          "負責理解任務、推理的 Claude 本身，固定不變。"
+        ],
+        [
+          "Harness",
+          "包在模型外面的那一層：給模型工具，並管理它看到什麼。"
+        ],
+        [
+          "Context",
+          "模型每一輪（每回應一次）看得到的所有內容：對話、讀進來的檔案、指令的輸出。"
+        ]
+      ],
+      "key_w": 240,
+      "refs": [
+        "c2",
+        "c3",
+        "c4"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "sockets",
+      "title": "只靠固定的工具，不夠應付實際任務",
+      "body": "工具是模型能呼叫的動作，例如讀檔、改檔、跑指令。只靠模型加固定的工具清單，對編碼 Agent 實際遇到的任務太過僵化，所以 Harness 多開三個擴充點。",
+      "heads": [
+        "Harness 多開的三個插孔"
+      ],
+      "nodes": [
+        {
+          "text": "Skills",
+          "sub": "教它某件事怎麼做"
+        },
+        {
+          "text": "Hooks",
+          "sub": "固定節點自動執行"
+        },
+        {
+          "text": "MCP",
+          "sub": "接上外部的服務"
+        }
+      ],
+      "refs": [
+        "c5",
+        "c6",
+        "c7",
+        "c9",
+        "c12",
+        "c13"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "lazy",
+      "title": "Skill 平常只佔一行，用到才整份讀進來",
+      "body": "Skill 是一個資料夾，裝著某個重複性任務的做法。模型一開始只看到每個 Skill 的一行描述，用到哪個才拉進整份指示，用不到的不會先佔掉位置。",
+      "heads": [
+        "模型一開始看到的"
+      ],
+      "nodes": [
+        {
+          "text": "部署清單",
+          "sub": "發布前要跑哪些步驟",
+          "emph": true
+        },
+        {
+          "text": "程式風格指南",
+          "sub": "團隊的程式碼怎麼寫"
+        },
+        {
+          "text": "除錯手冊",
+          "sub": "遇到錯誤的排查順序"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "整份指示",
+          "sub": "用到才讀進來"
+        }
+      ],
+      "note": "三個 Skill 的名字是假設的例子，用來示意。",
+      "refs": [
+        "c6",
+        "c7",
+        "c8"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "transcript",
+      "title": "固定節點一到，Hook 就自動執行",
+      "body": "Hook 是 Harness 在固定節點自動執行的 shell 指令（直接下給電腦的指令）：Session（一場對話）開始時、工具執行前、Agent 回覆完成後。這是確定性的控制，每次照做，不靠模型自己決定。",
+      "heads": [
+        "示意：金色菱形是 Hook 介入的地方"
+      ],
+      "nodes": [
+        {
+          "text": "Hook　Session 開始時",
+          "tone": "hook"
+        },
+        {
+          "text": "你：把這個檔案改好",
+          "tone": "prompt"
+        },
+        {
+          "text": "Hook　工具執行前",
+          "tone": "hook"
+        },
+        {
+          "text": "工具　改檔案",
+          "tone": "tool"
+        },
+        {
+          "text": "Hook　Agent 回覆完成後",
+          "tone": "hook"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": ""
+        }
+      ],
+      "refs": [
+        "c9",
+        "c10"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "intercept",
+      "title": "要保證規則被遵守，Hook 是對的位置",
+      "body": "Hook 是一般程式碼、不是模型呼叫，所以適合用來保證「模型本身無法被信任會可靠遵守」的規則。寫在 CLAUDE.md（專案裡給 Claude 讀的說明檔）的規則只是請求。",
+      "heads": [
+        "只寫在提示裡，靠模型遵守",
+        "寫成 Hook，執行前檢查",
+        "Hook 檢查",
+        "檔案"
+      ],
+      "nodes": [
+        {
+          "text": "「絕不能改這些檔案」"
+        },
+        {
+          "text": "工具　改檔案"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "受保護就擋下"
+        },
+        {
+          "text": "沒問題才放行"
+        }
+      ],
+      "refs": [
+        "c9",
+        "c10",
+        "c11",
+        "c16"
+      ]
+    },
+    {
+      "layout": "table",
+      "title": "Hook 能做的事，和要注意的結束碼",
+      "body": "Hook 可以擋下動作、自動整理，也能讓檢查失敗。",
+      "rows": [
+        [
+          "擋下受保護寫入",
+          "要寫入受保護的檔案時，Hook 先攔下。"
+        ],
+        [
+          "編輯後自動整理",
+          "每次改完檔案，自動整理格式。"
+        ],
+        [
+          "檢查不過就失敗",
+          "檢查（lint）沒過，就讓這一輪失敗。"
+        ],
+        [
+          "要擋就得用對碼",
+          "回報一個數字（結束碼）：2 阻擋，0 沒意見，其他通常照樣進行。"
+        ]
+      ],
+      "key_w": 290,
+      "refs": [
+        "c9",
+        "c10",
+        "c11"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "hub",
+      "title": "MCP：用同一套介面，接各種外部服務",
+      "body": "Model Context Protocol（MCP）讓 Claude Code 用共通介面，接上 GitHub、資料庫、內部 API 這類外部服務。每個服務（MCP server）自己說明有哪些工具，Claude Code 就能像用內建工具一樣用它。",
+      "heads": [
+        "MCP：共通介面",
+        "不必為每個整合，手刻一套客製化的工具程式碼"
+      ],
+      "nodes": [
+        {
+          "text": "Claude Code"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "Slack 工作區"
+        },
+        {
+          "text": "工單系統"
+        },
+        {
+          "text": "私有 repo"
+        }
+      ],
+      "note": "抓外部內容的服務可能夾帶惡意指令，只連信任的。",
+      "refs": [
+        "c12",
+        "c13",
+        "c14"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "pinned",
+      "title": "CLAUDE.md 每場對話開頭自動讀進來",
+      "body": "接下來看怎麼管理 context。CLAUDE.md 是放在專案裡、給 Claude 讀的說明檔：每次開新對話，它會被讀取並自動放進 context，持久、可共享，不依附任何單一對話。但它只是參考，不是強制執行的設定。",
+      "heads": [
+        "對話一",
+        "對話二",
+        "對話三"
+      ],
+      "nodes": [
+        {
+          "text": "CLAUDE.md"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "每場新對話，開頭是同一份"
+        }
+      ],
+      "refs": [
+        "c16"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compact",
+      "title": "對話快滿時，壓成摘要再繼續",
+      "body": "對話快塞滿時，Claude Code 不盲目截斷，而是把較早的對話摘要成精簡版本後繼續，使用者不必重新解釋先前的決策。要注意，早期的詳細指示可能在壓縮時遺失，長期要遵守的規則請放進 CLAUDE.md。",
+      "heads": [
+        "快滿的對話",
+        "壓縮後的摘要"
+      ],
+      "nodes": [
+        {
+          "text": "摘要成精簡版本"
+        },
+        {
+          "text": "你的請求"
+        },
+        {
+          "text": "重要的程式片段"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "左邊亮色的灰條，是摘要會保留的請求和重要程式片段。"
+        }
+      ],
+      "refs": [
+        "c16",
+        "c17"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "sidecar",
+      "title": "搜尋派給 Subagent，主對話只收摘要",
+      "body": "Subagent 是 Claude Code 派出去的幫手，在自己獨立的 context 裡工作。範圍廣的探索性搜尋交給它，雜訊多的中間輸出留在它那邊，主對話只收到最後的摘要。",
+      "heads": [
+        "主對話",
+        "Subagent"
+      ],
+      "nodes": [
+        {
+          "text": "派出搜尋任務"
+        },
+        {
+          "text": "收到摘要"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "在自己的 context 裡搜尋，產生一堆中間輸出"
+        },
+        {
+          "text": "只有摘要回來"
+        }
+      ],
+      "note": "這讓 context 的長度忽高忽低，不會一路累積。",
+      "refs": [
+        "c18",
+        "c19"
+      ]
+    },
+    {
+      "layout": "table",
+      "title": "各機制吃 context 的方式不同",
+      "body": "各機制載入的時機不同。偶爾才用的參考資料，放進 Skill。",
+      "rows": [
+        [
+          "CLAUDE.md",
+          "開頭整份讀入，每次請求帶著"
+        ],
+        [
+          "Skills",
+          "一行描述常駐，整份用到才讀"
+        ],
+        [
+          "MCP",
+          "預設只讀工具名稱，用到才讀定義"
+        ],
+        [
+          "Hooks",
+          "在外面執行，通常不佔空間"
+        ],
+        [
+          "壓縮",
+          "較早的對話換成精簡摘要"
+        ],
+        [
+          "Subagent",
+          "另開 context，不佔主對話"
+        ]
+      ],
+      "key_w": 260,
+      "refs": [
+        "c7",
+        "c9",
+        "c13",
+        "c16",
+        "c17",
+        "c18"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "combo",
+      "title": "單獨都不算特殊，自動組合才成為 Harness",
+      "body": "前面這些機制不是各做各的。派給 Subagent、用 CLAUDE.md 記慣例、壓縮對話，單獨看都不算新；能自動彼此組合，才成為 Harness。看兩個例子。",
+      "heads": [
+        "例一：Subagent 的摘要，也可能被再次收進壓縮",
+        "例二：不論這一輪從哪來，都套用同一份慣例"
+      ],
+      "nodes": [
+        {
+          "text": "Subagent 的摘要"
+        },
+        {
+          "text": "壓縮後的摘要"
+        },
+        {
+          "text": "後續壓縮"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "使用者這一輪"
+        },
+        {
+          "text": "Hook 觸發的重試",
+          "sub": "Hook 讓這一輪再試一次"
+        },
+        {
+          "text": "CLAUDE.md 的慣例",
+          "sub": "一致套用"
+        }
+      ],
+      "refs": [
+        "c1",
+        "c20"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "Claude Code 靠六個機制，擴充能力又管住 context",
+      "title": "這些機制單獨都不算特殊，\n能自動彼此組合，\n才是 Harness 的關鍵。",
+      "refs": [
+        "c1"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "一次看完這個系列",
+      "current": "claude-code-extension-and-context",
+      "nav": "完整文章：datasciocean.com/ai-concept/claude-code",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "Claude Code 靠六個機制，擴充能力又管住 context\n\nClaude Code 是 Anthropic 推出的 AI 編碼工具。它靠 Skills、Hooks、MCP 擴充能力，再用 CLAUDE.md、壓縮、Subagent 管理模型一次看得到的內容（context）。這些機制單獨看都不算特殊，真正讓它能運作的，是它們被設計成可以彼此組合。\n\n這是系列第 2 則。",
+      "refs": [
+        "c1",
+        "c2",
+        "c5",
+        "c16",
+        "c17",
+        "c18"
+      ]
+    },
+    "last": {
+      "text": "想看完整拆解？\n文章：datasciocean.com/ai-concept/claude-code\n同系列：讓 Claude Code 自己改檔案、下指令，不會出事嗎？（尚未發布）",
+      "refs": [
+        "c1"
+      ],
+      "link": "https://datasciocean.com/ai-concept/claude-code/"
+    }
+  },
+  "caption": {
+    "first": "Claude Code 靠六個機制，擴充能力又管住 context",
+    "first_refs": [
+      "c1",
+      "c5",
+      "c16",
+      "c17",
+      "c18"
+    ],
+    "nav": "完整文章請在 datasciocean.com 搜尋「拆解 Claude Code：Agentic Loop、工具系統、Skills 與權限機制」",
+    "hashtags": [
+      "DSO_ClaudeCode",
+      "ClaudeCode",
+      "AIAgent",
+      "Anthropic"
+    ]
+  }
+}

@@ -10,8 +10,8 @@
 
 | 發文順序 | 觀念 | 標題（planned_title） | IG | Threads | 打開 |
 |---|---|---|---|---|---|
-| 1 | `claude-code-agentic-loop-and-tools`＋`claude-code-permission-blast-radius` | Claude Code 為什麼敢自己動手改程式？ | 未做 | 未做 | [README](claude-code-agentic-loop-and-tools/README.md) |
-| 2 | `claude-code-extension-and-context` | Skills、Hooks、MCP 怎麼組成一套 Harness？ | 未做 | 未做 | （還沒做） |
+| 1 | `claude-code-agentic-loop-and-tools`＋`claude-code-permission-blast-radius` | 讓 Claude Code 自己改檔案、下指令，不會出事嗎？ | 未做 | 未做 | [README](claude-code-agentic-loop-and-tools/README.md) |
+| 2 | `claude-code-extension-and-context` | Claude Code 靠六個機制，擴充能力又管住 context | 未做 | 未做 | [README](claude-code-extension-and-context/README.md) |
 
 ## JEV 串接 Judge 系列（`jev-cascade`）
 

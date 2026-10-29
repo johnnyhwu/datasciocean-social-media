@@ -54,6 +54,13 @@
   dial      有刻度的軌道與金色旋鈕：人轉旋鈕、模型被打叉：nodes 兩個（人、模型）、heads[0] 說明、選用 heads[1]／heads[2] 軌道左右端的標籤
   lanes     一個問題分成兩欄：nodes[0] 問題、nodes[1:] 左欄項目、heads 兩欄標題、outcomes 兩欄結果（左金色）
   layers    兩排各一道防線：上排指令過關卡、下排指令在虛線容器裡碰不到外面：heads 三個、nodes 兩個（工作目錄、指令）、outcomes[0] 關卡旁的字
+  sockets   三個擴充點（2026-10-28，Claude Code 第 2 則）：heads[0] 上方橫條的字、nodes 剛好 3 個 [{text, sub}]
+  lazy      平常一行、用到才全讀進來：heads = [左窗標題]、nodes 3 個 [{text, sub, emph?}]（剛好一個 emph）、outcomes[0] = {text, sub?}（文件）
+  hub       共通介面接外部服務：heads = [共通介面標籤, 被叉掉的說明]、nodes[0] = Claude Code、outcomes = 2～4 個服務
+  pinned    每場對話開頭釘著同一份：heads = 3 個視窗標題、nodes[0] = {text}（金色那行）、選用 outcomes[0] = {text}
+  compact   快滿的對話壓成摘要：heads = [左窗, 右窗標題]、nodes = [箭頭標籤, 摘要項一, 摘要項二]、outcomes[0] = 底下虛線框的提醒
+  sidecar   另開一扇窗做雜事、只有摘要回來：heads = [主視窗, 側視窗標題]、nodes = [派出那行, 收到摘要那行]、outcomes = [側視窗標籤, 回傳箭頭標籤]
+  combo     兩個機制自動組合的例子（上：一個東西被收進另一個；下：兩種來源都套用同一份）：heads = [上標, 下標]、nodes = [被收進去的框, 視窗標題, 箭頭標籤]、outcomes = [來源一, 來源二, 金色那份{text, sub?}]
   stops     由上往下三個停靠點（不按比例）：nodes = [{text, sub?, emph?}]、選用 heads = [上端標籤, 下端標籤]
 
 規則：圖形全部用 class "bg"（不進程式 B 的文字與圖形重疊檢查），所以排版由這裡負責避開文字；框內的文字由程式 B 的「框內文字不超出框」檢查；
@@ -2182,12 +2189,19 @@ def ledger(c: Canvas, spec: dict, y0: float) -> float:
 
 # ------------------------------------------------------------------ Claude Code 系列（2026-10-28）：視窗風格的六種示意圖
 DESC = {      # 給審查者與人看的「畫面」描述（build_package 輸出）：文字以外，圖上畫了什麼
-    "transcript": "一個終端機視窗，一列一個動作（提示符號、工具呼叫、失敗、通過）；有標 feeds 的列，金色箭頭從那一列繞到下一列並寫上標籤",
+    "transcript": "一個終端機視窗，一列一個動作（提示符號、工具呼叫、失敗、通過）；有標 feeds 的列，金色箭頭從那一列繞到下一列並寫上標籤；金色菱形的列是 Hook 在這個節點介入",
     "oneloop": "中間一個圈，圈裡是兩個框（規劃、執行）；兩側各一個被打叉的虛線框（規劃模組、執行模組）；圈下一行說明",
     "intercept": "上下兩條路：上面是一句話直接通到檔案；下面是工具呼叫先過一道金框的關卡（關卡裡列出檢查項目）才到檔案",
     "dial": "一條有刻度的軌道，金色旋鈕停在其中一格；左上的人伸手轉旋鈕（金色箭頭），右上的模型要伸手但被打叉；軌道下一行說明",
     "lanes": "最上面一個問題，分成兩欄：左欄是兩個項目，一個向下的箭頭指向金色的「自動核准」；右欄是一個深色框，寫另一種動作的處理方式",
     "turn": "左上是「模型給出回應」，金色箭頭指向右邊金色的「最終答案：結束」；往下的箭頭通向金框的「權限檢查」，再分成打勾（同意）與打叉（拒絕）兩個結果；兩個結果各有箭頭，指向右邊一張「對話紀錄」紙上各自新增的一行；最下面一個虛線框說明回到下一輪",
+    "sockets": "上方一條深色橫條，下緣三個插孔，各接一根金色插頭到下面三張卡（名稱加一句它解決什麼）",
+    "lazy": "左邊一個終端機視窗列出三行（名稱加一句描述），其中一行金色框起來；金色箭頭指向右邊展開的一整份文件",
+    "hub": "上面一個被叉掉的虛線框（各接各的客製程式）；下面左邊 Claude Code，金色箭頭通向一條金色直條（共通介面），再各畫一條線連到右邊幾個外部服務",
+    "pinned": "並排三個終端機視窗，每個視窗最上面都釘著同一個金色方塊，下面的灰條內容各不相同；底下一句說明",
+    "combo": "上面：左邊一個框，金色箭頭指向右邊視窗，視窗裡也有一個同名的金邊框；下面：左邊兩個來源框各連一條線，匯到右邊同一個金色方塊",
+    "compact": "左邊視窗很多行灰條（亮色是保留的，暗色是丟掉的），金色箭頭通向右邊視窗：只剩兩個框和一個游標；底下一個虛線框提醒",
+    "sidecar": "左邊主視窗只有兩行（派出任務、收到摘要）；右邊側視窗滿是灰條；上面一條箭頭送出任務，下面一條金色箭頭只把摘要帶回來",
     "layers": "兩排各一道防線：上排是指令先經過一道關卡；下排是指令在一個虛線容器裡，容器裡有金色的工作目錄，指令想往外走被叉掉、碰不到容器外的框",
 }
 
@@ -2198,7 +2212,10 @@ def _win(c: Canvas, x, y, w, h, title="") -> None:
     for i in range(3):
         c.circle(x + 36 + 34 * i, y + 30, 9, fill=CREAM, op=.35)
     if title:
-        c.text(x + 150, y + 10, w - 300, title, "ds", CREAM, "center")
+        if w >= 700:
+            c.text(x + 150, y + 10, w - 300, title, "ds", CREAM, "center")
+        else:                                              # 窄視窗：標題放在三顆點的右邊
+            c.text(x + 130, y + 10, w - 150, title, "ds", CREAM, "left")
 
 
 def _tick(c: Canvas, x, y, color=LIGHT, sw=6) -> None:
@@ -2215,7 +2232,7 @@ def _tw(s: str, size: int = 34) -> float:
 
 
 def transcript(c: Canvas, spec: dict, y0: float) -> float:
-    """heads[0] = 視窗標題（例：假設的例子）；nodes = 一列一個動作 [{text, tone}]，tone = prompt／tool／fail／ok；
+    """heads[0] = 視窗標題（例：假設的例子）；nodes = 一列一個動作 [{text, tone}]，tone = prompt／tool／fail／ok／hook（金色菱形，Hook 在這一行介入）；
     text 裡的全形空白「　」把工具名（淺藍綠粗體）和內容分開；有 feeds: true 的列（通常是 fail）會畫金色箭頭繞到下一列，
     outcomes[0].text 是箭頭的標籤（下一輪的輸入）。純示意，圖上要標假設。"""
     rows = spec["nodes"]
@@ -2240,11 +2257,13 @@ def transcript(c: Canvas, spec: dict, y0: float) -> float:
             _cross2(c, ix + 2, cy)
         elif tone == "ok":
             _tick(c, ix + 2, cy)
+        elif tone == "hook":
+            c.poly([(ix + 2, cy - 14), (ix + 16, cy), (ix + 2, cy + 14), (ix - 12, cy)], fill=GOLD, closed=True)
         txt = r["text"]
         if "　" in txt:
             lab, rest = txt.split("　", 1)
             lw = _tw(lab) + 14
-            c.text(tx, cy - 22, lw, lab, "dn", LIGHT, "left", (X0, y0, w, H))
+            c.text(tx, cy - 22, lw, lab, "dn", GOLD if tone == "hook" else LIGHT, "left", (X0, y0, w, H))
             c.text(tx + lw + 12, cy - 22, tw - lw - 12, rest, "dt", CREAM, "left", (X0, y0, w, H))
         else:
             c.text(tx, cy - 22, tw, txt, "dn" if tone in ("prompt", "ok") else "dt", CREAM, "left", (X0, y0, w, H))
@@ -2316,14 +2335,14 @@ def intercept(c: Canvas, spec: dict, y0: float) -> float:
     _fit(total, BOTTOM - y0, "intercept")
     ex = min(70.0, (BOTTOM - y0 - total) / 3)
     fx, fw = X1 - 170, 170
-    c.text(X0, y0, 600, h0, "dl", TEAL)
+    c.text(X0, y0, min(600.0, _tw(h0, 28) + 16), h0, "dl", TEAL)
     ry = y0 + 44
     c.rect(X0, ry, 440, 130 + ex, fill="none", stroke=TEAL, sw=3, dash="10 8", rx=18)
     c.text(X0 + 22, ry + (130 + ex - c.lines(say["text"], 396, 34) * 44.2) / 2, 396, say["text"], "dt", DEEP, "left", (X0, ry, 440, 130 + ex))
     c.arrow(X0 + 456, ry + (130 + ex) / 2, fx - 14, ry + (130 + ex) / 2, TEAL, 5, 16)
     _doc(c, fx, ry + ex / 2, fw, 130, hf)
     y2 = ry + 130 + ex + 40 + ex
-    c.text(X0, y2, 600, h1, "dl", TEAL)
+    c.text(X0, y2, min(600.0, _tw(h1, 28) + 16), h1, "dl", TEAL)
     ry2 = y2 + 44
     rh = max(gh, 130) + ex
     c.textbox(X0, ry2 + (rh - 130) / 2, 300, call["text"], None, h=130, align="center", pad=14)
@@ -2511,13 +2530,253 @@ def turn(c: Canvas, spec: dict, y0: float) -> float:
     return y
 
 
+def _ghost(c: Canvas, x: float, y: float, w: float, color=CREAM, op=.3) -> None:
+    """視窗裡一行看不清字的灰條（示意「有一行紀錄」）。"""
+    c.rect(x, y, w, 12, fill=color, rx=6, op=op)
+
+
+def sockets(c: Canvas, spec: dict, y0: float) -> float:
+    """三個擴充點（2026-10-28，Claude Code 第 2 則）：heads[0] = 上方深色橫條的字；nodes = 3 個 [{text（名稱）, sub（解決什麼問題）}]。
+    橫條下緣有三個插孔，各自一根金色插頭接到下面的卡。"""
+    cap, items = spec["heads"][0], spec["nodes"]
+    if len(items) != 3:
+        raise ValueError(f"sockets 的 nodes 要剛好 3 個擴充點，現在是 {len(items)}")
+    cw, gap, pad = 296, 16, 16
+    inner = cw - 2 * pad
+    ch = max(c.lines(n["text"], inner, 34) * 44.2 + c.lines(n["sub"], inner, 28) * 39.2 + 6 for n in items) + 2 * pad + 8
+    caph = c.lines(cap, X1 - X0 - 60, 34) * 44.2
+    bar_h = 22 + caph + 14 + 52
+    stem = 54
+    _fit(bar_h + stem + ch, BOTTOM - y0, "sockets")
+    ex = min(70.0, (BOTTOM - y0 - (bar_h + stem + ch)) / 2)
+    stem += ex / 2
+    ch += ex
+    ex = 0.0
+    c.rect(X0, y0, X1 - X0, bar_h, fill=DEEP, rx=22)
+    c.text(X0 + 30, y0 + 22, X1 - X0 - 60, cap, "dn", CREAM, "center", (X0, y0, X1 - X0, bar_h))
+    for k, n in enumerate(items):
+        cx = X0 + cw / 2 + k * (cw + gap)
+        sy = y0 + bar_h - 36
+        c.circle(cx, sy, 22, fill=ABYSS, stroke=LIGHT, sw=4)
+        c.line(cx, sy + 6, cx, y0 + bar_h + stem + ex, GOLD, 12)
+        c.rect(cx - 20, y0 + bar_h + stem + ex - 26, 40, 26, fill=GOLD, rx=8)
+        c.textbox(cx - cw / 2, y0 + bar_h + stem + ex, cw, n["text"], n["sub"], h=ch, align="center", pad=pad)
+    return y0 + bar_h + stem + ex + ch
+
+
+def lazy(c: Canvas, spec: dict, y0: float) -> float:
+    """平常一行、用到才全讀進來（2026-10-28）：heads[0] = 左窗標題；nodes = 3 個 [{text（名稱）, sub（一行描述）, emph?（被用到的那個，剛好一個）}]；
+    outcomes[0] = {text（文件標題）, sub?（文件裡的說明）}。左窗的每一行平常都在，被用到的那一行用金色箭頭指向右邊展開的整份文件。"""
+    items, doc = spec["nodes"], spec["outcomes"][0]
+    if len(items) != 3 or sum(1 for n in items if n.get("emph")) != 1:
+        raise ValueError("lazy 的 nodes 要 3 個，且剛好 1 個 emph（被用到的那個）")
+    ww, dw, bar = 520, 330, 60
+    iw = ww - 2 * 34
+    pitch = max(c.lines(n["text"], iw, 34) * 44.2 + c.lines(n["sub"], iw, 28) * 39.2 + 6 for n in items) + 22
+    pitch = min(pitch + max(0.0, (BOTTOM - y0 - (bar + 12 + 3 * pitch + 6)) / 3), 140.0)
+    H = bar + 12 + 3 * pitch + 6
+    _fit(H, BOTTOM - y0, "lazy")
+    ty = y0
+    DX = X1 - dw
+    _win(c, X0, ty, ww, H, spec["heads"][0])
+    c.rect(DX, ty, dw, H, fill=CREAM, stroke=DEEP, sw=4, rx=10)
+    c.text(DX + 16, ty + 16, dw - 32, doc["text"], "dn", DEEP, "center", (DX, ty, dw, H))
+    sub_h = (c.lines(doc["sub"], dw - 40, 28) * 39.2 + 18) if doc.get("sub") else 0
+    n_gh = int((H - 16 - 60 - sub_h) // 34)
+    for k in range(n_gh):
+        _ghost(c, DX + 30, ty + 76 + k * 34, dw - 60 - (50 if k % 3 == 2 else 0), DEEP, .22)
+    if doc.get("sub"):
+        c.text(DX + 20, ty + H - sub_h - 4, dw - 40, doc["sub"], "ds", TEAL, "center", (DX, ty, dw, H))
+    for k, n in enumerate(items):
+        ry = ty + bar + 12 + k * pitch
+        used = bool(n.get("emph"))
+        if used:
+            c.rect(X0 + 12, ry - 6, ww - 24, pitch - 4, fill=ABYSS, stroke=GOLD, sw=5, rx=14)
+        l1 = c.lines(n["text"], iw, 34) * 44.2
+        c.text(X0 + 34, ry + 4, iw, n["text"], "dn", GOLD if used else LIGHT, "left", (X0, ty, ww, H))
+        c.text(X0 + 34, ry + 4 + l1 + 2, iw, n["sub"], "ds", CREAM, "left", (X0, ty, ww, H))
+        if used:
+            my = ry - 6 + (pitch - 4) / 2
+            c.line(X0 + ww - 12, my, DX - 28, my, GOLD, 7)
+            c.arrow(DX - 60, my, DX - 6, my, GOLD, 7, 20)
+    return ty + H
+
+
+def hub(c: Canvas, spec: dict, y0: float) -> float:
+    """共通介面接外部服務（2026-10-28）：heads = [中間共通介面的標籤, 上方被叉掉的虛線框說明]；nodes[0] = {text, sub?}（Claude Code）；
+    outcomes = 2～4 個外部服務 [{text, sub?}]。Claude Code 經一條金色共通介面接到所有服務，不必各接一條客製的線。"""
+    hub_lab, no_lab = spec["heads"][:2]
+    me, svcs = spec["nodes"][0], spec["outcomes"]
+    if not 2 <= len(svcs) <= 4:
+        raise ValueError("hub 的 outcomes 要 2～4 個外部服務")
+    nh = c.lines(no_lab, X1 - X0 - 150, 34) * 44.2 + 40
+    sw_, sh, sg = 330, 88, 16
+    labh = c.lines(hub_lab, 330, 28) * 39.2 + 12
+    _fit(nh + 40 + max(len(svcs) * sh + (len(svcs) - 1) * sg, 260) + labh, BOTTOM - y0, "hub")
+    sh = min(130.0, sh + (BOTTOM - y0 - nh - 40 - labh - max(len(svcs) * sh + (len(svcs) - 1) * sg, 260)) / len(svcs))
+    area = len(svcs) * sh + (len(svcs) - 1) * sg
+    c.rect(X0, y0, X1 - X0, nh, fill="none", stroke=TEAL, sw=3, dash="10 8", rx=16)
+    c.text(X0 + 30, y0 + 20, X1 - X0 - 150, no_lab, "dt", TEAL, "left", (X0, y0, X1 - X0, nh))
+    c.circle(X1 - 52, y0 + nh / 2, 30, fill=CREAM, stroke=TEAL, sw=4)
+    _cross2(c, X1 - 52, y0 + nh / 2, 11, TEAL, 6)
+    top = y0 + nh + 40 + labh
+    H = max(area, 260)
+    mid = top + H / 2
+    bx = X0 + 330                                           # 共通介面的金色直條
+    c.text(bx - 130, top - labh, 330, hub_lab, "dl", TEAL, "center")
+    c.textbox(X0, mid - 90, 250, me["text"], me.get("sub"), h=180, align="center", pad=14)
+    c.arrow(X0 + 258, mid, bx - 6, mid, GOLD, 9, 22)
+    c.rect(bx, top, 70, H, fill=GOLD, rx=20)
+    ty0 = top + (H - area) / 2
+    for k, s in enumerate(svcs):
+        sy = ty0 + k * (sh + sg)
+        c.arrow(bx + 76, sy + sh / 2, X1 - sw_ - 8, sy + sh / 2, TEAL, 5, 16)
+        c.textbox(X1 - sw_, sy, sw_, s["text"], s.get("sub"), h=sh, pad=18)
+    return top + H
+
+
+def pinned(c: Canvas, spec: dict, y0: float) -> float:
+    """每場對話開頭都釘著同一份（2026-10-28）：heads = 3 個對話視窗的標題；nodes[0] = {text}（被釘在最上面的金色那行）；outcomes[0] = {text}（底下一句說明，選用）。
+    三個視窗的內容各不相同（灰條），只有最上面那一行一模一樣。"""
+    titles, pin = spec["heads"], spec["nodes"][0]
+    if len(titles) != 3:
+        raise ValueError(f"pinned 的 heads 要剛好 3 個視窗標題，現在是 {len(titles)}")
+    note = spec["outcomes"][0]["text"] if spec.get("outcomes") else None
+    wd, gap, bar = 280, 40, 60
+    noteh = (c.lines(note, X1 - X0, 34) * 44.2 + 24) if note else 0
+    H = min(470.0, BOTTOM - y0 - noteh - 10)
+    _fit(bar + 250 + noteh, BOTTOM - y0, "pinned")
+    pats = [[220, 150, 200, 90, 180, 130], [160, 230, 110, 200, 140, 210], [200, 120, 230, 170, 100, 190]]
+    for k, ttl in enumerate(titles):
+        x = X0 + k * (wd + gap)
+        _win(c, x, y0, wd, H, ttl)
+        c.rect(x + 16, y0 + bar + 14, wd - 32, 70, fill=GOLD, rx=12)
+        c.text(x + 16, y0 + bar + 14 + 13, wd - 32, pin["text"], "dn", DEEP, "center", (x, y0, wd, H))
+        for j, lw in enumerate(pats[k]):
+            yy = y0 + bar + 112 + j * 44
+            if yy + 12 < y0 + H - 14:
+                _ghost(c, x + 26, yy, lw)
+    if note:
+        c.text(X0, y0 + H + 18, X1 - X0, note, "dn", DEEP, "center")
+    return y0 + H + 18 + (noteh - 24 if note else -18)
+
+
+def compact(c: Canvas, spec: dict, y0: float) -> float:
+    """快滿的對話壓成摘要（2026-10-28）：heads = [左窗標題, 右窗標題]；nodes = [{text（箭頭上的標籤）}, {text（摘要裡保留的一項）}, {text（摘要裡保留的另一項）}]；
+    outcomes[0] = {text（底下虛線框的提醒）}。左窗很多行（保留的亮色、其餘暗色），右窗只剩兩個框和一個游標。"""
+    h_l, h_r = spec["heads"][:2]
+    arrow_lab, k1, k2 = spec["nodes"][:3]
+    foot = spec["outcomes"][0]["text"]
+    ww, bar = 330, 60
+    fh = c.lines(foot, X1 - X0 - 44, 28) * 39.2 + 36
+    avail = BOTTOM - y0 - fh - 26
+    rows = 7 if avail >= 60 + 16 + 7 * 40 + 8 else 6
+    pitch = min(44.0, (avail - bar - 24) / rows)
+    H = bar + 16 + rows * pitch + 8
+    _fit(H + 26 + fh, BOTTOM - y0, "compact")
+    RX = X1 - ww
+    _win(c, X0, y0, ww, H, h_l)
+    keep = {1, 4} if rows == 6 else {1, 3, 5}
+    lens = [250, 190, 230, 170, 250, 150, 220]
+    for j in range(rows):
+        _ghost(c, X0 + 28, y0 + bar + 22 + j * pitch, lens[j], LIGHT if j in keep else CREAM, .85 if j in keep else .28)
+    _win(c, RX, y0, ww, H, h_r)
+    bh = 72
+    by = y0 + bar + 18
+    for k, n in enumerate((k1, k2)):
+        c.textbox(RX + 18, by + k * (bh + 16), ww - 36, n["text"], None, fill=ABYSS, stroke=LIGHT, h=bh, align="center", pad=8)
+    cy = by + 2 * (bh + 16) + 6
+    if cy + 36 < y0 + H - 6:
+        c.rect(RX + 30, cy, 24, 36, fill=GOLD, rx=4)
+    ax0, ax1 = X0 + ww + 20, RX - 20
+    my = y0 + H / 2
+    c.arrow(ax0, my, ax1, my, GOLD, 8, 22)
+    lw_ = ax1 - ax0
+    c.text(ax0, my - 14 - c.lines(arrow_lab["text"], lw_, 28) * 39.2, lw_, arrow_lab["text"], "dl", TEAL, "center")
+    fy = y0 + H + 26
+    c.rect(X0, fy, X1 - X0, fh, fill="none", stroke=TEAL, sw=3, dash="10 8", rx=16)
+    c.text(X0 + 22, fy + 18, X1 - X0 - 44, foot, "ds", TEAL, "left", (X0, fy, X1 - X0, fh))
+    return fy + fh
+
+
+def combo(c: Canvas, spec: dict, y0: float) -> float:
+    """兩個機制自動組合的兩個例子（2026-10-29）：heads = [上標, 下標]；
+    上：nodes = [{text（被收進去的框）}, {text（右邊視窗標題）}, {text（箭頭上的標籤）}]，左邊一個框、金色箭頭指向右邊視窗，視窗裡也有一個同名的金邊框；
+    下：outcomes = [{text, sub?（來源一）}, {text, sub?（來源二）}, {text, sub?（金色的那一份）}]，兩個來源各一條線，匯到同一個金色方塊。"""
+    h1, h2 = spec["heads"][:2]
+    if len(spec["nodes"]) < 3 or len(spec["outcomes"]) < 3:
+        raise ValueError("combo 的 nodes 與 outcomes 都要有 3 項")
+    box, win_t, lab = spec["nodes"][:3]
+    s1, s2, gold = spec["outcomes"][:3]
+    bw, ww, hd = 350, 430, 44
+    wh, sh, gap = 176, 116, 18
+    gh = 2 * sh + gap
+    total = hd + wh + 36 + hd + gh
+    _fit(total, BOTTOM - y0, "combo")
+    RX = X1 - ww
+    c.text(X0, y0, X1 - X0, h1, "ds", TEAL, "left")
+    ry = y0 + hd
+    c.textbox(X0, ry + (wh - 76) / 2, bw, box["text"], None, fill=DEEP, h=76, align="center", pad=10)
+    _win(c, RX, ry, ww, wh, win_t["text"])
+    c.textbox(RX + 24, ry + 76, ww - 48, box["text"], None, fill=ABYSS, stroke=GOLD, h=wh - 76 - 22, align="center", pad=8)
+    ax0, ax1 = X0 + bw + 16, RX - 16
+    my = ry + wh / 2
+    c.arrow(ax0, my, ax1, my, GOLD, 8, 22)
+    c.text(ax0 - 10, my - 14 - c.lines(lab["text"], ax1 - ax0 + 20, 28) * 39.2, ax1 - ax0 + 20, lab["text"], "dl", TEAL, "center")
+    y2 = ry + wh + 36
+    c.text(X0, y2, X1 - X0, h2, "ds", TEAL, "left")
+    sy = y2 + hd
+    for k, n in enumerate((s1, s2)):
+        c.textbox(X0, sy + k * (sh + gap), bw, n["text"], n.get("sub"), fill=DEEP, h=sh, align="left", pad=12)
+    c.rect(RX, sy, ww, gh, fill=GOLD, rx=18)
+    c.textbox(RX, sy, ww, gold["text"], gold.get("sub"), fill=GOLD, tcolor=DEEP, scolor=DEEP, h=gh, align="center", pad=14)
+    for k, f in enumerate((.3, .7)):
+        c.arrow(X0 + bw, sy + k * (sh + gap) + sh / 2, RX - 14, sy + gh * f, TEAL, 6, 20)
+    return sy + gh
+
+
+def sidecar(c: Canvas, spec: dict, y0: float) -> float:
+    """另開一扇窗做雜事，只有摘要回來（2026-10-28）：heads = [主視窗標題, 側視窗標題]；nodes = [{text（主視窗：派出任務那一行）}, {text（主視窗：收到摘要那一行）}]；
+    outcomes = [{text（側視窗裡的標籤：中間做了很多事）}, {text（回傳箭頭的標籤）}]。側視窗滿是灰條，主視窗只多一行。"""
+    h_m, h_s = spec["heads"][:2]
+    send, got = spec["nodes"][:2]
+    busy, back = spec["outcomes"][:2]
+    ww, bar = 360, 60
+    H = bar + 24 + 7 * 52 + 10
+    _fit(H, BOTTOM - y0, "sidecar")
+    RX = X1 - ww
+    _win(c, X0, y0, ww, H, h_m)
+    iw = ww - 90
+    y1, y2 = y0 + bar + 34, y0 + H - 90
+    for j, (yy, row, tone) in enumerate(((y1, send, "tool"), (y2, got, "ok"))):
+        c.circle(X0 + 40, yy + 22, 11, fill=LIGHT) if tone == "tool" else _tick(c, X0 + 42, yy + 22)
+        c.text(X0 + 74, yy, iw, row["text"], "dn", CREAM, "left", (X0, y0, ww, H))
+    for j, lw in enumerate((230, 170, 250, 200)):
+        _ghost(c, X0 + 74, y1 + 70 + j * 30 + (0 if j < 2 else 40), lw)
+    _win(c, RX, y0, ww, H, h_s)
+    c.text(RX + 24, y0 + bar + 16, ww - 48, busy["text"], "dt", LIGHT, "left", (RX, y0, ww, H))
+    ly = y0 + bar + 16 + c.lines(busy["text"], ww - 48, 34) * 44.2 + 14
+    j = 0
+    while ly + 12 < y0 + H - 16:
+        _ghost(c, RX + 28, ly, [300, 220, 290, 180, 310, 250][j % 6], CREAM, .3)
+        ly += 34
+        j += 1
+    ax0, ax1 = X0 + ww + 20, RX - 20
+    c.arrow(ax0, y1 + 22, ax1, y1 + 22, TEAL, 6, 18)
+    c.arrow(ax1, y2 + 22, ax0, y2 + 22, GOLD, 9, 24)
+    lw_ = ax1 - ax0 + 30
+    c.text(ax0 - 15, y2 + 22 - 12 - c.lines(back["text"], lw_, 28) * 39.2, lw_, back["text"], "dl", DEEP, "center")
+    return y0 + H
+
+
 KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "paths": paths, "epochs": epochs,
          "dotgrid": dotgrid, "dumbbell": dumbbell, "range": range_chart, "funnel": funnel,
          "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation, "tokens": tokens,
          "seesaw": seesaw, "hidden": hidden, "cycle": cycle, "links": links, "hops": hops, "bubble": bubble, "drift": drift, "ingest": ingest,
          "roles": roles, "embed": embed, "online": online, "gate": gate, "concat": concat, "joint": joint, "rails": rails, "scoreboard": scoreboard, "leak": leak, "amplify": amplify,
          "receipt": receipt, "squeeze": squeeze, "alias": alias, "handoff": handoff, "mismatch": mismatch, "ledger": ledger,
-         "transcript": transcript, "oneloop": oneloop, "intercept": intercept, "dial": dial, "lanes": lanes, "layers": layers, "turn": turn}
+         "transcript": transcript, "oneloop": oneloop, "intercept": intercept, "dial": dial, "lanes": lanes, "layers": layers, "turn": turn,
+         "sockets": sockets, "lazy": lazy, "hub": hub, "pinned": pinned, "compact": compact, "sidecar": sidecar, "combo": combo}
 
 
 def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:

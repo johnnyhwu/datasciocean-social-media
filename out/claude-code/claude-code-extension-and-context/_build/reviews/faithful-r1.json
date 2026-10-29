@@ -1,0 +1,185 @@
+{
+  "post": "claude-code-extension-and-context",
+  "blocks": [
+    {
+      "block": "hook（封面，第 1 張）",
+      "atoms": [
+        {"text": "Claude Code 的功能（摘要、範圍化委派、專案設定檔，以及 Skills、Hooks、MCP 等）單獨看都不新", "verdict": "完全支持", "card_quote": "這些單獨拿出來看都不算是什麼特殊技術", "note": "c1 的兩句 source_quotes 合起來支持；封面以作者口吻直述屬部落格判斷，可直接寫。"},
+        {"text": "價值在它們能自動彼此組合（合起來就不一樣）", "verdict": "完全支持", "card_quote": "真正讓它們成為「Harness」而非單純「功能」的，是它們能自動彼此組合", "note": "主標副標合看字面為真；『不一樣』是疑問式語氣，內文第 14 張說明組合例子，未暗示卡上沒有的範圍。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 1 張",
+      "atoms": [
+        {"text": "Claude Code 的功能單獨看都不新，合起來為什麼就不一樣（主標）", "verdict": "完全支持", "card_quote": "這三個機制單獨拿出來看都不算新穎", "note": "與封面同一張，判定同上。"},
+        {"text": "Skills、Hooks、MCP、CLAUDE.md、Subagent 的價值在能自動彼此組合（補充）", "verdict": "完全支持", "card_quote": "真正讓它能運作的，是這些機制被設計成可以彼此組合", "note": "c1 結語句涵蓋 Skills、Hooks、MCP；CLAUDE.md、Subagent 對應 c1 的專案設定檔、範圍化委派。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 2 張",
+      "atoms": [
+        {"text": "系列第 2 則細節：Claude Code 怎麼加能力、管理模型看得到的內容", "verdict": "完全支持", "card_quote": "Claude Code 的 harness 層額外提供三個擴充點，各自解決不同的問題", "note": "加能力對應擴充點（c5）；管理 context 對應卡標題「CLAUDE.md、compaction、Subagent 管理 context」。"},
+        {"text": "這些機制單獨都不新，能自動組合才是關鍵", "verdict": "完全支持", "card_quote": "這些單獨拿出來看都不算是什麼特殊技術——真正讓它能運作的，是這些機制被設計成可以彼此組合", "note": "c1。系列第 1 則的標題與細節屬系列檔結構（來自另一張卡），不在此卡判定範圍。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 3 張",
+      "atoms": [
+        {"text": "blog 把 Claude Code 看成三層：凍結的模型、執行腳手架（Harness）、動態組裝的 Context", "verdict": "完全支持", "card_quote": "「凍結模型、執行腳手架、動態組裝的 Context」三層架構並非只是理論", "note": "c4；主詞為 blog，寫法符合部落格判斷。"},
+        {"text": "擴充點是 Harness 額外開的三個接口：Skills、Hooks、MCP", "verdict": "完全支持", "card_quote": "Claude Code 的 harness 層額外提供三個擴充點，各自解決不同的問題", "note": "c5 說三個擴充點；Skills、Hooks、MCP 的名稱來自 c6、c9、c12 與卡 sections 標題「擴充 Agent：Skills、Hooks 與 MCP」。"},
+        {"text": "Harness／Context 兩列的定義（包在模型外面…；模型這一輪看得到的內容）", "verdict": "完全支持", "card_quote": "Claude Code 的工具系統、Hooks 與 `CLAUDE.md` 記憶，正是這套架構的實際落地。", "note": "放行項 1（官方文件補充）：未標成 blog 說法（表中無 blog 主詞）、與卡無矛盾、未使主張更強。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 4 張",
+      "atoms": [
+        {"text": "blog 認為凍結的模型加固定的工具清單，對編碼 Agent 實際遇到的任務太過僵化", "verdict": "完全支持", "card_quote": "一個凍結的模型加上固定的工具清單，對於編碼 Agent 實際會遇到的任務範圍來說仍然太過僵化", "note": "c5，主詞 blog。"},
+        {"text": "Harness 多開三個擴充點，各解決不同的問題（Skills 教某件事怎麼做、Hooks 固定節點自動執行、MCP 接外部服務）", "verdict": "完全支持", "card_quote": "Claude Code 的 harness 層額外提供三個擴充點，各自解決不同的問題", "note": "三句一行描述分別對應 c6（描述如何完成特定任務的指示）、c9（固定節點執行）、c12（與外部服務對話），皆是白話，未加新事實。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 5 張",
+      "atoms": [
+        {"text": "Skill 是一個資料夾，裝著某個重複性任務的做法", "verdict": "完全支持", "card_quote": "Skill 是一個資料夾，裡面裝著描述如何完成特定、重複性任務的指示(可選附帶腳本)", "note": "c6。"},
+        {"text": "模型一開始只看到每個 Skill 的一行描述，用到哪個才拉進整份指示（標題：平常只佔一行，用到才整份讀進來）", "verdict": "完全支持", "card_quote": "Skills 只會在需要時才載入 context：模型一開始只會看到每個可用 skill 的一行描述，只有真正用到的那一個，才會把完整指示拉進來。", "note": "c7，限定『只有真正用到的那一個』已出現。"},
+        {"text": "圖上左視窗標示『模型每一輪看得到的』（一行描述列表）", "verdict": "部分支持", "card_quote": "模型一開始只會看到每個可用 skill 的一行描述", "note": "卡說『一開始』，沒說『每一輪』；『一行描述常駐』僅見於第 13 張的官方補充（放行項），此處圖上用語略超出卡，建議人注意但不影響意思。"},
+        {"text": "blog 稱這是漸進式揭露", "verdict": "完全支持", "card_quote": "這正是 harness-engineering 筆記中 [Just-In-Time 工具注入](../harness-engineering/#just-in-time-jit-tool-injection) 所談的「漸進式揭露」原則", "note": "c8，主詞 blog。"},
+        {"text": "三個 Skill 名稱與一行描述（部署清單、程式風格指南、除錯手冊）", "verdict": "完全支持", "card_quote": "模型一開始只會看到每個可用 skill 的一行描述", "note": "放行項 2（假設的例子），圖註已標『假設的例子』，內部自洽、未違背卡。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 6 張",
+      "atoms": [
+        {"text": "Hook 是 Harness 在固定節點執行的 shell 指令：工具執行前、Agent 回覆完成後、Session 開始時", "verdict": "完全支持", "card_quote": "Hooks 是 harness 在固定節點執行的 shell 指令——工具執行前、Agent 回覆完成後、Session 開始時。", "note": "c9，逐字吻合。"},
+        {"text": "Hook 自動跑、不等模型決定（標題）", "verdict": "完全支持", "card_quote": "因為 Hook 是一般程式碼，而非模型呼叫", "note": "c10 支持 Hook 非模型呼叫；『確定性的控制』句為放行項 1，未標成 blog 說法、與卡不矛盾、未加強主張。"},
+        {"text": "圖：Hook 在 Session 開始時、工具執行前、Agent 回覆完成後三個節點介入", "verdict": "完全支持", "card_quote": "工具執行前、Agent 回覆完成後、Session 開始時", "note": "與 c9 的三節點一致；對話列為示意（放行項 2、3）。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 7 張",
+      "atoms": [
+        {"text": "提示裡的規則是寄望，Hook 讓它強制執行", "verdict": "完全支持", "card_quote": "Hooks 讓「Agent 絕不能做 X」從系統提示裡一句寄望變成真正被強制執行的規則。", "note": "c10；標題以作者口吻直述，部落格判斷可直述；範圍對應『Agent 絕不能做 X』這類規則，與標題用語略概括但意思一致。"},
+        {"text": "blog 認為 Hook 是一般程式碼、不是模型呼叫，所以是實作『模型本身無法被信任會可靠遵守』之保證的正確位置", "verdict": "完全支持", "card_quote": "因為 Hook 是一般程式碼，而非模型呼叫，所以它是實作「模型本身無法被信任會可靠遵守」的保證的正確位置", "note": "c10 逐字。"},
+        {"text": "圖：路徑受保護？是，擋下；寫成 Hook、執行前檢查", "verdict": "完全支持", "card_quote": "阻擋對受保護路徑的寫入", "note": "c11；『執行前』對應 c9 的『工具執行前』。『絕不能改這些檔案』為假設例子（放行項 2）。"},
+        {"text": "官方文件說，CLAUDE.md 的規則只是請求", "verdict": "完全支持", "card_quote": "Hooks 讓「Agent 絕不能做 X」從系統提示裡一句寄望變成真正被強制執行的規則。", "note": "放行項 1：主詞為官方文件，未混淆；與 c10 方向一致，未使卡的主張更強。與 c20『CLAUDE.md 的慣例…都會被一致地套用』語氣有些張力但不矛盾。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 8 張",
+      "atoms": [
+        {"text": "擋下受保護寫入：工具執行前檢查路徑，碰到受保護的路徑就擋下", "verdict": "完全支持", "card_quote": "阻擋對受保護路徑的寫入", "note": "c11；『工具執行前』對應 c15 的『在任何動作真正發生前』。"},
+        {"text": "編輯後自動整理：每次改完檔案，自動把檔案格式化", "verdict": "完全支持", "card_quote": "在每次編輯後自動格式化檔案", "note": "c11。"},
+        {"text": "檢查不過就失敗：lint 檢查沒通過，就讓這一輪直接失敗", "verdict": "完全支持", "card_quote": "在 lint 檢查不通過時直接讓該輪失敗", "note": "c11；前三種標明為 blog 舉的用法，符合部落格舉例寫法。"},
+        {"text": "結束碼 2 才是阻擋、0 是沒意見、其他碼多半不擋", "verdict": "完全支持", "card_quote": "Hooks 是 harness 在固定節點執行的 shell 指令", "note": "放行項 1（第 8 張第 4 列官方文件補充）；已標『官方文件』，與卡無矛盾、未加強卡的主張。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 9 張",
+      "atoms": [
+        {"text": "MCP 讓 Claude Code 用共通介面接 GitHub、資料庫、內部 API，不必為每個整合手刻客製化工具程式碼", "verdict": "完全支持", "card_quote": "Model Context Protocol 讓 Claude Code 能透過共通介面與外部服務對話——GitHub、資料庫、內部 API——而不必為每個整合手刻一套客製化工具程式碼。", "note": "c12，逐字。"},
+        {"text": "MCP server 自己宣告有哪些工具，Harness 再用跟內建工具相同的方式交給模型", "verdict": "完全支持", "card_quote": "一個 MCP server 自己宣告它有哪些工具與資源；harness 再把這些工具以與內建工具相同的方式呈現給模型。", "note": "c13。"},
+        {"text": "圖：Claude Code 經 MCP 共通介面連 Slack 工作區、工單系統、私有 repo", "verdict": "完全支持", "card_quote": "這正是讓同一個 Agent 能同時觸及 Slack 工作區、工單系統與私有 repo，而 harness 作者不需要為每一個都自己寫一份 client 的關鍵。", "note": "c14；貼文只畫連線、未把『關鍵』寫成事實，服務名稱對應放行項 2。『只連你信任的 server』為放行項 1。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 10 張",
+      "atoms": [
+        {"text": "CLAUDE.md 是專案層級的記憶", "verdict": "完全支持", "card_quote": "CLAUDE.md 作為專案層級記憶", "note": "c16 text。"},
+        {"text": "被 checked in 的 CLAUDE.md 會在 session 開始時自動摺進 context，不依附任何單一對話", "verdict": "完全支持", "card_quote": "一份被 checked in 的 `CLAUDE.md`——就像管轄本 repo 部落格發文慣例的那一份——會在 session 開始時被讀取並自動摺入 context。", "note": "c16；『不依附於任何單一對話』也見於 c16 的第二句 source_quote；標題『每場對話開頭』為 session 的白話。"},
+        {"text": "官方文件補充：它是參考用的 context，不是強制的設定", "verdict": "完全支持", "card_quote": "持久、共享，且不依附於任何單一對話", "note": "放行項 1：已標官方文件，與 c16、c20 不矛盾、未加強卡的主張。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 11 張",
+      "atoms": [
+        {"text": "Claude Code 不盲目截斷，快逼近 context window 上限時把較早的對話摘要成精簡版本後繼續", "verdict": "完全支持", "card_quote": "長時間的 session 終究會逼近 context window 的上限。Claude Code 不會盲目截斷，而是把較早的對話摘要成精簡版本後繼續工作", "note": "c17。"},
+        {"text": "使用者不必重新解釋先前的決策", "verdict": "完全支持", "card_quote": "對話得以延續，使用者不需要重啟或重新解釋先前的決策。", "note": "c17；同張官方提醒『早期詳細指示可能遺失』與此句有語氣張力（決策 vs 詳細指示），但放行項 1 允許，且該提醒指向 CLAUDE.md，未加強卡。"},
+        {"text": "圖：保留『你的請求』『重要的程式片段』，其餘丟掉；官方提醒要長期遵守的規則寫進 CLAUDE.md", "verdict": "完全支持", "card_quote": "把較早的對話摘要成精簡版本後繼續工作", "note": "放行項 1（圖上『你的請求』『重要的程式片段』與官方提醒句）；已標官方文件。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 12 張",
+      "atoms": [
+        {"text": "把範圍廣的探索性搜尋派給 Subagent，例如找出某個設定值在大型程式碼庫裡所有被用到的地方", "verdict": "完全支持", "card_quote": "透過 `Task` 工具把一次範圍廣、探索性的搜尋(例如「找出某個設定值在大型程式碼庫裡所有被用到的地方」)派給 Subagent", "note": "c18；限定『範圍廣、探索性』在補充中出現。"},
+        {"text": "雜訊多的中間輸出留在主迴圈的 context 外，只有最終摘要回傳", "verdict": "完全支持", "card_quote": "能讓這次搜尋雜訊多的中間輸出留在主迴圈的 context 之外——只有 Subagent 最終的摘要會回傳。", "note": "c18。"},
+        {"text": "圖：Subagent 在自己的 context 裡搜尋、讀檔，產生一堆中間輸出", "verdict": "部分支持", "card_quote": "能讓這次搜尋雜訊多的中間輸出留在主迴圈的 context 之外", "note": "『自己的 context』『讀檔』是白話／示意，卡只說中間輸出在主迴圈 context 之外；未改變意思，第 13 張官方補充『另開 context』亦有呼應。"},
+        {"text": "blog 認為這讓 context 長度呈鋸齒狀，不會一直累積", "verdict": "完全支持", "card_quote": "複雜的子任務讓 context 長度呈現鋸齒狀變化，而不是對主對話造成永久性、不斷累積的負擔。", "note": "c19，主詞 blog。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 13 張",
+      "atoms": [
+        {"text": "Skills：描述常駐，整份用到才載入", "verdict": "完全支持", "card_quote": "只有真正用到的那一個，才會把完整指示拉進來", "note": "與 c7 一致；整張表為放行項 1（官方文件整理的載入方式）。"},
+        {"text": "Subagent：另開 context，不佔主對話", "verdict": "完全支持", "card_quote": "能讓這次搜尋雜訊多的中間輸出留在主迴圈的 context 之外", "note": "與 c18 一致，無矛盾。"},
+        {"text": "CLAUDE.md：開頭整份載入，每次請求帶著", "verdict": "完全支持", "card_quote": "會在 session 開始時被讀取並自動摺入 context", "note": "與 c16 不矛盾；『每次請求帶著』屬官方補充。MCP、Hooks 兩列亦為官方補充，與 c9、c13 無矛盾，補充句已標明『官方文件整理』，未用來加強卡的主張。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 14 張",
+      "atoms": [
+        {"text": "blog 認為摘要、範圍化委派、專案設定檔單獨看都不算新，讓它們成為 Harness 的是能自動彼此組合", "verdict": "完全支持", "card_quote": "這三個機制單獨拿出來看都不算新穎——摘要、範圍化委派、專案設定檔，在 agentic 編碼工具出現之前就已存在。真正讓它們成為「Harness」而非單純「功能」的，是它們能自動彼此組合", "note": "c1，主詞 blog。"},
+        {"text": "例子一：Subagent 的摘要可能在後續的壓縮流程中被再次摺入", "verdict": "完全支持", "card_quote": "Subagent 的摘要本身也可能在後續的壓縮流程中被再次摺入", "note": "c20；標明為 blog 舉的例子。"},
+        {"text": "例子二：CLAUDE.md 的慣例無論這一輪來自使用者或 Hook 觸發的重試，都一致套用", "verdict": "完全支持", "card_quote": "`CLAUDE.md` 的慣例無論當前這一輪來自使用者、或來自 Hook 觸發的重試，都會被一致地套用。", "note": "c20；圖註『連線依 blog 舉的兩個例子畫，不代表所有情況』符合範圍。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 15 張",
+      "atoms": [
+        {"text": "擴充有三個接口", "verdict": "完全支持", "card_quote": "Claude Code 的 harness 層額外提供三個擴充點，各自解決不同的問題", "note": "c5。"},
+        {"text": "管 context 有三個機制（CLAUDE.md、壓縮、Subagent）", "verdict": "完全支持", "card_quote": "把較早的對話摘要成精簡版本後繼續工作", "note": "c16、c17、c18 各為一個機制；『三個』對應 c1 的三個機制與卡標題。"},
+        {"text": "價值在能自動組合", "verdict": "完全支持", "card_quote": "真正讓它們成為「Harness」而非單純「功能」的，是它們能自動彼此組合", "note": "c1；先問的問題同封面。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 16 張",
+      "atoms": [
+        {"text": "系列地圖、系列第 2 則細節、導流行", "verdict": "完全支持", "card_quote": "這些單獨拿出來看都不算是什麼特殊技術——真正讓它能運作的，是這些機制被設計成可以彼此組合", "note": "結構元素，不對證；第 2 則細節的內容與 c1 一致。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "threads.body",
+      "atoms": [
+        {"text": "Claude Code 的功能單獨看都不新，合起來為什麼就不一樣？（hook）", "verdict": "完全支持", "card_quote": "這三個機制單獨拿出來看都不算新穎", "note": "同封面。"},
+        {"text": "加能力靠 Skills、Hooks、MCP；管 context 靠 CLAUDE.md、壓縮、Subagent", "verdict": "完全支持", "card_quote": "Claude Code 的 harness 層額外提供三個擴充點，各自解決不同的問題", "note": "c5、c16、c17、c18 與卡標題；白話分類不加新事實。"},
+        {"text": "blog 認為這些機制單獨看都不算特殊，真正讓它能運作的，是它們被設計成可以彼此組合", "verdict": "完全支持", "card_quote": "這些單獨拿出來看都不算是什麼特殊技術——真正讓它能運作的，是這些機制被設計成可以彼此組合", "note": "c1 逐字，主詞 blog。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "threads.last",
+      "atoms": [
+        {"text": "想看 Claude Code 的迴圈和權限？文章連結、同系列連結", "verdict": "完全支持", "card_quote": "拆解 Claude Code：Agentic Loop、工具系統、Skills 與權限機制", "note": "導流行與同系列連結為結構元素，文章標題含迴圈與權限。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "caption",
+      "atoms": [
+        {"text": "Claude Code 怎麼擴充能力、管理 context：單獨都不新，組合起來才是 Harness", "verdict": "完全支持", "card_quote": "真正讓它們成為「Harness」而非單純「功能」的，是它們能自動彼此組合", "note": "c1。"},
+        {"text": "條列的 11 項為各投影片標題（含『前三種是 blog 舉的用法』『CLAUDE.md 是專案層級的記憶』『官方文件整理的載入方式』括號說明）", "verdict": "完全支持", "card_quote": "CLAUDE.md 作為專案層級記憶", "note": "各項判定同對應投影片；括號說明標明來源，未混淆主詞。導流行與 hashtag 為結構。"}
+      ],
+      "errors": []
+    }
+  ],
+  "recalculations": [
+    {"block": "第 15 張", "expression": "擴充點 Skills、Hooks、MCP = 3；管 context 機制 CLAUDE.md、壓縮、Subagent = 3", "result": "3 與 3，與貼文『三個接口』『三個機制』相符"}
+  ],
+  "gaps": []
+}

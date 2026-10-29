@@ -7,11 +7,11 @@ style: window   # 2026-10-28 人選 A「視窗」（終端機視窗）
 members:   # 草案（人決定 2026-10-28：合成 2 則；未鎖定、一則一則發）
   - concept: claude-code-agentic-loop-and-tools
     also: [claude-code-permission-blast-radius]   # 雙卡：迴圈與工具＋權限與犯錯代價（待人看成果再定發文順序）
-    planned_title: Claude Code 為什麼敢自己動手改程式？   # 暫用，待人確認
+    planned_title: 讓 Claude Code 自己改檔案、下指令，不會出事嗎？   # 人挑定（2026-10-28）
     summary: 核心只有一個迴圈：讀、改、驗證，失敗也只是下一輪的輸入；安全機制的目標是讓犯錯便宜又可逆。   # 暫用，依該則的卡寫，發布前由忠實者審過一次
   - concept: claude-code-extension-and-context
-    planned_title: Skills、Hooks、MCP 怎麼組成一套 Harness？   # 暫用，待人確認
-    summary: 摘要、Subagent、CLAUDE.md 單獨都不新鮮，能自動彼此組合才讓它成為 Harness。   # 暫用，依該則的卡寫，發布前由忠實者審過一次
+    planned_title: Claude Code 靠六個機制，擴充能力又管住 context   # 人挑定（2026-10-29，C1）
+    summary: Claude Code 怎麼加能力、管理模型看得到的內容；這些機制單獨都不算特殊，能自動組合才是關鍵。   # 暫用（2026-10-28 重寫成白話），依該則的卡寫，發布前由忠實者審過一次
 hashtag: DSO_ClaudeCode   # 暫用，待人確認
 status: planning
 ---

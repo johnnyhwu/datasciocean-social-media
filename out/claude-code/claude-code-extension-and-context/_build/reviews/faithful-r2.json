@@ -1,0 +1,486 @@
+{
+ "post": "claude-code-extension-and-context",
+ "blocks": [
+  {
+   "block": "hook（第 1 張封面）",
+   "atoms": [
+    {
+     "text": "主標：Claude Code 的功能單獨看都不新，合起來為什麼就不一樣？",
+     "verdict": "完全支持",
+     "card_quote": "這些單獨拿出來看都不算是什麼特殊技術——真正讓它能運作的，是這些機制被設計成可以彼此組合",
+     "note": "c1 部落格判斷，可以作者口吻；問句留白，內文有答案"
+    },
+    {
+     "text": "副標：加技能、設規矩、接外部工具、管對話長度",
+     "verdict": "完全支持",
+     "card_quote": "Claude Code 的 harness 層額外提供三個擴充點，各自解決不同的問題",
+     "note": "放行項 4 的口語概括，對應 Skills／Hooks／MCP 與 CLAUDE.md／壓縮"
+    },
+    {
+     "text": "能自動彼此組合才是重點",
+     "verdict": "完全支持",
+     "card_quote": "真正讓它們成為「Harness」而非單純「功能」的，是它們能自動彼此組合",
+     "note": "c1 原句"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 3 張",
+   "atoms": [
+    {
+     "text": "Claude Code 是 Anthropic 推出的 AI 編碼工具",
+     "verdict": "完全支持",
+     "card_quote": "Claude Code 是 Anthropic 推出的 agentic 編碼 CLI",
+     "note": "c2"
+    },
+    {
+     "text": "blog 把它看成三層：固定不變的模型、包在外面的 Harness、每一輪動態組裝的 Context",
+     "verdict": "部分支持",
+     "card_quote": "三層是凍結模型、執行腳手架、動態組裝的 Context",
+     "note": "卡只說「動態組裝的 Context」，沒有「每一輪」；「每一輪」是新增的頻率說法，且掛在 blog 名下（輕微）"
+    },
+    {
+     "text": "Harness／Context 兩列定義",
+     "verdict": "完全支持",
+     "card_quote": "blog 把 Claude Code 視為「Model + Harness + Context」框架的具體實作",
+     "note": "放行項 1，已核對無矛盾；「像攤在桌上的資料」是白話比喻"
+    },
+    {
+     "text": "這一則看後兩層",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "放行項 5 編排用語"
+    }
+   ],
+   "errors": [
+    "措辭與卡不同"
+   ]
+  },
+  {
+   "block": "第 4 張",
+   "atoms": [
+    {
+     "text": "blog 認為，模型加固定的工具清單，對編碼 Agent 實際遇到的任務太過僵化",
+     "verdict": "完全支持",
+     "card_quote": "一個凍結的模型加上固定的工具清單，對於編碼 Agent 實際會遇到的任務範圍來說仍然太過僵化",
+     "note": "c5；有標「blog 認為」"
+    },
+    {
+     "text": "Harness 多開三個擴充點（Skills、Hooks、MCP），各解決不同的事",
+     "verdict": "完全支持",
+     "card_quote": "Claude Code 的 harness 層額外提供三個擴充點，各自解決不同的問題",
+     "note": "c5；三個點的名稱由 c6、c9、c12 對應"
+    },
+    {
+     "text": "Skills 教它某件事怎麼做／Hooks 固定節點自動執行／MCP 接上外部的服務",
+     "verdict": "完全支持",
+     "card_quote": "Skill 是一個資料夾，裡面裝著描述如何完成特定、重複性任務的指示",
+     "note": "c6、c9「在固定節點執行的 shell 指令」、c12「與外部服務對話」"
+    },
+    {
+     "text": "工具是模型能呼叫的動作，例如讀檔、改檔、跑指令",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "放行項 1 官方文件補充，未與卡矛盾"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 5 張",
+   "atoms": [
+    {
+     "text": "Skill 是一個資料夾，裝著某個重複性任務的做法",
+     "verdict": "完全支持",
+     "card_quote": "Skill 是一個資料夾，裡面裝著描述如何完成特定、重複性任務的指示(可選附帶腳本)",
+     "note": "c6"
+    },
+    {
+     "text": "模型一開始只看到每個 Skill 的一行描述，用到哪個才拉進整份指示",
+     "verdict": "完全支持",
+     "card_quote": "模型一開始只會看到每個可用 skill 的一行描述，只有真正用到的那一個，才會把完整指示拉進來",
+     "note": "c7"
+    },
+    {
+     "text": "用不到的不會先佔掉位置",
+     "verdict": "完全支持",
+     "card_quote": "不該為當前任務用不到的能力預付 context 成本",
+     "note": "c7、c8 的白話"
+    },
+    {
+     "text": "圖：三個 Skill 名稱與描述（假設的例子）",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "放行項 2，圖註已標假設，未違背卡"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 6 張",
+   "atoms": [
+    {
+     "text": "Hook 是 Harness 在固定節點自動執行的 shell 指令：Session 開始時、工具執行前、Agent 回覆完成後",
+     "verdict": "完全支持",
+     "card_quote": "Hooks 是 harness 在固定節點執行的 shell 指令——工具執行前、Agent 回覆完成後、Session 開始時。",
+     "note": "c9；順序改為時間序，內容一致"
+    },
+    {
+     "text": "官方文件說這是確定性的控制，每次照做，不靠模型自己決定",
+     "verdict": "完全支持",
+     "card_quote": "Hooks 讓「Agent 絕不能做 X」從系統提示裡一句寄望變成真正被強制執行的規則。",
+     "note": "放行項 1；主詞標明官方文件，與 c10 方向一致，未使卡的主張更強"
+    },
+    {
+     "text": "圖：Hook 在 Session 開始、工具執行前、Agent 回覆完成後三節點介入，對話紀錄為假設",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "放行項 2、3"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 7 張",
+   "atoms": [
+    {
+     "text": "blog 認為，Hook 是一般程式碼、不是模型呼叫，所以適合用來保證「模型本身無法被信任會可靠遵守」的規則",
+     "verdict": "完全支持",
+     "card_quote": "因為 Hook 是一般程式碼，而非模型呼叫，所以它是實作「模型本身無法被信任會可靠遵守」的保證的正確位置",
+     "note": "c10；有標 blog 認為"
+    },
+    {
+     "text": "標題：要保證規則被遵守，Hook 才是對的位置",
+     "verdict": "部分支持",
+     "card_quote": "所以它是實作「模型本身無法被信任會可靠遵守」的保證的正確位置",
+     "note": "卡說 Hook 是「正確位置」，沒有說唯一；標題的「才」是絕對詞，卡上沒有排他條件；且標題未帶「blog 認為」"
+    },
+    {
+     "text": "圖：只寫在提示裡靠模型遵守 vs 寫成 Hook 執行前檢查，路徑受保護就擋下",
+     "verdict": "完全支持",
+     "card_quote": "Hooks 讓「Agent 絕不能做 X」從系統提示裡一句寄望變成真正被強制執行的規則。",
+     "note": "c10、c11；「絕不能改這些檔案」屬放行項 2 假設例子"
+    },
+    {
+     "text": "官方文件說，寫在 CLAUDE.md 的規則只是請求",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "放行項 1，主詞為官方文件；與 c16 不矛盾"
+    }
+   ],
+   "errors": [
+    "範圍被放大"
+   ]
+  },
+  {
+   "block": "第 8 張",
+   "atoms": [
+    {
+     "text": "擋下受保護寫入：工具執行前先查路徑，受保護的就擋下",
+     "verdict": "部分支持",
+     "card_quote": "阻擋對受保護路徑的寫入",
+     "note": "c11 只說阻擋對受保護路徑的寫入；「工具執行前先查路徑」是用 c9 的節點補出的做法，合理但卡未直接寫"
+    },
+    {
+     "text": "編輯後自動整理：每次改完檔案，自動格式化",
+     "verdict": "完全支持",
+     "card_quote": "在每次編輯後自動格式化檔案",
+     "note": "c11"
+    },
+    {
+     "text": "檢查不過就失敗：檢查（lint）沒過，就讓這一輪失敗",
+     "verdict": "完全支持",
+     "card_quote": "或是在 lint 檢查不通過時直接讓該輪失敗",
+     "note": "c11"
+    },
+    {
+     "text": "前三列是 blog 舉的用法",
+     "verdict": "完全支持",
+     "card_quote": "blog 舉的 Hooks 用法包括：阻擋對受保護路徑的寫入、在每次編輯後自動格式化檔案，或是在 lint 檢查不通過時直接讓該輪失敗",
+     "note": "c11 部落格舉例，已標明；卡寫「包括」，標題「三種用法」靠此行限縮"
+    },
+    {
+     "text": "末列結束碼",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "放行項 1，已標明是官方文件補充，與卡無矛盾"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 9 張",
+   "atoms": [
+    {
+     "text": "MCP 讓 Claude Code 用共通介面，接上 GitHub、資料庫、內部 API 這類外部服務",
+     "verdict": "完全支持",
+     "card_quote": "Model Context Protocol 讓 Claude Code 能透過共通介面與外部服務對話——GitHub、資料庫、內部 API——而不必為每個整合手刻一套客製化工具程式碼",
+     "note": "c12"
+    },
+    {
+     "text": "每個服務（MCP server）自己說明有哪些工具，Claude Code 就能像用內建工具一樣用它",
+     "verdict": "完全支持",
+     "card_quote": "一個 MCP server 自己宣告它有哪些工具與資源；harness 再把這些工具以與內建工具相同的方式呈現給模型",
+     "note": "c13"
+    },
+    {
+     "text": "圖：Claude Code 經共通介面連 Slack 工作區、工單系統、私有 repo；不必為每個整合手刻客製程式",
+     "verdict": "完全支持",
+     "card_quote": "這正是讓同一個 Agent 能同時觸及 Slack 工作區、工單系統與私有 repo，而 harness 作者不需要為每一個都自己寫一份 client 的關鍵",
+     "note": "c14、c12；圖上未把 blog 判斷寫成事實"
+    },
+    {
+     "text": "圖註：官方文件提醒抓外部內容的服務可能夾帶惡意指令，只連信任的",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "放行項 1，未與卡矛盾"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 10 張",
+   "atoms": [
+    {
+     "text": "CLAUDE.md 每次開新對話被讀取並自動放進 context，持久、可共享，不依附任何單一對話",
+     "verdict": "完全支持",
+     "card_quote": "一份被 checked in 的 `CLAUDE.md`——就像管轄本 repo 部落格發文慣例的那一份——會在 session 開始時被讀取並自動摺入 context。",
+     "note": "c16，另一句原文「持久、共享，且不依附於任何單一對話」"
+    },
+    {
+     "text": "圖：三個對話開頭釘著同一份 CLAUDE.md",
+     "verdict": "完全支持",
+     "card_quote": "持久、共享，且不依附於任何單一對話",
+     "note": "c16"
+    },
+    {
+     "text": "官方文件補充：它只是參考，不是強制執行的設定；放在專案裡、給 Claude 讀的說明檔",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "放行項 1，標明官方文件；與 c16 不矛盾"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 11 張",
+   "atoms": [
+    {
+     "text": "對話快塞滿時，不盲目截斷，把較早的對話摘要成精簡版本後繼續，使用者不必重新解釋先前的決策",
+     "verdict": "完全支持",
+     "card_quote": "Claude Code 不會盲目截斷，而是把較早的對話摘要成精簡版本後繼續工作——對話得以延續，使用者不需要重啟或重新解釋先前的決策",
+     "note": "c17"
+    },
+    {
+     "text": "官方文件提醒：早期詳細指示可能在壓縮時遺失，長期規則請放進 CLAUDE.md",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "放行項 1，主詞為官方文件；與 c17 不矛盾"
+    },
+    {
+     "text": "圖：左邊對話的灰條有亮有暗，壓縮後只剩摘要；亮色是請求和重要程式片段",
+     "verdict": "完全支持",
+     "card_quote": "長時間的 session 終究會逼近 context window 的上限。",
+     "note": "c17 的示意；「你的請求」「重要的程式片段」屬放行項 1"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 12 張",
+   "atoms": [
+    {
+     "text": "範圍廣、雜訊多的搜尋交給 Subagent，中間輸出留在它那邊，主對話只收到最後的摘要",
+     "verdict": "完全支持",
+     "card_quote": "透過 `Task` 工具把一次範圍廣、探索性的搜尋(例如「找出某個設定值在大型程式碼庫裡所有被用到的地方」)派給 Subagent，能讓這次搜尋雜訊多的中間輸出留在主迴圈的 context 之外——只有 Subagent 最終的摘要會回傳。",
+     "note": "c18；「雜訊多」在卡上修飾的是中間輸出，貼文寫成「雜訊多的搜尋」（輕微）；「探索性」未帶出"
+    },
+    {
+     "text": "Subagent 是 Claude Code 派出去的幫手，有自己獨立的 context",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "放行項 1"
+    },
+    {
+     "text": "圖：在自己的 context 裡搜尋、讀檔，產生一堆中間輸出",
+     "verdict": "部分支持",
+     "card_quote": "能讓這次搜尋雜訊多的中間輸出留在主迴圈的 context 之外",
+     "note": "卡只說有「中間輸出」，沒有說「讀檔」；屬輕微的示意細節"
+    },
+    {
+     "text": "圖註：blog 認為，這讓 context 的長度忽高忽低，不會一路累積",
+     "verdict": "完全支持",
+     "card_quote": "複雜的子任務讓 context 長度呈現鋸齒狀變化，而不是對主對話造成永久性、不斷累積的負擔",
+     "note": "c19；有標 blog 認為，「忽高忽低」對應「鋸齒狀」"
+    }
+   ],
+   "errors": [
+    "夾帶卡上沒有的判斷"
+   ]
+  },
+  {
+   "block": "第 13 張",
+   "atoms": [
+    {
+     "text": "整張表為官方文件整理的載入方式",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "放行項 1，已在補充明講「這張表是官方文件整理的」，主詞沒有混淆"
+    },
+    {
+     "text": "CLAUDE.md 開頭整份讀進來；Skills 一行描述常駐、整份要用才讀",
+     "verdict": "完全支持",
+     "card_quote": "Skills 只會在需要時才載入 context：模型一開始只會看到每個可用 skill 的一行描述，只有真正用到的那一個，才會把完整指示拉進來。",
+     "note": "c7、c16 與表一致，無矛盾"
+    },
+    {
+     "text": "MCP：只先讀工具名稱，要用才讀完整定義",
+     "verdict": "部分支持",
+     "card_quote": "harness 再把這些工具以與內建工具相同的方式呈現給模型",
+     "note": "官方補充，但與 c13「與內建工具相同的方式呈現」有潛在張力（表中把 MCP 寫成延後載入），請人判斷是否算矛盾"
+    },
+    {
+     "text": "Subagent 另開自己的 context，不佔主對話；Hooks 在外面執行，除非回報內容不佔空間",
+     "verdict": "部分支持",
+     "card_quote": "只有 Subagent 最終的摘要會回傳",
+     "note": "官方補充，與卡不矛盾；「不佔主對話」略強於卡（摘要仍會回傳），Hooks 一列與 c9 不矛盾"
+    },
+    {
+     "text": "官方建議：每次請求帶著的規則寫精簡，偶爾才用的參考資料放進 Skill",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "放行項 1，未把卡的主張說更強"
+    }
+   ],
+   "errors": [
+    "其他"
+   ]
+  },
+  {
+   "block": "第 14 張",
+   "atoms": [
+    {
+     "text": "blog 認為，摘要、範圍化委派、專案設定檔單獨看都不算新，讓它們成為 Harness 的是能自動彼此組合",
+     "verdict": "完全支持",
+     "card_quote": "這三個機制單獨拿出來看都不算新穎——摘要、範圍化委派、專案設定檔，在 agentic 編碼工具出現之前就已存在。真正讓它們成為「Harness」而非單純「功能」的，是它們能自動彼此組合",
+     "note": "c1，有標 blog 認為"
+    },
+    {
+     "text": "括號對應：範圍化委派＝派給 Subagent、專案設定檔＝CLAUDE.md",
+     "verdict": "部分支持",
+     "card_quote": "透過 `Task` 工具把一次範圍廣、探索性的搜尋(例如「找出某個設定值在大型程式碼庫裡所有被用到的地方」)派給 Subagent",
+     "note": "卡 c1 沒有明寫對應；對應是依 c18、c16 的推論，與卡不矛盾（放行項 4 已判斷）"
+    },
+    {
+     "text": "圖：Subagent 的摘要到後續的壓縮流程，摘要可能又被濃縮一次",
+     "verdict": "部分支持",
+     "card_quote": "Subagent 的摘要本身也可能在後續的壓縮流程中被再次摺入",
+     "note": "卡寫「被再次摺入」，貼文改成「又被濃縮一次」，是對「摺入」的詮釋；「可能」有保留"
+    },
+    {
+     "text": "圖：使用者這一輪、Hook 觸發的重試，兩種情況都套用同一份 CLAUDE.md 的慣例",
+     "verdict": "完全支持",
+     "card_quote": "CLAUDE.md` 的慣例無論當前這一輪來自使用者、或來自 Hook 觸發的重試，都會被一致地套用",
+     "note": "c20；已標明是 blog 的兩個例子"
+    }
+   ],
+   "errors": [
+    "措辭與卡不同"
+   ]
+  },
+  {
+   "block": "第 15 張",
+   "atoms": [
+    {
+     "text": "各機制單獨都不新，能自動彼此組合，才是 Harness 的關鍵",
+     "verdict": "完全支持",
+     "card_quote": "真正讓它們成為「Harness」而非單純「功能」的，是它們能自動彼此組合",
+     "note": "c1 部落格判斷，可作者口吻；「機制單獨都不新」對應結語原句"
+    },
+    {
+     "text": "先問的問題：功能單獨看都不新，為什麼合起來就不一樣？",
+     "verdict": "完全支持",
+     "card_quote": "這些單獨拿出來看都不算是什麼特殊技術——真正讓它能運作的，是這些機制被設計成可以彼此組合",
+     "note": "c1"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "threads.body",
+   "atoms": [
+    {
+     "text": "Claude Code 是 Anthropic 推出的 AI 編碼工具",
+     "verdict": "完全支持",
+     "card_quote": "Claude Code 是 Anthropic 推出的 agentic 編碼 CLI",
+     "note": "c2"
+    },
+    {
+     "text": "它靠 Skills、Hooks、MCP 擴充能力，再用 CLAUDE.md、壓縮、Subagent 管理 context",
+     "verdict": "完全支持",
+     "card_quote": "Claude Code 的 harness 層額外提供三個擴充點，各自解決不同的問題",
+     "note": "c5、c16、c17、c18；管理 context 的描述與卡一致"
+    },
+    {
+     "text": "blog 認為這些機制單獨看都不算特殊，真正讓它能運作的，是它們被設計成可以彼此組合",
+     "verdict": "完全支持",
+     "card_quote": "這些單獨拿出來看都不算是什麼特殊技術——真正讓它能運作的，是這些機制被設計成可以彼此組合",
+     "note": "c1 原句，有標 blog 認為"
+    },
+    {
+     "text": "這是系列第 2 則",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "結構"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "threads.last",
+   "atoms": [
+    {
+     "text": "導流行、同系列連結與（尚未發布）標註",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "結構元素，不需對證卡"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "caption",
+   "atoms": [
+    {
+     "text": "開頭與各條目為各張標題的重述",
+     "verdict": "部分支持",
+     "card_quote": "是實作「模型本身無法被信任會可靠遵守」的保證的正確位置",
+     "note": "標題逐條對回各張；第 7 張標題的「才是」絕對詞同樣帶入 caption，見第 7 張"
+    },
+    {
+     "text": "括號補充（工具是模型能呼叫的動作…、這張表是官方文件整理的）",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "放行項 1 與 5"
+    },
+    {
+     "text": "文章導流與 hashtag",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "結構"
+    }
+   ],
+   "errors": [
+    "範圍被放大"
+   ]
+  }
+ ],
+ "recalculations": [],
+ "gaps": [
+  {
+   "description": "第 12 張把搜尋說成「範圍廣、雜訊多」，沒有帶出卡上的「探索性」這個限定",
+   "card_quote": "透過 `Task` 工具把一次範圍廣、探索性的搜尋"
+  }
+ ]
+}
