@@ -1,6 +1,6 @@
 ---
 id: claude-code
-name: "拆解 Claude Code"   # 草案，待人確認；會印在每張圖上，發布後不能改
+name: "Claude Code：怎麼讓 AI 敢自己改你的程式"   # 人挑定（2026-10-29，候選 A）；會印在每張圖上，發布後不能改
 philosophy: series/claude-code/philosophy.md   # 尚未做：新系列要先做視覺哲學與樣張，人審過才量產
 color: window   # 相鄰系列不同色（目前已用：teal-mid、paper-cards、spotlight、abyss-contour）
 style: window   # 2026-10-28 人選 A「視窗」（終端機視窗）
@@ -8,11 +8,12 @@ members:   # 草案（人決定 2026-10-28：合成 2 則；未鎖定、一則�
   - concept: claude-code-agentic-loop-and-tools
     also: [claude-code-permission-blast-radius]   # 雙卡：迴圈與工具＋權限與犯錯代價（待人看成果再定發文順序）
     planned_title: 讓 Claude Code 自己改檔案、下指令，不會出事嗎？   # 人挑定（2026-10-28）
-    summary: 核心只有一個迴圈：讀、改、驗證，失敗也只是下一輪的輸入；安全機制的目標是讓犯錯便宜又可逆。   # 暫用，依該則的卡寫，發布前由忠實者審過一次
+    summary: 反覆讀程式碼、改程式碼、驗證，出錯就拿錯誤再來一輪；Agent 無人看管時，安全設計的目標是讓犯錯代價低、能還原。   # 2026-10-29 白話改寫，忠實者重審通過（BLOCKER 無），讀者已看過
   - concept: claude-code-extension-and-context
     planned_title: Claude Code 靠六個機制，擴充能力又管住 context   # 人挑定（2026-10-29，C1）
-    summary: Claude Code 怎麼加能力、管理模型看得到的內容；這些機制單獨都不算特殊，能自動組合才是關鍵。   # 暫用（2026-10-28 重寫成白話），依該則的卡寫，發布前由忠實者審過一次
-hashtag: DSO_ClaudeCode   # 暫用，待人確認
+    summary: 三個幫 Claude Code 加功能的做法，三個管理 AI 讀進內容的做法；各自不特殊，能彼此組合才是重點。   # 2026-10-29 忠實者重審通過（BLOCKER 無），讀者已看過；標題的 context 為人挑的 hook，不改
+hashtag: ClaudeCode   # 人決定（2026-10-29）：不用特別把 DataSci Ocean 與 Claude Code 寫在一起，不用 DSO_ 前綴
+members_locked: true   # 2026-10-29 人說發佈第一則；鎖定後系列名與各則 planned_title 不改
 status: planning
 ---
 

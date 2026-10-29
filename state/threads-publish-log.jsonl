@@ -28,3 +28,4 @@
 {"time": "2026-10-28T12:17:22+00:00", "concept": "sag-latent-hyperedge-one-hop", "format": "threads_backfill", "reply_id": "18095368919682692", "reply_to_id": "18161609995498929", "targets": ["sag-tradeoffs-price-paid"]}
 {"time": "2026-10-28T12:17:22+00:00", "concept": "sag-results-and-gain-source", "format": "threads_backfill", "reply_id": "18153808984549548", "reply_to_id": "17999837187041949", "targets": ["sag-tradeoffs-price-paid"]}
 {"time": "2026-10-28T12:17:22+00:00", "concept": "sag-sql-vector-llm-division-and-funnel", "format": "threads_backfill", "reply_id": "18129848303494058", "reply_to_id": "18128153935849289", "targets": ["sag-tradeoffs-price-paid"]}
+{"time": "2026-10-29T00:33:52+0000", "concept": "claude-code-agentic-loop-and-tools", "format": "threads_thread", "root_id": "18086342993330276", "permalink": "https://www.threads.com/@datasciocean/post/DfDupxOk16t", "post_ids": ["18086342993330276", "18120076004514246"]}

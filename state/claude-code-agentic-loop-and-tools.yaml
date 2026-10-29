@@ -1,0 +1,23 @@
+concept: claude-code-agentic-loop-and-tools
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: claude-code-agentic-loop-and-tools:ig_carousel
+  format: ig_carousel
+  series_id: claude-code
+  url: https://www.instagram.com/p/DfDuOUJk09k/
+  published_at: 2026-10-29T00:30:53+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []
+- post_id: claude-code-agentic-loop-and-tools:threads_thread
+  format: threads_thread
+  series_id: claude-code
+  url: https://www.threads.com/@datasciocean/post/DfDupxOk16t
+  published_at: 2026-10-29T00:33:52+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []

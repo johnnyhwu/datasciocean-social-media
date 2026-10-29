@@ -1,6 +1,6 @@
 # IG 輪播：讓 Claude Code 自己改檔案、下指令，不會出事嗎？
 
-- 系列：拆解 Claude Code　｜　hook 樣態：讀者疑問　｜　共 16 張，**依頁碼順序上傳**
+- 系列：Claude Code：怎麼讓 AI 敢自己改你的程式　｜　hook 樣態：讀者疑問　｜　共 16 張，**依頁碼順序上傳**
 - 每頁下方的「替代文字」貼到 IG 的替代文字欄；最後的 Caption 整段貼上
 
 ## 第 1 頁（封面）
@@ -168,9 +168,9 @@
 
 - **主標**：一次看完這個系列
 - **導流行**：完整文章：datasciocean.com/ai-concept/claude-code
-- **第 1 則**：讓 Claude Code 自己改檔案、下指令，不會出事嗎？　核心只有一個迴圈：讀、改、驗證，失敗也只是下一輪的輸入；安全機制的目標是讓犯錯便宜又可逆。
-- **第 2 則**：Claude Code 靠六個機制，擴充能力又管住 context　Claude Code 怎麼加能力、管理模型看得到的內容；這些機制單獨都不算特殊，能自動組合才是關鍵。
-- **替代文字**：一次看完這個系列。讓 Claude Code 自己改檔案、下指令，不會出事嗎？：核心只有一個迴圈：讀、改、驗證，失敗也只是下一輪的輸入；安全機制的目標是讓犯錯便宜又可逆。、Claude Code 靠六個機制，擴充能力又管住 context：Claude Code 怎麼加能力、管理模型看得到的內容；這些機制單獨都不算特殊，能自動組合才是關鍵。
+- **第 1 則**：讓 Claude Code 自己改檔案、下指令，不會出事嗎？　反覆讀程式碼、改程式碼、驗證，出錯就拿錯誤再來一輪；Agent 無人看管時，安全設計的目標是讓犯錯代價低、能還原。
+- **第 2 則**：Claude Code 靠六個機制，擴充能力又管住 context　三個幫 Claude Code 加功能的做法，三個管理 AI 讀進內容的做法；各自不特殊，能彼此組合才是重點。
+- **替代文字**：一次看完這個系列。讓 Claude Code 自己改檔案、下指令，不會出事嗎？：反覆讀程式碼、改程式碼、驗證，出錯就拿錯誤再來一輪；Agent 無人看管時，安全設計的目標是讓犯錯代價低、能還原。、Claude Code 靠六個機制，擴充能力又管住 context：三個幫 Claude Code 加功能的做法，三個管理 AI 讀進內容的做法；各自不特殊，能彼此組合才是重點。
 
 ## Caption（整段貼到 IG）
 
@@ -192,5 +192,5 @@ Claude Code 運作原理：一個迴圈，讓 AI 自己讀、改、驗證程式�
 
 完整文章請在 datasciocean.com 搜尋「拆解 Claude Code：Agentic Loop、工具系統、Skills 與權限機制」
 
-#DSO_ClaudeCode #ClaudeCode #AIAgent #Anthropic
+#ClaudeCode #AIAgent #Anthropic
 ```

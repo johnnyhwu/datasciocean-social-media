@@ -2,7 +2,7 @@
 
 | 項目 | 內容 |
 |---|---|
-| 系列 | 拆解 Claude Code |
+| 系列 | Claude Code：怎麼讓 AI 敢自己改你的程式 |
 | 觀念 | `claude-code-extension-and-context`（卡：`concept-wiki/wiki/concepts/claude-code-extension-and-context.md`） |
 | hook 樣態 | 並列式 |
 | IG 輪播 | 未做（16 張） |

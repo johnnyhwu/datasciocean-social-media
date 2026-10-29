@@ -53,7 +53,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 3 行",
@@ -83,7 +83,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -139,7 +139,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -169,7 +169,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -225,7 +225,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -265,7 +265,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -321,7 +321,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -356,7 +356,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -412,7 +412,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -452,7 +452,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -508,7 +508,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -548,7 +548,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -604,7 +604,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -644,7 +644,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -700,7 +700,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -740,7 +740,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -796,7 +796,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -831,7 +831,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -887,7 +887,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -922,7 +922,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -978,7 +978,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -1018,7 +1018,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -1074,7 +1074,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -1114,7 +1114,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -1170,7 +1170,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -1210,7 +1210,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -1266,7 +1266,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -1306,7 +1306,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -1382,7 +1382,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     },
@@ -1403,7 +1403,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=47, 最大右=935"
+          "detail": "最小左=47, 最大右=964"
         },
         {
           "name": "文字框無橫向溢出",
@@ -1438,7 +1438,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 Claude Code）"
+          "detail": "最低 5.0（Claude Code：怎麼讓 ）"
         },
         {
           "name": "標題最多 2 行",
@@ -1463,7 +1463,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 Claude Code']"
+          "detail": "['Claude Code：怎麼讓 AI 敢自己改你的程式']"
         }
       ]
     }

@@ -36,7 +36,7 @@
 | 第一句 | 約 40 字，預設上限 50 字（`caption_first_sentence_max_chars`，待手機預覽後調整）。放讀者會搜尋的詞（例如 RLHF、reward model），**不重複封面主標** |
 | 逐張摘要 | `build_package.py` 由**最終的投影片規格**自動產生，格式「・主標（補充第一個子句）」，**不編號**（編號像序號，暗示先後順序，也會因封面與脈絡張不列而從 3 開始）。封面與系列地圖不列。必須在張數定案之後才產生。可開關（`caption_per_slide_summary`），預設開 |
 | 導流行 | 見 §3 |
-| hashtag | **系列標籤用主題詞，像台灣讀者實際會用的樣子**（例如 `#DSO_LLMJudge`），不要把內部系列 id 或英文詞硬拼在一起（`#DSO_JEVCascade` 被人覺得怪）；用語要跟貼文一致（Judge，不寫判官）。最多 5 個，選小眾精準的，不用 #AI、#科技。系列貼文含一個系列專屬標籤（例如 `#DSO_SAG`，必須在 `hashtags` 裡）。獨立 post 沒有系列標籤 |
+| hashtag | **系列標籤用主題詞，像台灣讀者實際會用的樣子**（例如 `#DSO_LLMJudge`），不要把內部系列 id 或英文詞硬拼在一起（`#DSO_JEVCascade` 被人覺得怪）；用語要跟貼文一致（Judge，不寫判官）。最多 5 個，選小眾精準的，不用 #AI、#科技。系列貼文含一個系列專屬標籤（例如 `#DSO_SAG`，必須在 `hashtags` 裡）。**主題本身就是讀者會搜的詞（產品名、技術名）時，系列標籤直接用那個詞，不加 `DSO_` 前綴，不特意把 DataSci Ocean 和主題寫在一起**（人，2026-10-29，Claude Code 系列用 `#ClaudeCode`）；`series.md` 的 `hashtag` 與 `caption.hashtags` 要一致（程式 A 會檢查）。獨立 post 沒有系列標籤 |
 
 ## 3. 導流與系列導航
 
