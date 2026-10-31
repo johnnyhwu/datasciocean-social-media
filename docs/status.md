@@ -53,4 +53,4 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 人決定：3 卡合成 2 則（迴圈＋權限雙卡、擴充），一則一則發；系列名「Claude Code：怎麼讓 AI 敢自己改你的程式」（2026-10-29）；hashtag `#ClaudeCode`（不加 `DSO_` 前綴）；可上網補充，但只准官方來源（`series/claude-code/research.md`）。系列已鎖定（`members_locked`，2026-10-29）。
 - 第 1 則 `out/claude-code/claude-code-agentic-loop-and-tools/`（雙卡、16 張）**已發布（2026-10-29）**：IG https://www.instagram.com/p/DfDuOUJk09k/ 、Threads https://www.threads.com/@datasciocean/post/DfDupxOk16t 。hook 人挑定（讀者疑問式）。系列摘要（`series.md` 的 `summary`）已改白話，忠實者重審通過、讀者看過。
 - 第 2 則 `out/claude-code/claude-code-extension-and-context/`（單卡、16 張）**已發布（2026-10-31）**：IG https://www.instagram.com/p/DfI172ND6Xv/ 、Threads https://www.threads.com/@datasciocean/post/DfI2QXrj7JH 。hook 人挑 C1。發布前官方文件 13 條補充逐條重新核對，文字沒有改版；Threads「同系列」連結已用 `series_links.py` 補上第 1 則。第 13 張 MCP 列（卡 c13 沒提載入時機，忠實者判定不矛盾但有張力）人決定照原樣發（2026-10-31）。新圖型 `sockets`、`lazy`、`hub`、`pinned`、`compact`、`sidecar`、`combo`（有回歸測試）。
-- 系列 2 則全發完。**第 1 則 Threads 回補（補上第 2 則連結）待人說「發」**（`state/backfill.md`）。
+- 系列 2 則全發完；第 1 則 Threads 回補（補上第 2 則連結）已於 2026-10-31 發布（reply_id 18080710904763396），`state/backfill.md` 清空。

@@ -20,4 +20,5 @@ posts:
   published_at: 2026-10-29T00:33:52+0000
   hook_type: 讀者疑問
   mentions: []
-  backfilled: []
+  backfilled:
+  - claude-code-extension-and-context
