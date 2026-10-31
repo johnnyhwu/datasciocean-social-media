@@ -1,0 +1,23 @@
+concept: claude-code-extension-and-context
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: claude-code-extension-and-context:ig_carousel
+  format: ig_carousel
+  series_id: claude-code
+  url: https://www.instagram.com/p/DfI172ND6Xv/
+  published_at: 2026-10-31T00:13:35+0000
+  hook_type: 並列式
+  mentions: []
+  backfilled: []
+- post_id: claude-code-extension-and-context:threads_thread
+  format: threads_thread
+  series_id: claude-code
+  url: https://www.threads.com/@datasciocean/post/DfI2QXrj7JH
+  published_at: 2026-10-31T00:16:30+0000
+  hook_type: 並列式
+  mentions: []
+  backfilled: []

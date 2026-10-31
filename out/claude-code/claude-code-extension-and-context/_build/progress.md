@@ -27,3 +27,11 @@
 - 讀者 R4：第 14 張「一輪」「Hook 觸發的重試」沒鋪墊 → 第 3 張補「每一輪（每回應一次）」、第 14 張補子標；第 13 張補「壓縮」列對上封面六個。讀者沒有再審 R5（只剩理解面的小調整）。
 - 兩則的 planned_title 已對齊並重渲第 1 則系列地圖（第 1 則 spec 文字沒動）。
 - 待人決定：系列名／hashtag、第 13 張 MCP 列（忠實者：不矛盾但有張力）、發布順序。尚未 ready、未 commit、未發布。
+
+## 2026-10-31 發布
+- 發布前重抓官方文件核對 `supplements.md` 的 13 條補充（how-claude-code-works、features-overview、hooks-guide、skills、memory、sub-agents、mcp）：原文一字未改，沒有改版。
+- `series_links.py --write` 補上第 1 則 Threads 連結 → 重跑 check_a（PASS，ERROR 0）、build_package、batch_check（PASS，只有存量 WARN）。
+- 人決定第 13 張 MCP 列照原樣發（卡 c13 沒提載入時機，忠實者判定不矛盾但有張力）；人授權整串發布與 commit／push。
+- 兩個格式 `ready` →`prepare` → push `ig/jpg/`（894a27f）→ 預檢（16 張，可沿用）→ IG dry-run（problems 0、warnings 0）→ IG 發布：https://www.instagram.com/p/DfI172ND6Xv/ （media_id 18105037832457914，00:13:35+0000）
+- Threads dry-run（2 則）→ 發布：https://www.threads.com/@datasciocean/post/DfI2QXrj7JH （root_id 18148411657569222，00:16:30+0000）
+- 兩個格式 state 都是 `published`。第 1 則 Threads 回補已進 `state/backfill.md`，待人說「發」。

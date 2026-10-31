@@ -153,7 +153,8 @@ Claude Code 是 Anthropic 推出的 AI 編碼工具。它靠 Skills、Hooks、MC
 ### 最後一則（置頂）
 想看完整拆解？
 文章：datasciocean.com/ai-concept/claude-code
-同系列：讓 Claude Code 自己改檔案、下指令，不會出事嗎？（尚未發布）
+同系列：讓 Claude Code 自己改檔案、下指令，不會出事嗎？
+https://www.threads.com/@datasciocean/post/DfDupxOk16t
 引用：c1
 
 ## IG caption
