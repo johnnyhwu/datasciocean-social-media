@@ -2,9 +2,9 @@
 
 ## 現況（接手只讀這段；每次更新時覆寫）
 
-- 第 1 則，18 張。審查全部通過（忠實者 r5、讀者 r3），已 `--mark`；`ready`（IG、Threads）；系列已鎖定（2026-11-01）。
-- 等人決定：無。
-- 下一步：照發文順序發布（`publish-flow.md`；push 前問人、每個 dry-run 給人看、人說「發」才 `--confirm`；第 2 則以後先跑 `series_links.py`）。
+- 第 1 則，18 張。**已發布（2026-11-01）**：IG https://www.instagram.com/p/DfM6X75kzNZ/ 、Threads https://www.threads.com/@datasciocean/post/DfM7L3Mk4a0 。
+- Threads 正文「有人按過」後有一個誤植的斷行，人說「沒關係，直接發」，照原樣發出。
+- 等人決定：無。下一步：無（第 2 則發布後，這則的 Threads 會列入回補）。
 
 ## 歷史
 
