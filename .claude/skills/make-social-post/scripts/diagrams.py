@@ -39,7 +39,7 @@
   hops 的選用欄位（2026-10-26）：spec 頂層 fade: true＝箭頭一跳比一跳淡（圖上傳遞的分數越來越弱，純示意，圖註要說明）；每列 shortcut: true＝鏈上方畫一條被叉掉的虛線捷徑，標籤用該列的 sub2
   scoreboard 戰績表（2026-10-26，SAG 第 3 則）：nodes = 每列一個資料集 [{text, sub?, emph?}]、heads = 兩個欄標籤、outcomes = 圖例 [{text（深色那一方）}, {text（淺色那一方）}]、cells = 每列每欄的 [深色值, 淺色值]（字串，例 "64.1"）；
             每格兩條橫條，軸從 0 起、長度與數值成正比（axis_max 預設 100）；深色值小於淺色值的格子畫虛線框（圖註要說明）；emph 的列底下墊金色淡底
-  leak      每一跳都漏一些（2026-10-26）：nodes = 兩條路 [{text, sub?}（走很多跳的）, {text, sub?}（一次到位的）]、heads = 兩條路箭頭上的標籤（例：剪枝）；兩條路從同一個起點到同一個終點，每個站畫一格點，漏掉的畫成虛線空點；點數是固定示意，圖註要標「示意」
+  leak      每一跳都漏一些（2026-10-26）：nodes = 兩條路 [{text, sub?}（走很多跳的）, {text, sub?}（一次到位的）]、heads = 兩條路箭頭上的標籤（例：剪枝）；兩條路從同一個起點到同一個終點，每個站畫一格點，漏掉的畫成虛線空點；點數是固定示意，圖註要標「示意」；選用 hops = 第一條的跳數（2 或 3，預設 3）
   amplify   誤差沿路放大 vs 精確比對（2026-10-26）：nodes = 兩條路 [{text, sub?}, {text, sub?}]、heads = 第一條的兩端標籤（起點、終點）、outcomes[0] = 第二條的標籤；第一條畫一個越來越寬的楔形，第二條是一條等寬的金色帶；純示意
   receipt   帳單（2026-10-27，SAG 第 4 則）：heads = [抬頭, 「換來的」標籤]、nodes = 品項 2～4 個 [{text, sub?}]（自動編號）、outcomes = 換來的東西 1～3 個 [{text}]（金色小標籤）；米色紙、下緣鋸齒
   squeeze   名額線擠掉了誰（2026-10-27）：heads = [左端標, 右端標, 名額線標]、nodes = [{text, sub?}（上方說明）, {text, sub?}（被擠出去的金點）]、outcomes = 推理鏈兩端 [{text}, {text}]；排隊的點是固定示意，圖註要標「示意」
@@ -62,6 +62,21 @@
   sidecar   另開一扇窗做雜事、只有摘要回來：heads = [主視窗, 側視窗標題]、nodes = [派出那行, 收到摘要那行]、outcomes = [側視窗標籤, 回傳箭頭標籤]
   combo     兩個機制自動組合的例子（上：一個東西被收進另一個；下：兩種來源都套用同一份）：heads = [上標, 下標]、nodes = [被收進去的框, 視窗標題, 箭頭標籤]、outcomes = [來源一, 來源二, 金色那份{text, sub?}]
   stops     由上往下三個停靠點（不按比例）：nodes = [{text, sub?, emph?}]、選用 heads = [上端標籤, 下端標籤]
+  waist     沙漏（2026-10-31，Cerebras RAG 第 1 則）：上段異質來源收斂成一條只有五格的窄帶、下段重新展開。
+            heads = [上段標籤, 窄帶標籤, 下段標籤]、nodes = 上段的來源 2～5 個 [{text}]、outcomes = 下段展開的東西 2～5 個 [{text}]；純示意
+  depend    序列依賴（2026-11-01）：heads = [上段標籤, 下段標籤]、nodes = [{text}（工具 A）, {text}（工具 B）]、outcomes = [{text}（A 的結果）, {text}（斷線旁的字）, {text}（金色框說明）]；上段同時出發、A 的結果送不到 B，下段金色框包成一個工具；純示意
+  pick      勾選單 vs 寫一整段（2026-11-01）：heads = [左標, 右標]、nodes = 勾選單選項 2～5 個 [{text, on?}]、outcomes[0] = {text}（底下金色橫框）；右邊的灰條是示意
+  pile      證據堆原樣交給最後一步（2026-11-01）：heads = [左欄標籤, 金框標籤]、nodes = [{text, sub?}（左欄說明）, {text, sub?}（金框）]、outcomes = 證據卡 2～5 張 [{text}]；純示意
+  addlane   多接一種資料要做多少（2026-11-01）：heads = [上段, 下段]、nodes = 上段每一路的格子 2～3 個 [{text}]、outcomes = [上段新一路說明, 上段右框, 下段新一路說明, 下段右框]；純示意
+  schema    一張只有幾個欄位的表（2026-10-31）：heads = [表名]、nodes = 欄位 3～5 個 [{text（欄位名）, sub（這一欄存什麼）, emph?（金色那一格，只能一個）}]、
+            選用 outcomes[0] = {text}（底下一條金色橫框）
+  branch    形式統一但語意分裂（2026-10-31）：窄帶右邊硬接上幾個來源專屬欄位，它們各拉一條線到下游，下游就得寫分支。
+            heads = [上段標籤, 下段標籤]、nodes = [{text, sub?}（上段說明）, {text, sub?}（下游的檢索邏輯）]、outcomes = 額外欄位 2～3 個 [{text}]；純示意
+  gates     幾道門檻，一條路一路通過、另一條在第一道就被擋下（2026-10-31）：heads = [通過那一條的標籤, 被擋那一條的標籤]、
+            nodes = 門檻 2～4 個 [{text, sub?}]、outcomes = [{text}（通過之後）, {text}（沒過的下場）]；純示意
+  route     路線圖（2026-10-31，人的回饋「讀起來不連貫、不知道處在 journey 的哪裡」）：一條金色的路由上往下走，路上幾站，
+            每站一個編號圓與一句「這一站要回答什麼」；這一則不走的那一段畫成虛線與空心終點。
+            nodes = 站 2～4 個 [{text, sub?}]、選用 heads = [最上面的標籤, 虛線那一段的說明]
 
 規則：圖形全部用 class "bg"（不進程式 B 的文字與圖形重疊檢查），所以排版由這裡負責避開文字；框內的文字由程式 B 的「框內文字不超出框」檢查；
 比例（dumbbell／range）由程式 B 檢查圖形位置與數值成正比。字級只用 {28, 34, 40, 56}。
@@ -148,6 +163,12 @@ class Canvas:
         if sub:
             self.text(x + pad, ty + l1 * (size * 1.3) + 6, iw, sub, "ds", scolor, align, box)
         return bh
+
+    def cell(self, x, y, w, h, s, fill="none", stroke=None, dash=None, color=DEEP, pad=10):
+        """矮格子（約 52px 高）裡放一行字。用 28px 粗體（dl）：34px 的字框約 49px 高，
+        程式 B 取字框外緣四角算對比時會取到格子邊線或格子外的底色。"""
+        self.rect(x, y, w, h, fill=fill, stroke=stroke, dash=dash)
+        self.text(x + pad, y + (h - 39.2) / 2, w - 2 * pad, s, "dl", color, "center", (x, y, w, h))
 
 
 def _fit(total: float, avail: float, what: str) -> None:
@@ -1038,7 +1059,7 @@ def cycle(c: Canvas, spec: dict, y0: float) -> float:
     lw = 300
     c.text(X0, (A[1] + B[1]) / 2 - 22, lw, heads[0], "dn", DEEP, "right")
     c.text(X0 + w / 2 - lw / 2, yb + r + 24, lw, heads[1], "dn", DEEP, "center")
-    c.text(X1 - lw, (A[1] + C[1]) / 2 - 22, lw, heads[2], "dn", DEEP, "left")
+    c.text(X1 - lw, (A[1] + C[1]) / 2 - 52, lw, heads[2], "dn", DEEP, "right")   # 靠右並上移，避開金色箭頭與右下的圓（2026-11-01）
     y = yb + r + under
     if foot:
         y += 28
@@ -1779,8 +1800,12 @@ def scoreboard(c: Canvas, spec: dict, y0: float) -> float:
 # ------------------------------------------------------------------ leak（每一跳都漏一些）
 def leak(c: Canvas, spec: dict, y0: float) -> float:
     """nodes = 兩條路 [{text, sub?}（走很多跳的）, {text, sub?}（一次到位的）]；heads = 箭頭上的標籤（例：剪枝，兩條路共用）。
-    兩條路從同一個起點走到同一個終點：第一條分 3 跳（4 格），第二條一跳（2 格）。每一格是 2 × 5 個點，實心＝留下、虛線空點＝漏掉；點數是固定示意。"""
+    兩條路從同一個起點走到同一個終點：第一條分 3 跳（4 格），第二條一跳（2 格）。每一格是 2 × 5 個點，實心＝留下、虛線空點＝漏掉；點數是固定示意。
+    選用 hops = 第一條的跳數，2 或 3（預設 3；2026-11-01 Cerebras 第 3 則：「摘要的摘要」是壓縮兩次）。"""
     A, B = spec["nodes"]
+    hops = spec.get("hops", 3)
+    if hops not in (2, 3):
+        raise ValueError(f"leak 的 hops 只能是 2 或 3，現在是 {hops}")
     lab = spec["heads"][0]
     w = X1 - X0
     cols, rows_, pitch, rr = 2, 5, 30, 11
@@ -1792,9 +1817,9 @@ def leak(c: Canvas, spec: dict, y0: float) -> float:
     _fit(total, BOTTOM - y0, "leak")
     extra = min((BOTTOM - y0 - total) / 2, 50)
     y = y0
-    xs_a = [X0 + i * ((w - binw) / 3) for i in range(4)]
+    xs_a = [X0 + i * ((w - binw) / hops) for i in range(hops + 1)]
     xs_b = [X0, X0 + w - binw]
-    plans = ((A, xs_a, [10, 8, 6, 5], TEAL, False), (B, xs_b, [10, 9], DEEP, True))
+    plans = ((A, xs_a, [10, 8, 6, 5] if hops == 3 else [10, 7, 5], TEAL, False), (B, xs_b, [10, 9], DEEP, True))
     for n, xs, keep, col, win in plans:
         c.text(X0, y, w, n["text"], "dn", DEEP, "left")
         if n.get("sub"):
@@ -2769,6 +2794,455 @@ def sidecar(c: Canvas, spec: dict, y0: float) -> float:
     return y0 + H
 
 
+# ------------------------------------------------------------------ 2026-10-31（Cerebras RAG 第 1 則）：waist／schema／branch／gates
+WAIST_CELLS = 5          # 窄帶永遠畫五格（系列哲學：窄到一眼數得完）
+WAIST_GOLD = 2           # 金色給中間那一格，與封面的小沙漏一致
+
+
+def _waist_bar(c: Canvas, cx: float, y: float, bw: float = 460, h: float = 72) -> None:
+    """一條只有五格的深海色窄帶，第三格金色。"""
+    x0, cw = cx - bw / 2, bw / WAIST_CELLS
+    c.rect(x0, y, bw, h, fill=DEEP, rx=10)
+    for i in range(WAIST_CELLS):
+        on = i == WAIST_GOLD
+        c.rect(x0 + i * cw + 7, y + 14, cw - 14, h - 28, fill=GOLD if on else CREAM, rx=4,
+               op=None if on else .24)
+
+
+def waist(c: Canvas, spec: dict, y0: float) -> float:
+    """沙漏：上段的異質來源各一個框，收斂到中間一條只有五格的窄帶，再重新展開成下段幾條路。
+    heads = [上段標籤, 窄帶標籤, 下段標籤]；nodes = 上段的來源 2～5 個 [{text}]；outcomes = 下段展開的東西 2～5 個 [{text}]。純示意。"""
+    hu, hw, hd = spec["heads"]
+    ups, dns = spec["nodes"], spec["outcomes"]
+    if not (2 <= len(ups) <= 5 and 2 <= len(dns) <= 5):
+        raise ValueError("waist 的 nodes 與 outcomes 各要 2～5 個")
+    w = X1 - X0
+    cx = (X0 + X1) / 2
+
+    def row(ns):
+        cw = (w - (len(ns) - 1) * 16) / len(ns)
+        return cw, 20 + max(c.lines(n["text"], cw - 24, 28) for n in ns) * 39.2
+    ucw, uh = row(ups)
+    dcw, dh = row(dns)
+    lab, bar, conv = 46, 72, 70
+    wlab = c.lines(hw, w, 28) * 39.2 + 10          # 窄帶的標籤：整幅居中放在帶子下面（放在帶子旁邊會塞不下而溢出）
+    total = lab + uh + conv + bar + wlab + conv + lab + dh
+    _fit(total, BOTTOM - y0, "waist")
+    conv += min((BOTTOM - y0 - total) / 2, 30)
+    y = y0
+    c.text(X0, y, w, hu, "dl", TEAL, "left")
+    y += lab
+    for i, n in enumerate(ups):                    # 上段：還沒被整理的東西，只有細外框
+        x = X0 + i * (ucw + 16)
+        c.rect(x, y, ucw, uh, fill="none", stroke=MID, sw=3, rx=10)
+        c.text(x + 12, y + 10, ucw - 24, n["text"], "ds", DEEP, "center", (x, y, ucw, uh))
+        c.line(x + ucw / 2, y + uh + 4, cx, y + uh + conv - 4, MID, 2, op=.6)
+    y += uh + conv
+    _waist_bar(c, cx, y)
+    y += bar
+    c.text(X0, y + 5, w, hw, "ds", DEEP, "center")
+    y += wlab
+    for i, n in enumerate(dns):                    # 下段：重新展開，淺藍綠的細線與小圓點
+        x = X0 + i * (dcw + 16)
+        c.line(cx, y + 4, x + dcw / 2, y + conv + lab - 4, LIGHT, 2, op=.85)
+        c.circle(x + dcw / 2, y + conv + lab - 4, 7, fill=LIGHT)
+    y += conv
+    c.text(X0, y, w, hd, "dl", TEAL, "left")
+    y += lab
+    for i, n in enumerate(dns):
+        x = X0 + i * (dcw + 16)
+        c.rect(x, y, dcw, dh, fill=LIGHT, rx=10, op=.20)
+        c.text(x + 12, y + 10, dcw - 24, n["text"], "ds", DEEP, "center", (x, y, dcw, dh))
+    return y + dh
+
+
+def schema(c: Canvas, spec: dict, y0: float) -> float:
+    """一張只有幾個欄位的表：表頭一列深色格子（emph 的那一格金色），每格下面一句「這一欄存什麼」。
+    heads = [表名]；nodes = 欄位 3～5 個 [{text, sub, emph?}]；選用 outcomes[0] = {text}（底下一條金色橫框）。"""
+    cols = spec["nodes"]
+    if not 3 <= len(cols) <= 5:
+        raise ValueError("schema 的 nodes 要 3～5 個欄位")
+    if sum(1 for n in cols if n.get("emph")) > 1:
+        raise ValueError("schema 的 emph 只能有一個（金色只給一個元素）")
+    w = X1 - X0
+    g = 10
+    cw = (w - (len(cols) - 1) * g) / len(cols)
+    iw = cw - 10                                   # 欄位名是拉丁字，欄窄，留白要小一點才不會溢出
+    lab, hh = 46, 58
+    dh = 18 + max(c.lines(n["sub"], iw, 28) for n in cols) * 39.2
+    out = spec.get("outcomes", [])
+    oh = (20 + c.lines(out[0]["text"], w - 44, 34) * 44.2) if out else 0
+    gap = 46 if out else 0
+    total = lab + hh + 8 + dh + gap + oh
+    _fit(total, BOTTOM - y0, "schema")
+    extra = min(BOTTOM - y0 - total, 60)
+    dh += extra * .5
+    y = y0
+    c.text(X0, y, w, spec["heads"][0], "dl", TEAL, "left")
+    y += lab
+    for i, n in enumerate(cols):
+        x = X0 + i * (cw + g)
+        on = n.get("emph")
+        c.rect(x, y, cw, hh, fill=GOLD if on else DEEP, rx=8)
+        c.text(x + 5, y + (hh - 39.2) / 2, iw, n["text"], "ds", DEEP if on else CREAM, "center", (x, y, cw, hh))
+        c.rect(x, y + hh + 8, cw, dh, fill="none", stroke=MID, sw=3, rx=8)
+        c.text(x + 5, y + hh + 8 + 9, iw, n["sub"], "ds", DEEP, "center", (x, y + hh + 8, cw, dh))
+    y += hh + 8 + dh
+    if out:
+        y += gap
+        c.rect(X0, y, w, oh, fill=GOLD, op=.30, stroke=GOLD, sw=4, rx=16)
+        c.text(X0 + 22, y + (oh - c.lines(out[0]["text"], w - 44, 34) * 44.2) / 2, w - 44,
+               out[0]["text"], "dn", DEEP, "left", (X0, y, w, oh))
+        y += oh
+    return y
+
+
+def branch(c: Canvas, spec: dict, y0: float) -> float:
+    """形式統一但語意分裂：窄帶右邊硬接上幾個來源專屬欄位，它們各拉一條線下來，下游就得針對來源寫分支。
+    heads = [上段標籤, 下段標籤]；nodes = [{text, sub?}（上段說明）, {text, sub?}（下游的檢索邏輯）]；outcomes = 額外欄位 2～3 個 [{text}]。純示意。"""
+    hu, hd = spec["heads"]
+    top, low = spec["nodes"]
+    adds = spec["outcomes"]
+    if not 2 <= len(adds) <= 3:
+        raise ValueError("branch 的 outcomes 要 2～3 個額外欄位")
+    w = X1 - X0
+    bw, aw = 420, 400                              # 左邊的窄帶、右邊的額外欄位欄寬
+    ax = X1 - aw
+    ah, agap = 58, 12                              # 框要比字高一截，文字框外緣四角才不會落在虛線框線上（對比度檢查會擋）
+    stack = len(adds) * ah + (len(adds) - 1) * agap
+    band = max(stack, 72)
+    th = c.lines(top["text"], w, 28) * 39.2
+    lh = 20 + _th(c, low, w - 44)
+    lab, arr = 46, 86
+    total = lab + band + 8 + th + arr + lab + lh
+    _fit(total, BOTTOM - y0, "branch")
+    arr += min(BOTTOM - y0 - total, 40)
+    y = y0
+    c.text(X0, y, w, hu, "dl", TEAL, "left")
+    y += lab
+    _waist_bar(c, X0 + bw / 2, y + (band - 72) / 2, bw=bw)
+    px = X0 + bw + 36                              # 窄帶與額外欄位之間一個「＋」
+    c.line(px - 14, y + band / 2, px + 14, y + band / 2, DEEP, 5)
+    c.line(px, y + band / 2 - 14, px, y + band / 2 + 14, DEEP, 5)
+    ay = y + (band - stack) / 2
+    xs = []
+    for i, n in enumerate(adds):                   # 遷就來源硬加上去的欄位：虛線框
+        yy = ay + i * (ah + agap)
+        c.rect(ax, yy, aw, ah, fill="none", stroke=DEEP, sw=3, rx=8, dash="9 7")
+        c.text(ax + 12, yy + (ah - 39.2) / 2, aw - 24, n["text"], "ds", DEEP, "center", (ax, yy, aw, ah))
+        xs.append(ax + aw * (i + 1) / (len(adds) + 1))
+    y += band + 8
+    c.text(X0, y, w, top["text"], "ds", DEEP, "left")
+    y += th
+    for x in xs:                                   # 每個額外欄位都往下長出一條分支
+        c.arrow(x, y + 6, X0 + w / 2 + (x - (ax + aw / 2)) * .25, y + arr + lab - 6, DEEP, 4, 14)
+    _cross(c, X1 - 30, y + arr / 2, 15, DEEP, 5)
+    y += arr
+    c.text(X0, y, w, hd, "dl", TEAL, "left")
+    y += lab
+    c.rect(X0, y, w, lh, fill=DEEP, rx=16)
+    ty = y + (lh - _th(c, low, w - 44)) / 2
+    c.text(X0 + 22, ty, w - 44, low["text"], "dn", CREAM, "left", (X0, y, w, lh))
+    if low.get("sub"):
+        c.text(X0 + 22, ty + c.lines(low["text"], w - 44, 34) * 44.2 + 6, w - 44, low["sub"], "ds", LIGHT, "left", (X0, y, w, lh))
+    return y + lh
+
+
+def gates(c: Canvas, spec: dict, y0: float) -> float:
+    """幾道門檻排成一排：一條金色的路一路通過（每道打勾），另一條在第一道就被叉掉擋下。
+    heads = [通過那一條的標籤, 被擋那一條的標籤]；nodes = 門檻 2～4 個 [{text, sub?}]；outcomes = [{text}（通過之後）, {text}（沒過的下場）]。純示意。"""
+    hp, hs = spec["heads"]
+    gs = spec["nodes"]
+    if not 2 <= len(gs) <= 4:
+        raise ValueError("gates 的 nodes 要 2～4 道門檻")
+    if len(spec["outcomes"]) != 2:
+        raise ValueError("gates 的 outcomes 要 2 個（通過之後、沒過的下場）")
+    ok, no = spec["outcomes"]
+    lw = 220                                       # 左邊兩條路的標籤寬
+    x_first, x_last = X0 + 320, X1 - 120
+    xs = [x_first + i * (x_last - x_first) / max(len(gs) - 1, 1) for i in range(len(gs))]
+    gw = min(240, (xs[1] - xs[0]) - 12 if len(gs) > 1 else 240)      # 每道門檻的標籤寬（相鄰兩道不重疊）
+    nh = max(c.lines(n["text"], gw, 28) for n in gs) * 39.2 + 12
+    sh = max((c.lines(n["sub"], gw, 28) * 39.2 for n in gs if n.get("sub")), default=0)
+    rw = (X1 - X0 - 40) / 2                        # 兩條路的下場：柱子下面一列，左右各一半（柱子之間放字會壓到柱子）
+    rh = max(c.lines(ok["text"], rw, 28), c.lines(no["text"], rw, 28)) * 39.2
+    gh = 186
+    total = nh + gh + 14 + rh + (sh + 16 if sh else 0)
+    _fit(total, BOTTOM - y0, "gates")
+    gh += min(BOTTOM - y0 - total, 50)
+    y = y0
+    for i, n in enumerate(gs):
+        c.text(xs[i] - gw / 2, y, gw, n["text"], "ds", DEEP, "center")
+    gy = y + nh
+    ya, yb = gy + gh * .34, gy + gh * .78
+    for x in xs:                                   # 門檻本身：一根深海色柱子
+        c.rect(x - 9, gy, 18, gh, fill=DEEP, rx=6)
+    th = c.lines(hp, lw, 28) * 39.2
+    c.text(X0, ya - th / 2, lw, hp, "ds", DEEP, "left")
+    th = c.lines(hs, lw, 28) * 39.2
+    c.text(X0, yb - th / 2, lw, hs, "ds", TEAL, "left")
+    c.arrow(X0 + lw + 20, ya, X1 - 6, ya, GOLD, 7, 20)        # 一路通過
+    for x in xs:
+        _tick(c, x, ya, GOLD, 7)
+    c.arrow(X0 + lw + 20, yb, xs[0] - 36, yb, TEAL, 5, 18)    # 第一道就被擋下
+    _cross(c, xs[0], yb, 16, TEAL, 6)
+    y = gy + gh + 14
+    c.text(X0, y, rw, no["text"], "ds", TEAL, "left")
+    c.text(X1 - rw, y, rw, ok["text"], "ds", DEEP, "right")
+    y += rh
+    if sh:                                         # 每道門檻為什麼要設：放在最下面，一欄一段
+        for i, n in enumerate(gs):
+            if n.get("sub"):
+                c.text(xs[i] - gw / 2, y + 16, gw, n["sub"], "ds", TEAL, "center")
+        y += sh + 16
+    return y
+
+
+def route(c: Canvas, spec: dict, y0: float) -> float:
+    """路線圖：一條金色的路由上往下走，路上幾站，每站一個編號圓與一句「這一站要回答什麼」；
+    這一則不走的那一段接在最後一站下面，畫成虛線與空心的終點。
+    heads = [最上面的標籤]（選用 heads[1] = 虛線那一段的說明）；nodes = 站 2～4 個 [{text, sub?}]。"""
+    stops = spec["nodes"]
+    if not 2 <= len(stops) <= 4:
+        raise ValueError("route 的 nodes 要 2～4 站")
+    heads = spec.get("heads", [])
+    w = X1 - X0
+    sx, r = X0 + 54, 38                            # 路（也是編號圓）的 x、圓的半徑
+    tx = X0 + 142
+    tw = X1 - tx
+    lab = 56 if heads else 0
+    pad = r - 22                                   # 編號圓比文字高，上緣會超出文字頂端，先留這段才不會壓到上面
+    hs = [c.lines(n["text"], tw, 34) * 44.2 + (c.lines(n["sub"], tw, 28) * 39.2 + 8 if n.get("sub") else 0) for n in stops]
+    th = c.lines(heads[1], tw, 28) * 39.2 if len(heads) > 1 else 0
+    tail = th + 60 if th else 0                    # 虛線尾巴：ey 最多 y+70，字置中在 ey，所以 th/2 之外留 60 就夠
+    gap = 44
+    total = lab + pad + sum(hs) + gap * (len(stops) - 1) + tail
+    _fit(total, BOTTOM - y0, "route")
+    gap += min((BOTTOM - y0 - total) / max(len(stops) - 1 + (1 if tail else 0), 1), 90)
+    y = y0
+    if heads:
+        c.text(X0, y, w, heads[0], "dl", TEAL, "left")
+        y += lab
+    y += pad
+    cys = [y + 22 + sum(hs[:i]) + gap * i for i in range(len(stops))]
+    c.line(sx, cys[0], sx, cys[-1], GOLD, 10)      # 走完的那一段：一條金色的路
+    for i, n in enumerate(stops):
+        cy, top = cys[i], cys[i] - 22
+        c.circle(sx, cy, r, fill=DEEP)
+        c.text(sx - 26, cy - 20, 52, str(i + 1), "dl", CREAM, "center", (sx - 26, cy - 26, 52, 52))
+        c.text(tx, top, tw, n["text"], "dn", DEEP, "left")
+        if n.get("sub"):
+            c.text(tx, top + c.lines(n["text"], tw, 34) * 44.2 + 8, tw, n["sub"], "ds", TEAL, "left")
+    y += sum(hs) + gap * (len(stops) - 1)
+    if tail:                                       # 這一則不走的那一段：虛線接到一個空心的終點
+        ey = y + min(gap, 70)
+        c.line(sx, cys[-1] + r + 8, sx, ey - 18, TEAL, 5, dash="12 10")
+        c.circle(sx, ey, 14, fill=CREAM, stroke=TEAL, sw=4)
+        c.text(tx, ey - th / 2, tw, heads[1], "ds", TEAL, "left")
+        y = ey + max(th / 2, 22)
+    return y
+
+
+# ------------------------------------------------------------------ depend（B 要等 A 的結果：平行做不到，固定兩步可包成一個工具）
+def depend(c: Canvas, spec: dict, y0: float) -> float:
+    """序列依賴（2026-11-01，Cerebras 第 3 則）：heads = [上段標籤, 下段標籤]；nodes = [{text}（工具 A）, {text}（工具 B，要用 A 的結果）]；
+    outcomes = [{text}（A 查到的結果）, {text}（斷掉的虛線旁的字）, {text}（金色框底下的說明）]。
+    上段：A、B 從同一條起跑線同時出發，A 的結果用虛線送不到 B（打叉）；下段：金色框把 A → B 包成一個工具。純示意。"""
+    ha, hb = spec["heads"][:2]
+    a, b = spec["nodes"][:2]
+    if len(spec.get("outcomes", [])) < 3:
+        raise ValueError("depend 的 outcomes 要 3 項：A 的結果、斷線旁的字、金色框的說明")
+    res, brk, wrap = spec["outcomes"][:3]
+    w = X1 - X0
+    bw, bh, lg = 380, 80, 56
+    rx0 = X0 + 40 + bw + 90
+    rw = X1 - rx0
+    wraph = c.lines(wrap["text"], w - 60, 28) * 39.2
+    top = 44 + 2 * bh + lg
+    bot = 56 + 30 + bh + 16 + wraph + 26
+    total = top + 40 + bot
+    _fit(total, BOTTOM - y0, "depend")
+    ex = min(36.0, (BOTTOM - y0 - total) / 3)
+    lg += ex
+    # 上段：同一條起跑線
+    c.text(X0, y0, w, ha, "dl", TEAL)
+    ly = y0 + 44
+    c.rect(X0, ly - 8, 12, 2 * bh + lg + 16, fill=TEAL, rx=6)
+    ya, yb = ly, ly + bh + lg
+    for yy, n in ((ya, a), (yb, b)):
+        c.line(X0 + 12, yy + bh / 2, X0 + 40, yy + bh / 2, TEAL, 5)
+        c.textbox(X0 + 40, yy, bw, n["text"], None, h=bh, align="center", pad=10)
+    c.arrow(X0 + 40 + bw + 10, ya + bh / 2, rx0 - 10, ya + bh / 2, TEAL, 5, 16)
+    c.textbox(rx0, ya, rw, res["text"], None, fill=CREAM, tcolor=DEEP, stroke=DEEP, h=bh, align="center", pad=10)
+    sx, sy = rx0 + rw / 2, ya + bh + 6
+    tx, ty = X0 + 40 + bw + 8, yb + bh / 2
+    c.line(sx, sy, sx, ty, TEAL, 4, dash="10 8")
+    c.line(sx, ty, tx + 14, ty, TEAL, 4, dash="10 8")
+    mx = (sx + tx) / 2 + 20
+    c.circle(mx, ty, 22, fill=CREAM, stroke=TEAL, sw=4)
+    _cross2(c, mx, ty, 9, TEAL, 5)
+    c.text(tx + 30, ty - 72, sx - tx - 50, brk["text"], "ds", TEAL, "center")   # 斷線上方，避開叉
+    # 下段：金色框包成一個工具
+    y = yb + bh + 40
+    c.text(X0, y, w, hb, "dl", TEAL)
+    gy = y + 56
+    gh = 30 + bh + 16 + wraph + 26 - 30
+    c.rect(X0, gy, w, gh, fill=GOLD, stroke=GOLD, sw=4, rx=20, op=.30)
+    c.rect(X0, gy, w, gh, fill="none", stroke=GOLD, sw=5, rx=20)
+    iy = gy + 20
+    iw = (w - 60 - 80) / 2
+    c.textbox(X0 + 30, iy, iw, a["text"], None, h=bh, align="center", pad=10)
+    c.arrow(X0 + 30 + iw + 10, iy + bh / 2, X0 + 30 + iw + 70, iy + bh / 2, DEEP, 5, 16)
+    c.textbox(X0 + 30 + iw + 80, iy, iw, b["text"], None, h=bh, align="center", pad=10)
+    c.text(X0 + 30, iy + bh + 16, w - 60, wrap["text"], "ds", DEEP, "left")
+    return gy + gh
+
+
+def pick(c: Canvas, spec: dict, y0: float) -> float:
+    """勾選單 vs 寫一整段（2026-11-01，Cerebras 第 3 則「planner 只做分類」）：heads = [左標, 右標]；
+    nodes = 左邊勾選單的選項 2～5 個 [{text, on?}]（on 的格子打勾）；outcomes[0] = {text}（底下金色橫框）。
+    左邊是一張短短的勾選單，右邊同樣大的紙上寫滿一行行的字（灰條，示意「要從頭寫出一段文字」）。純示意。"""
+    hl, hr = spec["heads"][:2]
+    opts = spec["nodes"]
+    if not 2 <= len(opts) <= 5:
+        raise ValueError(f"pick 的 nodes（選項）要 2～5 個，現在是 {len(opts)}")
+    if not spec.get("outcomes"):
+        raise ValueError("pick 要有 outcomes[0]（底下金色橫框）")
+    foot = spec["outcomes"][0]
+    w, pw, gap = X1 - X0, 440, 40
+    rx = X0 + pw + gap
+    fh = c.lines(foot["text"], w - 44, 34) * 44.2 + 44
+    rh = 66
+    total = 56 + 40 + len(opts) * rh + 30 + fh
+    _fit(total, BOTTOM - y0, "pick")
+    rh += min((BOTTOM - y0 - total) / len(opts), 24)
+    ph = 40 + len(opts) * rh
+    c.text(X0, y0, pw, hl, "dl", TEAL)
+    c.text(rx, y0, pw, hr, "dl", TEAL)
+    y = y0 + 56
+    c.rect(X0, y, pw, ph, fill="none", stroke=DEEP, sw=4, rx=18)
+    for i, o in enumerate(opts):
+        cy = y + 20 + i * rh + rh / 2
+        c.rect(X0 + 30, cy - 18, 36, 36, fill=TEAL if o.get("on") else "none", stroke=TEAL, sw=4, rx=6)
+        if o.get("on"):
+            _tick(c, X0 + 48, cy, CREAM, 5)
+        c.text(X0 + 86, cy - 23, pw - 110, o["text"], "dt", DEEP if o.get("on") else TEAL, "left", (X0, y, pw, ph))
+    c.rect(rx, y, pw, ph, fill="none", stroke=DEEP, sw=4, rx=18)
+    n = int((ph - 40) // 34)
+    for i in range(n):
+        lw = (pw - 60) * (0.55 if i == n - 1 else (0.92, 0.84, 0.97, 0.78)[i % 4])
+        c.rect(rx + 30, y + 26 + i * 34, lw, 12, fill=DEEP, rx=6, op=.28)
+    y += ph + 30
+    c.textbox(X0, y, w, foot["text"], None, fill=GOLD, tcolor=DEEP, align="center", h=fh)
+    return y + fh
+
+
+def pile(c: Canvas, spec: dict, y0: float) -> float:
+    """證據堆原樣交給最後一步（2026-11-01，Cerebras 第 3 則「推理放最後」）：heads = [左欄標籤, 金框上方標籤]；
+    nodes = [{text, sub?}（左欄底下的說明）, {text, sub?}（金框：最後一步）]；outcomes = 證據卡片 2～5 張 [{text}]（每張的來源標籤）。
+    左邊一疊證據卡（標籤加兩條灰條，示意原始內容），每張各一條箭頭匯進右邊同一個金框。純示意。"""
+    hl, hr = spec["heads"][:2]
+    note, gold = spec["nodes"][:2]
+    cards = spec.get("outcomes", [])
+    if not 2 <= len(cards) <= 5:
+        raise ValueError(f"pile 的 outcomes（證據卡）要 2～5 張，現在是 {len(cards)}")
+    lw, gx = 400, X0 + 400 + 120
+    gw = X1 - gx
+    ch, cg = 70, 18
+    nh = c.lines(note["text"], lw, 34) * 44.2 + (c.lines(note["sub"], lw, 28) * 39.2 + 6 if note.get("sub") else 0)
+    total = 56 + len(cards) * (ch + cg) - cg + 24 + nh
+    _fit(total, BOTTOM - y0, "pile")
+    ex = BOTTOM - y0 - total
+    ch += min(ex * 0.5 / len(cards), 20)
+    cg += min(ex * 0.3 / max(len(cards) - 1, 1), 24)
+    c.text(X0, y0, lw, hl, "dl", TEAL)
+    y = y0 + 56
+    ys = []
+    for k in cards:
+        c.rect(X0, y, lw, ch, fill="none", stroke=DEEP, sw=3, rx=12)
+        c.text(X0 + 22, y + (ch - 44) / 2, 170, k["text"], "dn", DEEP, "left", (X0, y, lw, ch))
+        c.rect(X0 + 210, y + ch / 2 - 16, 160, 11, fill=DEEP, rx=5, op=.28)
+        c.rect(X0 + 210, y + ch / 2 + 6, 110, 11, fill=DEEP, rx=5, op=.28)
+        ys.append(y + ch / 2)
+        y += ch + cg
+    stack_bot = y - cg
+    c.text(X0, stack_bot + 24, lw, note["text"], "dn", DEEP, "left")
+    if note.get("sub"):
+        c.text(X0, stack_bot + 24 + c.lines(note["text"], lw, 34) * 44.2 + 6, lw, note["sub"], "ds", TEAL, "left")
+    mid = (y0 + 56 + stack_bot) / 2
+    gh = c.lines(gold["text"], gw - 44, 34) * 44.2 + (c.lines(gold["sub"], gw - 44, 28) * 39.2 + 6 if gold.get("sub") else 0) + 60
+    gy = mid - gh / 2
+    c.text(gx, gy - 50, gw, hr, "dl", TEAL)
+    for i, cy in enumerate(ys):
+        ty = gy + 30 + (gh - 60) * (i + .5) / len(ys)
+        c.arrow(X0 + lw + 8, cy, gx - 10, ty, TEAL, 4, 14)
+    c.textbox(gx, gy, gw, gold["text"], gold.get("sub"), fill=GOLD, tcolor=DEEP, scolor=DEEP, h=gh)
+    return max(stack_bot + 24 + nh, gy + gh)
+
+
+def addlane(c: Canvas, spec: dict, y0: float) -> float:
+    """多接一種資料要做多少（2026-11-01，Cerebras 第 3 則「多一種資料只要加一個工具」）：heads = [上段標籤, 下段標籤]；
+    nodes = 上段每一路的格子 2～3 個 [{text}]（例：搜尋、推理、摘要；下段每一路只有第一格）；
+    outcomes = [{text}（上段新增那一路的說明）, {text}（上段右邊的框）, {text}（下段新增那一路的說明）, {text}（下段右邊的框）]。
+    兩段各三路：前兩路是現有的，第三路是新接的；上段新的一路整排虛線格子，下段新的一路只有一個金色格子。純示意。"""
+    ht, hb = spec["heads"][:2]
+    parts = spec["nodes"]
+    if not 2 <= len(parts) <= 3:
+        raise ValueError(f"addlane 的 nodes（每一路的格子）要 2～3 個，現在是 {len(parts)}")
+    if len(spec.get("outcomes", [])) < 4:
+        raise ValueError("addlane 的 outcomes 要 4 項：上段新的一路、上段右框、下段新的一路、下段右框")
+    new_t, box_t, new_b, box_b = spec["outcomes"][:4]
+    bw = 200
+    bx = X1 - bw
+    lane_w = bx - 50 - X0
+    cg = 20
+    cw = (lane_w - cg * (len(parts) - 1)) / len(parts)
+    rh, rg = 52, 10          # 格子的 pad 要大於圓角（程式 B 取字框外緣四角的背景色算對比）
+    nt = c.lines(new_t["text"], lane_w, 28) * 39.2
+    sec = 46 + 3 * rh + 2 * rg
+    nb = c.lines(new_b["text"], lane_w, 28) * 39.2
+    total = sec + 6 + nt + 30 + sec + 6 + nb
+    _fit(total, BOTTOM - y0, "addlane")
+    ex = BOTTOM - y0 - total
+    rh += min(ex * 0.5 / 6, 14)
+    rg += min(ex * 0.2 / 4, 10)
+    sec = 46 + 3 * rh + 2 * rg
+
+    def lanes(y, full):
+        c.text(X0, y, X1 - X0, ht if full else hb, "dl", TEAL)
+        ry = y + 46
+        cys = []
+        for r in range(3):
+            new = r == 2
+            n = len(parts) if full else 1
+            for k in range(n):
+                x = X0 + k * (cw + cg)
+                if new and not full:
+                    fill, tc, st, da = GOLD, DEEP, None, None
+                elif new:
+                    fill, tc, st, da = "none", TEAL, TEAL, "10 8"
+                else:
+                    fill, tc, st, da = DEEP, CREAM, None, None
+                c.cell(x, ry, cw, rh, parts[k]["text"], fill=fill, stroke=st, dash=da, color=tc)
+                if k < n - 1:
+                    c.line(x + cw + 3, ry + rh / 2, x + cw + cg - 3, ry + rh / 2, TEAL if new else DEEP, 4, dash="6 6" if new and full else None)
+            end = X0 + n * cw + (n - 1) * cg
+            cys.append((end, ry + rh / 2, new))
+            ry += rh + rg
+        top, bot = y + 46, ry - rg
+        c.textbox(bx, top, bw, box_t["text"] if full else box_b["text"], None, fill=CREAM, tcolor=DEEP, stroke=DEEP, h=bot - top, align="center", pad=12)
+        for end, cy, new in cys:
+            c.arrow(end + 8, cy, bx - 10, cy, TEAL, 4, 14) if not (full and new) else c.line(end + 8, cy, bx - 10, cy, TEAL, 4, dash="6 6")
+        return bot, cys
+
+    bot, _ = lanes(y0, True)
+    c.text(X0, bot + 6, lane_w, new_t["text"], "ds", TEAL, "left")
+    y = bot + 6 + nt + 30 + min(ex * 0.3, 40)
+    bot2, _ = lanes(y, False)
+    c.text(X0, bot2 + 6, lane_w, new_b["text"], "ds", DEEP, "left")
+    return bot2 + 6 + nb
+
+
 KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "paths": paths, "epochs": epochs,
          "dotgrid": dotgrid, "dumbbell": dumbbell, "range": range_chart, "funnel": funnel,
          "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation, "tokens": tokens,
@@ -2776,7 +3250,9 @@ KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "
          "roles": roles, "embed": embed, "online": online, "gate": gate, "concat": concat, "joint": joint, "rails": rails, "scoreboard": scoreboard, "leak": leak, "amplify": amplify,
          "receipt": receipt, "squeeze": squeeze, "alias": alias, "handoff": handoff, "mismatch": mismatch, "ledger": ledger,
          "transcript": transcript, "oneloop": oneloop, "intercept": intercept, "dial": dial, "lanes": lanes, "layers": layers, "turn": turn,
-         "sockets": sockets, "lazy": lazy, "hub": hub, "pinned": pinned, "compact": compact, "sidecar": sidecar, "combo": combo}
+         "sockets": sockets, "lazy": lazy, "hub": hub, "pinned": pinned, "compact": compact, "sidecar": sidecar, "combo": combo,
+         "waist": waist, "schema": schema, "branch": branch, "gates": gates, "route": route, "depend": depend,
+         "pick": pick, "pile": pile, "addlane": addlane}
 
 
 def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:

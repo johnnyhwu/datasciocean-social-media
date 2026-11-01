@@ -1,0 +1,40 @@
+{
+  "post": "out/cerebras-rag/slack-vector-failure-orthogonal-signals",
+  "blocks": [
+    {"block": "Threads 正文", "atoms": [
+      {"text": "（hook）搜尋出三種毛病，Cerebras 不是多加幾招，是一種毛病配一帖藥", "verdict": "完全支持",
+       "card_quote": "Cerebras 沒有隨便疊加幾種常見訊號了事，而是先精確診斷每種失效的根因，再找一個訊號的數學性質剛好不受那個根因影響", "note": "hook 留白可接受；「三種」來自 c3 原文「純向量搜尋在這種資料上有三種很具體的失效模式」，限定（純向量搜尋、Slack 對話資料）在正文第一句出現。"},
+      {"text": "Cerebras 內部知識庫的資料包含 Slack 這類對話資料", "verdict": "完全支持",
+       "card_quote": "Cerebras 內部知識庫系統「Cerebras Knowledge」…資料橫跨 Slack、Wiki、程式碼倉庫、Jira", "note": "c2 支持；「對話資料（像 Slack）」與卡標題「純向量搜尋在對話資料上會失效」一致。"},
+      {"text": "對話資料用純向量搜尋會出三種毛病", "verdict": "完全支持",
+       "card_quote": "原因是純向量搜尋在這種資料上有三種很具體的失效模式", "note": "c3 source_quote 逐字支持。"},
+      {"text": "毛病一：語意方向相近的廢話和乾貨分不開", "verdict": "完全支持",
+       "card_quote": "一句廢話跟一句乾貨，只要語意方向都跟查詢接近，分數可能非常相近，向量搜尋分不出「這句話語意相關」跟「這句話有料」的差別", "note": "c4；保留了「語意方向相近」這個條件。"},
+      {"text": "毛病二：短訊息的相似度分數佔便宜", "verdict": "完全支持",
+       "card_quote": "短訊息在 cosine 相似度計算上會系統性佔便宜", "note": "c5。"},
+      {"text": "毛病三：有些訊息脫離上下文就沒有意義", "verdict": "完全支持",
+       "card_quote": "單獨一句「that fixed it」脫離對話脈絡完全沒有意義", "note": "c7；「有些訊息」範圍未放大。"},
+      {"text": "他們沒有隨便疊幾種常見訊號，而是先診斷每種毛病的根因，再找一個不受那個根因影響的訊號", "verdict": "完全支持",
+       "card_quote": "Cerebras 沒有隨便疊加幾種常見訊號了事，而是先精確診斷每種失效的根因，再找一個訊號的數學性質剛好不受那個根因影響", "note": "c1，部落格判斷以作者口吻直述，未比卡強。"},
+      {"text": "三個對應訊號：詞有多稀有（IDF）、精確比對字詞的全文搜尋、以整個討論串為處理單位", "verdict": "完全支持",
+       "card_quote": "語意方向掩蓋內容價值 | IDF（詞彙稀有度）…短訊息佔便宜 | 全文搜尋 | 精確 token 匹配，不受長短影響…上下文依賴 | 處理單位選 thread", "note": "c8，對應順序與毛病一致。"},
+      {"text": "訊號疊加要有用，失效模式必須「正交」（不會在同一種輸入上一起失效）", "verdict": "完全支持",
+       "card_quote": "兩種訊號要疊加才有意義，前提是它們的失效模式必須「正交」。如果兩種訊號對同一種輸入都會失效，疊加根本沒解決任何問題", "note": "c10；括號白話解釋與卡意思一致。"},
+      {"text": "多路搜完之後，各路分數沒辦法互比", "verdict": "完全支持",
+       "card_quote": "系統同時用好幾種檢索器打同一個查詢…不同檢索器的分數完全沒辦法直接比較", "note": "rrf-rank-fusion:c3，背景說明。"},
+      {"text": "RRF 只用名次合併各路結果", "verdict": "完全支持",
+       "card_quote": "RRF 最核心的巧思在於：它只用「名次」不用「分數」", "note": "rrf-rank-fusion:c1。"},
+      {"text": "k = 60 是 RRF 的平滑常數", "verdict": "完全支持",
+       "card_quote": "其中 k = 60（這個平滑常數來自 Cormack 等人在 2009 年那篇論文的建議值）", "note": "rrf-rank-fusion:c6（未列入引用但卡上有）。"},
+      {"text": "選 k = 60 等於選擇相信多路的共識", "verdict": "完全支持",
+       "card_quote": "選 k=60，等於 Cerebras 選擇了「寧可相信多個獨立訊號的共識，也不要被單一路的巧合命中牽著走」", "note": "rrf-rank-fusion:c8，簡化未放大。"},
+      {"text": "RRF 的弱點：某一路完全沒撈到正確答案時，共識反而變成懲罰", "verdict": "完全支持",
+       "card_quote": "一旦正確答案在某一路完全缺席（連候選都沒進去），RRF 對那一路的貢獻是 0，「共識」機制反而變成「懲罰」", "note": "rrf-rank-fusion:c13。"},
+      {"text": "補法是各路多撈一些候選、取聯集（不只信 RRF 分數），再交給 reranker 重新打分，它不看候選來自幾路", "verdict": "完全支持",
+       "card_quote": "各路拉深召回後取聯集（不只信 RRF 分數），交給 cross-encoder 重新逐一打分——reranker 對查詢跟文件直接配對評估，不管來源路數", "note": "rrf-rank-fusion:c17，部落格判斷以作者口吻直述；未寫成 Cerebras 已實作，也未保留「天生免疫」等更強說法。"}
+    ],
+    "errors": []}
+  ],
+  "recalculations": [],
+  "gaps": []
+}

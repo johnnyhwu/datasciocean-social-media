@@ -1,0 +1,73 @@
+{
+  "post": "slack-vector-failure-orthogonal-signals",
+  "blocks": [
+    {
+      "block": "第 16 張",
+      "atoms": [
+        {"text": "主標：RRF 合成之後，再交給 reranker（先後順序：RRF 融合在前、rerank 在後）", "verdict": "完全支持",
+         "card_quote": "融合排序算完之後，還有去重跟限額…以及 rerank 之後的補回上下文", "note": "rrf-rank-fusion:c11 交代融合排序之後才有 rerank 等收尾步驟，順序與主標一致。"},
+        {"text": "補法在 RRF 的下一站：reranker（reranker 用來補 RRF 的弱點）", "verdict": "完全支持",
+         "card_quote": "最根本的做法是讓 reranker 補 RRF 的結構弱點", "note": "rrf-rank-fusion:c17；貼文省略「最根本」只是語氣較弱。"},
+        {"text": "reranker 是一種模型", "verdict": "完全支持",
+         "card_quote": "reranker（一種 cross-encoder 模型）", "note": "rrf-rank-fusion:c10。"},
+        {"text": "reranker 把查詢跟每份候選文件一對一配對打分", "verdict": "完全支持",
+         "card_quote": "reranker 會把查詢跟每一份候選文件逐一配對，直接輸出相關性分數", "note": "rrf-rank-fusion:c10，白話等強。"},
+        {"text": "reranker 不看候選來自幾路", "verdict": "完全支持",
+         "card_quote": "reranker 對查詢跟文件直接配對評估，不管來源路數", "note": "rrf-rank-fusion:c17。"},
+        {"text": "所以送進 reranker 的候選，改成各路多撈一些再取聯集", "verdict": "完全支持",
+         "card_quote": "各路拉深召回後取聯集（不只信 RRF 分數），交給 cross-encoder 重新逐一打分", "note": "rrf-rank-fusion:c17；「多撈一些」是「拉深召回」的白話，未加具體數字或新因果。"},
+        {"text": "圖第 1 格：各路各自搜，每一路多撈一些", "verdict": "完全支持",
+         "card_quote": "各路拉深召回後取聯集", "note": "rrf-rank-fusion:c17。"},
+        {"text": "圖第 2 格：RRF 用名次合成一份排序", "verdict": "完全支持",
+         "card_quote": "RRF 最核心的巧思在於它只用「名次」不用「分數」", "note": "rrf-rank-fusion:c1；在 reranker 之前的順序由 c11 支持。"},
+        {"text": "圖第 3 格：reranker 逐一配對、重新打分", "verdict": "完全支持",
+         "card_quote": "交給 cross-encoder 重新逐一打分", "note": "rrf-rank-fusion:c17。"},
+        {"text": "圖第 3 格小字：候選是各路撈到的聯集，不只信 RRF 分數", "verdict": "完全支持",
+         "card_quote": "各路拉深召回後取聯集（不只信 RRF 分數）", "note": "rrf-rank-fusion:c17，幾乎逐字。"},
+        {"text": "圖金色結論：正確答案只要進了聯集，就有機會排到最前面，不管它來自幾路", "verdict": "完全支持",
+         "card_quote": "不管來源路數，只要正確答案進了聯集就有機會被排到最前面", "note": "rrf-rank-fusion:c17，保留「有機會」，未寫成必然。"}
+      ],
+      "errors": []
+    },
+    {
+      "block": "Threads 正文",
+      "atoms": [
+        {"text": "首行：搜尋出三種毛病，Cerebras 不是多加幾招，是一種毛病配一帖藥", "verdict": "完全支持",
+         "card_quote": "Cerebras 沒有隨便疊加幾種常見訊號了事，而是先精確診斷每種失效的根因，再找一個訊號的數學性質剛好不受那個根因影響", "note": "c1（部落格判斷）加 c8 的三組對應；三種毛病見 c3 的引文。"},
+        {"text": "Cerebras 內部知識庫的對話資料（像 Slack）用純向量搜尋會出三種毛病", "verdict": "完全支持",
+         "card_quote": "原因是純向量搜尋在這種資料上有三種很具體的失效模式。", "note": "c3 的 source_quote；知識庫與 Slack 見 c2。"},
+        {"text": "語意方向相近的廢話和乾貨分不開", "verdict": "完全支持",
+         "card_quote": "一句廢話跟一句乾貨，只要語意方向都跟查詢接近，分數可能非常相近", "note": "c4。"},
+        {"text": "短訊息的相似度分數佔便宜", "verdict": "完全支持",
+         "card_quote": "短訊息在 cosine 相似度計算上會系統性佔便宜", "note": "c5。"},
+        {"text": "有些訊息脫離上下文就沒有意義", "verdict": "完全支持",
+         "card_quote": "單獨一句「that fixed it」脫離對話脈絡完全沒有意義", "note": "c7；「有些訊息」比卡的單例略泛，但卡將其歸為上下文依賴這一類失效，屬等強白話。"},
+        {"text": "他們沒有隨便疊幾種常見訊號，而是先診斷每種毛病的根因，再找一個不受那個根因影響的訊號", "verdict": "完全支持",
+         "card_quote": "Cerebras 沒有隨便疊加幾種常見訊號了事，而是先精確診斷每種失效的根因，再找一個訊號的數學性質剛好不受那個根因影響", "note": "c1，部落格判斷以作者口吻寫，未比卡強。"},
+        {"text": "三個訊號：詞有多稀有（IDF）、精確比對字詞的全文搜尋、以整個討論串為處理單位", "verdict": "完全支持",
+         "card_quote": "語意方向掩蓋內容價值，對應 IDF（詞彙稀有度）…短訊息佔便宜，對應全文搜尋，因為是精確 token 匹配…上下文依賴，對應處理單位選 thread", "note": "c8，順序與毛病一一對應。"},
+        {"text": "訊號疊加要有用，失效模式必須「正交」（不會在同一種輸入上一起失效）", "verdict": "完全支持",
+         "card_quote": "兩種訊號要疊加才有意義，前提是它們的失效模式必須「正交」；如果兩種訊號對同一種輸入都會失效，疊加根本沒解決任何問題", "note": "c10；括號定義與卡一致。"},
+        {"text": "多路搜完之後，各路分數沒辦法互比", "verdict": "完全支持",
+         "card_quote": "不同檢索器的分數完全沒辦法直接比較", "note": "rrf-rank-fusion:c3。"},
+        {"text": "所以 RRF 只用名次合併各路結果", "verdict": "完全支持",
+         "card_quote": "它只用「名次」不用「分數」…這一招直接繞開了「分數尺度不可比」這個難題", "note": "rrf-rank-fusion:c1，「所以」的因果與卡一致。"},
+        {"text": "選 k = 60（它的平滑常數）", "verdict": "完全支持",
+         "card_quote": "Cerebras 的 RRF 設定 k = 60（這個平滑常數來自 Cormack 等人在 2009 年那篇論文的建議值）", "note": "rrf-rank-fusion:c6（引用欄未列 c6，但內容有卡支撐）；設計參數主詞上下文為 RRF／Cerebras。"},
+        {"text": "選 k = 60 等於選擇相信多路的共識", "verdict": "完全支持",
+         "card_quote": "選 k=60，等於 Cerebras 選擇了「寧可相信多個獨立訊號的共識，也不要被單一路的巧合命中牽著走」", "note": "rrf-rank-fusion:c8。"},
+        {"text": "RRF 弱點：某一路完全沒撈到正確答案時，共識反而變成懲罰", "verdict": "完全支持",
+         "card_quote": "一旦正確答案在某一路完全缺席，RRF 對那一路的貢獻是 0，「共識」機制反而變成「懲罰」", "note": "rrf-rank-fusion:c13。"},
+        {"text": "補法是在 RRF 之後再交給 reranker 重新打分", "verdict": "部分支持",
+         "card_quote": "最根本的做法是讓 reranker 補 RRF 的結構弱點：各路拉深召回後取聯集（不只信 RRF 分數），交給 cross-encoder 重新逐一打分", "note": "卡上 reranker 能補弱點的條件是候選改為各路拉深召回後的聯集、不只信 RRF 分數；正文只寫「RRF 之後交給 reranker」，掉了這個條件，讀起來像只對 RRF 結果重排即可補上。"},
+        {"text": "reranker 不看候選來自幾路", "verdict": "完全支持",
+         "card_quote": "reranker 對查詢跟文件直接配對評估，不管來源路數", "note": "rrf-rank-fusion:c17。"}
+      ],
+      "errors": ["限定條件掉了"]
+    }
+  ],
+  "recalculations": [],
+  "gaps": [
+    {"description": "Threads 正文講 reranker 補法時，漏了卡上該補法成立所依賴的條件：候選要是各路拉深召回後取的聯集、不只信 RRF 分數，且正確答案要進了聯集才有機會被排到前面。", "card_quote": "各路拉深召回後取聯集（不只信 RRF 分數），交給 cross-encoder 重新逐一打分——reranker 對查詢跟文件直接配對評估，不管來源路數，只要正確答案進了聯集就有機會被排到最前面"}
+  ]
+}

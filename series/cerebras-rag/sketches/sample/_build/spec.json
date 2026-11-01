@@ -1,0 +1,107 @@
+{
+  "series": "cerebras-rag",
+  "concept": "slack-vector-failure-orthogonal-signals",
+  "also_concepts": ["rrf-rank-fusion"],
+  "lang": "zh-TW",
+  "status": "draft",
+  "_note": "沙漏風格的版型樣張，不是要發布的貼文。內容取自第 2 則的兩張卡，只為了讓人看九種版型長什麼樣。",
+  "hook": {
+    "style": "讀者疑問",
+    "title": "一路搜不夠，\n多路的排名怎麼[[合成一份]]？",
+    "subtitle": "分數的尺度不能比，但名次可以。\n只是「看共識」也有它會失手的時候。",
+    "refs": ["c1", "rrf-rank-fusion:c1"],
+    "candidate": "樣張暫用"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "一路搜不夠，\n多路的排名怎麼[[合成一份]]？",
+      "body": "分數的尺度不能比，但名次可以。\n只是「看共識」也有它會失手的時候。",
+      "refs": ["c1", "rrf-rank-fusion:c1"]
+    },
+    {
+      "layout": "recap",
+      "title": "[[前情提要]]與這一則重點",
+      "current": "slack-vector-failure-orthogonal-signals",
+      "refs": ["結構"]
+    },
+    {
+      "layout": "context",
+      "title": "先講三個會一直出現的詞",
+      "body": "這一則會一直提到三個詞，先用白話講一次，後面就不再解釋。",
+      "rows": [
+        ["向量搜尋", "把文字變成一串數字，比的是「意思像不像」"],
+        ["全文搜尋", "比的是「字面有沒有出現」，一個字一個字對"],
+        ["詞彙稀有度", "一個詞越少見，它出現時越能說明這段話在講什麼"]
+      ],
+      "key_w": 280,
+      "refs": ["c4", "c8"]
+    },
+    {
+      "layout": "text",
+      "title": "向量分不出「相關」\n跟「有料」",
+      "body": "把文字壓成向量的過程，只留得住「意思的方向」，留不住「這段話有多少實際資訊」。所以一句廢話和一句乾貨，只要意思都靠近問題，分數可能差不多。",
+      "refs": ["c4"]
+    },
+    {
+      "layout": "diagram",
+      "title": "每一種失效，\n各配一個不受它影響的訊號",
+      "body": "不是隨便疊幾種常見訊號，而是先找出每種失效的根因，再挑一個數學性質剛好不受那個根因影響的訊號。",
+      "kind": "pairs",
+      "heads": ["這種情況會失效", "改用這個訊號"],
+      "pairs": [
+        ["意思像，\n但沒有料", "詞彙稀有度：直接算詞有多罕見，跟向量幾何無關"],
+        ["短訊息\n系統性佔便宜", "全文搜尋：精確比對字面，不受長短影響"],
+        ["一句話\n脫離對話沒意義", "處理單位改成整條討論串，保留完整脈絡"]
+      ],
+      "refs": ["c1", "c8"]
+    },
+    {
+      "layout": "table",
+      "title": "兩種訊號要疊加，\n前提是失效的地方不一樣",
+      "body": "如果兩種訊號碰到同一種輸入都會失效，疊加等於把同一個弱點算了兩次，沒有解決任何問題。",
+      "rows": [
+        ["疊加有效", "兩者失效的情況不重疊，一個倒下另一個還站著"],
+        ["疊加無效", "兩者碰到同一種輸入一起失效，只是重複計分"]
+      ],
+      "note": "這是能不能疊加的判準，不是實驗結果",
+      "refs": ["c10"]
+    },
+    {
+      "layout": "chart_bars",
+      "title": "很多「單路沒撈到」，\n其實是被截斷線切掉的",
+      "body": "各路往下多撈一些，原本落在截斷線外的正確答案就回來了；名次深的結果本來貢獻就小，不太會帶進新的雜訊。",
+      "unit": "名",
+      "subs_inline": true,
+      "bars": [
+        {"name": "原本的召回深度", "subs": ["只取前面一小段"], "value": 10},
+        {"name": "拉深之後", "subs": ["下限"], "value": 50},
+        {"name": "拉深之後", "subs": ["上限"], "value": 100, "emphasize": true}
+      ],
+      "note": "拉深召回是由淺到深的第一步",
+      "refs": ["rrf-rank-fusion:c16"]
+    },
+    {
+      "layout": "takeaway",
+      "question": "多路檢索要怎麼合成一份排序？",
+      "title": "比名次，不比分數；\n但別忘了有人根本沒上榜",
+      "refs": ["rrf-rank-fusion:c1", "rrf-rank-fusion:c13"]
+    },
+    {
+      "layout": "series_map",
+      "title": "這個系列的三則",
+      "current": "slack-vector-failure-orthogonal-signals",
+      "nav": "完整拆解在個人檔案的文章連結",
+      "refs": ["結構"]
+    }
+  ],
+  "threads": {
+    "body": {"text": "樣張用，不發布。", "refs": ["c1"]},
+    "mode": "carousel"
+  },
+  "caption": {
+    "first": "樣張用，不發布。",
+    "first_refs": ["c1"],
+    "hashtags": ["CerebrasRAG"]
+  }
+}

@@ -22,7 +22,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 ```
 [1] 選觀念、系列規劃 → [2] hook 候選（人挑）→ [3] 寫內容規格 spec.json
  → [4] 程式 A（check_a）→ [5] 渲染 + 程式 B（render）→ [6] 組發布文字（build_package）
- → [7] 自檢 + 審查：忠實者（嚴格）、讀者（預設一般讀者，要看圖）、編輯（不擋，但易懂／圖／所以呢／制式要處理；要看圖）→ [8] 批次層檢查（batch_check）
+ → [6b] 人看初稿（結構、順序、圖）→ [7] 自檢 + 審查：忠實者（嚴格）、讀者（預設一般讀者，要看圖）、編輯（不擋，但易懂／圖／所以呢／制式要處理；要看圖）→ [8] 批次層檢查（batch_check）
  → [9] 人最後確認 → [10] state.py ready → [11] 發布到 IG 與 Threads（人確認後）→ 寫回狀態
 ```
 
@@ -36,6 +36,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | 4 | `check_a.py <spec.json>`，ERROR 清零 | `references/program-a.md` |
 | 5 | `render.py <spec.json>`，程式 B 全過；`contact_sheet.py <發布包資料夾>` 拼縮圖；**自己看一次渲染後的 PNG** | `references/program-b.md` |
 | 6 | （在 `contact_sheet.py` 之後）`build_package.py <spec.json>`：產生人看的 `README.md`、`ig/post.md`、`threads/post.md`、審查用的 `_build/post-with-refs.md`／`post-reader.md`，並更新 `out/README.md` 索引 | `references/threads-and-caption.md` |
+| 6b | **人看初稿**（人 2026-11-01 決定）：先照 `self-check.md` 自檢，再把 `_build/contact-sheet.png` 與 `ig/post.md` 給人看結構、順序、口吻、圖；說明「這是審查前的初稿，結構與圖現在改最便宜」。人點頭（或回饋改完）才派審查者。人的回饋一次改完，不邊改邊審 | `references/ig-carousel.md` §0、§0b |
 | 7 | **先照 `references/self-check.md` 自檢**，再派忠實者、讀者（一般讀者，附圖）、編輯（附圖）；**有 `fig_refs` 再派重製圖審查者**（`references/figure-prompt.md`，看原圖＋主張＋重製圖）；`verify_faithful.py`、`verify_reader.py`、`verify_figure.py`。**審查通過後再新增文字或改數字，要重審改過的區塊**：`spec_diff.py` 列出範圍、`--mark` 記下通過版本 | `references/review-loop.md`、`references/self-check.md` |
 | 8 | `batch_check.py <spec>...`（參數順序 = 預計發文順序） | `references/batch-and-publish.md` §4 |
 | 9–10 | 給人看貼文 `README.md`（含縮圖）、`ig/post.md`、`threads/post.md`；**交貼文時列出還沒定的事（hook 是否暫用、編輯建議沒回覆的）並請人明確回答**，確認後 `state.py ready <觀念> <格式> <發布包>`（兩個格式各一次） | `references/batch-and-publish.md` §5–6 |
@@ -76,6 +77,10 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 
 - 提示詞在 `references/*-prompt.md`：把全文貼進派發訊息、填好檔案路徑（審查者只准讀指定的檔案，讀不到提示詞檔）；放行項逐項列出（`review-loop.md`）。審查者看不到撰寫者推理，每輪用全新 subagent。
 - 並行上限 20；派完用檔案數核對應到／實到。
-- 審查產出（JSON）放 `_build/reviews/`；每則貼文在 `_build/progress.md` 記進度（做到哪一步、各審查者第幾輪與通過的 spec 版本、等人決定的事），對話被壓縮或換 session 才接得上。
+- 審查產出（JSON）放 `_build/reviews/`；每則貼文在 `_build/progress.md` 記進度，對話被壓縮或換 session 才接得上。**格式**：最上面固定一個「現況」區塊（10 行內，每次更新時覆寫，不累加）——做到哪一步、各審查者通過的輪次、**等人決定的事**、下一步；下面才是依日期累加的歷史（改了什麼、為什麼、不採用的建議與理由）。接手時只讀現況區塊，需要細節再往下找。hook 候選另存 `_build/hook-candidates.md`。
+
+## 範例
+
+品質基準：skillopt 第 2、3 則（`out/skillopt/skillopt-batch-evidence-minibatch/`、`…/skillopt-blind-acceptance-gate/`；雙卡、17 張）、SAG 第 1 則（`out/sag/sag-latent-hyperedge-one-hop/`；雙卡、19 張、卡上參考圖重製）。圖像大膽度與實驗頁：SAG 第 2、3 則（`recap`、`scoreboard`、`rails`、`gate`）。敘事順序（路線圖、小標籤、主角先對照後）：Cerebras 三則（`out/cerebras-rag/`）。單卡＋diagram：`skillopt-overview`；LaTeX：`out/standalone/bradley-terry-pairwise-preference/`。jev-cascade 寫法過時，不當範例；`tests/fixtures/` 只給測試用。
 - 審查者遇到用量限制或電腦睡眠中斷時，用 `SendMessage` 對同一個 subagent 說「繼續」，它會接著跑；不要重派（會多花一輪）。
 - **改動集中再派**：同一輪的文字修改（讀者建議、人的回饋）一次改完，跑完程式 A、B，再用 `spec_diff.py` 的區塊當 `{ONLY_BLOCKS}` 派一位忠實者；邊改邊審會多出好幾輪（sag 把例子換成真實公司那次，忠實者第一輪就抓出例子與機制不符，修完又審一輪）。

@@ -143,6 +143,14 @@ def main():
         ok = (code == 0) if expect is None else (code != 0 and expect in out)
         fails += not ok
         print(("PASS " if ok else "FAIL ") + name + ("" if ok else f"  [預期含 {expect!r}]\n{out}"))
+    # 審查驗證程式的參數打反時，直接提示正確順序（2026-11-01：verify_reader 參數打反，程式崩潰多一次來回）
+    sd_scripts = ROOT / ".claude/skills/make-social-post/scripts"
+    for script, args, want in (("verify_reader.py", ["r.json", "post-reader.md"], "貼文在前"),
+                               ("verify_faithful.py", ["f.json", "card.md"], "卡在前")):
+        r = subprocess.run(["uv", "run", "python", str(sd_scripts / script), *args], capture_output=True, text=True, cwd=ROOT)
+        ok = r.returncode != 0 and want in r.stdout + r.stderr
+        fails += not ok
+        print(("PASS " if ok else "FAIL ") + f"抓得到：{script} 參數打反 → 提示正確順序" + ("" if ok else f"\n{r.stdout}{r.stderr}"))
     print(f"\n{'全部通過' if not fails else f'{fails} 項失敗'}")
     return 1 if fails else 0
 

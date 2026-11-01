@@ -1,6 +1,8 @@
 # 讀者提示詞（見 review-loop.md）：預設是「一般讀者」
 
-用全新 subagent 執行。**只看貼文，不看卡、不看 blog、看不到引用編號。** 把 `{POST_PATH}`（`post-reader.md`）、`{IMAGES}`（`out/<系列>/<觀念>/_build/contact-sheet.png`，加上要細看的 `ig/NN.png`）、`{BACKGROUND_TERMS}`、`{OUT_PATH}`、`{QUESTIONS}`（撰寫者針對這則貼文出的題目，答案都確定在貼文上）、`{TRAP}`（陷阱題，貼文上確定沒有；驗證時用 `verify_reader.py ... --trap N`）換成實際內容。
+用全新 subagent 執行。**只看貼文，不看卡、不看 blog、看不到引用編號。** 把 `{POST_PATH}`（`post-reader.md`）、`{IMAGES}`（`out/<系列>/<觀念>/_build/contact-sheet.png`，加上要細看的 `ig/NN.png`）、`{BACKGROUND_TERMS}`、`{OUT_PATH}`、`{QUESTIONS}`（撰寫者針對這則貼文出的題目，答案都確定在貼文上）、`{TRAP}`（陷阱題，貼文上確定沒有；驗證時用 `verify_reader.py <post-reader.md> <reader.json> --trap N`，貼文在前）換成實際內容。**`{QUESTIONS}` 固定要有一題順序題**：貼文裡有依序發生的步驟時，問「先做什麼、再做什麼」（Cerebras 第 2 則：人看不出 RRF 和 reranker 的順序）。
+
+**第 2 輪以後只讀改過的頁**（人 2026-11-01 決定）：`{IMAGES}` 只放 `spec_diff.py` 列出的頁和前後各一頁，派發訊息說明「只審這幾頁，其他頁已審過」，A 快滑照做、B 細讀與 D、E 只針對這幾頁；陷阱題照出。**第 1 輪、或結構大改（重排段落、加刪 3 張以上、人給了整則的回饋）時讀全篇。**
 
 **讀者設定（人的決定，2026-10-10）：預設是「一般讀者」**——對 AI 只有模糊概念（聽過 ChatGPT 這類聊天機器人），不是工程師，也沒讀過這個系列。`{BACKGROUND_TERMS}` 只放「LLM（大型語言模型）、ChatGPT」；其他專有名詞（Judge、基準、題庫名稱、q、τ…）都視為不知道，輪播內要有白話說明才算懂。要換成工程師讀者（背景詞清單照 `concept-wiki/config/background-terms.md`），派發訊息裡明說。2026-10-10 的實測：工程師讀者第一輪就通過，一般讀者卻抓到 Judge 與題庫名稱沒定義、統計術語看不懂。
 

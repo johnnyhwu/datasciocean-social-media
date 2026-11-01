@@ -1,0 +1,566 @@
+{
+  "series": "cerebras-rag",
+  "concept": "rag-narrow-waist",
+  "also_concepts": [
+    "slack-distillation-and-bursting"
+  ],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "讀者疑問",
+    "title": "Slack、Wiki、程式碼、Jira，怎麼塞進[[同一張表]]？",
+    "subtitle": "Cerebras 的內部搜尋每天被問超過 15,000 次。\n它的答案是：這張表只留五個欄位。",
+    "refs": [
+      "c3",
+      "c4"
+    ],
+    "candidate": "A"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "Slack、Wiki、程式碼、Jira，怎麼塞進[[同一張表]]？",
+      "body": "Cerebras 的內部搜尋每天被問超過 15,000 次。\n它的答案是：這張表只留五個欄位。",
+      "refs": [
+        "c3",
+        "c4"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "這套系統要回答的，是公司內部的問題",
+      "body": "Cerebras 介紹了自家知識庫「Cerebras Knowledge」：每天超過 15,000 次查詢，資料橫跨 Slack、Wiki、程式碼倉庫、Jira，來查的不只有人，還有自動化流程與 AI agent。先講三個一直會出現的詞：",
+      "rows": [
+        [
+          "欄位",
+          "一張表格有哪幾欄；每一欄只放一種東西"
+        ],
+        [
+          "向量",
+          "把文字變成一串數字（這個動作叫 embed），比的是意思像不像"
+        ],
+        [
+          "IDF",
+          "衡量一個詞有多稀有的指標，越少見分數越高"
+        ]
+      ],
+      "key_w": 200,
+      "refs": [
+        "c3",
+        "slack-distillation-and-bursting:c10"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "route",
+      "label": "路線圖",
+      "title": "這一則只走沙漏的[[上半段]]",
+      "body": "窄腰設計像一個沙漏：上面各種來源進來，中間收窄成一個很單純的介面，下面再重新展開。",
+      "heads": [
+        "這一則的閱讀路線",
+        "腰以下（怎麼搜、誰決定搜什麼）是這個系列接下來兩則的事"
+      ],
+      "nodes": [
+        {
+          "text": "窄腰長什麼樣",
+          "sub": "Slack、Wiki、程式碼、Jira，怎麼塞進同一張表？"
+        },
+        {
+          "text": "收窄的代價",
+          "sub": "哪些事必須在寫入的當下就想清楚？收一半又會怎樣？"
+        },
+        {
+          "text": "整理成固定格式",
+          "sub": "討論串長短差這麼多，怎麼整理成同一個樣子？"
+        },
+        {
+          "text": "撈回與篩選",
+          "sub": "整理時被丟掉的那些，怎麼撿回來、又怎麼篩？"
+        }
+      ],
+      "refs": [
+        "c2",
+        "c7",
+        "c12",
+        "slack-distillation-and-bursting:c5"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "waist",
+      "label": "① 窄腰長什麼樣",
+      "title": "不管哪裡來的資料，先穿過[[同一個窄口]]",
+      "body": "腰以上和腰以下可以各自獨立演化、互不干擾：上面接一個新來源不必動讀取端，下面換一種搜法，也不必回頭問寫入端。",
+      "heads": [
+        "上半部＝寫入端：各種不一樣的來源",
+        "收窄成一個很單純的介面",
+        "下半部＝讀取端：重新展開"
+      ],
+      "nodes": [
+        {
+          "text": "Slack 討論串"
+        },
+        {
+          "text": "Wiki 頁面"
+        },
+        {
+          "text": "程式碼"
+        },
+        {
+          "text": "Jira 票"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "怎麼搜（檢索策略）"
+        },
+        {
+          "text": "誰決定搜什麼（編排策略）"
+        },
+        {
+          "text": "不必動寫入端"
+        }
+      ],
+      "refs": [
+        "c1",
+        "c2",
+        "c5"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "schema",
+      "label": "① 窄腰長什麼樣",
+      "title": "這個窄腰就是一張表，[[只有五個欄位]]",
+      "body": "那個窄口具體是什麼？在 Cerebras 的系統裡，它就是一張 embeddings table。想新增一個資料源，只要寫一個 connector（一支小程式）把資料塞進這五個欄位，讀取端完全不用改一行。",
+      "heads": [
+        "embeddings table：一行資料長什麼樣"
+      ],
+      "nodes": [
+        {
+          "text": "document",
+          "sub": "要被搜尋\n的文字"
+        },
+        {
+          "text": "embedding",
+          "sub": "向量"
+        },
+        {
+          "text": "metadata",
+          "sub": "附加資訊\n一包 JSON",
+          "emph": true
+        },
+        {
+          "text": "source",
+          "sub": "哪裡來的"
+        },
+        {
+          "text": "timestamp",
+          "sub": "時間戳"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "想換一種檢索策略，也只要在讀取端動手，寫入端毫無感覺"
+        }
+      ],
+      "note": "metadata 存的是附加資訊，像時間戳、來源類型、作者或團隊。",
+      "refs": [
+        "c4",
+        "c5",
+        "c12"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "label": "① 窄腰長什麼樣",
+      "title": "一個 connector 只要回答[[三個問題]]",
+      "body": "上一張那個 connector 要寫什麼？只需要回答三個問題。這三件事裡完全沒有「怎麼檢索」——檢索怎麼做，是腰以下的事。",
+      "nodes": [
+        {
+          "text": "資料怎麼變成 document 加 metadata",
+          "sub": "一個轉換函式"
+        },
+        {
+          "text": "怎麼從來源系統把資料拉過來",
+          "sub": "一個抓取函式"
+        },
+        {
+          "text": "多久同步一次",
+          "sub": "可以像 Slack 一樣，每個頻道各自設定自己的頻率"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "這三件事裡沒有「怎麼檢索」",
+          "tone": "good"
+        }
+      ],
+      "refs": [
+        "c9"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "pairs",
+      "label": "① 窄腰長什麼樣",
+      "title": "新增一個資料源，[[不必找核心團隊]]",
+      "body": "窄到這個程度，連團隊怎麼分工也跟著變：新增資料源可以下放給不熟悉核心系統的團隊自己做。反過來說，非得核心團隊出手才接得起來，通常代表這一層抽象本身在漏水。",
+      "heads": [
+        "看到的現象",
+        "代表什麼"
+      ],
+      "pairs": [
+        [
+          "開一個 PR，\n附上一個小程式",
+          "只要輸出符合\nschema 的一行資料，\n其餘自動接上"
+        ],
+        [
+          "新增資料源需要\n核心團隊介入",
+          "通常代表\n抽象層本身漏水了"
+        ]
+      ],
+      "refs": [
+        "c10",
+        "c11"
+      ]
+    },
+    {
+      "layout": "table",
+      "label": "② 收窄的代價",
+      "title": "排序要用的訊號，[[藏在 metadata 裡]]",
+      "body": "收窄不是免費的。第一件要想清楚的是 metadata：排序的時候會直接去讀它，所以寫 connector 的當下就要想好未來需要哪些訊號。",
+      "rows": [
+        [
+          "排序時怎麼用",
+          "age decay 直接讀 metadata 裡的 timestamp"
+        ],
+        [
+          "當下要想清楚",
+          "未來可能需要哪些排序訊號：時間戳、來源類型、作者或團隊"
+        ],
+        [
+          "沒想到的代價",
+          "之後想加，整批被搜尋的文件要重新處理一次"
+        ]
+      ],
+      "key_w": 300,
+      "note": "age decay 是隨時間衰減的排序機制。",
+      "refs": [
+        "c12"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "branch",
+      "label": "② 收窄的代價",
+      "title": "形式統一，但[[語意分裂]]",
+      "body": "第二件是收一半等於沒收。embeddings table 如果為了遷就每個來源加上專屬欄位，搜尋那一端又得分別處理 Slack 怎麼辦、Jira 怎麼辦，那其實不算真正收窄。",
+      "heads": [
+        "為了遷就來源，額外加上去的欄位",
+        "下游的檢索或排序邏輯"
+      ],
+      "nodes": [
+        {
+          "text": "形式上統一成一張表，語意上還是分裂的"
+        },
+        {
+          "text": "if source == 'X' then...",
+          "sub": "出現這種分支，就代表窄腰還沒收乾淨"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "slack_channel"
+        },
+        {
+          "text": "code_repo"
+        },
+        {
+          "text": "jira_ticket_id"
+        }
+      ],
+      "refs": [
+        "c7",
+        "c8"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "label": "③ 整理成固定格式",
+      "title": "長短差這麼多的討論串，壓成向量[[沒辦法互相比]]",
+      "body": "進表之前還有一關。長短、參與人數差這麼多的原始文字直接拿去 embed，算出來的向量在「什麼代表這個文件」這件事上根本沒辦法互相比。",
+      "columns": [
+        {
+          "head": "一條討論串可能是",
+          "items": [
+            {
+              "text": "2 個人講 3 句話"
+            },
+            {
+              "text": "向量要代表的\n是這 3 句話"
+            }
+          ]
+        },
+        {
+          "head": "也可能是",
+          "items": [
+            {
+              "text": "10 個人吵了 50 則訊息，\n還離題"
+            },
+            {
+              "text": "向量要代表的\n是這 50 則裡的什麼？"
+            }
+          ]
+        }
+      ],
+      "note": "這兩條討論串是文章舉的假設例子。",
+      "refs": [
+        "slack-distillation-and-bursting:c5",
+        "slack-distillation-and-bursting:c6"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "label": "③ 整理成固定格式",
+      "title": "先把討論串[[整理成四樣]]，才拿去 embed",
+      "body": "所以 Slack 的資料不直接 embed：先讓 LLM 讀完整條 thread，抽出四樣結構化資料，正規化成一致格式之後才拿去 embed。",
+      "nodes": [
+        {
+          "text": "整條討論串",
+          "sub": "原始的 thread 文字"
+        },
+        {
+          "text": "讓 LLM 抽出四樣結構化資料",
+          "sub": "一句話問題、摘要、解決方案、系統與程式碼參照"
+        },
+        {
+          "text": "正規化成一致格式之後才 embed"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "原始文字另外留著，可以用關鍵字找到，但不進向量那一邊"
+        }
+      ],
+      "refs": [
+        "slack-distillation-and-bursting:c3",
+        "slack-distillation-and-bursting:c4"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "pairs",
+      "label": "③ 整理成固定格式",
+      "title": "這一步要的是[[形狀]]，不是長度",
+      "body": "很容易被當成「把長的變短」。文章用的詞是 normalized（正規化）而不是 summarized（摘要），要的是同一種形狀，不是比較少的字。",
+      "heads": [
+        "進來的東西",
+        "整理之後"
+      ],
+      "pairs": [
+        [
+          "一條只有幾句話的\n討論串",
+          "一句話問題、摘要、\n解決方案、系統與\n程式碼參照"
+        ],
+        [
+          "一條吵了幾十則、\n還離題的討論串",
+          "一樣是那四欄，\n只是每欄裝的\n內容不同"
+        ]
+      ],
+      "note": "左邊兩條討論串是假設的例子，用來看「形狀一樣」是什麼意思。",
+      "refs": [
+        "slack-distillation-and-bursting:c1",
+        "slack-distillation-and-bursting:c3",
+        "slack-distillation-and-bursting:c8"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "rails",
+      "label": "④ 撈回與篩選",
+      "title": "摘要漏掉的旁枝，[[單獨撈回來]]",
+      "body": "distillation 是有損壓縮，旁枝訊息可能被漏掉。bursting 把同一個作者連續發的訊息單獨撈回來、前面加上這條討論串的主題；撈回來的每一段就是一筆 burst。",
+      "heads": [
+        "distillation：主線問答",
+        "bursting：連續發的訊息"
+      ],
+      "nodes": [
+        {
+          "text": "抽出固定的四樣"
+        },
+        {
+          "text": "同一個作者連續發的，\n單獨撈回"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "1 筆 distillation，\n加上 N 筆 burst"
+        }
+      ],
+      "note": "虛線那格是被漏掉的旁枝，金色那格是撈回來補上的。",
+      "refs": [
+        "slack-distillation-and-bursting:c3",
+        "slack-distillation-and-bursting:c9",
+        "slack-distillation-and-bursting:c11"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "gates",
+      "label": "④ 撈回與篩選",
+      "title": "burst 得先過門檻，[[才留得下來]]",
+      "body": "撈回來之後還要篩一次，三道門檻都是低成本規則。有料的留下來寫進同一張表；只回一句「收到！」那種純粹的社交填充語，完全不會被 embed。",
+      "heads": [
+        "有料的 burst",
+        "社交填充語"
+      ],
+      "nodes": [
+        {
+          "text": "IDF ≥ 4.0",
+          "sub": "含有稀有詞"
+        },
+        {
+          "text": "長度 ≥ 200 字元",
+          "sub": "內容量\n撐得起向量"
+        },
+        {
+          "text": "有 reaction 加分",
+          "sub": "有人按過\n表情符號"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "寫進同一張表"
+        },
+        {
+          "text": "完全不會被 embed"
+        }
+      ],
+      "note": "通過與被擋下的那兩則是假設的例子，不是實際的訊息。",
+      "refs": [
+        "slack-distillation-and-bursting:c10",
+        "slack-distillation-and-bursting:c11",
+        "slack-distillation-and-bursting:c12"
+      ],
+      "quals": [
+        "slack-distillation-and-bursting:c4#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "handoff",
+      "label": "④ 撈回與篩選",
+      "title": "噪音在[[寫入時擋掉]]，比查詢時再補救便宜",
+      "body": "為什麼要在寫入時擋？rerank 是資料被找出來之後，再用另一個模型重新排一次，每次查詢都要付一次這個成本。寫入時用低成本規則過濾，只付一次。",
+      "heads": [
+        "讀取端",
+        "寫入端",
+        "把過濾搬到寫入的時候"
+      ],
+      "nodes": [
+        {
+          "text": "靠後段昂貴的 rerank 補救垃圾資料排太前面",
+          "sub": "每次查詢都要付的成本"
+        },
+        {
+          "text": "寫入時就用低成本規則先過濾一批",
+          "sub": "一次性成本"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "越早把噪音擋掉，長期越省"
+        }
+      ],
+      "note": "這張圖比的不是誰排得準，而是這筆成本什麼時候付。",
+      "refs": [
+        "slack-distillation-and-bursting:c12"
+      ]
+    },
+    {
+      "layout": "table",
+      "label": "四站走完",
+      "title": "同一個窄腰，在這篇文章[[至少出現三次]]",
+      "body": "這一則只拆了第一層。同樣的收窄手法，這篇文章裡至少用了三次；看懂這一次，剩下的就是同一個形狀換個地方用，這也是整篇最值得記住的一個心智模型。",
+      "rows": [
+        [
+          "資料寫入層",
+          "Slack、Wiki、程式碼、Jira → 同一張 embeddings table"
+        ],
+        [
+          "讀取融合層",
+          "多個檢索器各自的排名 → 融合成單一排序"
+        ],
+        [
+          "多工具輸出層",
+          "格式各異的工具結果 → 正規化成共同的格式"
+        ]
+      ],
+      "key_w": 260,
+      "refs": [
+        "c13",
+        "c19"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "不一樣的資料，為什麼能塞進同一張表？",
+      "title": "先收窄，再展開；\n腰以上和腰以下，\n各自獨立演化",
+      "refs": [
+        "c1",
+        "slack-distillation-and-bursting:c1"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "一次看完這個系列",
+      "current": "rag-narrow-waist",
+      "nav": "完整文章：datasciocean.com/paper-intro/cerebras-rag",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "Slack、Wiki、程式碼、Jira，怎麼塞進同一張表？\n\nCerebras 內部的知識庫每天被問超過 15,000 次。他們的做法是把中間的介面收到只剩一張 embeddings table、五個欄位：document、embedding、metadata、source、timestamp。想接一個新資料源，寫一個 connector 把資料塞進這五個欄位就好，讀取端完全不用改一行。\n\n收窄也有代價。metadata 不只是展示用的附加資訊，排序的時候會直接讀它，所以寫 connector 的當下就要想清楚未來可能需要哪些排序訊號，不然事後想加，要把整批文件重新處理一次。\n\n寫入端這一側還多做了一步：Slack 討論串不直接拿去 embed，而是先讓 LLM 抽成四樣結構化資料再正規化。整理會丟掉東西，所以還有 bursting：把同一個作者連續發的訊息單獨撿回來、前面補上這條討論串的主題，而且要有夠少見的詞、字夠多才留得下來，有人按過\n表情符號還會加分。\n\n這是系列第 1 則。",
+      "refs": [
+        "c3",
+        "c4",
+        "c5",
+        "c12",
+        "slack-distillation-and-bursting:c3",
+        "slack-distillation-and-bursting:c9",
+        "slack-distillation-and-bursting:c10"
+      ],
+      "quals": [
+        "slack-distillation-and-bursting:c4#1"
+      ]
+    },
+    "last": {
+      "text": "想看完整拆解？\n文章：datasciocean.com/paper-intro/cerebras-rag\n同系列：搜尋出三種毛病，Cerebras 不是多加幾招，是一種毛病配一帖藥（尚未發布）\n同系列：搜尋每次都把所有工具叫一遍？又慢又貴（尚未發布）",
+      "refs": [
+        "c1"
+      ],
+      "link": "https://datasciocean.com/paper-intro/cerebras-rag/"
+    }
+  },
+  "caption": {
+    "first": "企業內部的 RAG 怎麼做：Cerebras 把 Slack、Wiki、程式碼收進同一張表",
+    "first_refs": [
+      "c3",
+      "c4"
+    ],
+    "nav": "完整文章在 datasciocean.com，搜「Cerebras 知識庫」",
+    "hashtags": [
+      "CerebrasRAG",
+      "RAG",
+      "向量搜尋"
+    ]
+  }
+}

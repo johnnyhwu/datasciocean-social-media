@@ -1,0 +1,73 @@
+{
+  "post": "out/cerebras-rag/rag-narrow-waist/_build/post-with-refs.md",
+  "blocks": [
+    {
+      "block": "第 13 張",
+      "atoms": [
+        {
+          "text": "distillation 是有損壓縮",
+          "verdict": "完全支持",
+          "card_quote": "Distillation 是有損壓縮",
+          "note": "slack-distillation-and-bursting:c9 原文。"
+        },
+        {
+          "text": "旁枝訊息可能被漏掉",
+          "verdict": "完全支持",
+          "card_quote": "重要的旁枝訊息可能因為不在主線問答脈絡裡而被摘要忽略掉",
+          "note": "保留了「可能」，沒有說得比卡強；省略原因只是少講，不改意思。"
+        },
+        {
+          "text": "bursting 把同一個作者連續發的訊息單獨撈回來",
+          "verdict": "完全支持",
+          "card_quote": "系統用 bursting 補救：把「同一個作者連續發的訊息」單獨抓出來",
+          "note": "範圍維持在「同一個作者連續發的訊息」，沒有擴大成任何訊息；「撈回來」對應「抓出來」與「補救」。"
+        },
+        {
+          "text": "撈回來的訊息前面加上這條討論串的主題",
+          "verdict": "完全支持",
+          "card_quote": "前面加上這條 thread 的主題當作上下文，單獨 embed 一次",
+          "note": "c9 原文。"
+        },
+        {
+          "text": "撈回來的每一則就是一筆 burst（名詞定義）",
+          "verdict": "部分支持",
+          "card_quote": "bursting 另外會把同一個作者連續發的訊息，前面加上這條 thread 的主題後單獨 embed 一次，但每個 burst 必須通過三道品質門檻才會留下",
+          "note": "沒有把 burst 說成一定會留下，也沒擴大範圍（門檻限定條件在第 14 張出現）；但卡上是把「同一個作者連續發的訊息」整段加主題後「單獨 embed 一次」，一筆 burst 對應的是這一段連續訊息，而貼文用量詞「每一則」（卡上「則」是單一訊息的量詞，如 c11「5 則訊息」），讀者容易讀成每一則訊息各自是一筆 burst，單位與卡不一致。"
+        },
+        {
+          "text": "圖：distillation 那條軌道抽出固定的四樣",
+          "verdict": "完全支持",
+          "card_quote": "抽出四樣結構化資料——一句話問題、摘要、解決方案、系統與程式碼參照——正規化成一致格式之後才拿去 embed",
+          "note": "slack-distillation-and-bursting:c3。"
+        },
+        {
+          "text": "圖：bursting 那條軌道是同一個作者連續發的，單獨撈回",
+          "verdict": "完全支持",
+          "card_quote": "把「同一個作者連續發的訊息」單獨抓出來",
+          "note": "c9。"
+        },
+        {
+          "text": "圖：結果是 1 筆 distillation，加上 N 筆 burst",
+          "verdict": "完全支持",
+          "card_quote": "最後可能產生「1 筆討論串層級的 distillation 產物，加上 N 筆通過品質門檻的 burst」",
+          "note": "N 是未定數，這張沒有主張撈回的全數留下；「通過品質門檻」在緊接的第 14 張主標與門檻圖出現。"
+        },
+        {
+          "text": "圖：distillation 負責主線問答、bursting 負責連續發的訊息",
+          "verdict": "完全支持",
+          "card_quote": "重要的旁枝訊息可能因為不在主線問答脈絡裡而被摘要忽略掉。系統用一個叫 bursting 的機制補救",
+          "note": "分工對應卡上「主線問答」與用 bursting 補救旁枝。"
+        },
+        {
+          "text": "圖註：虛線格是被漏掉的旁枝，金色格是撈回來補上的",
+          "verdict": "完全支持",
+          "card_quote": "系統用一個叫 bursting 的機制補救",
+          "note": "格子數量、虛線與金色屬放行的示意；語意（漏掉、補救）與卡一致。"
+        }
+      ],
+      "errors": ["措辭與卡不同"]
+    }
+  ],
+  "recalculations": [],
+  "gaps": []
+}

@@ -1,6 +1,6 @@
 # 審查迴圈（subagent）
 
-程式 A 與程式 B 都過了、發布文字也用 `build_package.py` 組好之後，才讓 subagent 審查。**每輪都用全新 subagent、全面重審（第 2 輪起可只審改過的區塊）**；審查者看不到撰寫者的推理，撰寫者不能反駁，只能標「爭議」交給人。
+程式 A 與程式 B 都過了、發布文字也用 `build_package.py` 組好、**人也看過初稿（SKILL.md 步驟 6b）**之後，才讓 subagent 審查。人的回饋多半是結構與圖（順序、口吻、圖怪），審查後才改會讓審查重來（Cerebras 第 3 則：審完 4 輪才給人看，人一改，忠實者與讀者又各多一輪）。**每輪都用全新 subagent、全面重審（第 2 輪起可只審改過的區塊）**；審查者看不到撰寫者的推理，撰寫者不能反駁，只能標「爭議」交給人。
 
 ## 角色
 
@@ -35,7 +35,7 @@
 ## 迴圈
 
 - 退回清單每條含位置、違反哪種錯誤、卡上的對應原文，**不給改寫版本**。
-- 第 2 輪起可只審改過的區塊（忠實者提示詞的 `{ONLY_BLOCKS}`）；每改一次先重跑程式 A、B。**改過哪些區塊用 `spec_diff.py <spec.json>` 列出**（它比對 `_build/reviewed-spec.json`）；每輪審查全數通過、人也接受後，跑 `spec_diff.py <spec.json> --mark` 記下「審查通過的版本」。區塊名對應：`slide02` ＝ 第 2 張，`threads.body`／`threads.last`、`caption`、`hook` 照字面。
+- 第 2 輪起可只審改過的區塊（忠實者提示詞的 `{ONLY_BLOCKS}`；讀者只讀改過的頁和前後各一頁，結構大改才讀全篇，見 `reader-prompt.md`）；每改一次先重跑程式 A、B。**改過哪些區塊用 `spec_diff.py <spec.json>` 列出**（它比對 `_build/reviewed-spec.json`）；每輪審查全數通過、人也接受後，跑 `spec_diff.py <spec.json> --mark` 記下「審查通過的版本」。區塊名對應：`slide02` ＝ 第 2 張，`threads.body`／`threads.last`、`caption`、`hook` 照字面。
 - hook 被退回：優先改用候選清單裡的另一個；必須改字就照 `hooks.md` 的規則告知人。
 - **改動一次改完再送審**：一輪退回的所有項目、加上自檢發現的，全部改完、重跑程式 A、B，才送下一輪；不要改一處送一次（SAG 第 3 則忠實者 8 輪、讀者 6 輪、圖 6 輪，多數是零碎送審）。審查者結果會自動通知，不需要排程輪詢。
 - **輪數上限 `review_max_rounds`（3）**：還沒過就停止，交給人二選一：自己指示怎麼改，或把這個格式標為 `unsuitable` 並附原因（`state.py unsuitable`）。觀念卡不動。

@@ -190,8 +190,16 @@ def backfill() -> None:
     print(f"wrote state/backfill.md（{len(items)} 項）")
 
 
+USAGE = {"ready": 4, "unsuitable": 4, "record": 3}   # 指令名 + 必填位置參數的個數
+
+
 def main(a: list[str]) -> int:
     cmd = a[0] if a else "status"
+    if cmd in USAGE and len(a) < USAGE[cmd]:
+        hint = "（查存量與各格式狀態用 status，不是 ready）" if cmd == "ready" else ""
+        print(f"參數不足：{cmd} 需要 {USAGE[cmd] - 1} 個位置參數，只給了 {len(a) - 1} 個{hint}\n")
+        print(__doc__)
+        return 1
     if cmd == "status":
         status()
     elif cmd == "ready":

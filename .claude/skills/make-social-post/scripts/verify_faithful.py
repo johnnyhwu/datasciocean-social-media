@@ -71,4 +71,6 @@ def main(card_path: str, out_path: str) -> int:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) < 3 or sys.argv[1].endswith(".json") or not sys.argv[2].endswith(".json"):
+        sys.exit("參數順序：verify_faithful.py <card.md>[,<card2.md>] <faithful.json>（卡在前、審查 JSON 在後）")
     sys.exit(main(sys.argv[1], sys.argv[2]))

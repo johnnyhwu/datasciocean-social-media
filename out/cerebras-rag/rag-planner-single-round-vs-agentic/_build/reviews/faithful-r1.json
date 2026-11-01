@@ -1,0 +1,206 @@
+{
+  "post": "rag-planner-single-round-vs-agentic",
+  "blocks": [
+    {"block": "第 1 張", "atoms": [
+      {"text": "每次都把所有工具叫一遍，又慢又貴（以疑問句呈現）", "verdict": "完全支持",
+       "card_quote": "如果每次查詢都無腦呼叫所有工具，會帶來兩個直接的壞處：不需要的工具也被觸發，拖慢延遲、浪費成本", "note": "c3 部落格判斷，疑問式 hook，字面可由卡支持。"},
+      {"text": "Cerebras 讓 planner 比工具還便宜", "verdict": "完全支持",
+       "card_quote": "Planner 被故意設計得比它服務的工具還便宜", "note": "c5。"},
+      {"text": "做決定的是一個小模型（寫成既成事實）", "verdict": "部分支持",
+       "card_quote": "所以可以用小模型、結構化輸出", "note": "卡寫「可以用小模型」，是設計上可行；貼文寫成「讓一個…小模型」決定，把「可以」說成確定採用。"},
+      {"text": "決定「這次該用哪幾個」，再平行去查", "verdict": "完全支持",
+       "card_quote": "輸出則是一組工具選擇清單，交給 executor 平行執行。", "note": "c4。"}],
+     "errors": ["措辭與卡不同"]},
+
+    {"block": "summary（這一則）", "atoms": [
+      {"text": "LLM 先挑這次用哪些工具", "verdict": "完全支持",
+       "card_quote": "LLM 被用來動態決定「這次該用哪些工具」", "note": "c1。"},
+      {"text": "平行查一輪", "verdict": "完全支持",
+       "card_quote": "整條處理線是決策一次、平行執行一次、synthesis 一次", "note": "c1。"},
+      {"text": "推理留到最後才做", "verdict": "完全支持",
+       "card_quote": "推理只在管線最末端的單次 synthesis 發生", "note": "retrieval-reasoning-decoupling:c8。"},
+      {"text": "作者判斷它是單輪流程，不是會回頭再查的迴圈", "verdict": "完全支持",
+       "card_quote": "沒有「證據不夠、回頭再查一輪」的迴圈——本質上是單輪 pipeline，不是 agentic loop", "note": "c1，且以「作者判斷」帶出 c1#1。"}],
+     "errors": []},
+
+    {"block": "第 3 張", "atoms": [
+      {"text": "路線圖三站與問題、前兩則內容", "verdict": "完全支持",
+       "card_quote": "", "note": "撰寫者列為結構；三站的問題與 c1、c4、retrieval-reasoning-decoupling:c8 的內容方向一致，不構成新主張。"}],
+     "errors": []},
+
+    {"block": "第 4 張", "atoms": [
+      {"text": "Cerebras 有一套內部知識庫，資料橫跨 Slack、Wiki、程式碼倉庫、Jira", "verdict": "完全支持",
+       "card_quote": "介紹他們內部知識庫系統「Cerebras Knowledge」的架構——這系統每天處理超過 15,000 次查詢，資料橫跨 Slack、Wiki、程式碼倉庫、Jira", "note": "c2 官方宣稱，主詞是 Cerebras。"},
+      {"text": "三個角色接力（planner、executor、synthesis）", "verdict": "完全支持",
+       "card_quote": "查詢進來，planner 決策一次，平行執行一次，synthesis 一次，結束", "note": "c9。"},
+      {"text": "工具：一種搜尋方法，例如搜 Slack、搜程式碼、查誰懂這個領域", "verdict": "完全支持",
+       "card_quote": "文章列出的工具——搜尋、搜尋 Slack、搜尋程式碼、查詢誰懂這個領域等等", "note": "retrieval-reasoning-decoupling:c12。"},
+      {"text": "planner：看完問題，決定這次用哪幾個工具", "verdict": "完全支持",
+       "card_quote": "輸出則是一組工具選擇清單，交給 executor 平行執行。", "note": "c4。"},
+      {"text": "executor：照清單把工具同時跑起來", "verdict": "完全支持",
+       "card_quote": "Executor 扛兩個職責：平行執行被選中的工具", "note": "c8。"},
+      {"text": "synthesis：讀完證據，寫出最後答案", "verdict": "完全支持",
+       "card_quote": "synthesis 讀完證據後才發現不夠", "note": "c16 與 retrieval-reasoning-decoupling:c10 描述 synthesis 讀證據推理；白話定義未加新用途。"}],
+     "errors": []},
+
+    {"block": "第 5 張", "atoms": [
+      {"text": "每個問題把所有工具叫一遍，不需要的工具也會被觸發，代價有兩種", "verdict": "完全支持",
+       "card_quote": "如果每次查詢都無腦呼叫所有工具，會帶來兩個直接的壞處：不需要的工具也被觸發", "note": "c3。"},
+      {"text": "延遲拖長、成本浪費", "verdict": "完全支持",
+       "card_quote": "拖慢延遲、浪費成本", "note": "c3。"},
+      {"text": "不相關工具吐回雜訊，可能拉低整體排序品質", "verdict": "完全支持",
+       "card_quote": "不相關工具吐出來的雜訊結果，還可能拉低整體排序品質", "note": "c3，保留「可能」。"},
+      {"text": "planner 的任務：從固定規則變成每次動態決定，讓成本和延遲跟著實際需求走", "verdict": "完全支持",
+       "card_quote": "Planner 存在的第一原理，是把「這次該用哪些工具」從固定規則變成一個動態決策，讓成本跟延遲跟查詢的實際需求成正比", "note": "c3。"}],
+     "errors": []},
+
+    {"block": "第 6 張", "atoms": [
+      {"text": "planner 拿到三樣東西：工具目錄、問題、鎖定的查詢範圍", "verdict": "完全支持",
+       "card_quote": "Planner 拿到三樣輸入：一份工具目錄（只需要精簡的能力描述，不需要完整技術文件或內部實作細節）、使用者的查詢本身、以及當前鎖定的查詢範圍", "note": "c4。"},
+      {"text": "每個工具只要「一句」能力描述", "verdict": "部分支持",
+       "card_quote": "只需要精簡的能力描述", "note": "卡寫「精簡的」，沒有「一句」這個量。"},
+      {"text": "交出來的只是一張清單：這次用哪幾個工具", "verdict": "完全支持",
+       "card_quote": "輸出則是一組工具選擇清單", "note": "c4。"},
+      {"text": "同一套工具，每個問題挑的不一樣", "verdict": "完全支持",
+       "card_quote": "把「這次該用哪些工具」從固定規則變成一個動態決策", "note": "c3。"},
+      {"text": "示意圖的問題與挑選結果（假設例子）；工具名取自 Cerebras 的清單", "verdict": "完全支持",
+       "card_quote": "文章列出的工具——搜尋、搜尋 Slack、搜尋程式碼、查詢誰懂這個領域等等", "note": "圖註已標假設例子；工具名對得上 retrieval-reasoning-decoupling:c12。"}],
+     "errors": ["措辭與卡不同"]},
+
+    {"block": "第 7 張", "atoms": [
+      {"text": "做決定的模型故意比工具還便宜", "verdict": "完全支持",
+       "card_quote": "Planner 被故意設計得比它服務的工具還便宜", "note": "c5。"},
+      {"text": "planner 做的是分類：從有限選項挑一個或幾個，不是生成", "verdict": "完全支持",
+       "card_quote": "它做的是分類任務（從有限選項裡選一個或幾個），不是生成任務", "note": "c5。"},
+      {"text": "所以小模型、結構化輸出就夠，成本和延遲都低", "verdict": "完全支持",
+       "card_quote": "所以可以用小模型、結構化輸出，推理成本跟延遲都低", "note": "「就夠」與「可以用」約略等強。"},
+      {"text": "整條處理線裡最便宜的一環", "verdict": "完全支持",
+       "card_quote": "是整條處理線裡最便宜的一環", "note": "c5。"},
+      {"text": "如果決策太貴，用來省錢的決策本身很花錢，設計就自相矛盾", "verdict": "完全支持",
+       "card_quote": "決策層要故意比執行層便宜，不然「用來省錢的決策」本身如果太貴，設計就自相矛盾了。", "note": "c6 部落格判斷。"}],
+     "errors": []},
+
+    {"block": "第 8 張", "atoms": [
+      {"text": "被選中的工具彼此沒有依賴，所以可以同時跑", "verdict": "完全支持",
+       "card_quote": "平行執行被選中的工具（前提是工具之間沒有依賴關係，本身是無狀態的檢索原語）", "note": "c8，前提有帶出。"},
+      {"text": "各工具格式不同，executor 整理成同一套證據格式，帶分數、新鮮度、來源提示等", "verdict": "完全支持",
+       "card_quote": "把不同工具吐出的原始格式正規化成一套共同的 evidence schema（包含分數、新鮮度、來源提示等）", "note": "c8。"}],
+     "errors": []},
+
+    {"block": "第 9 張", "atoms": [
+      {"text": "作者原本系統：每一路各自推理、各寫摘要，最後再合併摘要", "verdict": "完全支持",
+       "card_quote": "三種檢索各自呼叫對應的推理方法（比如 SQL 推理、圖文推理），各自產生一份摘要，最後再用一次 LLM 合併三份摘要", "note": "retrieval-reasoning-decoupling:c6，並由 c4 交代是作者原本的系統。"},
+      {"text": "答案要拼兩個來源（A 的一句話＋B 的一張圖），分頭讀的做法拼不出來；沒有 LLM 看過全部證據", "verdict": "完全支持",
+       "card_quote": "會導致沒有任何一個 LLM 同時看過全部證據，如果正確答案需要跨源交叉推理（比如「A 的一句話加上 B 的一張圖」），原架構結構性地做不到", "note": "retrieval-reasoning-decoupling:c10。"},
+      {"text": "改成每一路只交原始證據，A 和 B 攤在同一個 LLM 面前一次推理，拼得起來", "verdict": "完全支持",
+       "card_quote": "文章架構的單次 synthesis 讓所有證據攤在同一個 context 裡一次推理，天生就支援跨源推理", "note": "retrieval-reasoning-decoupling:c10。"}],
+     "errors": []},
+
+    {"block": "第 10 張", "atoms": [
+      {"text": "每一路先摘要、合併再摘要，兩層有損壓縮疊加，下游看不出上游丟了什麼", "verdict": "完全支持",
+       "card_quote": "原架構「摘要的摘要」（每一路先摘要、最後再合併摘要）是兩層有損壓縮疊加，下游完全無法察覺上游丟失了什麼細節", "note": "retrieval-reasoning-decoupling:c11。"},
+      {"text": "主標「丟了什麼沒人知道」", "verdict": "部分支持",
+       "card_quote": "下游完全無法察覺上游丟失了什麼細節", "note": "卡的主詞是「下游」，主標擴成「沒人」；補充有寫回「下游」，屬標題口語化，輕微。"},
+      {"text": "改成證據保持原樣、最後才壓縮一次，誤差不會累積兩次", "verdict": "完全支持",
+       "card_quote": "文章架構只在最末端壓縮一次，證據在此之前保持原始形態，誤差不會累積兩次", "note": "retrieval-reasoning-decoupling:c11；圖註已標點數是示意。"}],
+     "errors": []},
+
+    {"block": "第 11 張", "atoms": [
+      {"text": "作者推導出一個 Cerebras 沒直接寫的結論：檢索和推理要分開", "verdict": "完全支持",
+       "card_quote": "最後會補上兩個文章沒有直接講、但討論過程中自己推導出來的判斷——**檢索與推理必須解耦**", "note": "retrieval-reasoning-decoupling:c1#2 / c8#1 / c2。"},
+      {"text": "檢索工具只吐原始證據，不推理、不摘要；推理只在最後那一次 synthesis", "verdict": "完全支持",
+       "card_quote": "檢索工具只負責吐出原始證據，不做推理、不做摘要，推理只在管線最末端的單次 synthesis 發生", "note": "retrieval-reasoning-decoupling:c8；SQL 例外在第 12 張帶出。"},
+      {"text": "工具變乾淨，可以跨領域共用", "verdict": "完全支持",
+       "card_quote": "檢索工具變成乾淨、無狀態、不綁推理的原語，天生可以跨領域共用", "note": "retrieval-reasoning-decoupling:c9。"},
+      {"text": "新增資料類型只要加一個工具、寫好能力描述", "verdict": "完全支持",
+       "card_quote": "新增資料類型只需要新增一個檢索工具、更新它的能力描述", "note": "retrieval-reasoning-decoupling:c9。"}],
+     "errors": []},
+
+    {"block": "第 12 張", "atoms": [
+      {"text": "SQL 這類查詢要當場生成 SQL、執行才拿得到數據，這一步推理省不了", "verdict": "完全支持",
+       "card_quote": "「把相關數據取出來」這件事本身需要當場生成 SQL、執行，才能得到答案，這是一個不可省略的推理步驟", "note": "retrieval-reasoning-decoupling:c12。"},
+      {"text": "判準看 LLM 產出：證據→留著但藏進檢索工具；給使用者的部分答案→砍掉、延到最後的 synthesis", "verdict": "完全支持",
+       "card_quote": "如果產出是「證據」（下游還要再加工），可以保留這一步，但要**藏在檢索工具內部**", "note": "retrieval-reasoning-decoupling:c13，另一半「如果產出是「面向使用者問題的部分答案」…那一步就該砍掉，延後到管線最末端的單次 synthesis」亦在卡上。"}],
+     "errors": []},
+
+    {"block": "第 13 張", "atoms": [
+      {"text": "流程：planner 決策一次、executor 平行執行一次、synthesis 一次，結束", "verdict": "完全支持",
+       "card_quote": "文章描述的完整流程是：查詢進來，planner 決策一次，平行執行一次，synthesis 一次，結束。", "note": "c9。"},
+      {"text": "沒有「發現證據不夠→回頭再查一輪」這條路", "verdict": "完全支持",
+       "card_quote": "沒有「評估夠不夠、不夠再來一輪」的回饋路徑", "note": "c9。"},
+      {"text": "作者推導出 Cerebras 沒直接寫的判斷：單輪 pipeline，不是 agentic loop", "verdict": "完全支持",
+       "card_quote": "最後會補上兩個文章沒有直接講、但討論過程中自己推導出來的判斷——**檢索與推理必須解耦**，以及**這套架構本質上是單輪 pipeline，不是 agentic loop**。", "note": "c1#1、c9#1 帶出。"}],
+     "errors": []},
+
+    {"block": "第 14 張", "atoms": [
+      {"text": "只走一輪，結構上有兩種常見需求做不到", "verdict": "完全支持",
+       "card_quote": "這個結構性地不支援兩種很常見的複雜需求", "note": "c9 source_quote。"},
+      {"text": "根源是同一件事：缺少狀態和 Multi-Hop 推理；常常要看過第一輪結果才知道還要查什麼", "verdict": "完全支持",
+       "card_quote": "往根源追其實是同一件事：**系統缺少「狀態」和「多步推理」**", "note": "c11，多步→Multi-Hop 依 terms.yaml。"},
+      {"text": "讀完發現證據不夠想再查一輪：查完就結束，沒有評估夠不夠的回頭路", "verdict": "完全支持",
+       "card_quote": "但文章的 executor 是 fan-out 完就結束，沒有「評估夠不夠、不夠再來一輪」的回饋路徑", "note": "c9。"},
+      {"text": "先查 A 再拿結果查 B：平行要工具互不依賴，「B 等 A」表達不出來", "verdict": "完全支持",
+       "card_quote": "平行的前提正是工具彼此獨立、互不依賴，如果工具 B 的輸入依賴工具 A 的輸出，在「平行 fan-out」這個模型下根本沒辦法表達", "note": "c10。"},
+      {"text": "以「先查人，再查他提交的程式修改」當作單輪接不住的例子", "verdict": "部分支持",
+       "card_quote": "如果模式有限（比如固定「先查人、再查該人的 PR」這種兩步流程），不需要完整的 agentic loop，可以把這個序列寫成一個複合工具，內部固定執行順序，對外仍然是 planner 眼中的單一黑盒工具", "note": "卡上此例是用來說明「固定模式可寫成複合工具、不需要 agentic loop」；貼文借用這個例子當「單輪接不住」的代表，卻沒帶出卡上對同一例子的處理，讀者會以為這種需求一定要迴圈。"}],
+     "errors": ["其他"]},
+
+    {"block": "第 15 張", "atoms": [
+      {"text": "用了 LLM 做決策，不等於 agentic；核心是迴圈和狀態", "verdict": "完全支持",
+       "card_quote": "用了 LLM 做決策，不等於 agentic**。Agentic 的核心特徵是迴圈跟狀態，而不是決策過程裡有沒有 LLM 參與。", "note": "c14 部落格判斷，作者口吻。"},
+      {"text": "作者說嚴格來講是「用 LLM 做動態路由的傳統 RAG pipeline」，不是 agentic RAG", "verdict": "完全支持",
+       "card_quote": "嚴格說，這篇文章做的不是「agentic RAG」，而是「用 LLM 做動態路由的傳統 RAG pipeline」。", "note": "c13；「（先搜再答）」為名詞白話，未加新範圍。"},
+      {"text": "對照表：決策次數、工具間關係、何時停止", "verdict": "完全支持",
+       "card_quote": "決策次數 | 一次，決定完不再變 | 多次，每輪結果可能觸發下一輪決策", "note": "c12 三列逐項對得上（另兩列：「工具間關係 | 獨立，可平行 | 可能有依賴，需要序列」「何時停止 | 固定流程跑完就停 | 由判斷邏輯動態決定「夠了嗎」」）。"}],
+     "errors": []},
+
+    {"block": "第 16 張", "atoms": [
+      {"text": "這一輪可以當迴圈裡的一圈；兩層互不衝突：單輪品質決定每一圈品質，有沒有迴圈決定能不能處理 Multi-Hop 推理問題", "verdict": "完全支持",
+       "card_quote": "單輪架構的品質，決定了迴圈裡每一次迭代的品質；迴圈存在與否，決定了系統能不能處理需要多步推理的複雜問題。這兩層彼此正交。", "note": "c15；「互不衝突」對應「正交」，以作者口吻呈現。"},
+      {"text": "要補上的一步：寫完答案後檢查還缺什麼，餵回 planner 觸發下一輪", "verdict": "完全支持",
+       "card_quote": "如果是 synthesis 讀完證據後才發現不夠，需要在 synthesis 之後加一個 self-critique 或 sufficiency check 步驟，讓它輸出「還缺什麼」，再回頭餵給 planner 觸發下一輪", "note": "c16；圖上寫成「要補上的」，卡的條件「如果是 synthesis 讀完證據後才發現不夠」由圖註的追問分支對照帶出。"},
+      {"text": "如果只是使用者追問，每次追問重跑一輪就夠，不需要迴圈", "verdict": "完全支持",
+       "card_quote": "如果是使用者追問才觸發，那屬於對話管理的範疇，不是需要迴圈的迭代問題，單輪 pipeline 每次追問重跑一次就夠了", "note": "c16。"}],
+     "errors": []},
+
+    {"block": "第 17 張", "atoms": [
+      {"text": "LLM 只挑一次工具，是單輪，不是迴圈", "verdict": "完全支持",
+       "card_quote": "整條處理線是決策一次、平行執行一次、synthesis 一次，沒有「證據不夠、回頭再查一輪」的迴圈——本質上是單輪 pipeline，不是 agentic loop", "note": "c1；作者判斷的限定在第 13 張與 Threads 帶出。"},
+      {"text": "推理留到最後一次", "verdict": "完全支持",
+       "card_quote": "推理只在管線最末端的單次 synthesis 發生", "note": "retrieval-reasoning-decoupling:c8。"}],
+     "errors": []},
+
+    {"block": "Threads 正文", "atoms": [
+      {"text": "先讓一個小模型（planner）決定這次該用哪幾個工具", "verdict": "部分支持",
+       "card_quote": "所以可以用小模型、結構化輸出", "note": "同第 1 張：卡是「可以用小模型」，正文寫成確定採用。"},
+      {"text": "做的是分類不是生成，故意比它服務的工具還便宜", "verdict": "完全支持",
+       "card_quote": "Planner 被故意設計得比它服務的工具還便宜——它做的是分類任務（從有限選項裡選一個或幾個），不是生成任務", "note": "c5。"},
+      {"text": "被選中的工具彼此沒有依賴，同時去查，再整理成同一套證據格式", "verdict": "完全支持",
+       "card_quote": "平行執行被選中的工具（前提是工具之間沒有依賴關係，本身是無狀態的檢索原語），以及把不同工具吐出的原始格式正規化成一套共同的 evidence schema", "note": "c8。"},
+      {"text": "作者原本系統每一路先推理、摘要再合併，等於壓縮兩次，跨來源答案拼不起來", "verdict": "完全支持",
+       "card_quote": "原架構「摘要的摘要」（每一路先摘要、最後再合併摘要）是兩層有損壓縮疊加", "note": "retrieval-reasoning-decoupling:c11、c10、c6。"},
+      {"text": "檢索工具只交原始證據，推理留到最後一次 synthesis；SQL 例外，推理留著藏進工具", "verdict": "完全支持",
+       "card_quote": "那次推理應該保留，但要藏進檢索工具內部", "note": "retrieval-reasoning-decoupling:c8 與 c1#1。"},
+      {"text": "決策一次、查一次、答一次就結束，沒有回頭再查的迴圈；用了 LLM 做決策不等於 agentic", "verdict": "完全支持",
+       "card_quote": "用了 LLM 做決策，不等於 agentic**。", "note": "c1、c9、c14。"},
+      {"text": "兩個結論都是作者對照後自己推導的判斷，不是 Cerebras 直接寫的", "verdict": "完全支持",
+       "card_quote": "最後會補上兩個文章沒有直接講、但討論過程中自己推導出來的判斷——**檢索與推理必須解耦**，以及**這套架構本質上是單輪 pipeline，不是 agentic loop**。", "note": "限定條件帶出。"}],
+     "errors": ["措辭與卡不同"]},
+
+    {"block": "Threads 最後一則", "atoms": [
+      {"text": "導流與同系列連結", "verdict": "完全支持", "card_quote": "", "note": "結構，不對證。"}],
+     "errors": []},
+
+    {"block": "IG caption", "atoms": [
+      {"text": "RAG 搜尋怎麼決定叫哪些工具：Cerebras 的 planner 與「只查一輪」", "verdict": "完全支持",
+       "card_quote": "LLM 被用來動態決定「這次該用哪些工具」", "note": "c1；其餘條列為各張主標，已逐張審。"}],
+     "errors": []}
+  ],
+  "recalculations": [
+    {"block": "第 6 張", "expression": "len(['工具目錄','查詢','鎖定的查詢範圍'])", "result": "3，與卡「三樣輸入」一致"},
+    {"block": "第 5 張", "expression": "len(['延遲拖長、成本浪費','雜訊拉低排序品質'])", "result": "2，與卡「兩個直接的壞處」一致"}
+  ],
+  "gaps": [
+    {"description": "貼文用 c17 的「先查人、再查 PR」當單輪接不住的例子，並在第 16 張引用 c17，但沒帶出 c17 的分岔：固定模式的序列可寫成複合工具、不需要完整 agentic loop，只有開放式序列依賴才真正需要迴圈。", "card_quote": "如果模式有限（比如固定「先查人、再查該人的 PR」這種兩步流程），不需要完整的 agentic loop，可以把這個序列寫成一個複合工具，內部固定執行順序，對外仍然是 planner 眼中的單一黑盒工具；如果序列依賴是開放式、沒有固定模式、需要 agent 臨場判斷下一步，那才是真正需要 agentic loop 的情況"}
+  ]
+}

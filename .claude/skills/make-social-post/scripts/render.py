@@ -33,7 +33,7 @@ RP = PARAMS["render"]
 WD, HT, SAFE_X, PAD_X = RP["width"], RP["height"], RP["safe_x"], RP["pad_x"]
 CREAM, TEAL, DEEP, GOLD = "#F2E0C0", "#076876", "#01353F", "#DDA642"
 MID, LIGHT, ABYSS = "#1F8A8D", "#69B4AA", "#032027"
-SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD, "seesaw": GOLD, "spotlight": GOLD, "window": GOLD}
+SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD, "seesaw": GOLD, "spotlight": GOLD, "window": GOLD, "hourglass": GOLD}
 ALLOWED_FONT_PX = {28, 34, 38, 40, 56, 72, 76}
 ZERO_Y = 706          # 測深圖水面（0）
 
@@ -576,6 +576,130 @@ def wn_takeaway():
     return wn_deco(0, dark=True, y0=930, h=290)
 
 
+# ---------------------------------------------------------------- 沙漏系列（style: hourglass）的 SVG 元件
+# 哲學 series/cerebras-rag/philosophy.md：上段異質、中段收窄成一條只有五格的窄帶、下段重新展開。
+# 都用 class "bg"（背景層，不進程式 B 的文字與圖形重疊檢查），排版時自己確保不壓到文字。
+HG_FIELDS = ("document", "embedding", "metadata", "source", "timestamp")
+HG_GOLD_CELL = 2          # 金色永遠給 metadata 那一格（它是後面所有排序訊號的來源）
+
+
+def hg_shape(kind, x, y, w, h, rot=0.0, op=1.0):
+    """四種來源各畫成不同形狀（不填色，只有細外框：還沒被整理過的東西）。"""
+    g = (f'<g class="bg" transform="translate({x:.1f},{y:.1f}) rotate({rot})" fill="none" '
+         f'stroke="{MID}" stroke-width="3" stroke-opacity="{op}">')
+    if kind == "bubble":        # 對話（Slack）
+        g += f'<path d="M0 0 h{w} v{h - 16} h-{w * .62:.1f} l-15 16 v-16 H0 Z" stroke-linejoin="round"/>'
+        for i in range(2):
+            g += f'<line x1="16" y1="{24 + i * 20}" x2="{w - 24:.1f}" y2="{24 + i * 20}" stroke-opacity="{op * .55}"/>'
+    elif kind == "doc":         # 文件（Wiki）：右上角折角
+        g += f'<path d="M0 0 h{w - 20:.1f} l20 20 v{h - 20:.1f} H0 Z" stroke-linejoin="round"/><path d="M{w - 20:.1f} 0 v20 h20"/>'
+        for i in range(3):
+            g += f'<line x1="14" y1="{28 + i * 18}" x2="{w - 14:.1f}" y2="{28 + i * 18}" stroke-opacity="{op * .55}"/>'
+    elif kind == "code":        # 程式碼：一對角括號
+        g += (f'<rect width="{w}" height="{h}" rx="6"/>'
+              f'<path d="M{w * .32:.1f} {h * .3:.1f} L{w * .19:.1f} {h * .5:.1f} L{w * .32:.1f} {h * .7:.1f}" stroke-linecap="round"/>'
+              f'<path d="M{w * .68:.1f} {h * .3:.1f} L{w * .81:.1f} {h * .5:.1f} L{w * .68:.1f} {h * .7:.1f}" stroke-linecap="round"/>')
+    else:                       # ticket（Jira）：左右各一個撕票口
+        g += (f'<path d="M0 0 h{w} v{h} H0 Z" stroke-linejoin="round"/>'
+              f'<path d="M0 {h * .45:.1f} h10 M{w} {h * .45:.1f} h-10"/>'
+              f'<circle cx="{w * .5:.1f}" cy="{h * .5:.1f}" r="8" stroke-opacity="{op * .8}"/>')
+    return g + "</g>"
+
+
+def hg_waist(cx, y, bw=460, h=72, glow=False):
+    """窄帶：一條只有五格的深海色塊，金色給 metadata 那一格。"""
+    x0, cw = cx - bw / 2, bw / 5
+    s = f'<ellipse class="bg" cx="{cx}" cy="{y + h / 2}" rx="{bw * .62:.0f}" ry="86" fill="url(#glow)"/>' if glow else ""
+    s += f'<rect class="bg" x="{x0:.1f}" y="{y}" width="{bw}" height="{h}" rx="8" fill="{DEEP}"/>'
+    for i in range(5):
+        on = i == HG_GOLD_CELL
+        s += (f'<rect class="g mark" data-e="{int(on)}" x="{x0 + i * cw + 6:.1f}" y="{y + 14}" '
+              f'width="{cw - 12:.1f}" height="{h - 28}" rx="4" fill="{GOLD if on else CREAM}" '
+              f'fill-opacity="{1 if on else .22}"/>')
+    return s
+
+
+def hg_cover(mi):
+    """封面：上段四種來源收斂 → 中段窄帶 → 下段重新展開。
+    每一則強調不同的一段（第 1 則腰以上、第 2 則腰以下、第 3 則腰本身），其餘那段畫淡。"""
+    up = 1.0 if mi % 3 == 0 else (.55 if mi % 3 == 1 else .78)
+    dn = .55 if mi % 3 == 0 else (1.0 if mi % 3 == 1 else .78)
+    cx, wy = WD / 2, 430
+    s = ""
+    for kind, x, rot, name in (("bubble", 150, -6, "Slack"), ("doc", 390, 5, "Wiki"),
+                               ("code", 660, -3, "程式碼"), ("ticket", 900, 7, "Jira")):
+        s += hg_shape(kind, x - 72, 150, 144, 96, rot=rot, op=up)
+        s += (f'<text class="bg" x="{x}" y="{284}" text-anchor="middle" font-family="DSO" font-size="28" '
+              f'fill="{DEEP}" fill-opacity="{up * .85:.2f}">{esc(name)}</text>')
+        s += (f'<path class="bg" d="M{x} 302 C {x} 364, {cx} 344, {cx} {wy - 14}" stroke="{MID}" '
+              f'stroke-width="2" fill="none" stroke-opacity="{up * .6:.2f}"/>')
+    s += hg_waist(cx, wy, glow=(mi % 3 == 2))
+    for dx in (-330, -170, 0, 170, 330):
+        s += (f'<path class="bg" d="M{cx} {wy + 86} C {cx} {wy + 142}, {cx + dx} {wy + 122}, '
+              f'{cx + dx} {wy + 184}" stroke="{LIGHT}" stroke-width="2" fill="none" stroke-opacity="{dn * .75:.2f}"/>')
+        s += f'<circle class="bg" cx="{cx + dx}" cy="{wy + 194}" r="9" fill="{LIGHT}" fill-opacity="{dn * .8:.2f}"/>'
+    s += f'<rect class="bg" x="0" y="1234" width="{WD}" height="116" fill="{DEEP}"/>'
+    return s
+
+
+def hg_deco(idx, n, y0=790, h=320):
+    """內頁下半的裝飾：五條線收束到中央的窄口、再展開成五條（對稱，才看得出沙漏的形）。
+    用直線不用曲線；上段中藍綠、下段淺藍綠；展開的五條裡有一條是金色，隨張數換一條。"""
+    cx, ym = WD / 2, y0 + h / 2
+    lit = (idx - 1) % 5
+    s = ""
+    for k in range(5):
+        x = 140 + k * 200
+        s += (f'<line class="bg" x1="{x}" y1="{y0}" x2="{cx - 50}" y2="{ym - 13}" stroke="{MID}" '
+              f'stroke-width="2" stroke-opacity=".5"/>')
+        s += f'<circle class="bg" cx="{x}" cy="{y0}" r="7" fill="none" stroke="{MID}" stroke-width="3" stroke-opacity=".7"/>'
+        on = k == lit
+        s += (f'<line class="bg" x1="{cx + 50}" y1="{ym + 13}" x2="{x}" y2="{y0 + h}" '
+              f'stroke="{GOLD if on else LIGHT}" stroke-width="{3 if on else 2}" stroke-opacity="{1 if on else .5}"/>')
+        s += (f'<circle class="bg" cx="{x}" cy="{y0 + h}" r="{9 if on else 6}" '
+              f'fill="{GOLD if on else LIGHT}" fill-opacity="{1 if on else .75}"/>')
+    s += f'<rect class="bg" x="{cx - 58}" y="{ym - 15}" width="116" height="30" rx="7" fill="{DEEP}"/>'
+    for i in range(5):
+        s += (f'<rect class="bg" x="{cx - 50 + i * 20}" y="{ym - 8}" width="14" height="16" rx="3" '
+              f'fill="{CREAM}" fill-opacity=".30"/>')
+    return s
+
+
+def hg_corner(idx, n):
+    """右上角的小沙漏：上半的沙隨進度減少、下半增加（沙的高度＝這一則讀到哪裡），落下的那一粒是金色。"""
+    x, y, w, h = 912, 44, 68, 72
+    t = idx / max(n, 1)
+    s = (f'<path class="bg" d="M{x} {y} L{x + w} {y} L{x + w / 2} {y + h / 2} L{x + w} {y + h} L{x} {y + h} '
+         f'L{x + w / 2} {y + h / 2} Z" fill="none" stroke="{MID}" stroke-width="3" stroke-linejoin="round"/>')
+    ut = (1 - t) ** .5                                   # 上半剩下的沙：一個與輪廓同形的小三角
+    if ut > .04:
+        hw, hh = w / 2 * ut, h / 2 * ut
+        s += (f'<path class="bg" d="M{x + w / 2 - hw:.1f} {y + h / 2 - hh:.1f} L{x + w / 2 + hw:.1f} '
+              f'{y + h / 2 - hh:.1f} L{x + w / 2:.1f} {y + h / 2:.1f} Z" fill="{MID}" fill-opacity=".55"/>')
+    lt = t ** .5
+    if lt > .04:
+        hw, hh = w / 2 * lt, h / 2 * lt
+        s += (f'<path class="bg" d="M{x + w / 2:.1f} {y + h / 2:.1f} L{x + w / 2 + hw:.1f} {y + h / 2 + hh:.1f} '
+              f'L{x + w / 2 - hw:.1f} {y + h / 2 + hh:.1f} Z" fill="{MID}" fill-opacity=".55"/>')
+    s += f'<circle class="bg" cx="{x + w / 2}" cy="{y + h / 2 + 12}" r="5" fill="{GOLD}"/>'
+    return s
+
+
+def hg_takeaway():
+    """帶走張（深色底）：下半一個大沙漏的輪廓，窄口一道金色細流。"""
+    cx, y, w, h = WD / 2, 830, 700, 410      # 2026-10-31 編輯：帶走張下半太空 → 沙漏放大、沙的對比提高
+    s = (f'<path class="bg" d="M{cx - w / 2} {y} L{cx + w / 2} {y} L{cx} {y + h / 2} L{cx + w / 2} {y + h} '
+         f'L{cx - w / 2} {y + h} L{cx} {y + h / 2} Z" fill="none" stroke="{LIGHT}" stroke-opacity=".42" '
+         f'stroke-width="4" stroke-linejoin="round"/>')
+    for k, op in ((1, .30), (2, .22)):      # 下半積起來的沙：兩層由寬到窄的橫條
+        hw = w / 2 * (1 - k * .3)
+        s += (f'<path class="bg" d="M{cx - hw:.1f} {y + h} L{cx + hw:.1f} {y + h} L{cx:.1f} '
+              f'{y + h - hw * h / w:.1f} Z" fill="{LIGHT}" fill-opacity="{op}"/>')
+    s += f'<ellipse class="bg" cx="{cx}" cy="{y + h / 2}" rx="78" ry="58" fill="url(#glow)"/>'
+    s += f'<circle class="bg" cx="{cx}" cy="{y + h / 2}" r="9" fill="{GOLD}"/>'
+    return s
+
+
 def series_journey(members, cur, jy):
     """整個系列的路線：走過的是實心點，這一則是金色，後續是空心點；每個點下面一行「第 N 則」。回傳 (svg, html)。"""
     svg, out = "", ""
@@ -602,8 +726,10 @@ def series_rows(members, cur, y0, labels=False, upto=None):
     for i, m in enumerate(members[:upto]):
         isc = i == cur
         sl_ = est_lines(m["summary"], 836 / 28 + 0.6)
+        tl_ = est_lines(m["planned_title"], 836 / 34 - 0.6)       # 標題太長一行放不下時折行（hook 當標題，約 25 字以上）；一行的照舊
+        t_extra = (tl_ - 1) * 48
         lab_h = 39 if labels else 0
-        h = lab_h + 48 + sl_ * 39 + 24
+        h = lab_h + 48 + t_extra + sl_ * 39 + 24
         top = y - 10
         if isc:
             svg += f'<rect class="bg" x="72" y="{top}" width="936" height="{h}" rx="6" fill="{DEEP}"/>'
@@ -614,8 +740,9 @@ def series_rows(members, cur, y0, labels=False, upto=None):
         if labels:
             lab = f"第 {i + 1} 則・這一則" if isc else f"第 {i + 1} 則・前面介紹過"
             out += f'<div class="t abs ilab{cc}" style="left:132px;top:{y}px">{esc(lab)}</div>'
-        out += f'<div class="t abs item{cc}" style="left:132px;top:{y + lab_h}px">{esc(m["planned_title"])}</div>'
-        out += f'<div class="t abs isum{cc}" style="left:132px;top:{y + lab_h + 48}px">{esc(bind_nums(m["summary"]))}</div>'
+        wrap_ = ";width:836px;white-space:normal;word-break:keep-all" if tl_ > 1 else ""
+        out += f'<div class="t abs item{cc}" style="left:132px;top:{y + lab_h}px{wrap_}">{esc(m["planned_title"])}</div>'
+        out += f'<div class="t abs isum{cc}" style="left:132px;top:{y + lab_h + 48 + t_extra}px">{esc(bind_nums(m["summary"]))}</div>'
         y += h + 14
     return svg, out, y - 14
 
@@ -632,6 +759,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     seesaw = series.get("style") == "seesaw"
     spot = series.get("style") == "spotlight"
     win = series.get("style") == "window"
+    hg = series.get("style") == "hourglass"
     idx, n_sl = spec.get("_idx", 1), spec.get("_n", 1)          # 第幾張／共幾張（render_all 填入）
     mi, mn = spec.get("_mi", 0), spec.get("_mn", 1)            # 這則是系列的第幾則／共幾則
     kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", ""))), "FAM": "", "BODY_STYLE": "", "FOOT_CLS": ""}
@@ -670,6 +798,11 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["SVG"] = svg_wrap(wn_cover(mi))
         kw["SUB_TOP"] = 560
         kw["BODY"] = kw["BODY"].replace("\n", "<br>")
+    elif lay == "cover" and hg:        # 米色底，上段四種來源收斂成一條窄帶、下段重新展開；標題與副標在下段
+        kw["SVG"] = svg_wrap(hg_cover(mi))
+        kw["TITLE_TOP"] = 756
+        kw["SUB_TOP"] = 756 + est_lines(re.sub(r"\[\[|\]\]", "", spec.get("title", "")), 920 / 76 - 0.4) * 95 + 26
+        kw["BODY"] = kw["BODY"].replace("\n", "<br>")
     elif lay == "cover" and seesaw:    # 米色底，標題在上，下半一座蹺蹺板；副標固定在 y=400
         kw["SVG"] = svg_wrap(ss_cover())
         kw["SUB_TOP"] = 400
@@ -689,7 +822,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             parts, cells, _ = table_block(spec["rows"], y0_ + shift, spec.get("key_w", 300))
             kw["SVG"], kw["CELLS"] = svg_wrap(parts), cells
         else:
-            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else (svg_wrap(ss_mid(idx, n_sl)) if seesaw else (svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False)) if spot else (svg_wrap(wn_deco(idx)) if win else ""))))), ""
+            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else (svg_wrap(ss_mid(idx, n_sl)) if seesaw else (svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False)) if spot else (svg_wrap(wn_deco(idx)) if win else (svg_wrap(hg_deco(idx, n_sl)) if hg else "")))))), ""
             if horizon:
                 kw["FOOT_CLS"] = "light"
     elif lay == "text" and contour:
@@ -706,6 +839,8 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["SVG"] = svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False))
     elif lay == "text" and win:        # 下半一個端正的視窗，游標停的行隨張數往下走
         kw["SVG"] = svg_wrap(wn_deco(idx))
+    elif lay == "text" and hg:         # 下半一束線收束到一個窄口再展開，窄口的位置隨張數往右移
+        kw["SVG"] = svg_wrap(hg_deco(idx, n_sl))
     elif lay == "text" and seesaw:     # 中段一座蹺蹺板，傾斜角隨張數轉向
         kw["SVG"] = svg_wrap(ss_mid(idx, n_sl))
     elif lay == "text":
@@ -861,6 +996,14 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         lab = spec.get("label")
         kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
         kw["SVG"] = svg_wrap(wn_takeaway())
+    elif lay == "takeaway" and hg:
+        kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
+        q = spec.get("question")
+        kw["QUESTION"] = f'<div class="t abs take-q" style="top:320px">{esc(q)}</div>' if q else ""
+        kw["TAKE_STYLE"] = f"top:{320 + math.ceil(len(q) / 15.0) * 73 + 36}px" if q else ""
+        lab = spec.get("label")
+        kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
+        kw["SVG"] = svg_wrap(hg_takeaway())
     elif lay == "takeaway" and seesaw:
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
         q = spec.get("question")
@@ -924,11 +1067,11 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         cur = [m["concept"] for m in series["members"]].index(spec["current"])
         y, svg, out = 330, "", ""
         for i, t in enumerate(items):
-            if (contour or cards or spot or win) and i == cur:
+            if (contour or cards or spot or win or hg) and i == cur:
                 svg += f'<rect class="bg" x="72" y="{y - 10}" width="936" height="84" rx="6" fill="{DEEP}"/>'
                 svg += f'<circle class="g mark" data-e="1" cx="100" cy="{y + 32}" r="12" fill="{GOLD}"/>'
                 out += f'<div class="t abs item cur" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
-            elif contour or cards or spot or win:
+            elif contour or cards or spot or win or hg:
                 svg += f'<circle class="g mark" cx="100" cy="{y + 32}" r="8" fill="{TEAL}"/>'
                 out += f'<div class="t abs item" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
             elif i == cur:
@@ -989,6 +1132,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     if spot and lay not in ("cover", "takeaway"):
         strip = sp_strip(idx, n_sl)
         kw["SVG"] = kw["SVG"].replace("</svg>", strip + "</svg>") if kw.get("SVG") else svg_wrap(strip)
+    if hg and lay not in ("cover", "takeaway"):
+        corner = hg_corner(idx, n_sl)
+        kw["SVG"] = kw["SVG"].replace("</svg>", corner + "</svg>", 1) if kw.get("SVG") else svg_wrap(corner)
     if win and lay not in ("cover", "takeaway"):
         dots = progress_dots(idx, n_sl)
         kw["SVG"] = kw["SVG"].replace("</svg>", dots + "</svg>") if kw.get("SVG") else svg_wrap(dots)
@@ -1066,6 +1212,21 @@ def contrast(a, b):
     return (la + .05) / (lb + .05)
 
 
+def worst_contrast(ts: list, img: Image.Image) -> tuple:
+    """各文字框外緣四角（外推 3px）的實際背景色與字色的最低對比度：(對比度, 文字名, 取樣點與顏色)。"""
+    worst = (99, "", "")
+    for t in ts:
+        r = t["r"]; fg = tuple(int(x) for x in re.findall(r"\d+", t["c"])[:3])
+        for (x, y) in ((r["l"] - 3, r["t"] - 3), (r["r"] + 3, r["t"] - 3), (r["l"] - 3, r["b"] + 3), (r["r"] + 3, r["b"] + 3)):
+            x = min(max(int(x), 0), WD - 1); y = min(max(int(y), 0), HT - 1)
+            bg = img.getpixel((x, y))[:3]
+            cr = contrast(fg, bg)
+            if cr < worst[0]:
+                # 失敗時直接印出取樣點與兩個顏色：常見原因是格子裡的字框太高，角落取到邊線或格子外的底色
+                worst = (cr, t["n"], f"取樣點 ({x},{y})、文字 rgb{fg}、背景 rgb{bg}")
+    return worst
+
+
 def inter(a, b):
     return max(0, min(a["r"], b["r"]) - max(a["l"], b["l"])) > 1 and max(0, min(a["b"], b["b"]) - max(a["t"], b["t"])) > 1
 
@@ -1090,15 +1251,9 @@ def program_b(spec: dict, m: dict, img: Image.Image, series_name: str, tag_texts
     fs = {t["fs"] for t in m["ts"]}
     chk(f"最小字級 >= {RP['min_font_px']}px", min(fs) >= RP["min_font_px"], f"最小 {min(fs)}px")
     chk("字級都在規定集合內", fs <= ALLOWED_FONT_PX, sorted(fs - ALLOWED_FONT_PX))
-    worst = (99, "")
-    for t in m["ts"]:
-        r = t["r"]; fg = tuple(int(x) for x in re.findall(r"\d+", t["c"])[:3])
-        for (x, y) in ((r["l"] - 3, r["t"] - 3), (r["r"] + 3, r["t"] - 3), (r["l"] - 3, r["b"] + 3), (r["r"] + 3, r["b"] + 3)):
-            x = min(max(int(x), 0), WD - 1); y = min(max(int(y), 0), HT - 1)
-            cr = contrast(fg, img.getpixel((x, y)))
-            if cr < worst[0]:
-                worst = (cr, t["n"])
-    chk(f"文字對比度 >= {RP['min_contrast']}（取文字框外緣四角的實際背景色）", worst[0] >= RP["min_contrast"], f"最低 {worst[0]:.1f}（{worst[1]}）")
+    worst = worst_contrast(m["ts"], img)
+    chk(f"文字對比度 >= {RP['min_contrast']}（取文字框外緣四角的實際背景色）", worst[0] >= RP["min_contrast"],
+        f"最低 {worst[0]:.1f}（{worst[1]}）" + ("" if worst[0] >= RP["min_contrast"] else f"；{worst[2]}"))
     ti = m["chk"].get("title")
     if ti:
         mx = 4 if lay == "takeaway" else (3 if spec.get("_split") else (PARAMS.get("cover_title_max_lines", PARAMS["title_max_lines"]) if lay == "cover" else PARAMS["title_max_lines"]))

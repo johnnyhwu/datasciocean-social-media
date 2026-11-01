@@ -1,0 +1,11 @@
+concept: slack-distillation-and-bursting
+formats:
+  ig_carousel:
+    status: ready
+    pack: out/cerebras-rag/rag-narrow-waist
+    merged_into: rag-narrow-waist
+  threads_thread:
+    status: ready
+    pack: out/cerebras-rag/rag-narrow-waist
+    merged_into: rag-narrow-waist
+posts: []

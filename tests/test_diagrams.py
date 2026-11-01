@@ -200,6 +200,36 @@ code, out = render(D("leak", **LEK))
 expect("正確的每跳都漏一些圖通過程式 B", code == 0, out)
 code, out = render(D("leak", **{**LEK, "nodes": [{"text": "很長的說明" * 40, "sub": "很長的小字" * 40}] * 2}))
 expect("故意做壞：漏斗式圖的字太多放不下 → 報錯", code != 0 and "放不下" in out, out)
+DEP = dict(heads=["同時出發", "包成一個工具"], nodes=[{"text": "查人"}, {"text": "查他的修改"}],
+           outcomes=[{"text": "查到的人"}, {"text": "B 拿不到"}, {"text": "對外仍是一個工具"}])
+code, out = render(D("depend", **DEP))
+expect("正確的序列依賴圖（depend）通過程式 B", code == 0, out)
+code, out = render(D("depend", **{**DEP, "outcomes": DEP["outcomes"][:2]}))
+expect("故意做壞：depend 的 outcomes 少於 3 項 → 報錯", code != 0 and "outcomes" in out, out)
+code, out = render(D("depend", **{**DEP, "outcomes": DEP["outcomes"][:2] + [{"text": "很長的說明" * 60}]}))
+expect("故意做壞：depend 的說明太長放不下 → 報錯", code != 0 and "放不下" in out, out)
+PIK = dict(heads=["分類", "生成"], nodes=[{"text": "甲"}, {"text": "乙", "on": True}, {"text": "丙"}], outcomes=[{"text": "所以很便宜"}])
+code, out = render(D("pick", **PIK))
+expect("正確的勾選單圖（pick）通過程式 B", code == 0, out)
+code, out = render(D("pick", **{**PIK, "nodes": PIK["nodes"] * 2}))
+expect("故意做壞：pick 的選項超過 5 個 → 報錯", code != 0 and "nodes" in out, out)
+PIL_ = dict(heads=["原始證據", "最後一步"], nodes=[{"text": "原樣往下傳"}, {"text": "synthesis", "sub": "一次讀完"}], outcomes=[{"text": "甲"}, {"text": "乙"}, {"text": "丙"}])
+code, out = render(D("pile", **PIL_))
+expect("正確的證據堆圖（pile）通過程式 B", code == 0, out)
+code, out = render(D("pile", **{**PIL_, "outcomes": PIL_["outcomes"][:1]}))
+expect("故意做壞：pile 的證據卡少於 2 張 → 報錯", code != 0 and "outcomes" in out, out)
+ADL = dict(heads=["每一路自帶", "放最後"], nodes=[{"text": "搜尋"}, {"text": "推理"}, {"text": "摘要"}],
+           outcomes=[{"text": "整套重做"}, {"text": "合併"}, {"text": "加一個"}, {"text": "合成"}])
+code, out = render(D("addlane", **ADL))
+expect("正確的多接一路圖（addlane）通過程式 B", code == 0, out)
+code, out = render(D("addlane", **{**ADL, "outcomes": ADL["outcomes"][:3]}))
+expect("故意做壞：addlane 的 outcomes 少於 4 項 → 報錯", code != 0 and "outcomes" in out, out)
+code, out = render(D("addlane", **{**ADL, "outcomes": [{"text": "很長的說明" * 40}] + ADL["outcomes"][1:]}))
+expect("故意做壞：addlane 的說明太長放不下 → 報錯", code != 0 and "放不下" in out, out)
+code, out = render(D("leak", hops=2, **LEK))
+expect("正確的每跳都漏一些圖（hops=2：第一條只壓縮兩次）通過程式 B", code == 0, out)
+code, out = render(D("leak", hops=4, **LEK))
+expect("故意做壞：leak 的 hops 不是 2 或 3 → 報錯", code != 0 and "hops" in out, out)
 AMP = dict(heads=["起點", "終點"], nodes=[{"text": "甲", "sub": "乙"}, {"text": "丙", "sub": "丁"}], outcomes=[{"text": "精確比對"}])
 code, out = render(D("amplify", **AMP))
 expect("正確的誤差放大圖通過程式 B", code == 0, out)
@@ -345,11 +375,85 @@ HK = dict(heads=["示意"], nodes=[{"text": "Hook　Session 開始時", "tone": 
 code, out = render(D("transcript", **HK))
 expect("正確的含 Hook 列的對話紀錄圖通過程式 B", code == 0, out)
 
+# 2026-10-31 新增（Cerebras RAG 第 1 則）：waist／schema／branch／gates
+WS = dict(heads=["上半部：異質的寫入來源", "收窄成一個很單純的介面", "下半部：重新展開"],
+          nodes=[{"text": "Slack 討論串"}, {"text": "Wiki 頁面"}, {"text": "程式碼"}, {"text": "Jira 票"}],
+          outcomes=[{"text": "檢索策略"}, {"text": "編排策略"}, {"text": "不必動寫入端"}])
+code, out = render(D("waist", **WS))
+expect("正確的沙漏圖通過程式 B", code == 0, out)
+code, out = render(D("waist", **{**WS, "nodes": [{"text": "只有一個來源"}]}))
+expect("故意做壞：沙漏圖上段只有 1 個來源 → 報錯", code != 0 and "waist" in out, out)
+code, out = render(D("waist", **{**WS, "nodes": [{"text": "很長的來源名稱" * 4}] * 4}))
+expect("故意做壞：沙漏圖上段的名稱太長 → 抓得到", code != 0, out)
+SH = dict(heads=["embeddings table：一行資料長什麼樣"],
+          nodes=[{"text": "document", "sub": "要被搜尋\n的文字"}, {"text": "embedding", "sub": "向量"},
+                 {"text": "metadata", "sub": "不透明的\nJSON", "emph": True}, {"text": "source", "sub": "哪裡來的"},
+                 {"text": "timestamp", "sub": "時間戳"}],
+          outcomes=[{"text": "新增一個資料源，只要把資料塞進這五個欄位"}])
+code, out = render(D("schema", **SH))
+expect("正確的欄位表通過程式 B", code == 0, out)
+code, out = render(D("schema", **{**SH, "nodes": [{**n, "emph": True} for n in SH["nodes"][:3]]}))
+expect("故意做壞：欄位表有兩格金色 → 報錯", code != 0 and "emph" in out, out)
+code, out = render(D("schema", **{**SH, "nodes": SH["nodes"][:2]}))
+expect("故意做壞：欄位表只有 2 欄 → 報錯", code != 0 and "schema" in out, out)
+BR = dict(heads=["為了遷就來源，額外加上去的欄位", "下游的檢索或排序邏輯"],
+          nodes=[{"text": "形式上統一成一張表，語意上還是分裂的"},
+                 {"text": "if source == 'X' then...", "sub": "出現這種分支，就代表窄腰還沒收乾淨"}],
+          outcomes=[{"text": "slack_channel"}, {"text": "code_repo"}, {"text": "jira_ticket_id"}])
+code, out = render(D("branch", **BR))
+expect("正確的語意分裂圖通過程式 B", code == 0, out)
+code, out = render(D("branch", **{**BR, "outcomes": BR["outcomes"][:1]}))
+expect("故意做壞：語意分裂圖只有 1 個額外欄位 → 報錯", code != 0 and "branch" in out, out)
+code, out = render(D("branch", **{**BR, "body": "很長的補充" * 40}))
+expect("故意做壞：語意分裂圖的補充太長放不下 → 抓得到", code != 0, out)
+GT = dict(heads=["有料的 burst", "社交填充語"],
+          nodes=[{"text": "IDF ≥ 4.0", "sub": "含有稀有詞，\n不是純廢話"},
+                 {"text": "長度 ≥ 200 字元", "sub": "內容量夠，\n撐得起一個向量"},
+                 {"text": "有 reaction 加分", "sub": "用社交訊號\n間接驗證有價值"}],
+          outcomes=[{"text": "寫進同一張表"}, {"text": "完全不會被 embed"}])
+code, out = render(D("gates", **GT))
+expect("正確的門檻圖通過程式 B", code == 0, out)
+code, out = render(D("gates", **{**GT, "outcomes": GT["outcomes"][:1]}))
+expect("故意做壞：門檻圖只有 1 個下場 → 報錯", code != 0 and "gates" in out, out)
+code, out = render(D("gates", **{**GT, "nodes": GT["nodes"] * 2}))
+expect("故意做壞：門檻超過 4 道 → 報錯", code != 0 and "gates" in out, out)
+code, out = render(D("gates", **{**GT, "nodes": [{"text": "很長的門檻名稱沒有標點所以斷不了行"}] * 3}))
+expect("故意做壞：門檻名稱太長塞不進欄寬 → 抓得到", code != 0, out)
+# route（2026-10-31 人的回饋「讀起來不連貫、不知道處在 journey 的哪裡」）
+RT = dict(heads=["這一則走的路線", "腰以下是這個系列接下來兩則的事"],
+          nodes=[{"text": "窄腰長什麼樣", "sub": "異質來源怎麼塞進同一張表？"},
+                 {"text": "收窄要付的代價", "sub": "哪些事必須在寫入的當下就想清楚？"},
+                 {"text": "資料進表之前", "sub": "討論串為什麼不能直接丟進去？"}])
+code, out = render(D("route", **RT))
+expect("正確的路線圖通過程式 B", code == 0, out)
+code, out = render(D("route", **{k: v for k, v in RT.items() if k != "heads"}))
+expect("路線圖沒有 heads（不畫標籤與虛線尾巴）也通過", code == 0, out)
+code, out = render(D("route", **{**RT, "nodes": RT["nodes"][:1]}))
+expect("故意做壞：路線圖只有 1 站 → 報錯", code != 0 and "route" in out, out)
+code, out = render(D("route", **{**RT, "nodes": RT["nodes"] * 2}))
+expect("故意做壞：路線圖超過 4 站 → 報錯", code != 0 and "route" in out, out)
+code, out = render(D("route", **{**RT, "nodes": [{"text": "站名", "sub": "很長的說明沒有標點所以斷不了行" * 6}] * 3}))
+expect("故意做壞：路線圖的說明太長放不下 → 抓得到", code != 0, out)
+
 import sys
 sys.path.insert(0, str(ROOT / ".claude/skills/make-social-post/scripts"))
 import diagrams as DG
 o = DG.drift_offsets(5, 200)
 expect("drift_offsets：起點 0、單調遞增、終點 = dmax", o[0] == 0 and all(b > a for a, b in zip(o, o[1:])) and abs(o[-1] - 200) < 1e-9, str(o))
+
+# 矮格子共用的 cell()：一定用 28px 粗體（dl），字框才不會高過格子讓程式 B 的對比取樣取到邊線
+import html
+cv = DG.Canvas(DG.Ctx(lambda s, n: 1, lambda s: s, html.escape))
+cv.cell(100, 200, 160, 52, "搜尋", fill=DG.DEEP, color=DG.CREAM)
+expect("cell()：畫一個框、文字用 dl 並帶 data-box", len(cv.svg) == 1 and len(cv.html) == 1 and "t abs dl" in cv.html[0] and 'data-box="100.0,200.0,160.0,52.0"' in cv.html[0], cv.html[0] if cv.html else "")
+
+# 對比度失敗時，訊息要直接給取樣點與兩個顏色（不必再臨時改 render.py 印 debug）
+import render as RD
+from PIL import Image
+img = Image.new("RGB", (1080, 1350), (240, 232, 214))
+w = RD.worst_contrast([{"n": "淺字", "r": {"l": 200, "t": 200, "r": 400, "b": 240}, "c": "rgb(240, 232, 214)"}], img)
+expect("故意做壞：米色底上的米色字 → 對比 1.0，並給出取樣點與文字、背景顏色",
+       w[0] < 1.1 and w[1] == "淺字" and "取樣點 (197,197)" in w[2] and "背景 rgb(240, 232, 214)" in w[2], str(w))
 
 print("\n全部通過" if not fails else f"\n{len(fails)} 項失敗")
 raise SystemExit(1 if fails else 0)

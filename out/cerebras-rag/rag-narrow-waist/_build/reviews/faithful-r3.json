@@ -1,0 +1,577 @@
+{
+  "post": "rag-narrow-waist（cerebras-rag 系列第 1 則，雙卡：rag-narrow-waist + slack-distillation-and-bursting）",
+  "blocks": [
+    {
+      "block": "第 1 張（封面）",
+      "atoms": [
+        {
+          "text": "Slack、Wiki、程式碼、Jira 可以塞進同一張表",
+          "verdict": "完全支持",
+          "card_quote": "這個「窄腰」在 Cerebras 的系統裡就是一張 embeddings table，只有五個欄位",
+          "note": "c3 列出資料橫跨 Slack、Wiki、程式碼倉庫、Jira，c4 說窄腰就是一張 embeddings table；主標是問句，沒有比卡說滿。"
+        },
+        {
+          "text": "Cerebras 的內部搜尋每天被問超過 15,000 次",
+          "verdict": "完全支持",
+          "card_quote": "這系統每天處理超過 15,000 次查詢",
+          "note": "「超過」已帶回，數字與卡一致；主詞含宣稱方 Cerebras，與卡上同樣的敘述方式。"
+        },
+        {
+          "text": "它的答案是：這張表只留五個欄位",
+          "verdict": "完全支持",
+          "card_quote": "只有五個欄位：`document`（要被搜尋的文字）、`embedding`（向量）、`metadata`（一個不透明的 JSON）、`source`（哪裡來的）、`timestamp`。",
+          "note": "設計參數，主詞是 Cerebras 系統裡的那張表，沒有「最佳」「應該」。"
+        },
+        {
+          "text": "封面沒有比內文說得滿",
+          "verdict": "完全支持",
+          "card_quote": "窄腰的價值不在於「統一」這件事本身好看，而在於**腰以上和腰以下可以各自獨立演化，互不干擾**。",
+          "note": "主標只問「怎麼塞進同一張表」，機制與限定（五欄內容、收窄的代價）都在第 4～9 張出現。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 2 張",
+      "atoms": [
+        {
+          "text": "這套系統要回答的是公司內部的問題",
+          "verdict": "完全支持",
+          "card_quote": "介紹他們內部知識庫系統「Cerebras Knowledge」的架構",
+          "note": "「內部知識庫系統」的白話說法，沒有加新範圍。"
+        },
+        {
+          "text": "每天超過 15,000 次查詢，資料橫跨 Slack、Wiki、程式碼倉庫、Jira，來查的不只有人，還有自動化流程與 AI agent",
+          "verdict": "完全支持",
+          "card_quote": "這系統每天處理超過 15,000 次查詢，資料橫跨 Slack、Wiki、程式碼倉庫、Jira，服務對象還包含自動化流程與 AI agent，不只是人類。",
+          "note": "逐字對得上；官方宣稱的主詞已寫成「Cerebras 介紹了自家知識庫」。"
+        },
+        {
+          "text": "IDF 是衡量一個詞有多稀有的指標，越少見分數越高",
+          "verdict": "完全支持",
+          "card_quote": "IDF 要 ≥ 4.0（確保含有稀有詞，不是純廢話）",
+          "note": "放行項 4 的白話定義，與卡上「稀有詞」的用法一致，沒有加新數字或用途。"
+        },
+        {
+          "text": "欄位、向量（embed）兩條定義",
+          "verdict": "完全支持",
+          "card_quote": "`embedding`（向量）",
+          "note": "放行項 4 的通用知識定義；與卡上「向量」「embed」的用法不衝突。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 3 張（路線圖）",
+      "atoms": [
+        {
+          "text": "窄腰設計像一個沙漏：上面各種來源進來，中間收窄成一個很單純的介面，下面再重新展開",
+          "verdict": "完全支持",
+          "card_quote": "想像一個沙漏：上半部是各種異質的資料寫入來源⋯⋯中間收窄成一個很單純的介面；下半部又重新展開成各種檢索與編排策略。",
+          "note": "部落格判斷，直述即可，語氣沒有比卡強。"
+        },
+        {
+          "text": "腰以下＝怎麼搜（檢索策略）、誰決定搜什麼（編排策略）",
+          "verdict": "完全支持",
+          "card_quote": "下半部又重新展開成各種檢索與編排策略。",
+          "note": "檢索／編排策略的白話改寫，意思未變。"
+        },
+        {
+          "text": "四站的名稱、各站要回答的問題、尾端「腰以下⋯⋯是系列接下來兩則的事」",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "放行項 1：整張路線圖是貼文自己的結構；各站問題（收窄的代價、固定格式、撈回與篩選）分別對應 c12、c7、slack-distillation-and-bursting:c5／c9／c10，沒有夾帶卡上沒有的因果。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 4 張",
+      "atoms": [
+        {
+          "text": "不管哪裡來的資料，先穿過同一個窄口",
+          "verdict": "完全支持",
+          "card_quote": "中間收窄成一個很單純的介面",
+          "note": "c2 的白話改寫。"
+        },
+        {
+          "text": "腰以上和腰以下可以各自獨立演化、互不干擾",
+          "verdict": "完全支持",
+          "card_quote": "腰以上和腰以下可以各自獨立演化，互不干擾",
+          "note": "c1 逐字。"
+        },
+        {
+          "text": "上面接一個新來源不必動讀取端，下面換一種搜法也不必回頭問寫入端",
+          "verdict": "完全支持",
+          "card_quote": "想新增一個資料源，只要寫一個 connector 把資料塞進這五個欄位，讀取端完全不用改一行；想換一種檢索策略，也只要在讀取端動手，寫入端毫無感覺。",
+          "note": "c5；絕對詞「完全不用改一行」是卡上原句，沒有放大。"
+        },
+        {
+          "text": "圖上四個來源：Slack 討論串、Wiki 頁面、程式碼、Jira 票",
+          "verdict": "完全支持",
+          "card_quote": "Slack 討論串、Wiki 頁面、程式碼、Jira 票、甚至自訂資料庫",
+          "note": "卡上還有「自訂資料庫」，貼文只取四個，屬於削弱不是放大。"
+        },
+        {
+          "text": "圖上標「上半部＝寫入端」「下半部＝讀取端」",
+          "verdict": "完全支持",
+          "card_quote": "上半部是各種異質的資料寫入來源⋯⋯下半部又重新展開成各種檢索與編排策略。",
+          "note": "白話標註（提示詞明示照白話規則判），意思與 c2、c5 的寫入端／讀取端一致。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 5 張",
+      "atoms": [
+        {
+          "text": "這個窄腰就是一張 embeddings table，只有五個欄位，欄位名與各自的意思",
+          "verdict": "完全支持",
+          "card_quote": "這個「窄腰」在 Cerebras 的系統裡就是一張 embeddings table，只有五個欄位：`document`（要被搜尋的文字）、`embedding`（向量）、`metadata`（一個不透明的 JSON）、`source`（哪裡來的）、`timestamp`。",
+          "note": "五欄名稱與註解都對得上；metadata 寫成「附加資訊／一包 JSON」是放行的白話，但卡上的「不透明」這個性質沒出現（見 gaps，屬削弱）。"
+        },
+        {
+          "text": "寫一個 connector（一支小程式）把資料塞進這五個欄位，讀取端完全不用改一行",
+          "verdict": "完全支持",
+          "card_quote": "想新增一個資料源，只要寫一個 connector 把資料塞進這五個欄位，讀取端完全不用改一行",
+          "note": "c5 逐字；「一支小程式」是放行的白話註解。"
+        },
+        {
+          "text": "圖註：metadata 存的是附加資訊，像時間戳、來源類型、作者或團隊",
+          "verdict": "完全支持",
+          "card_quote": "未來可能需要哪些排序訊號（時間戳、來源類型、作者或團隊資訊）",
+          "note": "c12 把這三類列為放在 metadata 的排序訊號；第 8 張補上「不只是展示用」這一面。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 6 張",
+      "atoms": [
+        {
+          "text": "一個 connector 只要回答三個問題：轉換函式、抓取函式、多久同步一次",
+          "verdict": "完全支持",
+          "card_quote": "每個 connector 只需要回答三個問題，而且**只有這三個**：資料怎麼變成 document 加 metadata（一個轉換函式）、怎麼從來源系統把資料拉過來（一個抓取函式）、多久同步一次（甚至可以像 Slack 一樣，每個頻道各自設定自己的頻率）。",
+          "note": "三問與括號說明都逐字對得上。"
+        },
+        {
+          "text": "這三件事裡完全沒有「怎麼檢索」",
+          "verdict": "完全支持",
+          "card_quote": "這三件事裡完全沒有「怎麼檢索」",
+          "note": "c9 逐字。"
+        },
+        {
+          "text": "檢索怎麼做，是腰以下的事",
+          "verdict": "完全支持",
+          "card_quote": "下半部又重新展開成各種檢索與編排策略。",
+          "note": "c2 支撐，沒有加新因果。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 7 張",
+      "atoms": [
+        {
+          "text": "新增一個資料源可以下放給不熟悉核心系統的團隊自己做，不必找核心團隊",
+          "verdict": "完全支持",
+          "card_quote": "契約夠窄帶來一個組織層面的紅利：新增資料源這件事可以完全下放給不熟悉核心系統的團隊自己做。⋯⋯不需要核心團隊介入。",
+          "note": "c10；補充寫「窄到這個程度」，把「契約夠窄」這個前提帶在主張上。"
+        },
+        {
+          "text": "開一個 PR、附上一個小程式，只要輸出符合 schema 的一行資料，其餘自動接上",
+          "verdict": "完全支持",
+          "card_quote": "開一個 PR、附上一個小型 Python module，只要輸出符合共享 schema 的一行資料，其餘全部自動接上",
+          "note": "「小型 Python module」寫成「小程式」是削弱，不是放大。"
+        },
+        {
+          "text": "非得核心團隊出手才接得起來，通常代表這一層抽象本身在漏水",
+          "verdict": "完全支持",
+          "card_quote": "如果新增一個資料源需要核心團隊介入才能完成，通常代表抽象層本身漏水了。",
+          "note": "c11；「通常」已保留，沒有寫成必然。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 8 張",
+      "atoms": [
+        {
+          "text": "排序要用的訊號藏在 metadata 裡；age decay 直接讀 metadata 裡的 timestamp",
+          "verdict": "完全支持",
+          "card_quote": "`metadata` 欄位不只是拿來展示的附加資訊，它同時也是檢索排序訊號的載體——例如後面會提到的 age decay（隨時間衰減的排序機制）就是直接讀 metadata 裡的 timestamp。",
+          "note": "c12 逐字；圖註「age decay 是隨時間衰減的排序機制」就是卡上的括號說明，前兩輪的退回項已補回。"
+        },
+        {
+          "text": "寫 connector 的當下就要想好未來需要哪些排序訊號：時間戳、來源類型、作者或團隊",
+          "verdict": "完全支持",
+          "card_quote": "metadata 的設計必須在寫 connector 的當下就想清楚未來可能需要哪些排序訊號（時間戳、來源類型、作者或團隊資訊）",
+          "note": "三類訊號與卡上括號一致。"
+        },
+        {
+          "text": "之後想加，整批被搜尋的文件要重新處理一次",
+          "verdict": "完全支持",
+          "card_quote": "不然事後想加，代價是要把整個 corpus 重新處理一次。",
+          "note": "corpus 的白話說法（卡上名詞補充即「被檢索的整批文件集合」），程度沒有加重。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 9 張",
+      "atoms": [
+        {
+          "text": "形式統一但語意分裂：為了遷就來源額外加 slack_channel、code_repo、jira_ticket_id 這種專屬欄位，就不算真正收窄",
+          "verdict": "完全支持",
+          "card_quote": "有個陷阱是「形式統一但語意分裂」：如果 embeddings table 為了遷就每個來源，額外加上 `slack_channel`、`code_repo`、`jira_ticket_id` 這種專屬欄位，下游的檢索邏輯還是得針對來源類型寫一堆 if-else，那其實不算真正收窄。",
+          "note": "c7 逐字；「搜尋那一端又得分別處理 Slack 怎麼辦、Jira 怎麼辦」是 if-else 的白話，兩個來源名也都在卡上的欄位清單裡。"
+        },
+        {
+          "text": "下游的檢索或排序邏輯出現 if source == 'X' then... 這種分支，就代表窄腰還沒收乾淨",
+          "verdict": "完全支持",
+          "card_quote": "如果下游的檢索或排序邏輯裡出現「if source == 'X' then...」這種分支，就代表窄腰還沒收乾淨。",
+          "note": "c8 逐字，條件（下游的檢索或排序邏輯）有在圖上出現，絕對詞沒有脫離條件。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 10 張",
+      "atoms": [
+        {
+          "text": "長短、參與人數差這麼多的原始文字直接拿去 embed，算出來的向量在「什麼代表這個文件」上沒辦法互相比",
+          "verdict": "完全支持",
+          "card_quote": "如果直接把這些長短、參與人數差異極大的原始文字拿去 embed，產生的向量在「什麼代表這個文件」這件事上根本無法互相比較。",
+          "note": "slack-distillation-and-bursting:c5 逐字。"
+        },
+        {
+          "text": "一條討論串可能是 2 個人講 3 句話，也可能是 10 個人吵了 50 則訊息還離題",
+          "verdict": "完全支持",
+          "card_quote": "一條討論串可能有 2 個人講 3 句話，也可能有 10 個人吵了 50 則訊息還離題",
+          "note": "slack-distillation-and-bursting:c6（部落格舉例），圖註已標「文章舉的假設例子」。"
+        },
+        {
+          "text": "圖上「向量要代表的是這 3 句話／是這 50 則裡的什麼？」",
+          "verdict": "完全支持",
+          "card_quote": "產生的向量在「什麼代表這個文件」這件事上根本無法互相比較。",
+          "note": "把卡上的「什麼代表這個文件」套到同一個假設例子上，數字與例子一致，沒有新主張。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 11 張",
+      "atoms": [
+        {
+          "text": "Slack 資料不直接 embed，先讓 LLM 讀完整條 thread 抽出四樣結構化資料（一句話問題、摘要、解決方案、系統與程式碼參照），正規化成一致格式之後才 embed",
+          "verdict": "完全支持",
+          "card_quote": "不直接 embed 原始的討論串文字，而是先讓 LLM 讀完整條 thread，抽出四樣結構化資料——一句話問題、摘要、解決方案、系統與程式碼參照——正規化成一致格式之後才拿去 embed。",
+          "note": "slack-distillation-and-bursting:c3 逐字。"
+        },
+        {
+          "text": "原始文字另外留著，可以用關鍵字找到，但不進向量那一邊",
+          "verdict": "完全支持",
+          "card_quote": "原始文字則另外走 Postgres 的全文索引，保持可以被字面搜尋到，但不進向量空間。",
+          "note": "slack-distillation-and-bursting:c4；Postgres 全文索引寫成「可以用關鍵字找到」是放行的白話。該主張綁的限定條件（bursting：同一個作者連續發、前面加主題、三道門檻）在第 13、14 張出現。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 12 張",
+      "atoms": [
+        {
+          "text": "文章用的詞是 normalized 而不是 summarized，要的是同一種形狀，不是比較少的字",
+          "verdict": "完全支持",
+          "card_quote": "這裡文章用的詞是「normalized」而不是「summarized」，強調的重點是讓向量在同一個表示空間裡語意一致，而不只是把文字弄短。",
+          "note": "slack-distillation-and-bursting:c8；「形狀」對應卡上的一致格式／語意一致，沒有加新理由。"
+        },
+        {
+          "text": "該問的是有沒有一個固定 schema 把異質資料收斂成一致格式",
+          "verdict": "完全支持",
+          "card_quote": "該問的不是「要不要摘要」，而是「有沒有一個固定 schema，能把這些異質資料收斂成一致格式」。",
+          "note": "slack-distillation-and-bursting:c1 支撐主標的取向。"
+        },
+        {
+          "text": "右欄：不管進來的是幾句話還是幾十則，整理之後一樣是那四欄，只是每欄裝的內容不同",
+          "verdict": "完全支持",
+          "card_quote": "抽出四樣結構化資料——一句話問題、摘要、解決方案、系統與程式碼參照——正規化成一致格式之後才拿去 embed。",
+          "note": "「一樣是那四欄」＝卡上的四樣＋一致格式；左欄兩條討論串是放行的假設例子，圖註已標，與第 10 張的例子自洽。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 13 張",
+      "atoms": [
+        {
+          "text": "distillation 是有損壓縮，旁枝訊息可能被漏掉",
+          "verdict": "完全支持",
+          "card_quote": "不過 distillation 是有損壓縮，重要的旁枝訊息可能因為不在主線問答脈絡裡而被摘要忽略掉。",
+          "note": "「可能」已保留；卡上的原因（不在主線問答脈絡裡）以圖上「distillation：主線問答」標示。"
+        },
+        {
+          "text": "bursting 把同一個作者連續發的訊息單獨撈回來，前面加上這條討論串的主題當上下文",
+          "verdict": "完全支持",
+          "card_quote": "把「同一個作者連續發的訊息」單獨抓出來，前面加上這條 thread 的主題當作上下文，單獨 embed 一次。",
+          "note": "slack-distillation-and-bursting:c9；前兩輪退回的「同一個作者」與「前面加上主題」兩項都已帶出。"
+        },
+        {
+          "text": "圖上「1 筆 distillation，加上 N 筆 burst」",
+          "verdict": "完全支持",
+          "card_quote": "最後可能產生「1 筆討論串層級的 distillation 產物，加上 N 筆通過品質門檻的 burst」",
+          "note": "卡上的「通過品質門檻」在這一張的標籤上沒寫，但緊接的第 14 張完整呈現三道門檻，限定條件在貼文內有出現；格數與通過／被擋那兩格是放行的示意。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 14 張",
+      "atoms": [
+        {
+          "text": "burst 必須通過三道門檻才留得下來：IDF ≥ 4.0（含有稀有詞）、長度 ≥ 200 字元（內容量撐得起向量）、有 reaction 加分",
+          "verdict": "完全支持",
+          "card_quote": "但不是每個 burst 都值得留：必須通過三道品質門檻——IDF 要 ≥ 4.0（確保含有稀有詞，不是純廢話）、長度要 ≥ 200 字元（確保內容量足以撐起一個有意義的向量）、有 reaction 加分（用社交訊號間接驗證這則訊息有價值）。",
+          "note": "三道門檻的數字與說明都對得上；「有 reaction 加分」逐字保留，沒有被寫成必要條件。"
+        },
+        {
+          "text": "圖上把 reaction 註為「有人按過表情符號」",
+          "verdict": "部分支持",
+          "card_quote": "有 reaction 加分（用社交訊號間接驗證這則訊息有價值）",
+          "note": "卡上只說 reaction 是社交訊號，沒說是表情符號；屬名詞的通用白話註解，不改變機制、不加新門檻，但卡上無此字面。"
+        },
+        {
+          "text": "有料的留下來寫進同一張表；只回一句「收到！」那種純粹的社交填充語完全不會被 embed",
+          "verdict": "完全支持",
+          "card_quote": "沒通過門檻的 burst（比如純粹的社交填充語）則完全不會被 embed。",
+          "note": "放行項 7 的假設例子，與卡上「純粹的社交填充語⋯⋯完全不會被 embed」一致，沒有違背；「全部寫進同一張 embeddings table」亦見 c11。"
+        },
+        {
+          "text": "三道門檻都是低成本規則",
+          "verdict": "完全支持",
+          "card_quote": "不如在寫入時就用低成本規則先過濾一批。",
+          "note": "slack-distillation-and-bursting:c12 把寫入時的過濾稱為低成本規則，程度沒有加重。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 15 張",
+      "atoms": [
+        {
+          "text": "噪音在寫入時擋掉，比查詢時再補救便宜；寫入時過濾是一次性成本，rerank 是每次查詢都要付的成本",
+          "verdict": "完全支持",
+          "card_quote": "與其等資料進了系統之後，靠後段昂貴的 rerank 去補救垃圾資料排太前面，不如在寫入時就用低成本規則先過濾一批。寫入時過濾是一次性成本，rerank 卻是每次查詢都要付的成本——越早把噪音擋掉，長期越省。",
+          "note": "slack-distillation-and-bursting:c12 逐字；圖上「昂貴」也是卡上的詞。"
+        },
+        {
+          "text": "rerank 是資料被找出來之後，再用另一個模型重新排一次",
+          "verdict": "部分支持",
+          "card_quote": "靠後段昂貴的 rerank 去補救垃圾資料排太前面",
+          "note": "claims 裡沒有 rerank 的定義（卡只在 yaml 外的名詞補充寫「檢索出候選之後，再用另一個模型重新排序」）；屬名詞白話解釋，與卡不衝突、未加新事實。"
+        },
+        {
+          "text": "圖註：這張圖比的不是誰排得準，而是這筆成本什麼時候付",
+          "verdict": "完全支持",
+          "card_quote": "寫入時過濾是一次性成本，rerank 卻是每次查詢都要付的成本",
+          "note": "前兩輪退回的「對 rerank 準確度的評價」已移除，整張只比成本的時點，無準確度主張。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 16 張",
+      "atoms": [
+        {
+          "text": "同一個窄腰在這篇文章至少出現三次",
+          "verdict": "完全支持",
+          "card_quote": "這個「窄腰」的形狀在文章裡至少重複出現三次，不是只在資料寫入層出現一次而已",
+          "note": "「至少」已補回；與 c19 的「反覆出現了四次」不衝突（至少三次 ⊆ 四次），見 recalculations。"
+        },
+        {
+          "text": "三層的收窄：資料寫入層、讀取融合層、多工具輸出層",
+          "verdict": "完全支持",
+          "card_quote": "資料寫入層 | Slack、Wiki、程式碼、Jira 等異質來源 | 同一張 embeddings table",
+          "note": "三列對應 c13 的表格；「融合成單一排序」「正規化成共同的格式」省略了 RRF 與 evidence schema，屬削弱。"
+        },
+        {
+          "text": "這也是整篇最值得記住的一個心智模型",
+          "verdict": "完全支持",
+          "card_quote": "是最值得內化的單一心智模型。",
+          "note": "c19 的白話改寫，語氣未加強。"
+        },
+        {
+          "text": "看懂這一次，剩下的就是同一個形狀換個地方用",
+          "verdict": "完全支持",
+          "card_quote": "這個「窄腰」的形狀在文章裡至少重複出現三次，不是只在資料寫入層出現一次而已",
+          "note": "同一形狀反覆出現是卡上的判斷；敘事銜接沒有夾帶新因果。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 17 張（帶走）",
+      "atoms": [
+        {
+          "text": "先收窄，再展開",
+          "verdict": "完全支持",
+          "card_quote": "中間收窄成一個很單純的介面；下半部又重新展開成各種檢索與編排策略。",
+          "note": "c2。"
+        },
+        {
+          "text": "腰以上和腰以下各自獨立演化",
+          "verdict": "完全支持",
+          "card_quote": "腰以上和腰以下可以各自獨立演化，互不干擾",
+          "note": "c1 逐字；卡上有「可以」，貼文少了語氣詞但沒有變成普遍事實以外的範圍。"
+        },
+        {
+          "text": "先問的問題：不一樣的資料，為什麼能塞進同一張表？",
+          "verdict": "完全支持",
+          "card_quote": "有沒有一個固定 schema，能把這些異質資料收斂成一致格式",
+          "note": "問句，對應 slack-distillation-and-bursting:c1 與 c4。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 18 張（系列地圖）",
+      "atoms": [
+        {
+          "text": "三則標題、系列名、導流行",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "結構元素，依提示詞不對證卡；第 2、3 則下面那行細節由該則審查者審。"
+        },
+        {
+          "text": "這一則的細節：異質來源收斂成只有五個欄位的一張表；寫入前先把討論串正規化成固定四樣再做 embedding",
+          "verdict": "完全支持",
+          "card_quote": "只有五個欄位：`document`（要被搜尋的文字）、`embedding`（向量）、`metadata`（一個不透明的 JSON）、`source`（哪裡來的）、`timestamp`。",
+          "note": "五欄見 c4，四樣正規化見 slack-distillation-and-bursting:c3。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "Threads 正文",
+      "atoms": [
+        {
+          "text": "Cerebras 內部的知識庫每天被問超過 15,000 次",
+          "verdict": "完全支持",
+          "card_quote": "這系統每天處理超過 15,000 次查詢",
+          "note": "「超過」有帶。"
+        },
+        {
+          "text": "把中間的介面收到只剩一張 embeddings table、五個欄位：document、embedding、metadata、source、timestamp",
+          "verdict": "完全支持",
+          "card_quote": "這個「窄腰」在 Cerebras 的系統裡就是一張 embeddings table，只有五個欄位",
+          "note": "c4。"
+        },
+        {
+          "text": "想接一個新資料源，寫一個 connector 把資料塞進這五個欄位就好，讀取端完全不用改一行",
+          "verdict": "完全支持",
+          "card_quote": "想新增一個資料源，只要寫一個 connector 把資料塞進這五個欄位，讀取端完全不用改一行",
+          "note": "c5 逐字。"
+        },
+        {
+          "text": "metadata 不只是展示用的附加資訊，排序時會直接讀它，寫 connector 當下就要想清楚未來需要哪些排序訊號，不然要把整批文件重新處理一次",
+          "verdict": "完全支持",
+          "card_quote": "`metadata` 欄位不只是拿來展示的附加資訊，它同時也是檢索排序訊號的載體⋯⋯不然事後想加，代價是要把整個 corpus 重新處理一次。",
+          "note": "c12。"
+        },
+        {
+          "text": "Slack 討論串不直接 embed，先讓 LLM 抽成四樣結構化資料再正規化",
+          "verdict": "完全支持",
+          "card_quote": "不直接 embed 原始的討論串文字，而是先讓 LLM 讀完整條 thread，抽出四樣結構化資料⋯⋯正規化成一致格式之後才拿去 embed。",
+          "note": "slack-distillation-and-bursting:c3。"
+        },
+        {
+          "text": "整理會丟掉東西，所以還有 bursting：把同一個作者連續發的訊息單獨撿回來、前面補上這條討論串的主題",
+          "verdict": "完全支持",
+          "card_quote": "把「同一個作者連續發的訊息」單獨抓出來，前面加上這條 thread 的主題當作上下文，單獨 embed 一次。",
+          "note": "前兩輪退回的「同一個作者」與「加上主題」在 Threads 也已帶出。"
+        },
+        {
+          "text": "要有夠少見的詞、字夠多才留得下來，有人按過表情符號還會加分",
+          "verdict": "完全支持",
+          "card_quote": "必須通過三道品質門檻——IDF 要 ≥ 4.0（確保含有稀有詞，不是純廢話）、長度要 ≥ 200 字元⋯⋯有 reaction 加分",
+          "note": "reaction 寫成「還會加分」，沒有被寫成必要條件；IDF 與長度兩道寫成必要與卡上「必須通過」一致，數字省略屬削弱。表情符號的字面見第 14 張的同一註記。"
+        },
+        {
+          "text": "這是系列第 1 則",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "放行項 8 的結構句。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "Threads 最後一則（置頂）",
+      "atoms": [
+        {
+          "text": "導流行、文章網址、同系列兩則標題",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "結構元素，不對證卡；沒有夾帶任何對卡的主張。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "IG caption",
+      "atoms": [
+        {
+          "text": "企業內部的 RAG 怎麼做：Cerebras 把 Slack、Wiki、程式碼收進同一張表",
+          "verdict": "完全支持",
+          "card_quote": "資料橫跨 Slack、Wiki、程式碼倉庫、Jira",
+          "note": "c3＋c4；只列三個來源屬削弱。"
+        },
+        {
+          "text": "各條 bullet（含括號裡的銜接句）",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "逐條與第 3～16 張的主標、補充首句相同，已在各張判定；小標籤前綴是放行項 2 的結構標記。"
+        },
+        {
+          "text": "搜尋提示與 hashtag",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "結構元素。"
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "recalculations": [
+    {
+      "block": "第 16 張",
+      "expression": "c13「至少重複出現三次」 vs c19「反覆出現了四次」：3 <= 4",
+      "result": "True — 「至少三次」與「四次」相容，貼文沒有與 c19 衝突"
+    },
+    {
+      "block": "第 14 張",
+      "expression": "門檻數字對照：IDF 4.0 == 4.0；長度 200 == 200；門檻數 3 == 3",
+      "result": "全部相符"
+    },
+    {
+      "block": "第 10、12 張",
+      "expression": "假設例子數字：2 人 3 句、10 人 50 則（卡 slack-distillation-and-bursting:c6）",
+      "result": "與卡一致；第 12 張左欄「只有幾句話」「吵了幾十則」與之自洽"
+    },
+    {
+      "block": "第 1、2 張、Threads",
+      "expression": "15000 次／天，三處都寫「超過 15,000」",
+      "result": "與 c3 相符，無放大"
+    }
+  ],
+  "gaps": [
+    {
+      "description": "第 5 張與 Threads 把 metadata 的欄位說明寫成「附加資訊／一包 JSON」，卡上 c4 原句的「不透明」這個性質（下游不需要解讀內容）在貼文任何地方都沒有出現。屬削弱，不是放大。",
+      "card_quote": "`metadata`（一個不透明的 JSON）"
+    },
+    {
+      "description": "第 13 張圖上的「1 筆 distillation，加上 N 筆 burst」省略了卡上綁在 N 上的「通過品質門檻」；該限定條件在第 14 張出現，貼文整體沒有缺。",
+      "card_quote": "最後可能產生「1 筆討論串層級的 distillation 產物，加上 N 筆通過品質門檻的 burst」"
+    }
+  ]
+}

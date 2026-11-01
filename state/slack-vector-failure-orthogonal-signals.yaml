@@ -1,0 +1,9 @@
+concept: slack-vector-failure-orthogonal-signals
+formats:
+  ig_carousel:
+    status: ready
+    pack: out/cerebras-rag/slack-vector-failure-orthogonal-signals
+  threads_thread:
+    status: ready
+    pack: out/cerebras-rag/slack-vector-failure-orthogonal-signals
+posts: []

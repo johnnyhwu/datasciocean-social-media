@@ -1,0 +1,658 @@
+{
+  "series": "cerebras-rag",
+  "concept": "rag-planner-single-round-vs-agentic",
+  "also_concepts": [
+    "retrieval-reasoning-decoupling"
+  ],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "情境痛點",
+    "title": "搜尋每次都把所有工具\n叫一遍？[[又慢又貴]]",
+    "subtitle": "Cerebras 先讓一個比工具還便宜的模型，\n決定「這次該用哪幾個」，再平行去查。",
+    "refs": [
+      "c3",
+      "c4",
+      "c5",
+      "c8"
+    ],
+    "candidate": "B"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "搜尋每次都把所有工具\n叫一遍？[[又慢又貴]]",
+      "body": "Cerebras 先讓一個比工具還便宜的模型，\n決定「這次該用哪幾個」，再平行去查。",
+      "refs": [
+        "c3",
+        "c4",
+        "c5",
+        "c8"
+      ]
+    },
+    {
+      "layout": "recap",
+      "title": "[[前情提要]]與這一則重點",
+      "current": "rag-planner-single-round-vs-agentic",
+      "refs": [
+        "結構"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "route",
+      "label": "路線圖",
+      "title": "這一則走到沙漏的[[最底下]]",
+      "body": "這個系列把 Cerebras 的知識庫比成沙漏：上半部把資料收進同一張表，腰以下是搜尋。這一則走到最底下：問題進來之後，誰決定查什麼、查回來的東西誰來讀。",
+      "heads": [
+        "這一則的閱讀路線"
+      ],
+      "nodes": [
+        {
+          "text": "先挑工具",
+          "sub": "每個問題，該叫哪幾個工具上場？"
+        },
+        {
+          "text": "推理放最後",
+          "sub": "查回來的東西，什麼時候、由誰來讀？"
+        },
+        {
+          "text": "只查一輪",
+          "sub": "查完一輪就作答，算 agentic（會自己決定要不要再查）嗎？"
+        }
+      ],
+      "refs": [
+        "c1",
+        "c4",
+        "retrieval-reasoning-decoupling:c8"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "先講四個一直會出現的詞",
+      "body": "Cerebras 有一套內部知識庫，資料橫跨 Slack、Wiki、程式碼倉庫、Jira。問題進來之後，有三個角色接力，加上它們用的工具：",
+      "rows": [
+        [
+          "工具",
+          "一種搜尋方法，例如搜 Slack、搜程式碼、查誰懂這個領域"
+        ],
+        [
+          "planner",
+          "看完問題，決定這次用哪幾個工具"
+        ],
+        [
+          "executor",
+          "照 planner 的清單，把工具同時跑起來"
+        ],
+        [
+          "synthesis",
+          "讀完查回來的證據，寫出最後的答案"
+        ]
+      ],
+      "key_w": 230,
+      "refs": [
+        "c2",
+        "c4",
+        "c8",
+        "c9",
+        "retrieval-reasoning-decoupling:c12"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "pairs",
+      "label": "① 先挑工具",
+      "title": "工具叫太多，[[又慢又貴]]",
+      "body": "直覺的做法，是每個問題把所有工具叫一遍。可是這樣一來，不需要的工具也會被觸發：",
+      "heads": [
+        "所有工具一起叫",
+        "代價"
+      ],
+      "pairs": [
+        [
+          "不需要的工具也跑了",
+          "延遲拖長（等得久）、成本浪費"
+        ],
+        [
+          "不相關的工具\n傳回雜訊",
+          "可能拉低整體排序品質\n（好結果被擠到後面）"
+        ]
+      ],
+      "outcomes": [
+        {
+          "text": "planner 的任務：每次看問題，再決定這次叫哪些工具，讓成本和延遲跟著實際需求走",
+          "tone": "good"
+        }
+      ],
+      "refs": [
+        "c3"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "links",
+      "label": "① 先挑工具",
+      "title": "[[問題不同，挑的工具就不同]]",
+      "body": "那 planner 怎麼挑？它拿到三樣東西：工具目錄（每個工具附精簡的能力描述）、你的問題、目前鎖定的查詢範圍。交出來的只是一張清單：這次用哪幾個工具。",
+      "heads": [
+        "問題",
+        "工具目錄"
+      ],
+      "nodes": [
+        {
+          "text": "「部署失敗，\n上次怎麼修的？」"
+        },
+        {
+          "text": "「誰懂計費系統？」"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "一般搜尋"
+        },
+        {
+          "text": "搜 Slack"
+        },
+        {
+          "text": "搜程式碼"
+        },
+        {
+          "text": "查誰懂這個領域"
+        }
+      ],
+      "edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hot": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "note": "問題與挑法是假設的例子；沒連線的工具，這次沒被選上。",
+      "refs": [
+        "c4",
+        "retrieval-reasoning-decoupling:c12"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "pick",
+      "label": "① 先挑工具",
+      "title": "做決定的模型，[[故意比工具還便宜]]",
+      "body": "planner 做的是分類：從清單裡勾一個或幾個，不用寫出一段答案，所以可以用小模型、照固定格式回答（結構化輸出）。用來省錢的決策要是本身太貴，設計就自相矛盾了。",
+      "refs": [
+        "c5",
+        "c6",
+        "retrieval-reasoning-decoupling:c12"
+      ],
+      "heads": [
+        "planner 做的：分類",
+        "不用做的：生成"
+      ],
+      "nodes": [
+        {
+          "text": "一般搜尋"
+        },
+        {
+          "text": "搜 Slack",
+          "on": true
+        },
+        {
+          "text": "搜程式碼",
+          "on": true
+        },
+        {
+          "text": "查誰懂這個領域"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "所以 planner 是整個流程裡最便宜的一環"
+        }
+      ],
+      "note": "勾選延續上一張「部署失敗」的例子；右邊灰條是示意。"
+    },
+    {
+      "layout": "diagram",
+      "kind": "fan",
+      "label": "① 先挑工具",
+      "title": "挑好的工具[[同時出發]]",
+      "body": "接手的是 executor。被選中的工具彼此沒有依賴，所以可以同時跑；各工具吐回的格式不一樣，executor 再整理成同一套證據格式。",
+      "heads": [
+        "搜 Slack",
+        "搜程式碼"
+      ],
+      "nodes": [
+        {
+          "text": "被選中的工具同時跑，各自交回自己的格式"
+        },
+        {
+          "text": "整理成同一套證據格式",
+          "sub": "每筆附上分數、新鮮度（多新）、來源提示等"
+        }
+      ],
+      "note": "延續上一張假設的例子。",
+      "refs": [
+        "c8",
+        "c4",
+        "retrieval-reasoning-decoupling:c12"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "pile",
+      "label": "② 推理放最後",
+      "title": "證據原封不動，[[留到最後一次讀]]",
+      "body": "整理好的證據交給誰讀？工具只交回原始證據；推理只在最後寫答案那一步（synthesis）做一次。這條原則 Cerebras 沒有直接講，是從它的設計推出來的。",
+      "heads": [
+        "工具交回的原始證據",
+        "最後一步"
+      ],
+      "nodes": [
+        {
+          "text": "原樣往下傳",
+          "sub": "討論串、程式碼片段，不先寫小結"
+        },
+        {
+          "text": "synthesis",
+          "sub": "所有證據攤在一起，推理一次，寫出答案"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "Slack"
+        },
+        {
+          "text": "程式碼"
+        },
+        {
+          "text": "Slack"
+        }
+      ],
+      "note": "延續「部署失敗」的假設例子。",
+      "quals": [
+        "retrieval-reasoning-decoupling:c1#2",
+        "retrieval-reasoning-decoupling:c8#1"
+      ],
+      "refs": [
+        "retrieval-reasoning-decoupling:c1",
+        "retrieval-reasoning-decoupling:c8",
+        "retrieval-reasoning-decoupling:c2",
+        "c8",
+        "retrieval-reasoning-decoupling:c12"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "joint",
+      "label": "② 推理放最後",
+      "title": "答案要拼兩個來源，[[分頭讀的 AI 拼不出來]]",
+      "body": "換個做法比比看：每一路（每個工具）先各自推理、寫摘要，最後再合併。第一個壞處：沒有 LLM 同時看過全部證據。",
+      "heads": [
+        "另一種：每一路各自讀",
+        "這裡：最後一起讀"
+      ],
+      "nodes": [
+        {
+          "text": "每一路先推理、寫摘要",
+          "sub": "例：答案靠來源 A 的一句話＋來源 B 的一張圖",
+          "sub2": "沒有 LLM 看過全部證據"
+        },
+        {
+          "text": "每一路只交原始證據",
+          "sub": "A 和 B 攤在同一個 LLM 面前",
+          "sub2": "一次推理，拼得起來"
+        }
+      ],
+      "refs": [
+        "retrieval-reasoning-decoupling:c6",
+        "retrieval-reasoning-decoupling:c10"
+      ],
+      "note": "×：各路互不相通；金色接起來：證據放在一起讀。"
+    },
+    {
+      "layout": "diagram",
+      "kind": "leak",
+      "hops": 2,
+      "label": "② 推理放最後",
+      "title": "摘要的摘要，[[丟了什麼下游看不出來]]",
+      "body": "第二個壞處：細節會不見。先各自摘要、再合併摘要，像拿影印本去影印，下游看不出上游丟了什麼。",
+      "heads": [
+        "壓縮"
+      ],
+      "nodes": [
+        {
+          "text": "另一種：先各自摘要，再合併摘要",
+          "sub": "壓縮兩次，誤差累積兩次"
+        },
+        {
+          "text": "這裡：證據保持原樣，最後才壓縮一次",
+          "sub": "誤差不會累積兩次"
+        }
+      ],
+      "note": "空心點是丟掉的細節；點數只是示意。",
+      "refs": [
+        "retrieval-reasoning-decoupling:c11"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "addlane",
+      "label": "② 推理放最後",
+      "title": "[[多一種資料]]，只要多接一個工具",
+      "body": "第三個差別在擴充。每一路自帶推理，等於每一路都是一整套問答流程；推理搬到最後，多一種資料只要加一個工具、寫好能力描述，planner 就會挑它。",
+      "heads": [
+        "另一種：每一路自帶推理",
+        "這裡：推理放最後"
+      ],
+      "nodes": [
+        {
+          "text": "搜尋"
+        },
+        {
+          "text": "推理"
+        },
+        {
+          "text": "摘要"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "多一種資料：連推理、摘要再做一整套"
+        },
+        {
+          "text": "合併摘要"
+        },
+        {
+          "text": "多一種資料：加一個工具，推理不用動"
+        },
+        {
+          "text": "synthesis"
+        }
+      ],
+      "refs": [
+        "retrieval-reasoning-decoupling:c6",
+        "retrieval-reasoning-decoupling:c7",
+        "retrieval-reasoning-decoupling:c9",
+        "retrieval-reasoning-decoupling:c8"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "pairs",
+      "label": "② 推理放最後",
+      "title": "哪些推理[[可以留在工具裡]]？",
+      "body": "不過有一種推理省不了：SQL（查資料庫的指令）。數據要當場生成 SQL、執行才拿得到。判斷標準是這次叫 LLM 做的事，產出的是什麼：",
+      "heads": [
+        "這次 LLM 產出的是",
+        "怎麼處理"
+      ],
+      "pairs": [
+        [
+          "證據，下游還要加工\n（例：生成 SQL 取數據）",
+          "留著，但藏進檢索工具內部"
+        ],
+        [
+          "給使用者的部分答案\n（例：替某個來源\n先寫好的小摘要）",
+          "砍掉，延到最後那一次 synthesis"
+        ]
+      ],
+      "quals": [
+        "retrieval-reasoning-decoupling:c1#1",
+        "retrieval-reasoning-decoupling:c8#2"
+      ],
+      "refs": [
+        "retrieval-reasoning-decoupling:c12",
+        "retrieval-reasoning-decoupling:c13",
+        "retrieval-reasoning-decoupling:c1",
+        "retrieval-reasoning-decoupling:c8"
+      ],
+      "outcomes": [
+        {
+          "text": "留下的推理只交出查到的證據，不替使用者寫答案",
+          "tone": "good"
+        }
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "label": "③ 只查一輪",
+      "title": "決策一次、查一次、答一次，[[就結束了]]",
+      "body": "三個角色串起來，流程只走一輪。Cerebras 沒有這樣替自己分類，但照這個結構，它是單輪 pipeline（跑完就停的固定流程），不是 agentic loop：它假設一開始就知道要查什麼，但真實情況常常要看過第一輪結果才知道。",
+      "nodes": [
+        {
+          "text": "問題進來，planner 決策一次"
+        },
+        {
+          "text": "executor 平行執行一次"
+        },
+        {
+          "text": "synthesis 寫答案一次，結束"
+        }
+      ],
+      "loop": "沒有這條路：看完結果發現證據不夠，再回頭查一輪",
+      "quals": [
+        "c1#1",
+        "c9#1",
+        "c11#1"
+      ],
+      "refs": [
+        "c1",
+        "c9",
+        "c11"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "depend",
+      "label": "③ 只查一輪",
+      "title": "B 要等 A？[[同時出發就做不到]]",
+      "body": "平行的前提是工具互不依賴，「B 要等 A 的結果」表達不出來。補法是：這種固定的兩步流程，可以包成一個複合工具；沒有固定模式、要臨場判斷下一步的，才真的需要迴圈。",
+      "heads": [
+        "平行：兩個工具同時出發",
+        "固定的兩步：包成一個複合工具"
+      ],
+      "nodes": [
+        {
+          "text": "查人"
+        },
+        {
+          "text": "查他改了哪些程式"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "查到的人"
+        },
+        {
+          "text": "B 出發時還拿不到"
+        },
+        {
+          "text": "內部固定先後順序，planner 眼中仍然只是一個工具"
+        }
+      ],
+      "note": "A 是「查人」，B 是「查這個人改了哪些程式」。",
+      "quals": [
+        "c10#1"
+      ],
+      "refs": [
+        "c10",
+        "c17"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "label": "③ 只查一輪",
+      "title": "用了 LLM 做決策，[[不等於 agentic]]",
+      "body": "agentic 的核心是迴圈和狀態（記得上一輪查到什麼），不是決策時有沒有 LLM。所以嚴格來講，這是讓 LLM 每次挑工具的傳統 RAG pipeline（先搜資料、再根據資料回答），不是 agentic RAG。",
+      "columns": [
+        {
+          "head": "Cerebras 的 pipeline",
+          "items": [
+            {
+              "text": "決策一次，\n決定完不再變"
+            },
+            {
+              "text": "工具互相獨立，\n可以平行"
+            },
+            {
+              "text": "固定流程跑完就停"
+            }
+          ]
+        },
+        {
+          "head": "agentic loop",
+          "items": [
+            {
+              "text": "多次決策，每輪結果\n可能觸發下一輪"
+            },
+            {
+              "text": "工具可能有依賴，\n要照順序來"
+            },
+            {
+              "text": "由判斷邏輯決定\n「夠了嗎」",
+              "emph": true
+            }
+          ]
+        }
+      ],
+      "quals": [
+        "c12#1",
+        "c13#1"
+      ],
+      "refs": [
+        "c12",
+        "c13",
+        "c14"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "cycle",
+      "label": "③ 只查一輪",
+      "title": "想補成迴圈？[[這一輪可以當迴圈裡的一圈]]",
+      "body": "兩者其實不衝突：Cerebras 這一套放進迴圈，就是每一圈的做法；要補的是迴圈本身，用來處理要一步接一步推下去的問題。",
+      "nodes": [
+        {
+          "text": "挑"
+        },
+        {
+          "text": "查"
+        },
+        {
+          "text": "答"
+        }
+      ],
+      "heads": [
+        "planner 挑工具",
+        "平行查完再作答",
+        "檢查還缺什麼，\n餵回 planner"
+      ],
+      "outcomes": [
+        {
+          "text": "金色那一步是要補上的：寫完答案才發現證據不夠時，檢查還缺什麼，再回頭查下一輪"
+        }
+      ],
+      "note": "如果只是使用者追問，每次追問重跑一輪就夠，不需要迴圈。",
+      "quals": [
+        "c15#1"
+      ],
+      "refs": [
+        "c15",
+        "c16",
+        "c17"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "用 LLM 挑工具的搜尋，算 agentic 嗎？",
+      "title": "LLM 只挑一次工具，\n推理留到最後一次，\n是單輪，不是迴圈",
+      "refs": [
+        "c1",
+        "c14",
+        "retrieval-reasoning-decoupling:c8"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "一次看完這個系列",
+      "current": "rag-planner-single-round-vs-agentic",
+      "nav": "完整文章：datasciocean.com/paper-intro/cerebras-rag",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "搜尋每次都把所有工具叫一遍？又慢又貴\n\n假設你問公司的知識庫「部署失敗，上次怎麼修的？」。Cerebras 的做法是先讓一個模型（planner）決定這次該用哪幾個工具，例如搜 Slack、搜程式碼。它只做分類、不寫答案，所以可以用小模型，故意設計得比它服務的工具還便宜；選好的工具彼此沒有依賴，同時去查。\n\n查回來的證據原封不動，留到最後寫答案那一步（synthesis）一次讀完；工具只交原始資料，不推理、不摘要。這條原則 Cerebras 沒有直接講，是從它的設計推出來的。換成每一路先各自摘要再合併，跨來源的答案拼不起來，細節也會在兩次壓縮裡不見。例外是 SQL 這種要當場算的查詢，那次推理留著、藏進工具內部。\n\n整條流程決策一次、查一次、答一次就結束，沒有回頭再查的迴圈。Cerebras 沒有這樣替自己分類，但照這個結構，它是單輪流程：用了 LLM 做決策，不等於 agentic。\n\n這是系列第 3 則。",
+      "refs": [
+        "c1",
+        "c3",
+        "c4",
+        "c5",
+        "c8",
+        "c9",
+        "c14",
+        "retrieval-reasoning-decoupling:c1",
+        "retrieval-reasoning-decoupling:c6",
+        "retrieval-reasoning-decoupling:c8",
+        "retrieval-reasoning-decoupling:c10",
+        "retrieval-reasoning-decoupling:c11",
+        "retrieval-reasoning-decoupling:c12"
+      ],
+      "quals": [
+        "c1#1",
+        "c9#1",
+        "retrieval-reasoning-decoupling:c1#1",
+        "retrieval-reasoning-decoupling:c1#2",
+        "retrieval-reasoning-decoupling:c8#1",
+        "retrieval-reasoning-decoupling:c8#2"
+      ]
+    },
+    "last": {
+      "text": "想看完整拆解？\n文章：datasciocean.com/paper-intro/cerebras-rag\n同系列：Slack、Wiki、程式碼、Jira，怎麼塞進同一張表？（尚未發布）\n同系列：搜尋出三種毛病，Cerebras 不是多加幾招，是一種毛病配一帖藥（尚未發布）",
+      "refs": [
+        "c1"
+      ],
+      "link": "https://datasciocean.com/paper-intro/cerebras-rag/"
+    }
+  },
+  "caption": {
+    "first": "RAG 搜尋怎麼決定叫哪些工具？用 LLM 挑工具，算不算 agentic",
+    "first_refs": [
+      "c4",
+      "c1",
+      "c14"
+    ],
+    "nav": "完整文章在 datasciocean.com，搜「Cerebras 知識庫」",
+    "hashtags": [
+      "CerebrasRAG",
+      "RAG",
+      "AIAgent"
+    ]
+  }
+}

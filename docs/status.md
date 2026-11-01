@@ -54,3 +54,14 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 - 第 1 則 `out/claude-code/claude-code-agentic-loop-and-tools/`（雙卡、16 張）**已發布（2026-10-29）**：IG https://www.instagram.com/p/DfDuOUJk09k/ 、Threads https://www.threads.com/@datasciocean/post/DfDupxOk16t 。hook 人挑定（讀者疑問式）。系列摘要（`series.md` 的 `summary`）已改白話，忠實者重審通過、讀者看過。
 - 第 2 則 `out/claude-code/claude-code-extension-and-context/`（單卡、16 張）**已發布（2026-10-31）**：IG https://www.instagram.com/p/DfI172ND6Xv/ 、Threads https://www.threads.com/@datasciocean/post/DfI2QXrj7JH 。hook 人挑 C1。發布前官方文件 13 條補充逐條重新核對，文字沒有改版；Threads「同系列」連結已用 `series_links.py` 補上第 1 則。第 13 張 MCP 列（卡 c13 沒提載入時機，忠實者判定不矛盾但有張力）人決定照原樣發（2026-10-31）。新圖型 `sockets`、`lazy`、`hub`、`pinned`、`compact`、`sidecar`、`combo`（有回歸測試）。
 - 系列 2 則全發完；第 1 則 Threads 回補（補上第 2 則連結）已於 2026-10-31 發布（reply_id 18080710904763396），`state/backfill.md` 清空。
+
+## Cerebras RAG 系列（2026-10-31 起；沙漏風格 `hourglass`）
+
+6 卡合成 3 則、每則雙卡；系列名「拆解 Cerebras 知識庫：資料怎麼進來，答案怎麼出去」、hashtag `#CerebrasRAG`。2026-11-01 三則（18／18／19 張）都通過審查、`ready`，`members_locked: true`；待發第 1 則（`rag-narrow-waist`）。人的回饋整理成 `ig-carousel.md` §0b（敘事順序、主角先對照後、順序圖、敘事口吻）。
+
+## 跨系列的人的決定與待決事項
+
+- 封面主標可放寬成 3 行（人，2026-10-28，`cover_title_max_lines: 3`；探照燈封面超過 2.5 行自動縮成 56px，其他風格要自己確認）。
+- 貼文不特別寫「blog 認為」「官方文件說」（人，2026-10-29）。
+- **待人決定**：`config/params.yaml` 的 `structure_text_max_chars` 與 `ai_tone_blacklist` 仍是初稿；Threads token 是否補 `threads_delete` 權限（沒有則刪除只能手動）；系列名與標題的取名偏好（memory `feedback_series_naming`）。
+- SAG 第 1～3 則 Threads 回補待人說「發」（`state/backfill.md`）。

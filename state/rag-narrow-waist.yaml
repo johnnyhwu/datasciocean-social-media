@@ -1,0 +1,9 @@
+concept: rag-narrow-waist
+formats:
+  ig_carousel:
+    status: ready
+    pack: out/cerebras-rag/rag-narrow-waist
+  threads_thread:
+    status: ready
+    pack: out/cerebras-rag/rag-narrow-waist
+posts: []

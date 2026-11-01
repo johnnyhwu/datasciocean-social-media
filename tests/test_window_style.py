@@ -17,7 +17,7 @@ sys.path.insert(0, str(ROOT / ".claude/skills/make-social-post/scripts"))
 import render as R
 
 CONCEPT = "claude-code-agentic-loop-and-tools"
-TAG = "拆解 Claude Code"
+TAG = R.load_series("claude-code")["name"]    # 系列標籤必須與 series.md 的 name 相同；讀檔才不會在系列改名時失效
 fails = []
 
 

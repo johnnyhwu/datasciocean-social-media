@@ -34,7 +34,7 @@ CONTENT = {"text", "table", "chart_bars", "chart_sounding", "diagram"}
 CONTENT_KEYS = {"title", "body", "label", "question", "rows", "bars", "note", "nav", "legend",
                 "nodes", "outcomes", "loop", "columns", "heads", "pairs", "count", "points", "ref", "ranges", "group", "start", "end",
                 "items", "steps", "cells"}
-LAYOUT_KEYS = {"layout", "refs", "quals", "fig_refs", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols", "more", "edges", "hot", "fade", "chain"}   # cols：點陣每列幾個點（版面參數，不含文字）
+LAYOUT_KEYS = {"layout", "refs", "quals", "fig_refs", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols", "more", "edges", "hot", "fade", "chain", "hops"}   # cols：點陣每列幾個點；hops：leak 第一條的跳數（版面參數，不含文字）
 
 
 def check_fields(d: dict) -> None:
@@ -76,10 +76,15 @@ def figure_credit(d: dict) -> str:
 def caption_text(d: dict) -> str:
     cap = d["caption"]
     lines = [cap["first"], ""]
+    prev_label = None
     for sl in d["slides"]:
         if sl["layout"] in CONTENT:
             fc = first_clause(sl.get("body", ""))
-            lead = f"{sl['label']}：" if sl.get("label") and not mark(sl["title"]).startswith(sl["label"]) else ""     # 小標籤放在前面；標題已經以同樣的詞開頭就不重複（「第一關：第一關：」）
+            lab = sl.get("label")
+            # 小標籤放在前面；標題已經以同樣的詞開頭就不重複（「第一關：第一關：」）。
+            # 小標籤當分段標記用時（每張都有、連著好幾張同一段），同一段只印一次，否則 caption 會像資料庫輸出（編輯，2026-10-31）
+            lead = f"{lab}：" if lab and lab != prev_label and not mark(sl["title"]).startswith(lab) else ""
+            prev_label = lab
             lines.append(f"・{lead}{mark(sl['title'])}" + (f"（{fc}）" if fc else ""))
     if figure_credit(d):
         lines += ["", figure_credit(d)]

@@ -77,5 +77,7 @@ def main(post: str, out: str, traps: list[int] | None) -> int:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) < 3 or sys.argv[1].endswith(".json") or not sys.argv[2].endswith(".json"):
+        sys.exit("參數順序：verify_reader.py <post-reader.md> <reader.json> [--trap N ...]（貼文在前、審查 JSON 在後）")
     args = sys.argv[3:]
     sys.exit(main(sys.argv[1], sys.argv[2], [int(a) for a in args[1:]] if args and args[0] == "--trap" else None))
