@@ -4,7 +4,6 @@
 
 ## 待發布
 
-- 拆解 Cerebras 知識庫：資料怎麼進來，答案怎麼出去 第 2 則：[搜尋出三種毛病，Cerebras 不是多加幾招，是一種毛病配一帖藥](cerebras-rag/slack-vector-failure-orthogonal-signals/README.md)
 - 拆解 Cerebras 知識庫：資料怎麼進來，答案怎麼出去 第 3 則：[搜尋每次都把所有工具叫一遍？又慢又貴](cerebras-rag/rag-planner-single-round-vs-agentic/README.md)
 
 ## 拆解 Cerebras 知識庫：資料怎麼進來，答案怎麼出去（`cerebras-rag`）
@@ -12,7 +11,7 @@
 | 發文順序 | 觀念 | 標題（planned_title） | IG | Threads | 打開 |
 |---|---|---|---|---|---|
 | 1 | `rag-narrow-waist`＋`slack-distillation-and-bursting` | Slack、Wiki、程式碼、Jira，怎麼塞進同一張表？ | 已發布 | 已發布 | [README](rag-narrow-waist/README.md) |
-| 2 | `slack-vector-failure-orthogonal-signals`＋`rrf-rank-fusion` | 搜尋出三種毛病，Cerebras 不是多加幾招，是一種毛病配一帖藥 | 待發布 | 待發布 | [README](slack-vector-failure-orthogonal-signals/README.md) |
+| 2 | `slack-vector-failure-orthogonal-signals`＋`rrf-rank-fusion` | 搜尋出三種毛病，Cerebras 不是多加幾招，是一種毛病配一帖藥 | 已發布 | 已發布 | [README](slack-vector-failure-orthogonal-signals/README.md) |
 | 3 | `rag-planner-single-round-vs-agentic`＋`retrieval-reasoning-decoupling` | 搜尋每次都把所有工具叫一遍？又慢又貴 | 待發布 | 待發布 | [README](rag-planner-single-round-vs-agentic/README.md) |
 
 ## Claude Code：怎麼讓 AI 敢自己改你的程式（`claude-code`）
@@ -29,6 +28,14 @@
 | 1 | `jev-cascade-overview` | 便宜的 Judge 先判，沒把握才轉給 GPT-6 | 已發布 | 已發布 | [README](jev-cascade-overview/README.md) |
 | 2 | `judge-readable-vs-derive`＋`confidence-three-metrics` | Judge 能不能用，先問答案能不能讀出來或核對 | 已發布 | 已發布 | [README](judge-readable-vs-derive/README.md) |
 | 3 | `cascade-complementary-errors`＋`cascade-threshold-and-failure-mode` | 串接為什麼成立，門檻選錯又會怎樣 | 已發布 | 已發布 | [README](cascade-complementary-errors/README.md) |
+
+## （草案，未定）LLM-as-a-Verifier（`llm-as-a-verifier`）
+
+| 發文順序 | 觀念 | 標題（planned_title） | IG | Threads | 打開 |
+|---|---|---|---|---|---|
+| 1 | `verifier-expected-value-vs-argmax`＋`verifier-three-knobs-g-k-c` | （待定，hook 由人挑） | 未做 | 未做 | （還沒做） |
+| 2 | `ppt-pivot-tournament` | （待定，hook 由人挑） | 未做 | 未做 | （還沒做） |
+| 3 | `verifier-results-how-to-read` | （待定，hook 由人挑） | 未做 | 未做 | （還沒做） |
 
 ## Persona-Aware-D2S: 同一份文件，怎麼長出不同簡報（`persona-aware-d2s`）
 

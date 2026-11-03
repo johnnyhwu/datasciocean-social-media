@@ -193,7 +193,8 @@ Cerebras 內部知識庫的對話資料（像 Slack）用純向量搜尋會出�
 ### 最後一則（置頂）
 想看完整拆解？
 文章：datasciocean.com/paper-intro/cerebras-rag
-同系列：Slack、Wiki、程式碼、Jira，怎麼塞進同一張表？（尚未發布）
+同系列：Slack、Wiki、程式碼、Jira，怎麼塞進同一張表？
+https://www.threads.com/@datasciocean/post/DfM7L3Mk4a0
 同系列：搜尋每次都把所有工具叫一遍？又慢又貴（尚未發布）
 引用：c1
 

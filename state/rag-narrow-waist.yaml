@@ -20,4 +20,5 @@ posts:
   published_at: 2026-11-01T14:16:33+0000
   hook_type: 讀者疑問
   mentions: []
-  backfilled: []
+  backfilled:
+  - slack-vector-failure-orthogonal-signals

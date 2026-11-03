@@ -2,9 +2,9 @@
 
 ## 現況（接手只讀這段；每次更新時覆寫）
 
-- 第 2 則，18 張。審查全部通過（忠實者 r5、讀者 r4），已 `--mark`；`ready`（IG、Threads）；系列已鎖定（2026-11-01）。
+- 第 2 則，18 張。**已發布（2026-11-03）**：IG https://www.instagram.com/p/DfQoMfAk5M2/ 、Threads https://www.threads.com/@datasciocean/post/DfQqGN0E7pE 。
+- 發布前用 `series_links.py --write` 補上第 1 則 Threads 網址；第 1 則 Threads 已回補。
 - 等人決定：無。
-- 下一步：照發文順序發布（`publish-flow.md`；push 前問人、每個 dry-run 給人看、人說「發」才 `--confirm`；第 2 則以後先跑 `series_links.py`）。
 
 ## 歷史
 

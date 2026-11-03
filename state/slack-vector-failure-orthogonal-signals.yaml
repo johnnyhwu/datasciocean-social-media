@@ -1,9 +1,23 @@
 concept: slack-vector-failure-orthogonal-signals
 formats:
   ig_carousel:
-    status: ready
-    pack: out/cerebras-rag/slack-vector-failure-orthogonal-signals
+    status: published
   threads_thread:
-    status: ready
-    pack: out/cerebras-rag/slack-vector-failure-orthogonal-signals
-posts: []
+    status: published
+posts:
+- post_id: slack-vector-failure-orthogonal-signals:ig_carousel
+  format: ig_carousel
+  series_id: cerebras-rag
+  url: https://www.instagram.com/p/DfQoMfAk5M2/
+  published_at: 2026-11-03T01:00:23+0000
+  hook_type: 並列重點
+  mentions: []
+  backfilled: []
+- post_id: slack-vector-failure-orthogonal-signals:threads_thread
+  format: threads_thread
+  series_id: cerebras-rag
+  url: https://www.threads.com/@datasciocean/post/DfQqGN0E7pE
+  published_at: 2026-11-03T01:04:12+0000
+  hook_type: 並列重點
+  mentions: []
+  backfilled: []

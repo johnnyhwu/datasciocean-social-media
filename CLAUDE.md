@@ -85,7 +85,7 @@ tests/                                  回歸測試 `test_*.py`（`test_*_style
 ## 目前狀態（各系列進度、網址、待決事項：`docs/status.md`）
 
 - 已發布：系列 `skillopt`、`persona-aware-d2s`、`jev-cascade`、`sag`、`claude-code`，獨立貼文 `decision-transformer-reward-conditioning`、`bradley-terry-pairwise-preference`。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。
-- 進行中：`cerebras-rag`（第 1 則已發布（2026-11-01），第 2、3 則 `ready`）。
+- 進行中：`cerebras-rag`（第 1、2 則已發布（2026-11-01、11-03），第 3 則 `ready`）；`llm-as-a-verifier`（規劃中，視覺草圖待人選）。
 - 獨立貼文（沒有系列）：spec 寫 `series: null`，視覺在 `standalone/<觀念 id>/`，發布包在 `out/standalone/`。
 
 ## 工作方式

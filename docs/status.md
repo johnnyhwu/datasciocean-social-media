@@ -62,8 +62,13 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 | 則 | 觀念 | IG | Threads |
 |---|---|---|---|
 | 1 | `rag-narrow-waist`（＋`slack-distillation-and-bursting`） | https://www.instagram.com/p/DfM6X75kzNZ/ | https://www.threads.com/@datasciocean/post/DfM7L3Mk4a0 |
+| 2 | `slack-vector-failure-orthogonal-signals`（＋`rrf-rank-fusion`） | https://www.instagram.com/p/DfQoMfAk5M2/ | https://www.threads.com/@datasciocean/post/DfQqGN0E7pE |
 
-2026-11-01 發第 1 則；第 2、3 則 `ready`（發第 2 則前跑 `series_links.py`，之後第 1 則 Threads 要回補）。人的回饋整理成 `ig-carousel.md` §0b（敘事順序、主角先對照後、順序圖、敘事口吻）。
+2026-11-01 發第 1 則；2026-11-03 發第 2 則（`series_links.py` 已補第 1 則連結；第 1 則 Threads 已回補，reply_id 18137195164732568）。第 3 則 `ready`（發前跑 `series_links.py`，發後第 1、2 則 Threads 要回補）。人的回饋整理成 `ig-carousel.md` §0b（敘事順序、主角先對照後、順序圖、敘事口吻）。
+
+## LLM-as-a-Verifier 系列（2026-11-03 起，規劃中）
+
+4 卡合成 3 則（人選方案 B：期望值＋G/K/C 雙卡 → PPT → 實驗怎麼讀）；`series/llm-as-a-verifier/series.md`（未鎖定，系列名、hashtag、`planned_title` 都待定）。視覺草圖三個方向（V1 重心、V2 刻度、V3 濃淡帶）在 `sketches/`，待人選。
 
 ## 跨系列的人的決定與待決事項
 
