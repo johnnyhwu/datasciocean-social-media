@@ -1,0 +1,659 @@
+{
+  "series": "llm-as-a-verifier",
+  "concept": "verifier-expected-value-vs-argmax",
+  "also_concepts": [
+    "verifier-three-knobs-g-k-c"
+  ],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "讀者疑問",
+    "title": "叫 AI 打 1 到 5 分，\n為什麼[[一堆平手]]？",
+    "subtitle": "模型心裡其實分得出高下，\n是「只取最高分」把它丟掉了。",
+    "refs": [
+      "c4",
+      "c6"
+    ],
+    "candidate": "A"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "叫 AI 打 1 到 5 分，\n為什麼[[一堆平手]]？",
+      "body": "模型心裡其實分得出高下，\n是「只取最高分」把它丟掉了。",
+      "refs": [
+        "c4",
+        "c6"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "AI 幫 AI 打分數，[[現在幾乎是標配]]",
+      "body": "叫 LLM 替另一個 LLM 的輸出打一個 1 到 5 的整數，再拿這個整數去排序、篩選、當訓練時的獎勵。LLM-as-a-Verifier（Stanford／UC Berkeley／NVIDIA）改的，就是這個分數怎麼算。先講三個詞：",
+      "rows": [
+        [
+          "Judge",
+          "叫 LLM 直接給一個整數分數的標準做法"
+        ],
+        [
+          "verifier",
+          "同一個 LLM，改讀它對每個分數各給多少機率"
+        ],
+        [
+          "軌跡",
+          "agent（會自己動手做事的 AI）做一件任務的完整紀錄"
+        ]
+      ],
+      "key_w": 200,
+      "refs": [
+        "c2",
+        "c3",
+        "c4",
+        "c7"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "route",
+      "label": "路線圖",
+      "title": "這一則要回答[[四個問題]]",
+      "body": "從平手是怎麼來的講起，再看改法、一個真實的案例，最後是還能調的三個旋鈕。",
+      "heads": [
+        "這一則的閱讀路線",
+        "從很多條候選裡挑出最好的一條，留給這個系列的下一則"
+      ],
+      "nodes": [
+        {
+          "text": "平手從哪來",
+          "sub": "模型明明有偏好，為什麼分數一樣？"
+        },
+        {
+          "text": "改算期望值",
+          "sub": "只改一個算法，平手怎麼就消失了？"
+        },
+        {
+          "text": "一個案例",
+          "sub": "真的比較會排嗎？代價是什麼？"
+        },
+        {
+          "text": "三個旋鈕",
+          "sub": "分數切細、多問幾次、拆開評，各有什麼用、什麼限制？"
+        }
+      ],
+      "refs": [
+        "c1",
+        "c3",
+        "verifier-three-knobs-g-k-c:c1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "dotgrid",
+      "label": "① 平手從哪來",
+      "title": "Terminal-Bench 上，\n[[27%]] 的比較是平手",
+      "body": "Terminal-Bench 是一個考 agent 做任務的 benchmark。論文在上面把兩條軌跡配成一對比高下，27% 的時候兩邊分數一樣。平手就排不出先後，也就挑不出一條。",
+      "count": 100,
+      "cols": 20,
+      "on": 27,
+      "nodes": [
+        {
+          "text": "實心：平手的比較"
+        },
+        {
+          "text": "空心：分得出高下的比較"
+        }
+      ],
+      "note": "一個點是一次比較，把 27% 換算成每 100 次來畫。",
+      "refs": [
+        "c6",
+        "c4",
+        "c1"
+      ],
+      "quals": [
+        "c1#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "dist",
+      "label": "① 平手從哪來",
+      "title": "每個分數各有機率，[[最後只留一個]]",
+      "body": "模型在決定要寫哪個分數的那一刻，其實對 1 到 5 分各給了一個機率。標準做法只取機率最高的那一個，其他全丟。論文指出，丟掉這些機率的是解讀分數的這一步，不是模型沒產生。",
+      "nodes": [
+        {
+          "text": "1",
+          "p": 0.02
+        },
+        {
+          "text": "2",
+          "p": 0.05
+        },
+        {
+          "text": "3",
+          "p": 0.13
+        },
+        {
+          "text": "4",
+          "p": 0.35
+        },
+        {
+          "text": "5",
+          "p": 0.45
+        }
+      ],
+      "pick": "argmax",
+      "heads": [
+        "模型給每個分數的機率",
+        ""
+      ],
+      "outcomes": [
+        {
+          "text": "只取最高分：這條軌跡拿到 5 分"
+        }
+      ],
+      "note": "這組機率是假設的例子，論文沒有公布實際的機率分布。",
+      "refs": [
+        "c4",
+        "c9"
+      ],
+      "quals": [
+        "c9#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "dist",
+      "label": "② 改算期望值",
+      "title": "每個分數[[照機率加權]]，再加起來",
+      "body": "LLM-as-a-Verifier 的改法很單純：不取最高分，把每個分數乘上它的機率再加起來。1×0.02＋2×0.05＋3×0.13＋4×0.35＋5×0.45＝4.16，分數不再只有 1 到 5 的整數，而是像 4.16 這樣帶小數的數。",
+      "nodes": [
+        {
+          "text": "1",
+          "p": 0.02
+        },
+        {
+          "text": "2",
+          "p": 0.05
+        },
+        {
+          "text": "3",
+          "p": 0.13
+        },
+        {
+          "text": "4",
+          "p": 0.35
+        },
+        {
+          "text": "5",
+          "p": 0.45
+        }
+      ],
+      "pick": "ev",
+      "heads": [
+        "同一組機率",
+        "期望值"
+      ],
+      "note": "沿用上一張假設的機率，金色的針就是算出來的期望值。",
+      "refs": [
+        "c5",
+        "c9"
+      ],
+      "quals": [
+        "c9#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "snap",
+      "label": "② 改算期望值",
+      "title": "兩條都是 5 分，[[期望值分得開]]",
+      "body": "換一條軌跡：5 分的機率 0.52、4 分 0.30，其餘 0.18 分給 1 到 3 分。只取機率最高的分數，兩條都是 5 分；改算期望值，一條 4.16、一條在 4.3 附近，就分得開。後面實驗平手歸零，就是這個機制。",
+      "nodes": [
+        {
+          "text": "只取機率最高的分數",
+          "lo": 3,
+          "hi": 5,
+          "marks": [
+            {
+              "v": 5,
+              "text": "軌跡甲"
+            },
+            {
+              "v": 5,
+              "text": "軌跡乙"
+            }
+          ],
+          "tie": "平手"
+        },
+        {
+          "text": "改算期望值",
+          "lo": 3,
+          "hi": 5,
+          "marks": [
+            {
+              "v": 4.16,
+              "text": "軌跡甲 4.16"
+            },
+            {
+              "v": 4.3,
+              "text": "軌跡乙 約 4.3"
+            }
+          ]
+        }
+      ],
+      "note": "兩條軌跡都是假設的例子，刻度只畫 3 到 5 分這一段。",
+      "refs": [
+        "c9",
+        "c1"
+      ],
+      "quals": [
+        "c9#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "hidden",
+      "label": "③ 一個案例",
+      "title": "失敗的那條，卻[[自稱檢查通過]]",
+      "body": "論文舉了 Terminal-Bench 的一題：把資料庫查詢改快，結果要一模一樣。兩條軌跡都由 Claude Opus 4.5 產生，一條對、一條錯；錯的那條說自己驗證過了，其實沒有。打分的 AI 分得出來嗎？下一張看。",
+      "heads": [
+        "論文指出，失敗的那條軌跡表面上",
+        "實際上做了什麼"
+      ],
+      "nodes": [
+        {
+          "text": "自己回報：「內部 diff 檢查通過」"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "把資料庫複製一份",
+          "sub": "在複製品上加索引來加速"
+        },
+        {
+          "text": "兩份不同做法的\n結果互相比",
+          "sub": "從來沒有真正驗證結果相同"
+        }
+      ],
+      "refs": [
+        "c15"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "stack",
+      "label": "③ 一個案例",
+      "title": "同一題評 100 次：Judge 平手 88 次，verifier [[0 次]]",
+      "body": "verifier（Gemini 2.5 Flash）其實看出 agent 沒驗證，卻講得像無關緊要；只取機率最高的分數，這個判斷就被壓扁。改算期望值，排對從 12 次升到 69 次；量表再切細，升到 77 次。",
+      "heads": [
+        "排對",
+        "平手",
+        "排錯"
+      ],
+      "nodes": [
+        {
+          "text": "Judge（1 到 5 分，取機率最高）",
+          "parts": [
+            12,
+            88,
+            0
+          ]
+        },
+        {
+          "text": "verifier（1 到 5 分，期望值）",
+          "parts": [
+            69,
+            0,
+            31
+          ]
+        },
+        {
+          "text": "verifier（1 到 20 分，期望值）",
+          "parts": [
+            77,
+            0,
+            23
+          ]
+        }
+      ],
+      "note": "「排對」指正確的那條拿到比較高的分數；每種方法各評 100 次。",
+      "refs": [
+        "c4",
+        "c16",
+        "c17",
+        "c18"
+      ],
+      "quals": [
+        "c1#2",
+        "c1#5"
+      ],
+      "fig_refs": [
+        "llm-as-a-verifier/table2.png"
+      ]
+    },
+    {
+      "layout": "table",
+      "label": "③ 一個案例",
+      "title": "不再平手的代價：[[兩三成選錯邊]]",
+      "body": "Judge 那 88 次平手是不表態，但它從不把錯的排在對的前面；verifier 每次都得表態，其中兩三成選錯邊。選哪一個，要看下游怎麼處理平手。",
+      "rows": [
+        [
+          "平手算半分",
+          "Judge 12＋88÷2＝56 分，verifier 69 分與 77 分：verifier 還是勝出"
+        ],
+        [
+          "平手交給人審",
+          "Judge 不表態的都交給人，反而更安全"
+        ],
+        [
+          "verifier 排錯",
+          "1 到 5 分 31 次，1 到 20 分 23 次"
+        ]
+      ],
+      "key_w": 260,
+      "refs": [
+        "c19",
+        "c20",
+        "c1"
+      ],
+      "quals": [
+        "c1#4",
+        "c1#5",
+        "c19#1"
+      ]
+    },
+    {
+      "layout": "table",
+      "label": "④ 三個旋鈕",
+      "title": "還能調的[[三個旋鈕]]，各對付一個問題",
+      "body": "除了改算期望值，還有三個地方可以調。接下來說的準確率，指的是配對準確率：把兩條軌跡配成一對，verifier 判對的比例。",
+      "rows": [
+        [
+          "G｜分數切多細",
+          "量表太粗、分不出細微差別：例如從 1 到 5 拉到 1 到 20"
+        ],
+        [
+          "K｜同一題問幾次",
+          "單問一次會有隨機偏差：問 K 次再平均"
+        ],
+        [
+          "C｜拆成幾個標準",
+          "評分標準本身可能不合理：拆開評再加總"
+        ]
+      ],
+      "key_w": 300,
+      "refs": [
+        "verifier-three-knobs-g-k-c:c1",
+        "verifier-three-knobs-g-k-c:c2",
+        "verifier-three-knobs-g-k-c:c3",
+        "verifier-three-knobs-g-k-c:c4"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "snap",
+      "label": "④ 三個旋鈕",
+      "title": "量表切細，相近的判斷[[不再擠同一格]]",
+      "body": "論文的說法是：量表切細沒有給新資訊，而是讓模型本來就有的判斷有更細的位置放。G（分數分成幾級）從 1 加到 20，準確率從 73.1% 一路升到 77.5%。但切細要不要多跑 LLM，論文前後講法打架。",
+      "nodes": [
+        {
+          "text": "1 到 5 分",
+          "hi": 5,
+          "marks": [
+            {
+              "v": 4,
+              "text": "判斷甲"
+            },
+            {
+              "v": 4,
+              "text": "判斷乙"
+            }
+          ],
+          "tie": "同一格"
+        },
+        {
+          "text": "1 到 20 分",
+          "hi": 20,
+          "marks": [
+            {
+              "v": 15,
+              "text": "判斷甲"
+            },
+            {
+              "v": 16,
+              "text": "判斷乙"
+            }
+          ]
+        }
+      ],
+      "note": "兩個判斷的位置只是示意。",
+      "refs": [
+        "verifier-three-knobs-g-k-c:c4",
+        "verifier-three-knobs-g-k-c:c5",
+        "verifier-three-knobs-g-k-c:c6",
+        "verifier-three-knobs-g-k-c:c7"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "target",
+      "label": "④ 三個旋鈕",
+      "title": "多問幾次，[[只修得掉亂飄]]",
+      "body": "同一題問 K 次再平均，只修得掉亂飄（每次結果忽高忽低），修不掉每次都往同一邊錯的偏差：就像秤永遠多 2 公斤，量再多次也修不掉。論文也承認，K 越大，多問的好處越少。",
+      "heads": [
+        "問 1 次",
+        "問很多次取平均"
+      ],
+      "nodes": [
+        {
+          "text": "靶心：正確的判斷"
+        },
+        {
+          "text": "落點的平均：還是偏在同一邊"
+        }
+      ],
+      "note": "落點是示意，不是實驗數據。",
+      "refs": [
+        "verifier-three-knobs-g-k-c:c8",
+        "verifier-three-knobs-g-k-c:c9",
+        "verifier-three-knobs-g-k-c:c10"
+      ]
+    },
+    {
+      "layout": "chart_bars",
+      "label": "④ 三個旋鈕",
+      "title": "Judge 問到 16 次，平手還剩 [[5.5%]]",
+      "body": "多問幾次，Judge 的平手從 26.7% 降到 5.5%；verifier 問 1 次和 16 次，平手是 0%。Judge 的進步主要靠平均打破平手，像用重複測量補一把太粗的尺；verifier 是直接換一把細的。",
+      "unit": "%",
+      "bars": [
+        {
+          "name": "Judge 問 1 次",
+          "value": 26.7
+        },
+        {
+          "name": "Judge 問 16 次",
+          "value": 5.5,
+          "emphasize": true
+        }
+      ],
+      "note": "長條是 Judge 的平手率：兩條軌跡拿到一樣分數的比例。",
+      "refs": [
+        "verifier-three-knobs-g-k-c:c11",
+        "verifier-three-knobs-g-k-c:c13",
+        "c1"
+      ],
+      "quals": [
+        "c1#3"
+      ],
+      "fig_refs": [
+        "llm-as-a-verifier/figure7.png"
+      ]
+    },
+    {
+      "layout": "chart_bars",
+      "label": "④ 三個旋鈕",
+      "title": "verifier 問 1 次＝Judge 問 16 次？[[有點誇大]]",
+      "body": "論文說 verifier 問 1 次就追平 Judge 問 16 次（都是 74.7%），像省 16 倍。但兩種次數下 verifier 都只高 2.7% 到 2.9%；省 16 倍只在目標剛好是 74.7% 時成立。",
+      "unit": "%",
+      "axis_max": 100,
+      "legend": [
+        "Judge 準確率",
+        "verifier 準確率"
+      ],
+      "bars": [
+        {
+          "name": "問 1 次",
+          "value": 71.8,
+          "value2": 74.7
+        },
+        {
+          "name": "問 16 次",
+          "value": 74.7,
+          "value2": 77.5
+        }
+      ],
+      "note": "簡化重畫，沒畫原圖的誤差範圍；每組兩條長條只差 2.7% 到 2.9%。",
+      "refs": [
+        "verifier-three-knobs-g-k-c:c11",
+        "verifier-three-knobs-g-k-c:c12"
+      ],
+      "quals": [
+        "verifier-three-knobs-g-k-c:c12#1"
+      ],
+      "fig_refs": [
+        "llm-as-a-verifier/figure7.png"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "fan",
+      "label": "④ 三個旋鈕",
+      "title": "把「對不對」拆成[[三個標準]]分開評",
+      "body": "在長流程的 agent 任務裡，「這條軌跡正確嗎？」混了好幾個獨立的因素，verifier 往往只抓住最顯眼的那一個。所以論文替 code agent 拆出三個子準則分開評，合起來比只看其中任何一個準一點。",
+      "heads": [
+        "滿足所有要求\n75.2%",
+        "輸出格式對嗎\n76.4%",
+        "有失敗訊號嗎\n76.0%"
+      ],
+      "nodes": [
+        {
+          "text": "三個子準則：Specification、Output、Errors"
+        },
+        {
+          "text": "三個合起來：78.3%",
+          "sub": "比最好的單一準則多 1.9%"
+        }
+      ],
+      "refs": [
+        "verifier-three-knobs-g-k-c:c15",
+        "verifier-three-knobs-g-k-c:c16"
+      ],
+      "quals": [
+        "verifier-three-knobs-g-k-c:c16#1"
+      ],
+      "fig_refs": [
+        "llm-as-a-verifier/figure4.png"
+      ],
+      "note": "簡化重畫：數字是各標準單獨評的準確率；1.9% 可不可信，下一張說。"
+    },
+    {
+      "layout": "table",
+      "label": "④ 三個旋鈕",
+      "title": "多 1.9% 就代表拆得好？[[證據比較薄]]",
+      "body": "道理說得通：像幾個各有盲點的評審打分再平均，錯得不完全一樣，就會贏過單一最強的。但上一張的 78.3% 證據比較薄：",
+      "rows": [
+        [
+          "怎麼來的",
+          "三個準則怎麼挑的，論文沒說"
+        ],
+        [
+          "試過幾個",
+          "沒試 4、5 個，只證明 3 比 1 好"
+        ],
+        [
+          "差距可信嗎",
+          "1.9% 沒檢查是否碰巧；原圖誤差範圍重疊明顯、沒說代表什麼"
+        ],
+        [
+          "換個領域",
+          "機器人、醫療也說用同一組，怎麼套用沒回答"
+        ]
+      ],
+      "key_w": 230,
+      "refs": [
+        "verifier-three-knobs-g-k-c:c16",
+        "verifier-three-knobs-g-k-c:c17",
+        "verifier-three-knobs-g-k-c:c18",
+        "verifier-three-knobs-g-k-c:c19"
+      ],
+      "quals": [
+        "verifier-three-knobs-g-k-c:c16#1"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "AI 評審老是平手，該怎麼辦？",
+      "title": "要排出先後，改算期望值；\n代價是每次都得表態。\n平手能交給人審的話，\nJudge 反而更安全",
+      "refs": [
+        "c1",
+        "c19",
+        "c20"
+      ],
+      "quals": [
+        "c1#4"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "一次看完這個系列",
+      "current": "verifier-expected-value-vs-argmax",
+      "nav": "完整文章：datasciocean.com/paper-intro/llm-as-a-verifier",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "叫 AI 打 1 到 5 分，為什麼一堆平手？\n\n在 Terminal-Bench（一個考 agent 做任務的 benchmark）上，27% 的比較結果是平手。論文指出，原因不是模型分不出來：它在決定分數的那一刻，對每個分數都給了機率，標準做法卻只取機率最高的那一個，其餘全丟。\n\nLLM-as-a-Verifier 改算期望值：把每個分數乘上它的機率再加總，分數變成帶小數的數，平手就拆開了。代價是每次都得表態：同一個 query-optimize 任務各評 100 次，Judge 有 88 次平手、0 次排錯；verifier 沒有平手，但排錯 23 到 31 次。\n\n另外還有三個能調的旋鈕：量表切細（G）、同一題多問幾次（K）、拆成幾個標準分開評（C）。多問幾次只修得掉忽高忽低，修不掉每次往同一邊錯；拆標準只證明了三個比一個好。\n\n這是系列第 1 則。",
+      "refs": [
+        "c1",
+        "c4",
+        "c6",
+        "c5",
+        "c17",
+        "c19",
+        "verifier-three-knobs-g-k-c:c1",
+        "verifier-three-knobs-g-k-c:c9",
+        "verifier-three-knobs-g-k-c:c18"
+      ],
+      "quals": [
+        "c1#1",
+        "c1#4",
+        "c1#5"
+      ]
+    },
+    "last": {
+      "text": "LLM-as-a-Verifier：別只取最高分，改算期望值，平手就拆開了；代價是每次都得表態。\n文章：datasciocean.com/paper-intro/llm-as-a-verifier\n同系列：從 20 個答案挑最好的，AI 評審不必兩兩都比（尚未發布）\n同系列：論文說 LLM-as-a-Verifier 表現最好，功勞真的是它的嗎？（尚未發布）",
+      "refs": [
+        "c1",
+        "c4"
+      ],
+      "link": "https://datasciocean.com/paper-intro/llm-as-a-verifier/"
+    }
+  },
+  "caption": {
+    "first": "LLM 當評審、AI 評分老是平手？LLM-as-a-Verifier 改算期望值",
+    "first_refs": [
+      "c1",
+      "c5"
+    ],
+    "nav": "完整文章在 datasciocean.com，搜「LLM-as-a-Verifier」",
+    "hashtags": [
+      "LLMVerifier",
+      "LLMasaJudge",
+      "LLM評測"
+    ]
+  }
+}

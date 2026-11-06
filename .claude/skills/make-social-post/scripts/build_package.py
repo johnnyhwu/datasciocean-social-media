@@ -33,8 +33,8 @@ CONTENT = {"text", "table", "chart_bars", "chart_sounding", "diagram"}
 # 避免「新增欄位、卻漏了輸出」（審查者與人都看不到那段內容）。
 CONTENT_KEYS = {"title", "body", "label", "question", "rows", "bars", "note", "nav", "legend",
                 "nodes", "outcomes", "loop", "columns", "heads", "pairs", "count", "points", "ref", "ranges", "group", "start", "end",
-                "items", "steps", "cells"}
-LAYOUT_KEYS = {"layout", "refs", "quals", "fig_refs", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols", "more", "edges", "hot", "fade", "chain", "hops"}   # cols：點陣每列幾個點；hops：leak 第一條的跳數（版面參數，不含文字）
+                "items", "steps", "cells", "on", "total", "labels", "ops"}   # on：點陣裡實心的點數；total：stack 的總次數；labels：ring 每條邊的標籤；ops：equation 的運算符號（都會經 diagrams.texts() 輸出）
+LAYOUT_KEYS = {"layout", "refs", "quals", "fig_refs", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols", "more", "edges", "hot", "fade", "chain", "hops", "pick"}   # pick：dist 只取最高或期望值； cols：點陣每列幾個點；hops：leak 第一條的跳數（版面參數，不含文字）
 
 
 def check_fields(d: dict) -> None:
@@ -85,7 +85,7 @@ def caption_text(d: dict) -> str:
             # 小標籤當分段標記用時（每張都有、連著好幾張同一段），同一段只印一次，否則 caption 會像資料庫輸出（編輯，2026-10-31）
             lead = f"{lab}：" if lab and lab != prev_label and not mark(sl["title"]).startswith(lab) else ""
             prev_label = lab
-            lines.append(f"・{lead}{mark(sl['title'])}" + (f"（{fc}）" if fc else ""))
+            lines.append(f"・{lead}{mark(sl['title']).replace(chr(10), '')}" + (f"（{fc}）" if fc else ""))   # 標題裡的 \n 是圖上的換行，caption 一張一行
     if figure_credit(d):
         lines += ["", figure_credit(d)]
     lines += ([""] + [cap["nav"]] if cap.get("nav") else []) + ["", " ".join("#" + h for h in cap["hashtags"])]   # 導流行可省略（獨立貼文，人決定不導回來源文章）

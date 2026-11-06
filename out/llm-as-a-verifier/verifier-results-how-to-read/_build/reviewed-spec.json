@@ -1,0 +1,511 @@
+{
+  "series": "llm-as-a-verifier",
+  "concept": "verifier-results-how-to-read",
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "讀者疑問",
+    "title": "論文說 LLM-as-a-Verifier 表現最好，\n[[功勞真的是它的嗎？]]",
+    "subtitle": "同一批答案只換它來挑：成功率多 2.1～3.4%；\n同一個模型只換它的打分法：準確率多 16.6%",
+    "refs": [
+      "c5",
+      "c6",
+      "c8",
+      "c11",
+      "c10"
+    ],
+    "candidate": "A（人 2026-11-06 改寫）"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "論文說 LLM-as-a-Verifier 表現最好，\n[[功勞真的是它的嗎？]]",
+      "body": "同一批答案只換它來挑：成功率多 2.1～3.4%；\n同一個模型只換它的打分法：準確率多 16.6%",
+      "refs": [
+        "c5",
+        "c6",
+        "c8",
+        "c11",
+        "c10"
+      ]
+    },
+    {
+      "layout": "recap",
+      "title": "[[前情提要]]與這一則重點",
+      "current": "verifier-results-how-to-read",
+      "refs": [
+        "結構"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "讓 LLM 打分數，\n[[從好幾份答案裡挑最好的]]",
+      "body": "LLM-as-a-Verifier（Stanford／UC Berkeley／NVIDIA）讓一個 LLM 替另一個 LLM 的輸出打分數。打分時每個分數各有一個機率；它不只取機率最高的那個，而是把每個分數乘上機率再加總（期望值），再靠這些分數從好幾份候選裡挑出最好的一份。",
+      "rows": [
+        [
+          "verifier",
+          "負責打分數、挑答案的那個 LLM"
+        ],
+        [
+          "候選",
+          "同一題讓 AI 做好幾次，得到的好幾份答案"
+        ],
+        [
+          "Benchmark",
+          "大家拿來比成績的公開題目集"
+        ]
+      ],
+      "key_w": 220,
+      "refs": [
+        "c2"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "route",
+      "label": "路線圖",
+      "title": "這一則要回答[[三個問題]]",
+      "body": "論文在程式、機器人、醫療交了不少成績，但有的進步混了別的差異。我們拆三件事來看：論文說的第一名、機器人實驗，和「提早預警」的說法。",
+      "heads": [
+        "這一則的閱讀路線",
+        "方法怎麼運作，前兩則已經講過"
+      ],
+      "nodes": [
+        {
+          "text": "第一名的成績",
+          "sub": "論文說它表現最好，有多少是它的功勞？"
+        },
+        {
+          "text": "機器人實驗",
+          "sub": "同一個模型只換打分法，準確率差多少？"
+        },
+        {
+          "text": "「提早預警失敗」的說法",
+          "sub": "分數真的能提早看出快要失敗嗎？"
+        }
+      ],
+      "refs": [
+        "c1",
+        "c2"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "label": "① 第一名的成績",
+      "title": "86.5% 贏過 84.7%，\n但兩邊[[不只差一樣東西]]",
+      "body": "論文說它在 Terminal-Bench V2 這個 Benchmark 拿下第一（SOTA）：86.5%，贏過 GPT-5.5 的 84.7%。但兩邊連 harness（包在模型外面、讓它動手做事的程式）和抽樣也不同，差距不能全算給 verifier。",
+      "columns": [
+        {
+          "head": "論文的 86.5%",
+          "items": [
+            {
+              "text": "GPT-5.5"
+            },
+            {
+              "text": "Capy harness",
+              "emph": true
+            },
+            {
+              "text": "每題抽 5 份候選",
+              "emph": true
+            },
+            {
+              "text": "verifier 挑一份",
+              "emph": true
+            }
+          ]
+        },
+        {
+          "head": "對照的 84.7%",
+          "items": [
+            {
+              "text": "GPT-5.5"
+            },
+            {
+              "text": "另一個 harness"
+            },
+            {
+              "text": "每題抽 5 份候選",
+              "gone": true
+            },
+            {
+              "text": "verifier 挑一份",
+              "gone": true
+            }
+          ]
+        }
+      ],
+      "note": "兩邊相同的只有 GPT-5.5；harness 兩邊不同，劃掉的是 84.7% 那邊沒有的。",
+      "refs": [
+        "c8"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "links",
+      "label": "① 第一名的成績",
+      "title": "公平的比法：\n[[同一批候選，只換挑法]]",
+      "body": "論文也做了一組乾淨的比較：同一個模型先替每題做出好幾份候選，接著只換「怎麼挑一份交出去」。其他條件一樣，成績的差距就只來自挑法。",
+      "heads": [
+        "三種挑法",
+        "同一題的 4 份候選"
+      ],
+      "nodes": [
+        {
+          "text": "只交一次",
+          "sub": "Pass@1"
+        },
+        {
+          "text": "verifier 挑",
+          "sub": "論文的方法",
+          "emph": true
+        },
+        {
+          "text": "完美挑選",
+          "sub": "Oracle"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "甲：做錯"
+        },
+        {
+          "text": "乙：做對",
+          "emph": true
+        },
+        {
+          "text": "丙：做錯"
+        },
+        {
+          "text": "丁：做對",
+          "emph": true
+        }
+      ],
+      "edges": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hot": [
+        [
+          1,
+          1
+        ]
+      ],
+      "note": "假設的例子：同一題做出 4 份候選，三種挑法各交一份。",
+      "refs": [
+        "c5"
+      ]
+    },
+    {
+      "layout": "chart_bars",
+      "label": "① 第一名的成績",
+      "title": "換 verifier 來挑，\n成功率多 [[2.1～3.4%]]",
+      "body": "跟「只交一次」相比，verifier 挑的多 2.1～3.4%，完美挑選也只多 4.8～9.0%。這才是算得到 verifier 的功勞：可搶的空間它搶到四分之一到三分之二。",
+      "unit": "%",
+      "axis_max": 10,
+      "legend": [
+        "完美挑選能多拿的",
+        "verifier 多拿的"
+      ],
+      "bars": [
+        {
+          "name": "Terminal-Bench V2",
+          "value": 9.0,
+          "value2": 3.4,
+          "subs": [
+            "83.1→86.5%，搶到 38%"
+          ]
+        },
+        {
+          "name": "SWE-Bench Verified",
+          "value": 8.3,
+          "value2": 2.1,
+          "subs": [
+            "76.1→78.2%，搶到 25%"
+          ]
+        },
+        {
+          "name": "MedAgentBench",
+          "value": 4.8,
+          "value2": 3.1,
+          "subs": [
+            "70.2→73.3%，搶到 65%"
+          ]
+        }
+      ],
+      "note": "SWE-Bench 的 3 份候選來自三個不同模型，不能和另外兩列直接比。",
+      "refs": [
+        "c6",
+        "c7"
+      ],
+      "quals": [
+        "c6#1",
+        "c7#1"
+      ],
+      "fig_refs": [
+        "llm-as-a-verifier/table3.png"
+      ]
+    },
+    {
+      "layout": "chart_bars",
+      "label": "② 機器人實驗",
+      "title": "同一個模型只換打分法，\n準確率 [[70.8% → 87.4%]]",
+      "body": "機器人的 Benchmark RoboRewardBench 上，同一個 Qwen 3.6 35B 只換打分法，偏好準確率就多 16.6%：最能歸功給方法的數字。",
+      "unit": "%",
+      "axis_max": 100,
+      "subs_inline": true,
+      "bars": [
+        {
+          "name": "改算期望值",
+          "value": 87.4,
+          "subs": [
+            "LLM-as-a-Verifier"
+          ],
+          "emphasize": true
+        },
+        {
+          "name": "RoboReward-8B",
+          "value": 81.4,
+          "subs": [
+            "訓練過，約 4.5 萬 episode"
+          ]
+        },
+        {
+          "name": "Robometer-4B",
+          "value": 78.8,
+          "subs": [
+            "訓練過，約 100 萬筆比較"
+          ]
+        },
+        {
+          "name": "只取最高分",
+          "value": 70.8,
+          "subs": [
+            "同一個模型"
+          ]
+        }
+      ],
+      "refs": [
+        "c9",
+        "c10",
+        "c11"
+      ],
+      "fig_refs": [
+        "llm-as-a-verifier/table4.png"
+      ]
+    },
+    {
+      "layout": "table",
+      "label": "② 機器人實驗",
+      "title": "不用訓練就贏過專門模型，\n[[但有兩個保留]]",
+      "body": "RoboReward-8B、Robometer-4B 是專門訓練來替機器人打分數的 reward model。LLM-as-a-Verifier 不用額外訓練就贏過它們，換成影片輸入也不用改方法，但有兩個保留：",
+      "rows": [
+        [
+          "保留一｜沒解釋",
+          "專門訓練的模型，為什麼在自己的領域輸掉？論文只列數字"
+        ],
+        [
+          "保留二｜利益關係",
+          "這個 Benchmark 出自共同作者也掛名的 RoboReward 論文，被比的 RoboReward-8B 正是那篇的模型，論文沒揭露"
+        ]
+      ],
+      "key_w": 260,
+      "refs": [
+        "c12",
+        "c10",
+        "c9",
+        "c1"
+      ],
+      "quals": [
+        "c12#1",
+        "c12#2",
+        "c10#1",
+        "c1#1",
+        "c1#2"
+      ]
+    },
+    {
+      "layout": "chart_bars",
+      "label": "② 機器人實驗",
+      "title": "訓練好的模型改用期望值，\n[[和人類的誤差也變小]]",
+      "body": "把 RoboReward-8B 也改用連續的期望值打分，和人類標註的 MAE（平均絕對誤差，越小越接近人類）從 1.11 降到 0.72。也就是說，這套打分法可以直接加在既有的 reward model 上，不必從頭換。",
+      "unit": "",
+      "axis_max": 1.2,
+      "bars": [
+        {
+          "name": "原本的打分法",
+          "value": 1.11
+        },
+        {
+          "name": "改用期望值",
+          "value": 0.72,
+          "emphasize": true
+        }
+      ],
+      "note": "兩條是同一個 RoboReward-8B，長條越短越接近人類標註。",
+      "refs": [
+        "c13",
+        "c12",
+        "c11"
+      ]
+    },
+    {
+      "layout": "table",
+      "label": "③ 預警說法",
+      "title": "論文說：分數能[[提早看出 AI 快要失敗]]",
+      "body": "AI agent（會自己動手做事的 AI）一步步執行任務，verifier 可以每走一步就打一次分。論文主張：快要失敗或卡住時，分數會大致停在原地，所以同一個分數能當進度條，也能提早預警。它舉的例子是：",
+      "rows": [
+        [
+          "成功的那次",
+          "分數持續上升到約 1.0"
+        ],
+        [
+          "失敗的那次",
+          "多裝了不必要的套件、磁碟空間耗盡之後，分數一路偏低"
+        ],
+        [
+          "但這只是",
+          "單一任務的單一案例，不是 500 次任務的統計"
+        ]
+      ],
+      "key_w": 220,
+      "refs": [
+        "c15",
+        "c18",
+        "c14"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "snap",
+      "label": "③ 預警說法",
+      "title": "500 次任務一算：成功和失敗\n[[只差 0.079]]",
+      "body": "論文用 VOC 量「分數有沒有隨步驟一路往上」：完全跟著上升是 1，停在原地約為 0。它看的是有沒有往上，不是分數高低。失敗的 0.769 和成功的 0.848 很接近：失敗時分數照樣往上爬，很難靠它分出誰快失敗。",
+      "nodes": [
+        {
+          "text": "如果失敗時分數真的停在原地",
+          "lo": 0,
+          "hi": 1,
+          "marks": [
+            {
+              "v": 0,
+              "text": "失敗 約 0"
+            },
+            {
+              "v": 0.848,
+              "text": "成功 0.848"
+            }
+          ]
+        },
+        {
+          "text": "論文的實際統計（Terminal-Bench V2）",
+          "lo": 0,
+          "hi": 1,
+          "marks": [
+            {
+              "v": 0.769,
+              "text": "失敗 0.769"
+            },
+            {
+              "v": 0.848,
+              "text": "成功 0.848"
+            }
+          ]
+        }
+      ],
+      "note": "第一列：失敗時分數若停在原地，VOC 是 0；第二列：實際統計。",
+      "refs": [
+        "c14",
+        "c16",
+        "c17",
+        "c15"
+      ],
+      "quals": [
+        "c15#1",
+        "c15#2"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "看論文的成績，哪些數字\n才算得到 LLM-as-a-Verifier 頭上？",
+      "title": "只看換掉它、\n其他不變的比較：\n成功率多 2.1～3.4%，\n機器人準確率多 16.6%。",
+      "refs": [
+        "c1",
+        "c5",
+        "c6",
+        "c11"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "一次看完這個系列",
+      "current": "verifier-results-how-to-read",
+      "nav": "完整文章：datasciocean.com/paper-intro/llm-as-a-verifier",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "論文說 LLM-as-a-Verifier 表現最好，功勞真的是它的嗎？\n\nLLM-as-a-Verifier 讓 LLM 替另一個 LLM 的輸出打分數，再從同一題的好幾份候選裡挑最好的一份。論文說它在 Terminal-Bench V2 拿下第一（SOTA）：86.5%，贏過 GPT-5.5 的 84.7%。但兩邊的 harness（包在模型外面的程式）、抽樣、有沒有 verifier 三處不同，不能全算給它。\n\n公平的比法是同一批候選、只換挑法：成功率多 2.1～3.4%（SWE-Bench 的候選來自三個不同模型，不能和另外兩個比）。\n\n最乾淨的證據在機器人：同一個 Qwen 3.6 35B，只把「取機率最高的分數」換成「算期望值」，準確率 70.8% → 87.4%。但論文沒解釋專門訓練的模型為什麼在自己的領域輸掉；這個 Benchmark 也出自共同作者掛名的論文，被比的 RoboReward-8B 正是那篇的模型，論文沒揭露。\n\n論文還說分數能提早預警失敗，但衡量分數往上爬程度的 VOC，成功 0.848、失敗 0.769，只差 0.079。\n\n這是系列第 3 則。",
+      "refs": [
+        "c1",
+        "c11",
+        "c12",
+        "c14",
+        "c15",
+        "c16",
+        "c17",
+        "c2",
+        "c5",
+        "c6",
+        "c8",
+        "c9"
+      ],
+      "quals": [
+        "c6#1",
+        "c12#1",
+        "c12#2",
+        "c15#1",
+        "c15#2"
+      ]
+    },
+    "last": {
+      "text": "看論文成績，只看「只換掉它、其他條件不變」的比較：挑答案成功率多 2.1～3.4%，機器人準確率多 16.6%。\n文章：datasciocean.com/paper-intro/llm-as-a-verifier\n同系列：叫 AI 打 1 到 5 分，為什麼一堆平手？（尚未發布）\n同系列：從 20 個答案挑最好的，AI 評審不必兩兩都比（尚未發布）",
+      "refs": [
+        "c1",
+        "c5",
+        "c6",
+        "c11"
+      ],
+      "link": "https://datasciocean.com/paper-intro/llm-as-a-verifier/"
+    }
+  },
+  "caption": {
+    "first": "LLM-as-a-Verifier 的成績怎麼看：只換掉它、其他條件不變的比較才算數",
+    "first_refs": [
+      "c1",
+      "c2",
+      "c5"
+    ],
+    "nav": "完整文章在 datasciocean.com，搜「LLM-as-a-Verifier」",
+    "hashtags": [
+      "LLMVerifier",
+      "LLMasaJudge",
+      "LLM評測"
+    ]
+  }
+}

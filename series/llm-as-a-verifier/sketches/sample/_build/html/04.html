@@ -1,0 +1,82 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><style>/* LLM-as-a-Verifier 系列模板（哲學：series/llm-as-a-verifier/philosophy.md，濃淡帶）
+   顏色與字級只用 design-series-visuals/references/brand-and-layouts.md §2 規定的集合。字型內嵌自 assets/fonts。 */
+@font-face{font-family:"DSO";src:url("file:///Users/johnnyhwu/Desktop/datasciocean-social-media/assets/fonts/NotoSansCJKtc-Regular.otf");font-weight:400}
+@font-face{font-family:"DSO";src:url("file:///Users/johnnyhwu/Desktop/datasciocean-social-media/assets/fonts/NotoSansCJKtc-Bold.otf");font-weight:700}
+html,body{margin:0;width:1080px;height:1350px;overflow:hidden;background:#F2E0C0;
+  font-family:"DSO",sans-serif;color:#01353F}
+.slide{position:relative;width:1080px;height:1350px;overflow:hidden}
+.slide.dark{background:#01353F}
+.gfx{position:absolute;left:0;top:0}
+.t{margin:0}
+.abs{position:absolute}
+.tag{left:80px;top:88px;font-size:28px;font-weight:400;color:#076876;white-space:nowrap}
+.dark .tag{color:#F2E0C0}
+.title{left:80px;top:150px;width:920px;font-size:72px;font-weight:700;line-height:1.25;color:#076876;
+  word-break:keep-all;text-wrap:balance}
+.body{left:80px;top:352px;width:920px;font-size:40px;font-weight:400;line-height:1.6;word-break:keep-all}
+.body.sm{font-size:38px}   /* 圖表與對照表的補充：最多 2 行 */
+/* 小標籤：放右下角當頁腳的對側；金色只給濃淡帶上的針，所以用藍綠細框 */
+.chip{right:80px;top:1252px;font-size:28px;font-weight:400;color:#076876;white-space:nowrap;
+  border:2px solid #076876;border-radius:6px;padding:4px 18px}
+.foot{left:80px;top:1262px;font-size:28px;font-weight:400;color:#01353F;white-space:nowrap}
+.foot.light,.dark .foot{color:#F2E0C0}
+.hl{background:linear-gradient(transparent 56%,#DDA642 56%,#DDA642 94%,transparent 94%);color:#01353F}
+/* 封面 */
+.cover-title{left:80px;top:330px;width:920px;font-size:76px;font-weight:700;line-height:1.25;color:#076876;
+  word-break:keep-all;text-wrap:balance}
+.cover-sub{left:80px;width:920px;font-size:40px;font-weight:400;line-height:1.6;word-break:keep-all}
+.band-name{left:80px;top:1150px;font-size:34px;font-weight:700;color:#F2E0C0;white-space:nowrap}
+/* 深色封面（等深線系列）：標題與副標用米色；螢光筆沿用上一個系列的畫法（字的下半部有金色色帶），字改成米色 */
+.dark .cover-title,.dark .cover-sub{color:#F2E0C0}
+.dark .hl{color:#F2E0C0}
+/* 對照表 */
+.cell{font-size:38px;line-height:1.5;word-break:keep-all}
+.cell.k{font-weight:700;color:#076876}
+.cell.h{font-size:28px;font-weight:700;color:#076876}
+.cell.ks{font-size:28px;font-weight:400;color:#076876;line-height:1.5;white-space:nowrap}   /* 鍵的小字（指標名稱） */
+/* 圖表 */
+.name{font-size:34px;font-weight:700;line-height:1.5;white-space:nowrap}
+.sub{font-size:28px;font-weight:400;line-height:1.5;white-space:nowrap}
+.subi{font-size:28px;font-weight:400}   /* 接在名稱後面的副標籤（subs_inline） */
+.num{font-size:56px;font-weight:700;line-height:66px;white-space:nowrap}
+.num2{font-size:40px;font-weight:700;line-height:48px;white-space:nowrap}   /* 成對橫條圖的數字 */
+.legend{font-size:28px;white-space:nowrap}
+.note{font-size:28px;white-space:nowrap}
+.dark .note{color:#F2E0C0}
+.sea .name,.sea .sub,.sea .num,.sea .legend,.sea .note,.sea .foot{color:#F2E0C0}
+/* 帶走 */
+.take{left:80px;width:920px;top:430px;font-size:76px;font-weight:700;line-height:1.3;color:#DDA642;
+  word-break:keep-all;text-wrap:balance}
+.take-q{left:80px;width:920px;font-size:56px;font-weight:700;line-height:1.3;color:#F2E0C0;word-break:keep-all}
+.take-label{left:80px;font-size:28px;font-weight:400;color:#F2E0C0;white-space:nowrap}
+/* 系列地圖 */
+.item{font-size:34px;line-height:1.4;white-space:nowrap}
+.item.cur{color:#F2E0C0;font-weight:700}
+.nav{font-size:28px;line-height:1.5;color:#076876;white-space:nowrap}
+
+/* 示意圖版型（diagram）：文字可換行（不像 .name 是單行） */
+.dn{font-size:34px;font-weight:700;line-height:1.3;word-break:keep-all}
+.dt{font-size:34px;font-weight:400;line-height:1.35;word-break:keep-all}
+.ds{font-size:28px;font-weight:400;line-height:1.4;word-break:keep-all}
+.dl{font-size:28px;font-weight:700;line-height:1.4;white-space:nowrap}
+.dv{font-size:56px;font-weight:700;line-height:1.15;white-space:nowrap}
+.dv2{font-size:40px;font-weight:700;line-height:1.2;white-space:nowrap}
+.gone{text-decoration:line-through;text-decoration-thickness:3px}
+/* 系列地圖與回顧頁的細節（一則一行標題加一段細節；2026-10-25 人要求「標題＋細節」） */
+.isum{font-size:28px;font-weight:400;line-height:1.4;word-break:keep-all;width:836px}
+.isum.cur{color:#F2E0C0}
+.ilab{font-size:28px;font-weight:400;line-height:1.4;color:#076876;white-space:nowrap}
+.ilab.cur{color:#DDA642;font-weight:700}
+.ilab.cur2{color:#01353F;font-weight:700}
+</style></head><body><div class="slide">
+<svg class="gfx" width="1080" height="1350" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#076876"/><stop offset=".38" stop-color="#01353F"/><stop offset="1" stop-color="#032027"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#DDA642" stop-opacity=".42"/><stop offset="1" stop-color="#DDA642" stop-opacity="0"/></radialGradient></defs><rect class="bg" x="80.0" y="567.6" width="380.0" height="192.4" rx="14" fill="none" stroke="#01353F" stroke-width="3" stroke-dasharray="8 8"/><rect class="bg" x="540.0" y="567.6" width="460.0" height="192.4" rx="14" fill="#01353F"/><line class="bg" x1="470.0" y1="663.8" x2="530.0" y2="663.8" stroke="#DDA642" stroke-width="5" stroke-linecap="round"/><polygon class="bg" points="530.0,663.8 517.4,669.9 517.4,657.7" fill="#DDA642"/><rect class="bg" x="80.0" y="778.0" width="380.0" height="192.4" rx="14" fill="none" stroke="#01353F" stroke-width="3" stroke-dasharray="8 8"/><rect class="bg" x="540.0" y="778.0" width="460.0" height="192.4" rx="14" fill="#01353F"/><line class="bg" x1="470.0" y1="874.2" x2="530.0" y2="874.2" stroke="#DDA642" stroke-width="5" stroke-linecap="round"/><polygon class="bg" points="530.0,874.2 517.4,880.3 517.4,868.1" fill="#DDA642"/><defs><linearGradient id="bds" gradientUnits="userSpaceOnUse" x1="60" y1="0" x2="1020" y2="0"><stop offset="0.00" stop-color="#dbd9bc"/><stop offset="0.25" stop-color="#b9ceb7"/><stop offset="0.50" stop-color="#63b1a8"/><stop offset="0.75" stop-color="#106066"/><stop offset="1.00" stop-color="#01353f"/></linearGradient></defs><rect class="bg" x="0" y="0" width="1080" height="18" fill="url(#bds)"/><rect class="bg" x="468.4" y="0" width="6" height="18" fill="#DDA642"/><rect class="bg" x="468.4" y="18" width="6" height="16" fill="#DDA642"/></svg>
+<div class="t abs tag">（草案，未定）LLM-as-a-Verifier</div>
+
+<div class="t abs title chk" id="title">同一個模型，
+只換一種讀分數的方式</div>
+<div class="t abs body sm chk" id="body">不取最高分，改算期望值，分數就從整數變成連續的實數。</div>
+<div class="t abs dl" style="left:80.0px;top:509.6px;width:380.0px;color:#076876;text-align:left">只取最高分</div><div class="t abs dl" style="left:540.0px;top:509.6px;width:460.0px;color:#076876;text-align:left">改算期望值</div><div class="t abs dt" style="left:102.0px;top:619.6px;width:336.0px;color:#076876;text-align:left" data-box="80.0,567.6,380.0,192.4">分數只有<br>1～5 五種</div><div class="t abs dn" style="left:562.0px;top:619.6px;width:416.0px;color:#F2E0C0;text-align:left" data-box="540.0,567.6,460.0,192.4">分數是連續的實數，例如 4.16</div><div class="t abs dt" style="left:102.0px;top:830.0px;width:336.0px;color:#076876;text-align:left" data-box="80.0,778.0,380.0,192.4">兩條都拿 5<br>就是平手</div><div class="t abs dn" style="left:562.0px;top:830.0px;width:416.0px;color:#F2E0C0;text-align:left" data-box="540.0,778.0,460.0,192.4">一條 4.16、一條約 4.3，分得出先後</div>
+
+<div class="t abs foot">@datasciocean</div>
+</div>
+</body></html>

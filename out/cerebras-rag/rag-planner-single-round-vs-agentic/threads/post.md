@@ -44,6 +44,8 @@
 ```text
 想看完整拆解？
 文章：datasciocean.com/paper-intro/cerebras-rag
-同系列：Slack、Wiki、程式碼、Jira，怎麼塞進同一張表？（尚未發布）
-同系列：搜尋出三種毛病，Cerebras 不是多加幾招，是一種毛病配一帖藥（尚未發布）
+同系列：Slack、Wiki、程式碼、Jira，怎麼塞進同一張表？
+https://www.threads.com/@datasciocean/post/DfM7L3Mk4a0
+同系列：搜尋出三種毛病，Cerebras 不是多加幾招，是一種毛病配一帖藥
+https://www.threads.com/@datasciocean/post/DfQqGN0E7pE
 ```

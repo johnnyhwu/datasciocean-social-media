@@ -1,0 +1,49 @@
+{
+  "slides": [
+    {"slide": 9,
+     "items": [
+       {"what": "第一列方法名稱與解碼方式", "reproduced": "Judge（1 到 5 分，取機率最高）", "original_position": "Table 2 第一資料列 Method 欄與 Reward 欄", "original": "Judge (discrete, G=5)；φ(arg max_g p_θ(v_g))", "in_claim": "離散 judge（G=5）是 12/88/0", "verdict": "一致"},
+       {"what": "第二列方法名稱與解碼方式", "reproduced": "verifier（1 到 5 分，期望值）", "original_position": "Table 2 第二資料列 Method 欄與 Reward 欄", "original": "Verifier (continuous, G=5)；Σ_{g=1}^{5} p_θ(v_g) φ(v_g)", "in_claim": "連續 verifier（G=5）是 69/0/31", "verdict": "一致"},
+       {"what": "第三列方法名稱與解碼方式", "reproduced": "verifier（1 到 20 分，期望值）", "original_position": "Table 2 第三資料列 Method 欄與 Reward 欄", "original": "Verifier (continuous, G=20)；Σ_{g=1}^{20} p_θ(v_g) φ(v_g)", "in_claim": "連續 verifier（G=20）是 77/0/23", "verdict": "一致"},
+       {"what": "圖例：排對／平手／排錯", "reproduced": "排對｜平手｜排錯", "original_position": "Table 2 表頭第三、四、五欄", "original": "#(s_c>s_i) ✓｜#(s_c=s_i) (tie)｜#(s_c<s_i) ✗", "in_claim": "正確軌跡分數高於錯誤軌跡／平手／低於", "verdict": "一致"},
+       {"what": "Judge 三個數字", "reproduced": "排對 12・平手 88・排錯 0", "original_position": "Table 2 第一資料列第三至五欄", "original": "12/100｜88/100｜0/100", "in_claim": "離散 judge（G=5）是 12/88/0", "verdict": "一致"},
+       {"what": "verifier G=5 三個數字", "reproduced": "排對 69・平手 0・排錯 31", "original_position": "Table 2 第二資料列第三至五欄", "original": "69/100｜0/100｜31/100", "in_claim": "連續 verifier（G=5）是 69/0/31", "verdict": "一致"},
+       {"what": "verifier G=20 三個數字", "reproduced": "排對 77・平手 0・排錯 23", "original_position": "Table 2 第三資料列第三至五欄", "original": "77/100｜0/100｜23/100", "in_claim": "連續 verifier（G=20）是 77/0/23", "verdict": "一致"},
+       {"what": "堆疊條比例（以像素量測確認與數值成正比：12/69/77 段約佔全長 12%、69%、77%）", "reproduced": "三條總長相同，各段比例與 100 次中的次數相符", "original_position": "Table 2 各列分母皆為 /100", "original": "每列合計 100", "in_claim": "每種方法各評分一百次", "verdict": "一致"},
+       {"what": "圖註：「排對」定義與每種方法各評 100 次", "reproduced": "「排對」指正確的那條拿到比較高的分數；每種方法各評 100 次。", "original_position": "Table 2 表頭 #(s_c>s_i) 與各格分母 /100", "original": "#(s_c>s_i)；/100", "in_claim": "每種方法各評分一百次（正確軌跡分數高於錯誤軌跡／平手／低於）", "verdict": "一致"}
+     ],
+     "errors": []},
+    {"slide": 14,
+     "items": [
+       {"what": "Judge 問 1 次的平手率", "reproduced": "Judge 問 1 次 26.7%", "original_position": "Figure 7 右圖（Tie Rate），k=1 的 Judge 長條上方標籤", "original": "26.7%", "in_claim": "K=1 時 judge 準確率 71.8%、平手率 26.7%", "verdict": "一致"},
+       {"what": "Judge 問 16 次的平手率", "reproduced": "Judge 問 16 次 5.5%", "original_position": "Figure 7 右圖，k=16 的 Judge 長條上方標籤", "original": "5.5%", "in_claim": "K=16 時 judge 準確率 74.7%、平手率 5.5%", "verdict": "一致"},
+       {"what": "長條比例（像素量測 5.5 條長約為 26.7 條長的 0.21，與 5.5/26.7 相符；軸從 0 起）", "reproduced": "兩條長度與數值成正比", "original_position": "Figure 7 右圖 y 軸 0%–30%", "original": "y 軸從 0% 起", "in_claim": "", "verdict": "一致"},
+       {"what": "圖註：長條是 Judge 的平手率（兩條軌跡拿到一樣分數的比例）", "reproduced": "長條是 Judge 的平手率：兩條軌跡拿到一樣分數的比例。", "original_position": "Figure 7 右圖 y 軸標題與圖例", "original": "Tie Rate (%)；圖例 Judge", "in_claim": "平手率", "verdict": "一致"},
+       {"what": "「問 N 次」對應重複次數 K", "reproduced": "問 1 次／問 16 次", "original_position": "Figure 7 右圖 x 軸", "original": "Number of Repeated Evaluations (k)：1、4、16", "in_claim": "在不同重複次數下對照：K=1 時…；K=16 時…", "verdict": "一致"}
+     ],
+     "errors": []},
+    {"slide": 15,
+     "items": [
+       {"what": "圖例 Judge／verifier", "reproduced": "Judge｜verifier", "original_position": "Figure 7 左圖左上角圖例", "original": "Judge｜Verifier", "in_claim": "拿離散 judge 和 verifier 在不同重複次數下對照", "verdict": "一致"},
+       {"what": "問 1 次 Judge 準確率", "reproduced": "71.8%", "original_position": "Figure 7 左圖 k=1 Judge 長條上方標籤", "original": "71.8%", "in_claim": "K=1 時 judge 準確率 71.8%", "verdict": "一致"},
+       {"what": "問 1 次 verifier 準確率", "reproduced": "74.7%", "original_position": "Figure 7 左圖 k=1 Verifier 長條上方標籤", "original": "74.7%", "in_claim": "verifier 準確率 74.7%", "verdict": "一致"},
+       {"what": "問 16 次 Judge 準確率", "reproduced": "74.7%", "original_position": "Figure 7 左圖 k=16 Judge 長條上方標籤", "original": "74.7%", "in_claim": "K=16 時 judge 準確率 74.7%", "verdict": "一致"},
+       {"what": "問 16 次 verifier 準確率", "reproduced": "77.5%", "original_position": "Figure 7 左圖 k=16 Verifier 長條上方標籤", "original": "77.5%", "in_claim": "verifier 準確率 77.5%", "verdict": "一致"},
+       {"what": "長條比例（像素量測四條長度約為數值×4.0，從 0 起成正比；原圖 y 軸從 50% 起，重製圖從 0 起不誇大差距）", "reproduced": "四條長度與數值成正比", "original_position": "Figure 7 左圖 y 軸 50%–85%", "original": "y 軸從 50% 起", "in_claim": "", "verdict": "一致"},
+       {"what": "圖註：兩個 74.7% 是不同的組合", "reproduced": "長條是準確率；兩個 74.7% 是不同的組合。", "original_position": "Figure 7 左圖 k=1 Verifier 與 k=16 Judge 標籤", "original": "兩處皆為 74.7%，分屬 k=1 Verifier 與 k=16 Judge", "in_claim": "verifier 只跑 1 次（74.7%）就等於 judge 跑 16 次（74.7%）", "verdict": "一致"},
+       {"what": "誤差棒（原圖有、重製圖省略；主張未提誤差棒，省略不使範圍變大，但圖註未標「簡化重畫」）", "reproduced": "沒有誤差棒", "original_position": "Figure 7 左圖每根長條上的黑色誤差棒", "original": "有誤差棒，k=1 兩組誤差棒明顯重疊", "in_claim": "", "verdict": "主張沒寫"}
+     ],
+     "errors": ["其他"]},
+    {"slide": 16,
+     "items": [
+       {"what": "子準則名稱與順序", "reproduced": "三個子準則：Specification、Output、Errors", "original_position": "Figure 4 右圖 x 軸標籤", "original": "Specification、Error、Output、Ensemble (All)", "in_claim": "論文對 code agent 拆出三個子準則：Specification（…）、Output（…）、Errors（…）", "verdict": "一致"},
+       {"what": "第一格名詞說明＋數字", "reproduced": "滿足所有要求 75.2%", "original_position": "Figure 4 右圖 Specification 長條上方標籤", "original": "75.2%", "in_claim": "Specification（有沒有滿足任務的所有要求）；Specification 75.2%", "verdict": "一致"},
+       {"what": "第二格名詞說明＋數字", "reproduced": "輸出格式對嗎 76.4%", "original_position": "Figure 4 右圖 Output 長條上方標籤", "original": "76.4%", "in_claim": "Output（最終輸出格式是否符合預期）；Output 76.4%", "verdict": "一致"},
+       {"what": "第三格名詞說明＋數字", "reproduced": "有失敗訊號嗎 76.0%", "original_position": "Figure 4 右圖 Error 長條上方標籤", "original": "76.0%", "in_claim": "Errors（log／工具輸出有無失敗訊號）；Errors 76.0%", "verdict": "一致"},
+       {"what": "合起來的準確率（箭頭匯集＝ensemble）", "reproduced": "三個合起來：78.3%", "original_position": "Figure 4 右圖 Ensemble (All) 長條上方標籤", "original": "78.3%", "in_claim": "三者 ensemble 是 78.3%", "verdict": "一致"},
+       {"what": "比最好的單一準則多 1.9%", "reproduced": "比最好的單一準則多 1.9%", "original_position": "Figure 4 右圖 Ensemble 78.3% 與最高單一準則 Output 76.4%", "original": "78.3 − 76.4 = 1.9", "in_claim": "1.9pp 的改善沒做顯著性檢定", "verdict": "一致"},
+       {"what": "圖註：簡化重畫、誤差範圍重疊明顯、論文沒說它代表什麼", "reproduced": "簡化重畫：原圖的誤差範圍重疊得很明顯，論文也沒說它代表什麼。", "original_position": "Figure 4 右圖四根長條的誤差棒", "original": "誤差棒（範圍彼此重疊）", "in_claim": "圖裡誤差棒重疊得很明顯，…也沒說明誤差棒代表什麼", "verdict": "一致"}
+     ],
+     "errors": []}
+  ]
+}

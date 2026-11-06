@@ -1,0 +1,40 @@
+{
+  "slides": [
+    {"slide": 7,
+     "items": [
+       {"what": "列名 Terminal-Bench V2", "reproduced": "Terminal-Bench V2", "original_position": "Table 3 Benchmark 欄第一列", "original": "Terminal-Bench V2", "in_claim": "Terminal-Bench V2 是 83.1% → 86.5%（+3.4pp）", "verdict": "一致"},
+       {"what": "Terminal-Bench V2 Pass@1 → Ours", "reproduced": "83.1→86.5%", "original_position": "Table 3 第一列 Pass@1 欄與 Ours 欄", "original": "Pass@1 83.1%、Ours 86.5%", "in_claim": "Terminal-Bench V2 是 83.1% → 86.5%（+3.4pp）", "verdict": "一致"},
+       {"what": "Terminal-Bench V2 verifier 多拿的（Ours 減 Pass@1）", "reproduced": "3.4%", "original_position": "Table 3 第一列 Ours 減 Pass@1", "original": "86.5% − 83.1% = 3.4", "in_claim": "Terminal-Bench V2 是 83.1% → 86.5%（+3.4pp）", "verdict": "一致"},
+       {"what": "Terminal-Bench V2 完美挑選能多拿的（Oracle 減 Pass@1）", "reproduced": "9.0%", "original_position": "Table 3 第一列 Oracle 欄與 Pass@1 欄", "original": "Oracle 92.1%、Pass@1 83.1%，差 9.0", "in_claim": "可搶的 oracle 空間（oracle 減 Pass@1）不大（Terminal-Bench V2 9.0pp", "verdict": "一致"},
+       {"what": "Terminal-Bench V2 搶到比例", "reproduced": "搶到 38%", "original_position": "原圖未印比例（由 3.4/9.0 推得）", "original": "沒有", "in_claim": "verifier 兌現了四分之一到三分之二（38%、25%、65%）", "verdict": "僅來自主張"},
+       {"what": "列名 SWE-Bench Verified", "reproduced": "SWE-Bench Verified", "original_position": "Table 3 Benchmark 欄第二列", "original": "SWE-Bench Verified", "in_claim": "SWE-Bench Verified 是 76.1% → 78.2%（+2.1pp）", "verdict": "一致"},
+       {"what": "SWE-Bench Verified Pass@1 → Ours", "reproduced": "76.1→78.2%", "original_position": "Table 3 第二列 Pass@1 欄與 Ours 欄", "original": "Pass@1 76.1%、Ours 78.2%", "in_claim": "SWE-Bench Verified 是 76.1% → 78.2%（+2.1pp）", "verdict": "一致"},
+       {"what": "SWE-Bench Verified verifier 多拿的", "reproduced": "2.1%", "original_position": "Table 3 第二列 Ours 減 Pass@1", "original": "78.2% − 76.1% = 2.1", "in_claim": "SWE-Bench Verified 是 76.1% → 78.2%（+2.1pp）", "verdict": "一致"},
+       {"what": "SWE-Bench Verified 完美挑選能多拿的", "reproduced": "8.3%", "original_position": "Table 3 第二列 Oracle 欄與 Pass@1 欄", "original": "Oracle 84.4%、Pass@1 76.1%，差 8.3", "in_claim": "SWE-Bench Verified 8.3pp", "verdict": "一致"},
+       {"what": "SWE-Bench Verified 搶到比例", "reproduced": "搶到 25%", "original_position": "原圖未印比例", "original": "沒有", "in_claim": "verifier 兌現了四分之一到三分之二（38%、25%、65%）", "verdict": "僅來自主張"},
+       {"what": "列名 MedAgentBench", "reproduced": "MedAgentBench", "original_position": "Table 3 Benchmark 欄第三列", "original": "MedAgentBench", "in_claim": "MedAgentBench 是 70.2% → 73.3%（+3.1pp）", "verdict": "一致"},
+       {"what": "MedAgentBench Pass@1 → Ours", "reproduced": "70.2→73.3%", "original_position": "Table 3 第三列 Pass@1 欄與 Ours 欄", "original": "Pass@1 70.2%、Ours 73.3%", "in_claim": "MedAgentBench 是 70.2% → 73.3%（+3.1pp）", "verdict": "一致"},
+       {"what": "MedAgentBench verifier 多拿的", "reproduced": "3.1%", "original_position": "Table 3 第三列 Ours 減 Pass@1", "original": "73.3% − 70.2% = 3.1", "in_claim": "MedAgentBench 是 70.2% → 73.3%（+3.1pp）", "verdict": "一致"},
+       {"what": "MedAgentBench 完美挑選能多拿的", "reproduced": "4.8%", "original_position": "Table 3 第三列 Oracle 欄與 Pass@1 欄", "original": "Oracle 75.0%、Pass@1 70.2%，差 4.8", "in_claim": "MedAgentBench 4.8pp", "verdict": "一致"},
+       {"what": "MedAgentBench 搶到比例", "reproduced": "搶到 65%", "original_position": "原圖未印比例", "original": "沒有", "in_claim": "verifier 兌現了四分之一到三分之二（38%、25%、65%）", "verdict": "僅來自主張"},
+       {"what": "圖例「完美挑選能多拿的」對應 Oracle 減 Pass@1", "reproduced": "圖例：完美挑選能多拿的（青色）", "original_position": "Table 3 右半 LLM-as-a-Verifier 下的 Oracle 欄", "original": "Oracle", "in_claim": "可搶的 oracle 空間（oracle 減 Pass@1）", "verdict": "一致"},
+       {"what": "圖例「verifier 多拿的」對應 Ours 減 Pass@1", "reproduced": "圖例：verifier 多拿的（深色）", "original_position": "Table 3 右半 Pass@1 與 Ours 欄", "original": "Pass@1、Ours", "in_claim": "同一候選池上 Pass@1 → Ours", "verdict": "一致"},
+       {"what": "關係：每列完美挑選的空間大於 verifier 多拿的", "reproduced": "青色橫條皆長於深色橫條，長度與數值成正比（3.4/9.0≈0.38 等）", "original_position": "Table 3 各列 Oracle、Ours、Pass@1", "original": "各列 Oracle > Ours > Pass@1", "in_claim": "verifier 兌現了四分之一到三分之二", "verdict": "一致"},
+       {"what": "圖註：SWE-Bench 候選來自三個不同模型，不能直接比", "reproduced": "SWE-Bench 的 3 份候選來自三個不同模型，不能和另外兩列直接比。", "original_position": "Table 3 左半 Baseline models 欄 SWE-Bench 列（Opus 4.5、G3 Flash、M2.5，三個不同模型）", "original": "Opus 4.5 (76.8%)、G3 Flash (75.8%)、M2.5 (75.8%)", "in_claim": "SWE-Bench 的候選池是異質的：N=3 是從三個不同模型各抽一條，Pass@1 是三模型平均，跟其他列不可直接比較", "verdict": "僅來自主張"}
+     ],
+     "errors": []},
+    {"slide": 8,
+     "items": [
+       {"what": "LLM-as-a-Verifier 準確率", "reproduced": "改算期望值｜LLM-as-a-Verifier｜87.4%", "original_position": "Table 4 第五列（粗體）", "original": "LLM-as-a-Verifier (Ours) 87.4", "in_claim": "LLM-as-a-Verifier 是 87.4%", "verdict": "一致"},
+       {"what": "RoboReward-8B 準確率", "reproduced": "RoboReward-8B 81.4%", "original_position": "Table 4 第三列", "original": "RoboReward-8B 81.4", "in_claim": "RoboReward-8B（訓練過，約 4.5 萬 episode）是 81.4%", "verdict": "一致"},
+       {"what": "Robometer-4B 準確率", "reproduced": "Robometer-4B 78.8%", "original_position": "Table 4 第二列", "original": "Robometer-4B 78.8", "in_claim": "Robometer-4B（訓練過，約 100 萬筆比較）是 78.8%", "verdict": "一致"},
+       {"what": "離散 LLM-as-a-Judge 準確率", "reproduced": "只取最高分｜同一個模型｜70.8%", "original_position": "Table 4 第四列", "original": "LLM-as-a-Judge (Discrete) 70.8", "in_claim": "同一個 VLM 的離散 LLM-as-a-Judge 是 70.8%", "verdict": "一致"},
+       {"what": "副標「訓練過，約 4.5 萬 episode」", "reproduced": "訓練過，約 4.5 萬 episode", "original_position": "Table 4 未印", "original": "沒有", "in_claim": "RoboReward-8B（訓練過，約 4.5 萬 episode）", "verdict": "僅來自主張"},
+       {"what": "副標「訓練過，約 100 萬筆比較」", "reproduced": "訓練過，約 100 萬筆比較", "original_position": "Table 4 未印", "original": "沒有", "in_claim": "Robometer-4B（訓練過，約 100 萬筆比較）", "verdict": "僅來自主張"},
+       {"what": "標籤「改算期望值」「只取最高分」「同一個模型」", "reproduced": "改算期望值（Verifier）、只取最高分（Judge）、同一個模型", "original_position": "Table 4 只印 Discrete 與 Ours，沒寫期望值或同模型", "original": "LLM-as-a-Judge (Discrete)；LLM-as-a-Verifier (Ours)", "in_claim": "87.4% 和 70.8% 是同一個 Qwen 3.6 35B，唯一差別是離散 argmax 對上連續期望值", "verdict": "僅來自主張"},
+       {"what": "排序關係：Verifier > RoboReward-8B > Robometer-4B > 離散 Judge，橫條長度與數值成正比", "reproduced": "87.4 > 81.4 > 78.8 > 70.8，條長比例約 1 : 0.93 : 0.90 : 0.81", "original_position": "Table 4 Accuracy 欄", "original": "87.4、81.4、78.8、70.8", "in_claim": "LLM-as-a-Verifier 是 87.4%，RoboReward-8B … 81.4%，Robometer-4B … 78.8% … 離散 LLM-as-a-Judge 是 70.8%", "verdict": "一致"},
+       {"what": "省略 TOPReward 74.7 一列", "reproduced": "圖上沒有 TOPReward", "original_position": "Table 4 第一列", "original": "TOPReward 74.7", "in_claim": "TOPReward 是 74.7%", "verdict": "一致"}
+     ],
+     "errors": ["其他"]}
+  ]
+}

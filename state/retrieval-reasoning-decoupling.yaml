@@ -1,11 +1,9 @@
 concept: retrieval-reasoning-decoupling
 formats:
   ig_carousel:
-    status: ready
-    pack: out/cerebras-rag/rag-planner-single-round-vs-agentic
+    status: published
     merged_into: rag-planner-single-round-vs-agentic
   threads_thread:
-    status: ready
-    pack: out/cerebras-rag/rag-planner-single-round-vs-agentic
+    status: published
     merged_into: rag-planner-single-round-vs-agentic
 posts: []

@@ -78,6 +78,12 @@
             每站一個編號圓與一句「這一站要回答什麼」；這一則不走的那一段畫成虛線與空心終點。
             nodes = 站 2～4 個 [{text, sub?}]、選用 heads = [最上面的標籤, 虛線那一段的說明]
 
+  dist      機率分佈直條（2026-11-03，LLM-as-a-Verifier）：nodes = 每個分數一根 [{text（1、2、3…）, p}]（加總 1）、pick = argmax（最高那根金色、其餘虛線）／ev（金針停在期望值，程式算）、heads = [上方標籤, 針的標籤前綴]、選用 outcomes[0]
+  snap      刻度上的點（2026-11-03）：nodes = 2～3 列 [{text, sub?, lo?, hi, marks:[{v, text}], tie?}]；數值相同的點往上疊，旁邊放金色小牌 tie；點的位置由程式 B 檢查
+  stack     結果切三段的橫條（2026-11-03）：heads = 三個圖例、nodes = 2～4 列 [{text, sub?, parts:[a,b,c]}]（加總 total，預設 100）；長度由程式 B 檢查
+  target    打靶（2026-11-03）：heads = [左靶, 右靶]、nodes = [{text}（靶心）, {text}（金色 ✕＝落點平均）]、選用 outcomes[0]；左散右集、兩邊都偏同一個方向；純示意
+  dotgrid 的選用欄位 on（2026-11-03）：前 on 個點實心、其餘空心
+
 規則：圖形全部用 class "bg"（不進程式 B 的文字與圖形重疊檢查），所以排版由這裡負責避開文字；框內的文字由程式 B 的「框內文字不超出框」檢查；
 比例（dumbbell／range）由程式 B 檢查圖形位置與數值成正比。字級只用 {28, 34, 40, 56}。
 """
@@ -430,8 +436,14 @@ def dotgrid(c: Canvas, spec: dict, y0: float) -> float:
     gh = (rows - 1) * pitch + 2 * r
     total = gh + 34 + sum(leg_h) + 24 * (len(legs) - 1) + 10
     _fit(total, BOTTOM - y0, "dotgrid")
+    on = spec.get("on", n)                                      # on（選用）：前幾個點實心，其餘空心（例：100 次裡 27 次平手）
+    if not 0 <= on <= n:
+        raise ValueError(f"dotgrid 的 on 要在 0～{n} 之間，現在是 {on}")
     for i in range(n):
-        c.circle(gx + (i % cols) * pitch, y0 + r + (i // cols) * pitch, r, fill=MID)
+        if i < on:
+            c.circle(gx + (i % cols) * pitch, y0 + r + (i // cols) * pitch, r, fill=MID)
+        else:
+            c.circle(gx + (i % cols) * pitch, y0 + r + (i // cols) * pitch, r - 2, fill="none", stroke=DEEP, sw=3)
     y = y0 + gh + 34
     for k, l in enumerate(legs):
         if k == 0:
@@ -2214,6 +2226,7 @@ def ledger(c: Canvas, spec: dict, y0: float) -> float:
 
 # ------------------------------------------------------------------ Claude Code 系列（2026-10-28）：視窗風格的六種示意圖
 DESC = {      # 給審查者與人看的「畫面」描述（build_package 輸出）：文字以外，圖上畫了什麼
+    "ring": "幾個圓圈排成一圈，相鄰的兩個之間各一條箭頭，順時針繞回起點（每個圓恰好送出一條、接到一條箭頭）；箭頭旁可有標籤，金色的圓與箭頭是要注意的那個；圈中央可有一句說明",
     "transcript": "一個終端機視窗，一列一個動作（提示符號、工具呼叫、失敗、通過）；有標 feeds 的列，金色箭頭從那一列繞到下一列並寫上標籤；金色菱形的列是 Hook 在這個節點介入",
     "oneloop": "中間一個圈，圈裡是兩個框（規劃、執行）；兩側各一個被打叉的虛線框（規劃模組、執行模組）；圈下一行說明",
     "intercept": "上下兩條路：上面是一句話直接通到檔案；下面是工具呼叫先過一道金框的關卡（關卡裡列出檢查項目）才到檔案",
@@ -3243,6 +3256,297 @@ def addlane(c: Canvas, spec: dict, y0: float) -> float:
     return bot2 + 6 + nb
 
 
+# ------------------------------------------------------------------ 2026-11-03 新增（LLM-as-a-Verifier 第 1 則）：dist／snap／stack／target
+def dist_ev(nodes) -> float:
+    """dist 的期望值：第 k 根（從 1 起）的分數就是 k。"""
+    return sum((k + 1) * n["p"] for k, n in enumerate(nodes))
+
+
+def dist(c: Canvas, spec: dict, y0: float) -> float:
+    """機率分佈直條：一個分數一根，高度＝模型給這個分數的機率（從 0 起、與機率成正比，class vbar 由程式 B 檢查）。
+    nodes = 每個分數一根 [{text（分數，依序是 1、2、3…）, p（機率）}]（3～6 根，p 加總要是 1）；
+    pick = "argmax"：機率最高的那根金色、其餘畫成虛線空框（被丟掉）；
+           "ev"：全部實心，金色的針停在期望值（由程式算，標籤＝heads[1] + 兩位小數）；
+    heads = [圖上方的標籤, （ev 時）針的標籤前綴]；選用 outcomes[0] = {text}（底下一條橫框）。純示意時圖註要標「假設的例子」。"""
+    nodes = spec["nodes"]
+    if not 3 <= len(nodes) <= 6:
+        raise ValueError(f"dist 的 nodes（分數）要 3～6 根，現在是 {len(nodes)}")
+    ps = [float(n["p"]) for n in nodes]
+    if abs(sum(ps) - 1) > 0.011:
+        raise ValueError(f"dist 的機率加總要是 1，現在是 {sum(ps):.3f}")
+    if [n["text"] for n in nodes] != [str(k + 1) for k in range(len(nodes))]:
+        raise ValueError("dist 的分數要依序是 1、2、3…（期望值的位置由這個算）")
+    pick = spec.get("pick", "ev")
+    if pick not in ("argmax", "ev"):
+        raise ValueError("dist 的 pick 只能是 argmax 或 ev")
+    heads = list(spec.get("heads", [])) + ["", ""]
+    out = (spec.get("outcomes") or [None])[0]
+    n = len(nodes)
+    xa, xb = X0 + 90, X1 - 90
+    step = (xb - xa) / (n - 1)
+    bw = min(120, step * .6)
+    xs = [xa + k * step for k in range(n)]
+    oh = (c.lines(out["text"], X1 - X0 - 44, 34) * 44.2 + 44) if out else 0
+    lab = 50 if heads[0] else 0
+    top_room = 110 if pick == "ev" else 56          # 機率標籤（＋針的標籤）
+    fixed = lab + top_room + 14 + 54 + (30 + oh if out else 0)
+    H = min(440, BOTTOM - y0 - fixed)
+    if H < 180:
+        raise ValueError(f"示意圖（dist）放不下：直條只剩 {H:.0f}px 高；請縮短補充或底下橫框的字")
+    if heads[0]:
+        c.text(X0, y0, X1 - X0, heads[0], "dl", TEAL, "left")
+    base = y0 + lab + top_room + H
+    s = H / max(ps)
+    imax = max(range(n), key=lambda k: ps[k])
+    for k, (x, p) in enumerate(zip(xs, ps)):
+        h = p * s
+        gold = pick == "argmax" and k == imax
+        if pick == "argmax" and not gold:
+            c.svg.append(f'<rect class="bg vbar" x="{x - bw / 2:.1f}" y="{base - h:.1f}" width="{bw:.1f}" height="{h:.1f}" rx="6" fill="none" '
+                         f'stroke="{DEEP}" stroke-width="3" stroke-dasharray="10 8" data-p="{p}" data-s="{s}" data-base="{base}"/>')
+        else:
+            c.svg.append(f'<rect class="bg vbar" x="{x - bw / 2:.1f}" y="{base - h:.1f}" width="{bw:.1f}" height="{h:.1f}" rx="6" '
+                         f'fill="{GOLD if gold else MID}" data-p="{p}" data-s="{s}" data-base="{base}"/>')
+        c.text(x - 80, base - h - 46, 160, f"{p:g}", "dl", DEEP, "center")
+        c.text(x - 60, base + 14, 120, nodes[k]["text"], "dn", DEEP, "center")
+    c.line(X0, base, X1, base, DEEP, 3)
+    if pick == "ev":
+        ev = dist_ev(nodes)
+        nx = xa + (ev - 1) * step
+        c.circle(nx, base, 0.01, cls="bg dpt", extra=f' data-v="{ev}" data-x0="{xa - step}" data-s="{step}"')
+        c.rect(nx - 4, base - H - 40, 8, H + 54, fill=GOLD, rx=3)
+        lw = 300
+        lx = min(max(nx - lw / 2, X0), X1 - lw)
+        c.text(lx, base - H - 98, lw, f"{heads[1]} {ev:.2f}".strip(), "dl", DEEP, "center")
+    y = base + 14 + 54
+    if out:
+        y += 30
+        c.textbox(X0, y, X1 - X0, out["text"], None, fill=DEEP, tcolor=CREAM, h=oh)
+        y += oh
+    return y
+
+
+def snap(c: Canvas, spec: dict, y0: float) -> float:
+    """刻度上的點（分數落在哪裡、會不會疊在一起）：一列一條刻度尺，點的位置與數值成正比（class dpt 由程式 B 檢查）。
+    nodes = 每列 [{text（這一列是什麼）, sub?, lo（刻度起點，預設 1）, hi（刻度終點）, marks: [{v, text}]（1～3 個點）, tie?（點疊在一起時旁邊的金色小牌）}]（2～3 列）；
+    同一列數值相同的點往上疊；點的顏色依序深海、金、中藍綠。純示意時圖註要標。"""
+    rows = spec["nodes"]
+    if not 2 <= len(rows) <= 3:
+        raise ValueError(f"snap 的 nodes（刻度尺）要 2～3 列，現在是 {len(rows)}")
+    cols = [DEEP, GOLD, MID]
+    xa, xb = X0 + 40, X1 - 40
+    hs = []
+    for r in rows:
+        if not 1 <= len(r["marks"]) <= 3:
+            raise ValueError("snap 每列的 marks 要 1～3 個")
+        lo, hi = r.get("lo", 1), r["hi"]
+        if not all(lo <= m["v"] <= hi for m in r["marks"]):
+            raise ValueError(f"snap 的點超出刻度範圍 {lo}～{hi}")
+        stack = max(sum(1 for m2 in r["marks"] if abs(m2["v"] - m["v"]) < 1e-9) for m in r["marks"])
+        hs.append(c.lines(r["text"], X1 - X0, 34) * 44.2 + (c.lines(r["sub"], X1 - X0, 28) * 39.2 + 4 if r.get("sub") else 0)
+                  + 60 + 44 * (stack - 1) + 40 + 62)
+    gap = 20
+    total = sum(hs) + gap * (len(rows) - 1)
+    _fit(total, BOTTOM - y0, "snap")
+    gap += min((BOTTOM - y0 - total) / max(len(rows) - 1, 1), 70)
+    y = y0
+    for r, rh in zip(rows, hs):
+        lo, hi = r.get("lo", 1), r["hi"]
+        s = (xb - xa) / (hi - lo)
+        c.text(X0, y, X1 - X0, r["text"], "dn", DEEP, "left")
+        ty = y + c.lines(r["text"], X1 - X0, 34) * 44.2
+        if r.get("sub"):
+            c.text(X0, ty + 4, X1 - X0, r["sub"], "ds", TEAL, "left")
+            ty += c.lines(r["sub"], X1 - X0, 28) * 39.2 + 4
+        stack = max(sum(1 for m2 in r["marks"] if abs(m2["v"] - m["v"]) < 1e-9) for m in r["marks"])
+        ly = ty + 60 + 44 * (stack - 1) + 40                       # 刻度線的 y
+        c.line(xa, ly, xb, ly, DEEP, 4)
+        every = 1 if hi - lo <= 10 else 5
+        for v in range(int(lo), int(hi) + 1):
+            x = xa + (v - lo) * s
+            major = v in (lo, hi) or (v - lo) % every == 0 or (every > 1 and v % every == 0)
+            c.line(x, ly, x, ly + (14 if major else 8), DEEP, 3)
+            if major and (every == 1 or v % every == 0 or v in (lo, hi)):
+                c.text(x - 40, ly + 18, 80, f"{v:g}", "ds", DEEP, "center")
+        groups = {}
+        for k, m in enumerate(r["marks"]):
+            groups.setdefault(round(m["v"], 9), []).append((k, m))
+        gl = sorted(groups.items())
+        for gi, (v, ms) in enumerate(gl):
+            x = xa + (v - lo) * s
+            for j, (k, m) in enumerate(ms):
+                c.circle(x, ly - 22 - 44 * j, 18, fill=cols[k % 3], cls="bg dpt", extra=f' data-v="{v}" data-x0="{xa - lo * s}" data-s="{s}"')
+            lab = "、".join(m["text"] for _, m in ms)
+            yt = ly - 22 - 44 * (len(ms) - 1) - 62
+            w = min(400, sum(17 if ord(ch) < 128 else 29 for ch in lab) + 12)     # 字框只比字寬一點，相鄰兩個點的標籤才不會互相重疊
+            if len(gl) == 1:
+                lx, al = min(max(x - w / 2, X0), X1 - w), "center"
+            elif gi == 0:
+                lx, al = max(x + 8 - w, X0), "right"
+            else:
+                lx, al = min(x - 8, X1 - w), "left"
+            c.text(lx, yt, w, lab, "ds", DEEP, al)
+            if len(ms) > 1 and r.get("tie"):
+                tw = len(r["tie"]) * 28 + 40
+                tx = x - 40 - tw if x + 40 + tw > X1 else x + 40
+                c.cell(tx, ly - 22 - 44 * (len(ms) - 1) / 2 - 26, tw, 52, r["tie"], fill=GOLD, color=DEEP)
+        y += rh + gap
+    return y - gap
+
+
+def stack(c: Canvas, spec: dict, y0: float) -> float:
+    """100 次的結果切成三段：一列一個方法，一條橫條依序是三種結果的次數（長度與次數成正比，class rbar 由程式 B 檢查）。
+    heads = 三種結果的圖例（例：排對／平手／排錯）；nodes = 每列 [{text, sub?, parts: [a, b, c]}]（2～4 列，加總＝total）；選用 total（預設 100）。
+    橫條下面一行寫出三個次數。"""
+    heads = spec["heads"]
+    rows = spec["nodes"]
+    total = spec.get("total", 100)
+    if len(heads) != 3:
+        raise ValueError("stack 的 heads（圖例）要剛好 3 個")
+    if not 2 <= len(rows) <= 4:
+        raise ValueError(f"stack 的 nodes（方法）要 2～4 列，現在是 {len(rows)}")
+    for r in rows:
+        if len(r["parts"]) != 3 or sum(r["parts"]) != total:
+            raise ValueError(f"stack 的 parts 要 3 個數、加總 {total}：{r['text']} 是 {r['parts']}")
+    fills = [dict(fill=MID), dict(fill=CREAM, stroke=DEEP, dash="8 6"), dict(fill=DEEP)]
+    xa, xb = X0, X1
+    s = (xb - xa) / total
+    bh = 46
+    hs = [c.lines(r["text"], X1 - X0, 34) * 44.2 + (c.lines(r["sub"], X1 - X0, 28) * 39.2 + 4 if r.get("sub") else 0) + 10 + bh + 6 + 38 for r in rows]
+    leg = 60
+    gap = 24
+    tot = leg + sum(hs) + gap * (len(rows) - 1)
+    _fit(tot, BOTTOM - y0, "stack")
+    gap += min((BOTTOM - y0 - tot) / max(len(rows) - 1, 1), 60)
+    lx = X0
+    for k, h in enumerate(heads):
+        f = fills[k]
+        c.rect(lx, y0 + 6, 36, 36, fill=f["fill"], stroke=f.get("stroke"), dash=f.get("dash"), rx=6)
+        w = len(h) * 28 + 30
+        c.text(lx + 48, y0 + 4, w, h, "ds", DEEP, "left")
+        lx += 48 + w + 30
+    y = y0 + leg
+    for r, rh in zip(rows, hs):
+        c.text(X0, y, X1 - X0, r["text"], "dn", DEEP, "left")
+        by = y + c.lines(r["text"], X1 - X0, 34) * 44.2
+        if r.get("sub"):
+            c.text(X0, by + 4, X1 - X0, r["sub"], "ds", TEAL, "left")
+            by += c.lines(r["sub"], X1 - X0, 28) * 39.2 + 4
+        by += 10
+        cum = 0
+        for k, part in enumerate(r["parts"]):
+            if part:
+                f = fills[k]
+                st = f' stroke="{f["stroke"]}" stroke-width="3" stroke-dasharray="{f["dash"]}"' if f.get("stroke") else ""
+                c.svg.append(f'<rect class="bg rbar" x="{xa + cum * s:.1f}" y="{by:.1f}" width="{part * s:.1f}" height="{bh}" rx="0" fill="{f["fill"]}"{st} '
+                             f'data-lo="{cum}" data-hi="{cum + part}" data-s="{s}" data-x0="{xa}"/>')
+            cum += part
+        c.text(X0, by + bh + 6, X1 - X0, "・".join(f"{h} {p}" for h, p in zip(heads, r["parts"])), "ds", DEEP, "left")
+        y += rh + gap
+    return y - gap
+
+
+TARGET_SPREAD = [(.9, .3), (-.7, .8), (.2, -1.0), (-1.0, -.35), (.65, -.75), (-.25, .95), (1.0, .55), (-.55, -.9)]
+
+
+def target(c: Canvas, spec: dict, y0: float) -> float:
+    """打靶：兩個靶，落點的中心都偏離靶心同一個方向；左靶散得開、右靶擠成一團（變異小了，偏差還在）。
+    heads = [左靶標籤, 右靶標籤]；nodes = [{text}（靶心代表什麼）, {text}（金色 ✕：落點平均代表什麼）]；選用 outcomes[0] = {text}（底下一條橫框）。
+    落點是固定示意，圖註要標「示意」。"""
+    hl, hr = spec["heads"][:2]
+    bull, avg = spec["nodes"][:2]
+    out = (spec.get("outcomes") or [None])[0]
+    w = X1 - X0
+    leg_h = [c.lines(n["text"], w - 70, 34) * 44.2 for n in (bull, avg)]
+    oh = (c.lines(out["text"], w - 44, 34) * 44.2 + 44) if out else 0
+    lab = 50
+    fixed = lab + 30 + sum(leg_h) + 20 + (30 + oh if out else 0)
+    R = min(200, (BOTTOM - y0 - fixed) / 2, (w - 60) / 4)
+    if R < 110:
+        raise ValueError(f"示意圖（target）放不下：靶只剩半徑 {R:.0f}px；請縮短補充或圖上的字")
+    cy = y0 + lab + R
+    for k, (cx, label, spread) in enumerate(((X0 + w / 4, hl, .55), (X0 + 3 * w / 4, hr, .17))):
+        c.text(cx - w / 4, y0, w / 2, label, "dl", TEAL, "center")
+        for f in (1, .66, .33):
+            c.circle(cx, cy, R * f, fill="none", stroke=TEAL, sw=3)
+        c.circle(cx, cy, 12, fill=DEEP)
+        ox, oy = cx + .38 * R, cy - .3 * R
+        for dx, dy in TARGET_SPREAD:
+            c.circle(ox + dx * spread * R, oy + dy * spread * R, 11, fill=MID)
+        c.line(ox - 16, oy - 16, ox + 16, oy + 16, GOLD, 8)
+        c.line(ox - 16, oy + 16, ox + 16, oy - 16, GOLD, 8)
+    y = cy + R + 30
+    c.circle(X0 + 22, y + 22, 12, fill=DEEP)
+    c.text(X0 + 70, y, w - 70, bull["text"], "dn", DEEP, "left")
+    y += leg_h[0] + 20
+    c.line(X0 + 8, y + 8, X0 + 36, y + 36, GOLD, 8)
+    c.line(X0 + 8, y + 36, X0 + 36, y + 8, GOLD, 8)
+    c.text(X0 + 70, y, w - 70, avg["text"], "dn", DEEP, "left")
+    y += leg_h[1]
+    if out:
+        y += 30
+        c.textbox(X0, y, w, out["text"], None, fill=DEEP, tcolor=CREAM, h=oh)
+        y += oh
+    return y
+
+
+# ------------------------------------------------------------------ ring（環狀比較：只比相鄰的，每個節點恰好當一次起點、一次終點）
+def ring(c: Canvas, spec: dict, y0: float) -> float:
+    """2026-11-05 新增（LLM-as-a-Verifier 第 2 則：PPT 的 ring pass）。
+    nodes = 3～8 個 [{text, emph?}]，從正上方起順時針排成一圈；第 i 條邊是 nodes[i] → nodes[i+1]（最後一條接回第一個）。
+    labels（選用）= 每條邊的標籤，數量要等於節點數；hot（選用）= 畫成金色的邊序號（0 起）；
+    heads（選用）= [圈中央的一句說明]；outcomes[0]（選用）= 底下一條橫框 {text, sub?}。節點裡只放短字（約 3 字）。"""
+    nodes, labels, hot = spec["nodes"], spec.get("labels"), set(spec.get("hot", []))
+    n = len(nodes)
+    if not 3 <= n <= 8:
+        raise ValueError(f"ring 要 3～8 個節點，現在是 {n} 個")
+    if labels is not None and len(labels) != n:
+        raise ValueError(f"ring 的 labels 數量（{len(labels)}）要等於節點數（{n}）：每條邊一個標籤")
+    if any(not isinstance(h, int) or not 0 <= h < n for h in hot):
+        raise ValueError(f"ring 的 hot 要是 0～{n - 1} 的邊序號：{sorted(hot, key=str)}")
+    center = (spec.get("heads") or [None])[0]
+    foot = (spec.get("outcomes") or [None])[0]
+    w, rn = X1 - X0, 58
+    fh = (c.lines(foot["text"], w - 44, 34) * 44.2 + (c.lines(foot["sub"], w - 44, 28) * 39.2 + 6 if foot.get("sub") else 0) + 44) if foot else 0
+    lab = 56 if labels else 0                            # 標籤往圈外推的距離
+    avail = BOTTOM - y0 - (28 + fh if foot else 0)
+    Rx = min(360.0, (w - 2 * rn - (2 * 170 if labels else 0)) / 2)   # 橫向半徑：左右要留邊標籤的位置
+    R = min(Rx, 300.0, (avail - 2 * rn - 2 * lab) / 2)               # 縱向半徑：高度不夠時壓成橢圓
+    if R < 130:
+        raise ValueError(f"示意圖（ring）放不下：圈的高只剩半徑 {R:.0f}px；請縮短補充、拿掉底下的橫框或邊的標籤")
+    cx, cy = X0 + w / 2, y0 + lab + rn + R
+    pts = [(cx + Rx * math.sin(2 * math.pi * i / n), cy - R * math.cos(2 * math.pi * i / n)) for i in range(n)]
+    for i in range(n):
+        p, q = pts[i], pts[(i + 1) % n]
+        dx, dy = q[0] - p[0], q[1] - p[1]; d = math.hypot(dx, dy)
+        s_ = (p[0] + dx / d * (rn + 8), p[1] + dy / d * (rn + 8))
+        e_ = (q[0] - dx / d * (rn + 14), q[1] - dy / d * (rn + 14))
+        g = i in hot
+        c.arrow(s_[0], s_[1], e_[0], e_[1], color=GOLD if g else DEEP, sw=9 if g else 6, head=26 if g else 22)
+        if labels and labels[i]:
+            mx, my = (p[0] + q[0]) / 2, (p[1] + q[1]) / 2
+            ox, oy = mx - cx, my - cy; od = math.hypot(ox, oy) or 1
+            lx, ly = mx + ox / od * lab, my + oy / od * lab
+            lw = 170
+            al = "left" if ox / od > 0.35 else "right" if ox / od < -0.35 else "center"
+            bx = lx - (0 if al == "left" else lw if al == "right" else lw / 2)
+            c.text(bx, ly - 20, lw, labels[i], "dl", DEEP if g else TEAL, al)   # 金色字在米色底上對比不夠，金色只給箭頭
+    for p, nd in zip(pts, nodes):
+        emph = nd.get("emph")
+        c.circle(p[0], p[1], rn, fill=GOLD if emph else DEEP)
+        c.text(p[0] - rn, p[1] - 22, 2 * rn, nd["text"], "dl", DEEP if emph else CREAM, "center", (p[0] - rn, p[1] - rn, 2 * rn, 2 * rn))
+    if center:
+        iw = 2 * (min(Rx, R * 1.6) - rn) * 0.8
+        ch = c.lines(center, iw, 34) * 44.2
+        c.text(cx - iw / 2, cy - ch / 2, iw, center, "dn", DEEP, "center")
+    y = cy + R + rn + lab
+    if foot:
+        y += 28
+        c.textbox(X0, y, w, foot["text"], foot.get("sub"), fill=DEEP, tcolor=CREAM, scolor=LIGHT, align="center")
+        y += fh
+    return y
+
+
 KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "paths": paths, "epochs": epochs,
          "dotgrid": dotgrid, "dumbbell": dumbbell, "range": range_chart, "funnel": funnel,
          "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation, "tokens": tokens,
@@ -3252,7 +3556,8 @@ KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "
          "transcript": transcript, "oneloop": oneloop, "intercept": intercept, "dial": dial, "lanes": lanes, "layers": layers, "turn": turn,
          "sockets": sockets, "lazy": lazy, "hub": hub, "pinned": pinned, "compact": compact, "sidecar": sidecar, "combo": combo,
          "waist": waist, "schema": schema, "branch": branch, "gates": gates, "route": route, "depend": depend,
-         "pick": pick, "pile": pile, "addlane": addlane}
+         "pick": pick, "pile": pile, "addlane": addlane,
+         "dist": dist, "snap": snap, "stack": stack, "target": target, "ring": ring}
 
 
 def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:
@@ -3286,6 +3591,21 @@ def texts(sl: dict) -> list[str]:
         out += [l, r]
     if "count" in sl:
         out.append(f"{sl['count']}")
+    if "on" in sl:
+        out.append(f"{sl['on']}")
+    if sl.get("kind") == "dist":
+        out += [f"{n['p']:g}" for n in sl.get("nodes", [])]
+        if sl.get("pick", "ev") == "ev":
+            out.append(f"{(list(sl.get('heads', [])) + ['', ''])[1]} {dist_ev(sl['nodes']):.2f}".strip())
+    for r in sl.get("nodes", []) if sl.get("kind") in ("snap", "stack") else []:
+        out += [m["text"] for m in r.get("marks", [])] + ([r["tie"]] if r.get("tie") else [])
+        if r.get("parts"):
+            out.append("・".join(f"{h} {p}" for h, p in zip(sl.get("heads", []), r["parts"])))   # 和圖上那一行一字不差（讀者引用才對得上）
+    if sl.get("kind") == "ring":
+        out += [x for x in sl.get("labels") or [] if x]
+    if sl.get("kind") == "equation" and sl.get("ops"):      # 運算符號是內容（+ 和 × 意思不同），審查者要看得到整條算式
+        ns, ops = sl.get("nodes", []), sl["ops"]
+        out.append("算式：" + " ".join(x for pair in zip([n["text"] for n in ns], list(ops) + [""]) for x in pair if x))
     if "group" in sl:
         out.append(f"{sl['group']}")
     u = sl.get("unit", "")

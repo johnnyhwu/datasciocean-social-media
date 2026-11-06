@@ -1,0 +1,98 @@
+{
+  "post": "verifier-results-how-to-read",
+  "blocks": [
+    {"block": "第 1 張", "atoms": [
+      {"text": "論文說 LLM-as-a-Verifier 表現最好（SOTA 宣稱）", "verdict": "完全支持", "card_quote": "「SOTA」宣稱混雜了 harness 差異", "note": "封面省略 benchmark 範圍，第 5 張限定為 Terminal-Bench V2，符合封面可留白規則。"},
+      {"text": "扣掉其他差異，它的功勞只有 2.1～3.4%", "verdict": "完全支持", "card_quote": "這是扣掉 harness 差異之後 verifier 真正的貢獻", "note": "數字對得上 c6；「只有」屬語氣（卡上 c7 另有「這個幅度不難看」，但也說可搶空間不大、與敘事有距離），不判錯；SWE-Bench 不可比的限定在第 7 張出現。"},
+      {"text": "同一個模型只換它的打分法，準確率多 16.6%", "verdict": "完全支持", "card_quote": "87.4% 和 70.8% 是同一個 Qwen 3.6 35B，唯一差別是離散 argmax 對上連續期望值；這 16.6pp", "note": "機器人範圍在第 8 張限定。"}],
+     "errors": []},
+    {"block": "第 2 張", "atoms": [
+      {"text": "（只審第 3 則那一列）只換掉它、其他條件不變的比較才算數：挑答案成功率多 2.1～3.4%，機器人準確率多 16.6%", "verdict": "完全支持", "card_quote": "主表只有「同一候選池」那一半能歸功給 verifier，而機器人這一列是同一個模型只改解碼方式，是最乾淨的因果證據", "note": "其他兩列是別則貼文的結構內容，不審。"}],
+     "errors": []},
+    {"block": "第 3 張", "atoms": [
+      {"text": "LLM-as-a-Verifier（Stanford／UC Berkeley／NVIDIA）讓一個 LLM 替另一個 LLM 的輸出打分數", "verdict": "完全支持", "card_quote": "LLM-as-a-Verifier（arXiv 2607.05391v2，Stanford / UC Berkeley / NVIDIA）讓 LLM 替另一個 LLM 的輸出打分數時", "note": "機構對得上。"},
+      {"text": "不只取機率最高的分數，而是把每個分數乘上機率再加總（期望值）", "verdict": "完全支持", "card_quote": "不取分數 token 機率最高的那一個（argmax），改算期望值（把每個分數乘上它的機率再加總）", "note": "「不只…而是」是口語白話，意思未變。"},
+      {"text": "再靠這些分數，從同一題的好幾份候選裡挑出最好的一份", "verdict": "完全支持", "card_quote": "生成策略對每題產生 N 條候選，verifier 用 PPT 兩兩評分，選出正規化分數最高者提交", "note": "引用了 c3 的流程。"},
+      {"text": "名詞白話：verifier、候選、Benchmark", "verdict": "完全支持", "card_quote": "從 N 條候選裡挑出最好的一條", "note": "放行項；未違背卡上說法、未把用途說死。"},
+      {"text": "c3 的限定條件（三個準則是為 code-agent 軌跡設計、換到別的領域怎麼套用論文沒回答）", "verdict": "找不到", "card_quote": "", "note": "引用標記宣稱帶出 c3#1，但本張與全文都沒有出現這條限定；c3 是被使用的主張，且第 9 張寫「輸入換成多幀影片也不用改方法」正是這條限定所針對的跨領域情境。"}],
+     "errors": ["限定條件掉了"]},
+    {"block": "第 4 張", "atoms": [
+      {"text": "論文在程式、機器人、醫療三個領域交了成績", "verdict": "完全支持", "card_quote": "橫跨程式、機器人、醫療三個領域做了實驗", "note": ""},
+      {"text": "路線圖三個問題：第一名成績有多少是它的功勞、機器人只換打分法差多少、分數能否提早預警失敗", "verdict": "完全支持", "card_quote": "論文說這個分數可以兼作進度預警，但它自己的統計（成功與失敗軌跡只差 0.079）並不支持", "note": "問題句，不含新主張；「方法在前兩則」是結構。"}],
+     "errors": []},
+    {"block": "第 5 張", "atoms": [
+      {"text": "論文說它在 Terminal-Bench V2 拿下第一（SOTA）：86.5%，贏過 GPT-5.5 的 84.7%", "verdict": "完全支持", "card_quote": "「SOTA」宣稱混雜了 harness 差異：Terminal-Bench V2 的 86.5% 是 GPT-5.5 加上 Capy harness 加上 N=5 抽樣加上 verifier，而對照的 84.7% 是 GPT-5.5 加上另一個 harness", "note": "主詞是論文，符合宣稱寫法。"},
+      {"text": "兩邊連 harness 和抽樣也不同，差距不能全算給 verifier；兩邊相同的只有模型 GPT-5.5", "verdict": "完全支持", "card_quote": "三個變因不同，把差距全歸給 verifier 不成立", "note": "示意圖兩欄（Capy harness／另一個 harness、每題抽 5 份、verifier 挑一份，84.7% 側後兩項劃掉）與卡一致。"}],
+     "errors": []},
+    {"block": "第 6 張", "atoms": [
+      {"text": "乾淨的比較：同一個模型做出好幾份候選，只換怎麼挑，差距只來自挑法", "verdict": "完全支持", "card_quote": "右半是同一個候選池上的 Pass@1 → Oracle → Ours，同一批候選、同一個生成器，唯一變因是「怎麼挑」，這才是 verifier 的功勞", "note": ""},
+      {"text": "三種挑法：只交一次（Pass@1）、verifier 挑、完美挑選（Oracle）", "verdict": "完全支持", "card_quote": "oracle 是理想的挑選者，每次都能從候選裡挑中對的那條；Pass@1 是每題只交一次答案的成功率", "note": "定義來自 c4（引用未列 c4，不影響內容忠實）。"},
+      {"text": "假設例子：4 份候選甲乙丙丁，只交一次交甲（錯）、verifier 交乙（對）、完美挑選交丁（對）", "verdict": "完全支持", "card_quote": "oracle 是理想的挑選者，每次都能從候選裡挑中對的那條", "note": "放行項；已標假設的例子；內部自洽（完美挑選必交對的；有兩份對的）。"}],
+     "errors": []},
+    {"block": "第 7 張", "atoms": [
+      {"text": "verifier 挑的比只交一次多 2.1～3.4%（TB2 83.1→86.5、SWE 76.1→78.2、Med 70.2→73.3）", "verdict": "完全支持", "card_quote": "Terminal-Bench V2 是 83.1% → 86.5%（+3.4pp），SWE-Bench Verified 是 76.1% → 78.2%（+2.1pp），MedAgentBench 是 70.2% → 73.3%（+3.1pp）", "note": "已重算；pp 寫成 % 是用語規則。"},
+      {"text": "就算完美挑選也只能多 4.8～9.0%；能搶的空間本來就不大，verifier 搶到四分之一到三分之二（38%、25%、65%）", "verdict": "完全支持", "card_quote": "實際候選池上可搶的 oracle 空間（oracle 減 Pass@1）不大（Terminal-Bench V2 9.0pp、SWE-Bench Verified 8.3pp、MedAgentBench 4.8pp），verifier 兌現了四分之一到三分之二（38%、25%、65%）", "note": "比值已重算。"},
+      {"text": "SWE-Bench 的 3 份候選來自三個不同模型，不能和另外兩列直接比", "verdict": "完全支持", "card_quote": "SWE-Bench 的候選池是異質的：N=3 是從三個不同模型各抽一條，Pass@1 是三模型平均，跟其他列不可直接比較", "note": "c6#1、c7#1 已帶出。"}],
+     "errors": []},
+    {"block": "第 8 張", "atoms": [
+      {"text": "RoboRewardBench 上同一個 Qwen 3.6 35B 只換打分法，偏好準確率 70.8% → 87.4%，多 16.6%", "verdict": "完全支持", "card_quote": "87.4% 和 70.8% 是同一個 Qwen 3.6 35B，唯一差別是離散 argmax 對上連續期望值；這 16.6pp 是全篇最大、也最能歸因給方法本身的數字，完全沒有 harness 混雜", "note": "已重算。"},
+      {"text": "沒混別的差異，最能歸功給方法", "verdict": "完全支持", "card_quote": "最能歸因給方法本身的數字，完全沒有 harness 混雜", "note": ""},
+      {"text": "圖：RoboReward-8B（訓練過，約 4.5 萬 episode）81.4%、Robometer-4B（訓練過，約 100 萬筆比較）78.8%", "verdict": "完全支持", "card_quote": "RoboReward-8B（訓練過，約 4.5 萬 episode）是 81.4%，Robometer-4B（訓練過，約 100 萬筆比較）是 78.8%", "note": "省略 TOPReward 屬子集。"},
+      {"text": "量的是偏好準確率", "verdict": "完全支持", "card_quote": "機器人的 benchmark RoboRewardBench 量的是 preference accuracy（偏好準確率）", "note": ""}],
+     "errors": []},
+    {"block": "第 9 張", "atoms": [
+      {"text": "RoboReward-8B、Robometer-4B 是專門訓練的機器人打分模型；LLM-as-a-Verifier 不用額外訓練就贏過它們", "verdict": "完全支持", "card_quote": "一個零訓練的框架打贏兩個專門訓練的機器人 reward model", "note": ""},
+      {"text": "輸入換成多幀影片也不用改方法", "verdict": "完全支持", "card_quote": "輸入從文字換成多幀影片，方法完全不用改", "note": "但 c3 的跨領域限定未出現，見第 3 張。"},
+      {"text": "保留一：論文沒解釋專門訓練的模型為什麼在自己的領域輸掉，只列數字", "verdict": "完全支持", "card_quote": "論文完全沒有解釋，為什麼專門訓練的機器人 reward model 會在自己的領域輸掉，相關那節只列數字", "note": ""},
+      {"text": "保留二：Benchmark 出自共同作者也掛名的 RoboReward 論文，被比的 RoboReward-8B 正是那篇的模型，論文沒揭露", "verdict": "完全支持", "card_quote": "RoboRewardBench 是共同作者也掛名的 RoboReward 論文提出的，被比較的 RoboReward-8B 正是那篇的模型，論文沒揭露這層利益關係", "note": ""}],
+     "errors": []},
+    {"block": "第 10 張", "atoms": [
+      {"text": "把 RoboReward-8B 改用期望值打分，MAE 從 1.11 降到 0.72", "verdict": "完全支持", "card_quote": "把 RoboReward-8B 的輸出改用連續公式解碼，與人類標註的 MAE（平均絕對誤差，越小越接近人類）從 1.11 降到 0.72", "note": "比較對象（同一模型原本的解碼）有寫。"},
+      {"text": "（論文稱為連續公式）", "verdict": "找不到", "card_quote": "", "note": "卡上只寫「改用連續公式解碼」，沒有說這是論文的稱呼；把用語歸給論文是卡上沒有的事實。"},
+      {"text": "這套打分法可以直接加在現成的模型上；主標「現成的模型改用期望值，和人類的誤差也變小」", "verdict": "部分支持", "card_quote": "這套解碼方式可以直接加在既有的 reward model 上，不是非得從頭換掉", "note": "卡上的範圍是「既有的 reward model」，貼文寫成泛稱「現成的模型」，範圍比卡寬。"}],
+     "errors": ["措辭與卡不同", "範圍被放大"]},
+    {"block": "第 11 張", "atoms": [
+      {"text": "verifier 可以每走一步就打一次分", "verdict": "完全支持", "card_quote": "把「步驟的時間順序」跟「verifier 對該步驟前綴的分數」算 Spearman 等級相關", "note": "白話解釋；agent 定義是放行項。"},
+      {"text": "論文主張：快要失敗或卡住時分數大致停在原地，所以同一個分數能當進度條也能提早預警", "verdict": "完全支持", "card_quote": "論文主張 verifier 在停滯或走向失敗的軌跡上分數大致持平，因此同一個分數可以兼作進度量測與早期預警", "note": "主詞是論文，符合原作者解讀；限定在第 12 張。"},
+      {"text": "例子：成功的分數持續上升到約 1.0；失敗的在不必要地裝 torchvision、磁碟空間耗盡之後一路偏低；這只是單一任務的單一案例，不是 500 次的統計", "verdict": "完全支持", "card_quote": "論文拿來當敘事主軸的是單一任務的單一案例（成功軌跡分數持續上升到約 1.0，失敗軌跡在不必要地裝 torchvision、磁碟空間耗盡之後一路偏低），而不是 500 條軌跡的統計", "note": "「500 條軌跡」寫成「500 次任務」可接受。"}],
+     "errors": []},
+    {"block": "第 12 張", "atoms": [
+      {"text": "VOC 量分數有沒有隨步驟上升：完全跟著上升是 1，停在原地約為 0", "verdict": "完全支持", "card_quote": "分數完美隨步驟遞增，VOC 就趨近 1", "note": "持平 ≈ 0 見 c17「離「持平」（VOC ≈ 0）差得很遠」。"},
+      {"text": "500 次任務：失敗 0.769、成功 0.848，只差 0.079", "verdict": "完全支持", "card_quote": "在 500 條 Terminal-Bench V2 軌跡上，成功軌跡的 VOC 是 0.848 ± 0.012，失敗軌跡是 0.769 ± 0.016，落差只有 0.079", "note": "已重算。"},
+      {"text": "失敗時分數照樣往上爬，靠這麼小的落差預警，鑑別力很弱", "verdict": "完全支持", "card_quote": "用 0.079 的落差做執行中的即時預警，鑑別力其實很弱", "note": "c15 限定條件已帶出。"}],
+     "errors": []},
+    {"block": "第 13 張", "atoms": [
+      {"text": "只看換掉它、其他不變的比較：挑答案多 2.1～3.4%，機器人多 16.6%", "verdict": "完全支持", "card_quote": "主表只有「同一候選池」那一半能歸功給 verifier，而機器人這一列是同一個模型只改解碼方式，是最乾淨的因果證據", "note": "數字對得上 c6、c11；本張沒寫出是成功率／準確率（前面各張有），不列為錯誤。"}],
+     "errors": []},
+    {"block": "第 14 張", "atoms": [
+      {"text": "（只審第 3 則那一列）只換掉它、其他條件不變的比較才算數：挑答案成功率多 2.1～3.4%，機器人準確率多 16.6%", "verdict": "完全支持", "card_quote": "主表只有「同一候選池」那一半能歸功給 verifier，而機器人這一列是同一個模型只改解碼方式，是最乾淨的因果證據", "note": "其餘為結構。"}],
+     "errors": []},
+    {"block": "Threads 正文", "atoms": [
+      {"text": "LLM-as-a-Verifier 讓 LLM 替另一個 LLM 的輸出打分數，再從好幾份候選裡挑最好的一份", "verdict": "完全支持", "card_quote": "從 N 條候選裡挑出最好的一條", "note": ""},
+      {"text": "論文說它在 Terminal-Bench V2 拿下第一：86.5% 贏過 GPT-5.5 的 84.7%；harness、抽樣、有沒有 verifier 三處不同，不能全算給它", "verdict": "完全支持", "card_quote": "三個變因不同，把差距全歸給 verifier 不成立", "note": ""},
+      {"text": "同一批候選只換挑法：成功率多 2.1～3.4%（SWE-Bench 候選來自三個不同模型，不能直接比）", "verdict": "完全支持", "card_quote": "SWE-Bench 的候選池是異質的：N=3 是從三個不同模型各抽一條，Pass@1 是三模型平均，跟其他列不可直接比較", "note": ""},
+      {"text": "最乾淨的證據在機器人：同一個 Qwen 3.6 35B 只換成算期望值，準確率 70.8% → 87.4%", "verdict": "完全支持", "card_quote": "機器人這一列是同一個模型只改解碼方式，是最乾淨的因果證據", "note": ""},
+      {"text": "論文沒解釋專門訓練的模型為何在自己的領域輸掉；Benchmark 出自共同作者掛名的論文，RoboReward-8B 正是那篇的模型，論文沒揭露", "verdict": "完全支持", "card_quote": "RoboRewardBench 是共同作者也掛名的 RoboReward 論文提出的，被比較的 RoboReward-8B 正是那篇的模型，論文沒揭露這層利益關係", "note": "c12 兩條限定都在。"},
+      {"text": "論文說分數能提早預警失敗，但 500 次任務上成功 0.848、失敗 0.769，只差 0.079", "verdict": "部分支持", "card_quote": "在 500 條 Terminal-Bench V2 軌跡上，成功軌跡的 VOC 是 0.848 ± 0.012，失敗軌跡是 0.769 ± 0.016，落差只有 0.079", "note": "數字對，但正文沒說這是 VOC（分數與步驟順序的等級相關），緊接在「分數能提早預警」之後，讀者會把 0.848／0.769 讀成 verifier 分數本身，數字的意思被改變、缺量名。"},
+      {"text": "失敗時分數也在穩定上升", "verdict": "完全支持", "card_quote": "失敗軌跡的分數也在隨時間穩定上升", "note": ""}],
+     "errors": ["其他"]},
+    {"block": "Threads 最後一則", "atoms": [
+      {"text": "只看只換掉它、其他條件不變的比較：挑答案成功率多 2.1～3.4%，機器人準確率多 16.6%", "verdict": "完全支持", "card_quote": "主表只有「同一候選池」那一半能歸功給 verifier，而機器人這一列是同一個模型只改解碼方式，是最乾淨的因果證據", "note": "同系列行與文章網址為結構。"}],
+     "errors": []},
+    {"block": "IG caption", "atoms": [
+      {"text": "只換掉它、其他條件不變的比較才算數；各條目重述各張主標", "verdict": "完全支持", "card_quote": "主表只有「同一候選池」那一半能歸功給 verifier", "note": "條目與各張主標一致；圖片來源、導流行、hashtag 為結構。"}],
+     "errors": []}
+  ],
+  "recalculations": [
+    {"block": "第 7 張", "expression": "86.5-83.1, 78.2-76.1, 73.3-70.2", "result": "3.4, 2.1, 3.1"},
+    {"block": "第 7 張", "expression": "3.4/9.0, 2.1/8.3, 3.1/4.8", "result": "0.378 (38%), 0.253 (25%), 0.646 (65%)"},
+    {"block": "第 8 張", "expression": "87.4-70.8", "result": "16.6"},
+    {"block": "第 5 張", "expression": "86.5-84.7", "result": "1.8"},
+    {"block": "第 10 張", "expression": "1.11-0.72", "result": "0.39"},
+    {"block": "第 12 張", "expression": "0.848-0.769", "result": "0.079"}
+  ],
+  "gaps": [
+    {"description": "c3 被使用，但它的限定條件（三個準則為 code-agent 設計、跨領域如何套用論文沒回答）全文未出現；第 9 張宣稱換成多幀影片方法不用改。", "card_quote": "C=3 的三個準則明說是為 code-agent 軌跡設計的，機器人和醫療的實驗也宣稱用同一組，但換到別的領域怎麼套用，論文沒有回答"},
+    {"description": "Threads 正文的 0.848／0.769 沒標明是 VOC。", "card_quote": "成功軌跡的 VOC 是 0.848 ± 0.012，失敗軌跡是 0.769 ± 0.016"}
+  ]
+}

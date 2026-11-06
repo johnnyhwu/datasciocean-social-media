@@ -1,0 +1,23 @@
+concept: verifier-expected-value-vs-argmax
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: verifier-expected-value-vs-argmax:ig_carousel
+  format: ig_carousel
+  series_id: llm-as-a-verifier
+  url: https://www.instagram.com/p/DfYPlVKkwB2/
+  published_at: 2026-11-05T23:47:24+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []
+- post_id: verifier-expected-value-vs-argmax:threads_thread
+  format: threads_thread
+  series_id: llm-as-a-verifier
+  url: https://www.threads.com/@datasciocean/post/DfYQGXSEyKm
+  published_at: 2026-11-05T23:50:57+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []

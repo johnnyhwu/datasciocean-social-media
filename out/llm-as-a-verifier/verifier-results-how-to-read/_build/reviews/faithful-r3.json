@@ -1,0 +1,59 @@
+{
+  "post": "verifier-results-how-to-read",
+  "blocks": [
+    {"block": "第 7 張", "atoms": [
+      {"text": "換 verifier 來挑（同一候選池），成功率比只交一次多 2.1～3.4%", "verdict": "完全支持",
+       "card_quote": "同一候選池上 Pass@1 → Ours：Terminal-Bench V2 是 83.1% → 86.5%（+3.4pp），SWE-Bench Verified 是 76.1% → 78.2%（+2.1pp），MedAgentBench 是 70.2% → 73.3%（+3.1pp）", "note": "三列差距 3.4、2.1、3.1，範圍 2.1～3.4；pp 寫 % 是人定用語規則"},
+      {"text": "「只交一次」即 Pass@1", "verdict": "完全支持",
+       "card_quote": "Pass@1 是每題只交一次答案的成功率", "note": "白話對應正確"},
+      {"text": "完美挑選（oracle）也只多 4.8～9.0%", "verdict": "完全支持",
+       "card_quote": "實際候選池上可搶的 oracle 空間（oracle 減 Pass@1）不大（Terminal-Bench V2 9.0pp、SWE-Bench Verified 8.3pp、MedAgentBench 4.8pp）", "note": "「只」對應卡上「不大」"},
+      {"text": "這才是算得到 verifier 的功勞", "verdict": "完全支持",
+       "card_quote": "這是扣掉 harness 差異之後 verifier 真正的貢獻", "note": "部落格判斷，未比卡強"},
+      {"text": "可搶的空間它搶到四分之一到三分之二", "verdict": "完全支持",
+       "card_quote": "verifier 兌現了四分之一到三分之二（38%、25%、65%）", "note": "與卡一致"},
+      {"text": "圖表項目：Terminal-Bench V2 83.1→86.5%，搶到 38%，完美挑選能多拿 9%，verifier 多拿 3.4%", "verdict": "完全支持",
+       "card_quote": "| Terminal-Bench V2 | 83.1% → 86.5% | **+3.4pp** | 9.0pp | 38% |", "note": "重算 3.4/9.0=37.8%"},
+      {"text": "圖表項目：SWE-Bench Verified 76.1→78.2%，搶到 25%，8.3%，2.1%", "verdict": "完全支持",
+       "card_quote": "| SWE-Bench Verified | 76.1% → 78.2% | **+2.1pp** | 8.3pp | 25% |", "note": "重算 2.1/8.3=25.3%"},
+      {"text": "圖表項目：MedAgentBench 70.2→73.3%，搶到 65%，4.8%，3.1%", "verdict": "完全支持",
+       "card_quote": "| MedAgentBench | 70.2% → 73.3% | **+3.1pp** | 4.8pp | 65% |", "note": "重算 3.1/4.8=64.6%"},
+      {"text": "圖註：SWE-Bench 的 3 份候選來自三個不同模型，不能和另外兩列直接比", "verdict": "完全支持",
+       "card_quote": "SWE-Bench 的候選池是異質的：N=3 是從三個不同模型各抽一條，Pass@1 是三模型平均，跟其他列不可直接比較", "note": "c6#1、c7#1 限定條件已帶出"}
+    ], "errors": []},
+    {"block": "Threads 正文", "atoms": [
+      {"text": "論文說 LLM-as-a-Verifier 表現最好，功勞真的是它的嗎？（hook）", "verdict": "完全支持",
+       "card_quote": "「SOTA」宣稱混雜了 harness 差異", "note": "問句形式，主詞是論文的宣稱，內文有交代"},
+      {"text": "LLM-as-a-Verifier 讓 LLM 替另一個 LLM 的輸出打分數，再從同一題的好幾份候選裡挑最好的一份", "verdict": "完全支持",
+       "card_quote": "讓 LLM 替另一個 LLM 的輸出打分數時…再配一個排名演算法 PPT（用成對比較，從 N 條候選裡挑出最好的一條）", "note": "白話概述，未加新事實"},
+      {"text": "論文說它在 Terminal-Bench V2 拿下第一（SOTA）：86.5%，贏過 GPT-5.5 的 84.7%", "verdict": "完全支持",
+       "card_quote": "「SOTA」宣稱混雜了 harness 差異：Terminal-Bench V2 的 86.5% 是 GPT-5.5 加上 Capy harness 加上 N=5 抽樣加上 verifier，而對照的 84.7% 是 GPT-5.5 加上另一個 harness", "note": "主詞是論文"},
+      {"text": "兩邊的 harness、抽樣、有沒有 verifier 三處不同，不能全算給它", "verdict": "完全支持",
+       "card_quote": "三個變因不同，把差距全歸給 verifier 不成立", "note": "三個變因與卡列的 harness、N=5 抽樣、verifier 一致；harness 白話為放行項"},
+      {"text": "公平的比法是同一批候選、只換挑法：成功率多 2.1～3.4%", "verdict": "完全支持",
+       "card_quote": "右半才是誠實的證據，因為同一批候選、同一個生成器，唯一變因是「怎麼挑」", "note": "數字見 c6；比較基準（Pass@1）在 Threads 文字中只以「只換挑法」帶過，附圖第 6、7 張有寫明，不列 blocker"},
+      {"text": "SWE-Bench 的候選來自三個不同模型，不能和另外兩個比", "verdict": "完全支持",
+       "card_quote": "SWE-Bench 的候選池是異質的：N=3 是從三個不同模型各抽一條，Pass@1 是三模型平均，跟其他列不可直接比較", "note": "c6#1 已帶出"},
+      {"text": "最乾淨的證據在機器人", "verdict": "完全支持",
+       "card_quote": "機器人這一列是同一個模型只改解碼方式，是最乾淨的因果證據", "note": "來自 c1（引用標記未列 c1，但內容有卡支持，c1 兩條限定條件也都在本區塊出現）"},
+      {"text": "同一個 Qwen 3.6 35B，只把取機率最高的分數換成算期望值，準確率 70.8% → 87.4%", "verdict": "完全支持",
+       "card_quote": "87.4% 和 70.8% 是同一個 Qwen 3.6 35B，唯一差別是離散 argmax 對上連續期望值", "note": "比較對象明確"},
+      {"text": "論文沒解釋專門訓練的模型為什麼在自己的領域輸掉", "verdict": "完全支持",
+       "card_quote": "論文完全沒有解釋，為什麼專門訓練的機器人 reward model 會在自己的領域輸掉", "note": "c12#1、c1#1"},
+      {"text": "這個 Benchmark 出自共同作者掛名的論文，被比的 RoboReward-8B 正是那篇的模型，論文沒揭露", "verdict": "完全支持",
+       "card_quote": "RoboRewardBench 是共同作者也掛名的 RoboReward 論文提出的，被比較的 RoboReward-8B 正是那篇的模型，論文沒揭露這層利益關係", "note": "c12#2、c10#1、c1#2"},
+      {"text": "論文還說分數能提早預警失敗", "verdict": "完全支持",
+       "card_quote": "論文主張 verifier 在停滯或走向失敗的軌跡上分數大致持平，因此同一個分數可以兼作進度量測與早期預警", "note": "主詞是論文（原作者解讀）"},
+      {"text": "VOC 衡量分數往上爬的程度", "verdict": "完全支持",
+       "card_quote": "把「步驟的時間順序」跟「verifier 對該步驟前綴的分數」算 Spearman 等級相關（衡量兩組排序有多一致，1 代表完全同向）；分數完美隨步驟遞增，VOC 就趨近 1", "note": "白話解釋，「程度」可理解為隨步驟遞增的一致程度；附圖第 12 張另有說明「看的是有沒有往上，不是分數高低」"},
+      {"text": "成功 0.848、失敗 0.769，只差 0.079", "verdict": "完全支持",
+       "card_quote": "在 500 條 Terminal-Bench V2 軌跡上，成功軌跡的 VOC 是 0.848 ± 0.012，失敗軌跡是 0.769 ± 0.016，落差只有 0.079", "note": "重算 0.848-0.769=0.079；c15 限定條件（失敗軌跡分數也在上升）在附圖第 12 張出現"}
+    ], "errors": []}
+  ],
+  "recalculations": [
+    {"block": "第 7 張", "expression": "3.4/9.0, 2.1/8.3, 3.1/4.8", "result": "37.8%, 25.3%, 64.6%（對應 38%、25%、65%）"},
+    {"block": "第 7 張", "expression": "86.5-83.1, 78.2-76.1, 73.3-70.2", "result": "3.4, 2.1, 3.1"},
+    {"block": "Threads 正文", "expression": "87.4-70.8; 0.848-0.769", "result": "16.6; 0.079"}
+  ],
+  "gaps": []
+}

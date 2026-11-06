@@ -20,4 +20,5 @@ posts:
   published_at: 2026-11-03T01:04:12+0000
   hook_type: 並列重點
   mentions: []
-  backfilled: []
+  backfilled:
+  - rag-planner-single-round-vs-agentic

@@ -21,4 +21,5 @@ posts:
   hook_type: 讀者疑問
   mentions: []
   backfilled:
+  - rag-planner-single-round-vs-agentic
   - slack-vector-failure-orthogonal-signals

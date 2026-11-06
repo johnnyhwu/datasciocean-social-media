@@ -33,7 +33,7 @@ RP = PARAMS["render"]
 WD, HT, SAFE_X, PAD_X = RP["width"], RP["height"], RP["safe_x"], RP["pad_x"]
 CREAM, TEAL, DEEP, GOLD = "#F2E0C0", "#076876", "#01353F", "#DDA642"
 MID, LIGHT, ABYSS = "#1F8A8D", "#69B4AA", "#032027"
-SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD, "seesaw": GOLD, "spotlight": GOLD, "window": GOLD, "hourglass": GOLD}
+SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD, "seesaw": GOLD, "spotlight": GOLD, "window": GOLD, "hourglass": GOLD, "band": GOLD}
 ALLOWED_FONT_PX = {28, 34, 38, 40, 56, 72, 76}
 ZERO_Y = 706          # 測深圖水面（0）
 
@@ -700,6 +700,79 @@ def hg_takeaway():
     return s
 
 
+# ---------------------------------------------------------------- 濃淡帶系列（style: band）的 SVG 元件
+# 哲學 series/llm-as-a-verifier/philosophy.md：一條橫貫全寬的帶子，越可能的分數越濃；金針停在濃淡分佈的期望值。
+# 都用 class "bg"（背景層），排版時自己確保不壓到文字。分佈純示意（不是實驗數據），每一則一種。
+BD_DISTS = ((0.02, 0.05, 0.13, 0.35, 0.45),     # 第 1 則：最濃在右端
+            (0.10, 0.38, 0.30, 0.15, 0.07),     # 第 2 則：最濃偏左
+            (0.30, 0.08, 0.06, 0.16, 0.40))     # 第 3 則：兩頭濃、中間淡
+BD_X0, BD_X1 = 60, 1020          # 刻度 1 與 5 的 x（帶子本身貼齊畫布兩端）
+
+
+def bd_shade(q, dark=False):
+    """機率 → 濃淡。米色底：米色 → 淺藍綠 → 中藍綠 → 深海；深色底反過來，越重越亮。"""
+    stops = ([(0, (0x01, 0x35, 0x3F)), (.12, (0x1F, 0x8A, 0x8D)), (.25, (0x69, 0xB4, 0xAA)), (.45, (0xF2, 0xE0, 0xC0))] if dark else
+             [(0, (0xF2, 0xE0, 0xC0)), (.12, (0x69, 0xB4, 0xAA)), (.25, (0x1F, 0x8A, 0x8D)), (.45, (0x01, 0x35, 0x3F))])
+    for (a, ca), (b, cb) in zip(stops, stops[1:]):
+        if q <= b:
+            f = (q - a) / (b - a)
+            return "#%02x%02x%02x" % tuple(round(x + (y - x) * f) for x, y in zip(ca, cb))
+    return "#%02x%02x%02x" % stops[-1][1]
+
+
+def bd_ev(p):
+    return sum((i + 1) * q for i, q in enumerate(p))
+
+
+def bd_x(v):
+    return BD_X0 + (v - 1) / 4 * (BD_X1 - BD_X0)
+
+
+def bd_band(y, h, p, needle_v, gid, ticks=True, dark=False, nw=8, over=36):
+    """一條全寬帶子＋（可選）1～5 刻度＋金針。needle_v 是針停的位置（1～5 的實數）。"""
+    stops = "".join(f'<stop offset="{i / 4:.2f}" stop-color="{bd_shade(q, dark)}"/>' for i, q in enumerate(p))
+    s = (f'<defs><linearGradient id="{gid}" gradientUnits="userSpaceOnUse" x1="{BD_X0}" y1="0" x2="{BD_X1}" y2="0">'
+         f'{stops}</linearGradient></defs>'
+         f'<rect class="bg" x="0" y="{y}" width="{WD}" height="{h}" fill="url(#{gid})"/>')
+    if ticks:
+        col = CREAM if dark else DEEP
+        for i in range(5):
+            x = bd_x(i + 1)
+            s += f'<line class="bg" x1="{x:.1f}" y1="{y + h}" x2="{x:.1f}" y2="{y + h + 22}" stroke="{col}" stroke-width="3"/>'
+            s += (f'<text class="bg" x="{x:.1f}" y="{y + h + 58}" text-anchor="middle" font-family="DSO" '
+                  f'font-size="28" fill="{col}">{i + 1}</text>')
+    x = bd_x(needle_v)
+    s += f'<rect class="bg" x="{x - nw / 2:.1f}" y="{y - over}" width="{nw}" height="{h + 2 * over}" fill="{GOLD}"/>'
+    return s
+
+
+def bd_cover(mi):
+    """封面：中段一條高 230 的帶子（y 600～830），刻度與數字在下，金針在這一則分佈的期望值。"""
+    p = BD_DISTS[mi % len(BD_DISTS)]
+    return bd_band(600, 230, p, bd_ev(p), "bdc")
+
+
+def bd_strip(idx, n, mi, dark=False):
+    """內頁頂端貼齊畫布的一條細帶（高 18），針的位置＝這一則讀到第幾張。"""
+    p = BD_DISTS[mi % len(BD_DISTS)]
+    v = 1 + 4 * (idx - 1) / max(n - 1, 1)
+    return bd_band(0, 18, p, v, "bds", ticks=False, dark=dark, nw=6, over=0) + \
+        (f'<rect class="bg" x="{bd_x(v) - 3:.1f}" y="18" width="6" height="16" fill="{GOLD}"/>')
+
+
+def bd_deco(idx, n, mi, y=930, h=150):
+    """文字張與沒有名詞表的脈絡張：下半一條中等高度的帶子（沒有數字），針隨張數往右移。"""
+    p = BD_DISTS[mi % len(BD_DISTS)]
+    v = 1 + 4 * (idx - 1) / max(n - 1, 1)
+    return bd_band(y, h, p, v, "bdd", ticks=False, over=28)
+
+
+def bd_takeaway(mi):
+    """帶走張（深色底）：下段一條濃淡反過來的帶子（越重越亮），金針在期望值。"""
+    p = BD_DISTS[mi % len(BD_DISTS)]
+    return bd_band(1010, 120, p, bd_ev(p), "bdt", ticks=False, dark=True, over=30)
+
+
 def series_journey(members, cur, jy):
     """整個系列的路線：走過的是實心點，這一則是金色，後續是空心點；每個點下面一行「第 N 則」。回傳 (svg, html)。"""
     svg, out = "", ""
@@ -760,6 +833,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     spot = series.get("style") == "spotlight"
     win = series.get("style") == "window"
     hg = series.get("style") == "hourglass"
+    bd = series.get("style") == "band"
     idx, n_sl = spec.get("_idx", 1), spec.get("_n", 1)          # 第幾張／共幾張（render_all 填入）
     mi, mn = spec.get("_mi", 0), spec.get("_mn", 1)            # 這則是系列的第幾則／共幾則
     kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", ""))), "FAM": "", "BODY_STYLE": "", "FOOT_CLS": ""}
@@ -803,6 +877,11 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["TITLE_TOP"] = 756
         kw["SUB_TOP"] = 756 + est_lines(re.sub(r"\[\[|\]\]", "", spec.get("title", "")), 920 / 76 - 0.4) * 95 + 26
         kw["BODY"] = kw["BODY"].replace("\n", "<br>")
+    elif lay == "cover" and bd:        # 米色底，標題貼在帶子上方（依行數往上長）、中段一條全寬濃淡帶（y 600～830）、副標固定在帶子下方
+        kw["SVG"] = svg_wrap(bd_cover(mi))
+        kw["TITLE_TOP"] = 530 - sum(est_lines(seg, 920 / 76 - 0.4) for seg in re.sub(r"\[\[|\]\]", "", spec.get("title", "")).split("\n")) * 95   # 標題底緣貼著帶子上方（針頂 y=564）
+        kw["SUB_TOP"] = 920
+        kw["BODY"] = kw["BODY"].replace("\n", "<br>")
     elif lay == "cover" and seesaw:    # 米色底，標題在上，下半一座蹺蹺板；副標固定在 y=400
         kw["SVG"] = svg_wrap(ss_cover())
         kw["SUB_TOP"] = 400
@@ -822,7 +901,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             parts, cells, _ = table_block(spec["rows"], y0_ + shift, spec.get("key_w", 300))
             kw["SVG"], kw["CELLS"] = svg_wrap(parts), cells
         else:
-            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else (svg_wrap(ss_mid(idx, n_sl)) if seesaw else (svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False)) if spot else (svg_wrap(wn_deco(idx)) if win else (svg_wrap(hg_deco(idx, n_sl)) if hg else "")))))), ""
+            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else (svg_wrap(ss_mid(idx, n_sl)) if seesaw else (svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False)) if spot else (svg_wrap(wn_deco(idx)) if win else (svg_wrap(hg_deco(idx, n_sl)) if hg else (svg_wrap(bd_deco(idx, n_sl, mi)) if bd else ""))))))), ""
             if horizon:
                 kw["FOOT_CLS"] = "light"
     elif lay == "text" and contour:
@@ -841,6 +920,8 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["SVG"] = svg_wrap(wn_deco(idx))
     elif lay == "text" and hg:         # 下半一束線收束到一個窄口再展開，窄口的位置隨張數往右移
         kw["SVG"] = svg_wrap(hg_deco(idx, n_sl))
+    elif lay == "text" and bd:         # 下半一條中等高度的濃淡帶，針隨張數往右移
+        kw["SVG"] = svg_wrap(bd_deco(idx, n_sl, mi))
     elif lay == "text" and seesaw:     # 中段一座蹺蹺板，傾斜角隨張數轉向
         kw["SVG"] = svg_wrap(ss_mid(idx, n_sl))
     elif lay == "text":
@@ -901,6 +982,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         x0, maxlen = 72, 640
         s = maxlen / max(b["value"] for b in bars)
         dec1 = any(isinstance(b["value"], float) and b["value"] != int(b["value"]) for b in bars)    # 有小數的圖：全部數字都顯示一位小數（80.0，不是 80）
+        nd = max([1] + [len(f"{b['value']:g}".split(".")[1]) for b in bars if "." in f"{b['value']:g}"])   # 2026-11-05：卡上是兩位小數（65.83%、0.75）就照印兩位，不四捨五入成一位
         y = max(500, body_end(spec.get("body", "")) + 44)   # 補充排成多行時，圖往下讓出空間
         inline = bool(spec.get("subs_inline"))              # 副標籤接在名稱後面同一行（省 42px，長條才排得下）
         labels, svg = "", ""
@@ -927,7 +1009,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             svg += (f'<rect class="g bar" data-v="{b["value"]}" data-e="{int(bool(b.get("emphasize")))}" x="{x0}" y="{by}" '
                     f'width="{ln:.2f}" height="44" fill="{col}"/>')
             labels += (f'<div class="t abs num" style="left:{x0 + ln + 22:.1f}px;top:{by - 11}px;color:{DEEP}">'
-                       f'{b["value"]:.1f}{esc(spec.get("unit", ""))}</div>' if dec1 else
+                       f'{b["value"]:.{nd}f}{esc(spec.get("unit", ""))}</div>' if dec1 else
                        f'<div class="t abs num" style="left:{x0 + ln + 22:.1f}px;top:{by - 11}px;color:{DEEP}">'
                        f'{b["value"]:g}{esc(spec.get("unit", ""))}</div>')
             last_bottom = by + 44
@@ -1004,6 +1086,14 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         lab = spec.get("label")
         kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
         kw["SVG"] = svg_wrap(hg_takeaway())
+    elif lay == "takeaway" and bd:
+        kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
+        q = spec.get("question")
+        kw["QUESTION"] = f'<div class="t abs take-q" style="top:320px">{esc(q)}</div>' if q else ""
+        kw["TAKE_STYLE"] = f"top:{320 + math.ceil(len(q) / 15.0) * 73 + 36}px" if q else ""
+        lab = spec.get("label")
+        kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
+        kw["SVG"] = svg_wrap(bd_takeaway(mi))
     elif lay == "takeaway" and seesaw:
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
         q = spec.get("question")
@@ -1067,11 +1157,11 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         cur = [m["concept"] for m in series["members"]].index(spec["current"])
         y, svg, out = 330, "", ""
         for i, t in enumerate(items):
-            if (contour or cards or spot or win or hg) and i == cur:
+            if (contour or cards or spot or win or hg or bd) and i == cur:
                 svg += f'<rect class="bg" x="72" y="{y - 10}" width="936" height="84" rx="6" fill="{DEEP}"/>'
                 svg += f'<circle class="g mark" data-e="1" cx="100" cy="{y + 32}" r="12" fill="{GOLD}"/>'
                 out += f'<div class="t abs item cur" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
-            elif contour or cards or spot or win or hg:
+            elif contour or cards or spot or win or hg or bd:
                 svg += f'<circle class="g mark" cx="100" cy="{y + 32}" r="8" fill="{TEAL}"/>'
                 out += f'<div class="t abs item" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
             elif i == cur:
@@ -1135,6 +1225,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     if hg and lay not in ("cover", "takeaway"):
         corner = hg_corner(idx, n_sl)
         kw["SVG"] = kw["SVG"].replace("</svg>", corner + "</svg>", 1) if kw.get("SVG") else svg_wrap(corner)
+    if bd and lay not in ("cover", "takeaway", "text") and not (lay == "context" and not spec.get("rows")):
+        strip = bd_strip(idx, n_sl, mi)      # 頂端一條細濃淡帶（文字張與沒有名詞表的脈絡張下半已經有一條）
+        kw["SVG"] = kw["SVG"].replace("</svg>", strip + "</svg>", 1) if kw.get("SVG") else svg_wrap(strip)
     if win and lay not in ("cover", "takeaway"):
         dots = progress_dots(idx, n_sl)
         kw["SVG"] = kw["SVG"].replace("</svg>", dots + "</svg>") if kw.get("SVG") else svg_wrap(dots)
@@ -1172,6 +1265,7 @@ MEASURE_JS = r"""
     const rg=tight(e); return {n:e.textContent.trim().slice(0,14),out:rg.l<l-1||rg.r>l+w+1||rg.t<t-1||rg.b>t+h+1}});
   const rbars=[...document.querySelectorAll('.rbar')].map(e=>({lo:+e.dataset.lo,hi:+e.dataset.hi,s:+e.dataset.s,x0:+e.dataset.x0,
     x:e.tagName==='rect'?e.x.baseVal.value:null,w:e.tagName==='rect'?e.width.baseVal.value:null}));
+  const vbars=[...document.querySelectorAll('.vbar')].map(e=>({p:+e.dataset.p,s:+e.dataset.s,base:+e.dataset.base,y:e.y.baseVal.value,h:e.height.baseVal.value}));
   const dpts=[...document.querySelectorAll('.dpt')].map(e=>({v:+e.dataset.v,s:+e.dataset.s,x0:+e.dataset.x0,cx:e.cx.baseVal.value}));
   const emph=document.querySelectorAll('[data-e="1"]').length;
   function lines(el){
@@ -1194,7 +1288,7 @@ MEASURE_JS = r"""
   }
   const chk={}; document.querySelectorAll('.chk').forEach(e=>chk[e.id]=lines(e));
   const katexErr = window.katex ? document.querySelectorAll('.katex-error').length : null;
-  return {ts,gs,ropes,bobs,bars,axis,ticks,emph,chk,inbox,rbars,dpts,katexErr,
+  return {ts,gs,ropes,bobs,bars,axis,ticks,emph,chk,inbox,rbars,dpts,vbars,katexErr,
     pageH:document.documentElement.scrollHeight,pageW:document.documentElement.scrollWidth,
     fontOk:document.fonts.check('700 40px DSO')&&document.fonts.check('400 40px DSO')};
 }
@@ -1287,6 +1381,8 @@ def program_b(spec: dict, m: dict, img: Image.Image, series_name: str, tag_texts
     if m["rbars"]:
         ok = all((abs(r["x"] - (r["x0"] + r["lo"] * r["s"])) < 1 and abs(r["w"] - (r["hi"] - r["lo"]) * r["s"]) < 1) for r in m["rbars"] if r["x"] is not None)
         chk("區間條的位置與長度和數值成正比（軸從 0 起）", ok, [(r["lo"], r["hi"]) for r in m["rbars"]])
+    if m.get("vbars"):
+        chk("直條的高度與數值成正比、從同一條底線起", all(abs(b["h"] - b["p"] * b["s"]) < 1 and abs(b["y"] + b["h"] - b["base"]) < 1 for b in m["vbars"]), [b["p"] for b in m["vbars"]])
     if m["dpts"]:
         chk("前後對比的點落在數值對應的位置（軸從 0 起）", all(abs(p["cx"] - (p["x0"] + p["v"] * p["s"])) < 1 for p in m["dpts"]), [p["v"] for p in m["dpts"]])
     if lay not in ("cover", "context", "takeaway"):
@@ -1349,7 +1445,7 @@ def render_all(spec_path: Path, only: set[int] | None = None, force: bool = Fals
             if sl["layout"] == "cover" and series.get("style") == "spotlight":    # 探照燈封面主標排到第 3 行時：字縮成 56px（規定字級之一），多半就回到 2 行，副標才放得下（2026-10-28，人決定封面主標可放寬）
                 pg.evaluate("() => {const t=document.getElementById('title'); const lh=parseFloat(getComputedStyle(t).lineHeight); "
                             "if (t.getBoundingClientRect().height > lh*2.5) {t.style.fontSize='56px'}}")
-            if (sl["layout"] == "cover" and not series.get("standalone")) or built.get("dyn"):    # 封面與直切版面：補充文字接在標題下面（獨立貼文的封面副標固定在地平線下）
+            if (sl["layout"] == "cover" and not series.get("standalone") and series.get("style") != "band") or built.get("dyn"):    # 封面與直切版面：補充文字接在標題下面（獨立貼文的封面副標固定在地平線下；濃淡帶封面的副標固定在帶子下方）
                 pg.evaluate("() => {const t=document.getElementById('title'), s=document.getElementById('body'); "
                             "if(s) s.style.top=(t.getBoundingClientRect().bottom+36)+'px'}")
             m = pg.evaluate(MEASURE_JS)

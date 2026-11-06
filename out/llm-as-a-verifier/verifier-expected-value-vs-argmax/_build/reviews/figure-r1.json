@@ -1,0 +1,53 @@
+{
+  "slides": [
+    {"slide": 9,
+     "items": [
+       {"what": "第一列方法標籤：Judge 的解碼方式", "reproduced": "Judge（1 到 5 分，只取最高分）", "original_position": "表第一列 Method 欄與 Reward 欄", "original": "Judge (discrete, G=5)；Reward 欄 φ(arg max_g p_θ(v_g))，即取機率最高的分數", "in_claim": "標準做法只取機率最高的那一個（argmax），其餘全丟", "verdict": "不一致"},
+       {"what": "第二列方法標籤", "reproduced": "verifier（1 到 5 分，期望值）", "original_position": "表第二列 Method 與 Reward 欄", "original": "Verifier (continuous, G=5)；Σ_{g=1}^{5} p_θ(v_g) φ(v_g)", "in_claim": "連續 verifier（G=5）；同一個 1–5 量表只換解碼方式（argmax → 期望值）", "verdict": "一致"},
+       {"what": "第三列方法標籤", "reproduced": "verifier（1 到 20 分，期望值）", "original_position": "表第三列 Method 與 Reward 欄", "original": "Verifier (continuous, G=20)；Σ_{g=1}^{20} p_θ(v_g) φ(v_g)", "in_claim": "連續 verifier（G=20）；同樣是期望值只換量表（1–5 → 1–20）", "verdict": "一致"},
+       {"what": "Judge 三格數字", "reproduced": "排對 12・平手 88・排錯 0", "original_position": "表第一列第三、四、五欄", "original": "12/100、88/100、0/100", "in_claim": "離散 judge（G=5）是 12/88/0", "verdict": "一致"},
+       {"what": "verifier G=5 三格數字", "reproduced": "排對 69・平手 0・排錯 31", "original_position": "表第二列第三、四、五欄", "original": "69/100、0/100、31/100", "in_claim": "連續 verifier（G=5）是 69/0/31", "verdict": "一致"},
+       {"what": "verifier G=20 三格數字", "reproduced": "排對 77・平手 0・排錯 23", "original_position": "表第三列第三、四、五欄", "original": "77/100、0/100、23/100", "in_claim": "連續 verifier（G=20）是 77/0/23", "verdict": "一致"},
+       {"what": "圖例：排對／平手／排錯的定義", "reproduced": "排對、平手、排錯；圖註「排對是正確那條的分數比較高」", "original_position": "表頭第三、四、五欄", "original": "#(s_c>s_i) ✓、#(s_c=s_i) (tie)、#(s_c<s_i) ✗", "in_claim": "正確軌跡分數高於錯誤軌跡／平手／低於", "verdict": "一致"},
+       {"what": "圖註：每種方法各評 100 次", "reproduced": "每種方法各評 100 次", "original_position": "表內各格分母", "original": "/100", "in_claim": "每種方法各評分一百次", "verdict": "一致"},
+       {"what": "補充中的模型名 Gemini 2.5 Flash", "reproduced": "verifier（Gemini 2.5 Flash）", "original_position": "", "original": "沒有", "in_claim": "verifier（Gemini 2.5 Flash）其實有看出 agent 修改了資料庫", "verdict": "僅來自主張"}
+     ],
+     "errors": ["關係與原圖不一致", "圖比原圖更容易誤解"]},
+    {"slide": 15,
+     "items": [
+       {"what": "Judge K=1 平手率", "reproduced": "Judge 問 1 次 26.7%", "original_position": "右圖 k=1 Judge 長條上方標籤", "original": "26.7%", "in_claim": "K=1 時 judge 準確率 71.8%、平手率 26.7%", "verdict": "一致"},
+       {"what": "Judge K=16 平手率", "reproduced": "Judge 問 16 次 5.5%", "original_position": "右圖 k=16 Judge 長條上方標籤", "original": "5.5%", "in_claim": "K=16 時 judge 準確率 74.7%、平手率 5.5%", "verdict": "一致"},
+       {"what": "Judge K=1 準確率", "reproduced": "準確率 71.8%", "original_position": "左圖 k=1 Judge 長條上方標籤", "original": "71.8%", "in_claim": "K=1 時 judge 準確率 71.8%", "verdict": "一致"},
+       {"what": "Judge K=16 準確率", "reproduced": "準確率 74.7%", "original_position": "左圖 k=16 Judge 長條上方標籤", "original": "74.7%", "in_claim": "K=16 時 judge 準確率 74.7%", "verdict": "一致"},
+       {"what": "圖註：verifier K=1、K=16 平手率", "reproduced": "verifier 問 1 次和 16 次，平手率都是 0%", "original_position": "右圖 k=1、k=16 Verifier 標籤", "original": "0.0%、0.0%", "in_claim": "verifier 準確率 74.7%、平手率 0.0%；…verifier 準確率 77.5%、平手率 0.0%", "verdict": "一致"},
+       {"what": "長條所代表的量（圖例）", "reproduced": "圖註「長條是平手率」；軸從 0 起", "original_position": "右圖 y 軸 Tie Rate (%)，從 0% 起", "original": "Tie Rate (%)", "in_claim": "平手率", "verdict": "一致"},
+       {"what": "K 的白話：問 N 次", "reproduced": "Judge 問 1 次／問 16 次", "original_position": "右圖 x 軸", "original": "Number of Repeated Evaluations (k)：1、4、16", "in_claim": "在不同重複次數下對照：K=1…K=16", "verdict": "一致"}
+     ],
+     "errors": []},
+    {"slide": 16,
+     "items": [
+       {"what": "Judge 列：74.4% → 74.7%", "reproduced": "問到 16 次已經飽和：74.4% → 74.7%（未標 74.4% 是哪個 K）", "original_position": "左圖 k=4 與 k=16 Judge 長條標籤", "original": "k=4：74.4%；k=16：74.7%", "in_claim": "judge 在 K=16 已經飽和（74.4% → 74.7%）", "verdict": "一致"},
+       {"what": "verifier 列：K=16 準確率", "reproduced": "問 16 次停在 77.5%，天花板比較高", "original_position": "左圖 k=16 Verifier 長條標籤", "original": "77.5%", "in_claim": "verifier 還停在 77.5%", "verdict": "一致"},
+       {"what": "verifier K=1 與 Judge K=16 準確率", "reproduced": "verifier 只問 1 次（74.7%）；Judge 問 16 次（74.7%）", "original_position": "左圖 k=1 Verifier 標籤、k=16 Judge 標籤", "original": "74.7%、74.7%", "in_claim": "verifier 只跑 1 次（74.7%）就等於 judge 跑 16 次（74.7%）", "verdict": "一致"},
+       {"what": "每個 K 下的差距", "reproduced": "兩者都只差 2.7% 到 2.9%", "original_position": "左圖各 k 的兩條標籤（差值未印出）", "original": "k=1：71.8/74.7；k=4：74.4/77.1；k=16：74.7/77.5", "in_claim": "差距都落在 2.7 到 2.9pp 之間", "verdict": "一致"}
+     ],
+     "errors": ["圖例或範圍被省略", "其他"]},
+    {"slide": 17,
+     "items": [
+       {"what": "Specification 準確率", "reproduced": "Specification 75.2%", "original_position": "右圖第一條長條（Specification）標籤", "original": "75.2%", "in_claim": "Specification 75.2%", "verdict": "一致"},
+       {"what": "Output 準確率", "reproduced": "Output 76.4%", "original_position": "右圖第三條長條（Output）標籤", "original": "76.4%", "in_claim": "Output 76.4%", "verdict": "一致"},
+       {"what": "Errors 準確率", "reproduced": "Errors 76.0%", "original_position": "右圖第二條長條（Error）標籤", "original": "Error 76.0%", "in_claim": "Errors 76.0%", "verdict": "一致"},
+       {"what": "三者合起來", "reproduced": "三個合起來：78.3%", "original_position": "右圖第四條長條（Ensemble (All)）標籤", "original": "78.3%", "in_claim": "三者 ensemble 是 78.3%", "verdict": "一致"},
+       {"what": "比最好的單一準則多 1.9%", "reproduced": "比最好的單一準則多 1.9%", "original_position": "右圖第三、四條標籤（差值未印出）", "original": "76.4% 與 78.3%", "in_claim": "1.9pp 的改善沒做顯著性檢定", "verdict": "一致"},
+       {"what": "三個子準則的白話說明", "reproduced": "有沒有滿足所有要求、輸出格式對不對、log 有沒有失敗訊號", "original_position": "", "original": "沒有", "in_claim": "Specification（有沒有滿足任務的所有要求）、Output（最終輸出格式是否符合預期）、Errors（log／工具輸出有無失敗訊號）", "verdict": "僅來自主張"},
+       {"what": "「各評一次」", "reproduced": "：各評一次", "original_position": "右圖（未標每個準則評幾次）", "original": "沒有", "in_claim": "", "verdict": "原圖沒有"},
+       {"what": "誤差棒", "reproduced": "沒有畫誤差棒，也無圖註說明簡化", "original_position": "右圖四條長條上的誤差棒", "original": "四條都有誤差棒，且明顯重疊", "in_claim": "圖裡誤差棒重疊得很明顯，1.9pp 的改善沒做顯著性檢定，也沒說明誤差棒代表什麼", "verdict": "不一致"}
+     ],
+     "errors": ["原圖沒有的內容", "圖比原圖更容易誤解", "其他"]}
+  ],
+  "notes": {
+    "9": "「只取最高分」字面是取分數最高的那一級，原表 Reward 欄是 arg max_g p_θ(v_g)，也就是取機率最高的那一級分數；兩者意思不同，會讓人誤解 Judge 的做法。",
+    "16": "Judge 列的 74.4% 在原圖是 k=4 的值，重製表沒有標 K，讀者容易以為 74.4% 是起點（問 1 次），但第 15 張寫的是問 1 次 71.8%。其他：差距在主張裡是 pp，圖上寫成「%」（百分點寫成百分比）。",
+    "17": "原圖四條長條都有明顯重疊的誤差棒；重製圖拿掉誤差棒，也沒有圖註說明是簡化重畫，看起來 +1.9 是乾淨的提升，比原圖更確定。「各評一次」主張與原圖都沒有。其他：主張寫 1.9pp，圖上寫 1.9%（百分點寫成百分比）；準則順序和原圖不同（Output 與 Errors 對調），不影響關係。"
+  }
+}

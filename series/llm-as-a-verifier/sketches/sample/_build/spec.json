@@ -1,0 +1,172 @@
+{
+ "series": "llm-as-a-verifier",
+ "concept": "verifier-expected-value-vs-argmax",
+ "also_concepts": [
+  "verifier-three-knobs-g-k-c"
+ ],
+ "lang": "zh-TW",
+ "status": "draft",
+ "_note": "濃淡帶風格的版型樣張，不是要發布的貼文。內容取自第 1 則的兩張卡，只為了讓人看各版型長什麼樣。",
+ "hook": {
+  "style": "讀者疑問",
+  "title": "LLM 打分數老是平手？\n[[不是它分不出來]]",
+  "subtitle": "模型心裡其實有偏好，\n是「只取最高分」把它丟掉了。",
+  "refs": [
+   "c1",
+   "c4"
+  ],
+  "candidate": "樣張暫用"
+ },
+ "slides": [
+  {
+   "layout": "cover",
+   "title": "LLM 打分數老是平手？\n[[不是它分不出來]]",
+   "body": "模型心裡其實有偏好，\n是「只取最高分」把它丟掉了。",
+   "refs": [
+    "c1",
+    "c4"
+   ]
+  },
+  {
+   "layout": "context",
+   "title": "先講三個會一直出現的詞",
+   "body": "這一則會一直提到三個詞，先用白話講一次，後面就不再解釋。",
+   "rows": [
+    [
+     "只取最高分",
+     "模型對每個分數都有一個機率，只留機率最高的那個"
+    ],
+    [
+     "期望值",
+     "每個分數乘上它的機率，再全部加起來"
+    ],
+    [
+     "平手",
+     "兩個候選拿到一樣的分數，排不出先後"
+    ]
+   ],
+   "key_w": 280,
+   "refs": [
+    "c4",
+    "c5",
+    "c6"
+   ]
+  },
+  {
+   "layout": "text",
+   "title": "資訊不是模型沒產生，\n是被丟掉的",
+   "body": "模型在輸出分數的那一格，其實對每個分數都給了機率；標準做法只取機率最高的那一個，其餘全丟。",
+   "refs": [
+    "c4"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "title": "同一個模型，\n只換一種讀分數的方式",
+   "body": "不取最高分，改算期望值，分數就從整數變成連續的實數。",
+   "kind": "pairs",
+   "heads": [
+    "只取最高分",
+    "改算期望值"
+   ],
+   "pairs": [
+    [
+     "分數只有\n1～5 五種",
+     "分數是連續的實數，例如 4.16"
+    ],
+    [
+     "兩條都拿 5\n就是平手",
+     "一條 4.16、一條約 4.3，分得出先後"
+    ]
+   ],
+   "refs": [
+    "c5",
+    "c9"
+   ]
+  },
+  {
+   "layout": "table",
+   "title": "重複評很多次，\n修得掉什麼、修不掉什麼",
+   "body": "同一個問題問 K 次再平均，只能壓低隨機的起伏；模型每次都往同一邊錯，平均再多次也一樣錯。",
+   "rows": [
+    [
+     "修得掉",
+     "每次評估的隨機起伏"
+    ],
+    [
+     "修不掉",
+     "每次都往同一個方向錯"
+    ]
+   ],
+   "note": "就像秤永遠多 2 公斤，量再多次也修不掉",
+   "refs": [
+    "verifier-three-knobs-g-k-c:c9"
+   ]
+  },
+  {
+   "layout": "chart_bars",
+   "title": "分數切得越細，\n準確率一路往上",
+   "body": "分數的可能值從 1 種拉到 20 種，配對驗證準確率從 73.1% 升到 77.5%。",
+   "unit": "%",
+   "bars": [
+    {
+     "name": "G = 1",
+     "value": 73.1
+    },
+    {
+     "name": "G = 4",
+     "value": 75.1
+    },
+    {
+     "name": "G = 16",
+     "value": 77.2
+    },
+    {
+     "name": "G = 20",
+     "value": 77.5,
+     "emphasize": true
+    }
+   ],
+   "note": "G：分數可以有幾種值",
+   "refs": [
+    "verifier-three-knobs-g-k-c:c5"
+   ]
+  },
+  {
+   "layout": "takeaway",
+   "question": "LLM 打分數為什麼老是平手？",
+   "title": "不是它分不出來，\n是只取最高分把差別丟了",
+   "refs": [
+    "c1",
+    "c4"
+   ]
+  },
+  {
+   "layout": "series_map",
+   "title": "這個系列的三則",
+   "current": "verifier-expected-value-vs-argmax",
+   "nav": "完整拆解在個人檔案的文章連結",
+   "refs": [
+    "結構"
+   ]
+  }
+ ],
+ "threads": {
+  "body": {
+   "text": "樣張用，不發布。",
+   "refs": [
+    "c1"
+   ]
+  },
+  "mode": "carousel"
+ },
+ "caption": {
+  "first": "樣張用，不發布。",
+  "first_refs": [
+   "c1"
+  ],
+  "hashtags": [
+   "LLMVerifier"
+  ]
+ }
+}

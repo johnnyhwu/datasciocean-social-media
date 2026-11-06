@@ -1,0 +1,9 @@
+concept: verifier-three-knobs-g-k-c
+formats:
+  ig_carousel:
+    status: published
+    merged_into: verifier-expected-value-vs-argmax
+  threads_thread:
+    status: published
+    merged_into: verifier-expected-value-vs-argmax
+posts: []

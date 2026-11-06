@@ -1,9 +1,23 @@
 concept: rag-planner-single-round-vs-agentic
 formats:
   ig_carousel:
-    status: ready
-    pack: out/cerebras-rag/rag-planner-single-round-vs-agentic
+    status: published
   threads_thread:
-    status: ready
-    pack: out/cerebras-rag/rag-planner-single-round-vs-agentic
-posts: []
+    status: published
+posts:
+- post_id: rag-planner-single-round-vs-agentic:ig_carousel
+  format: ig_carousel
+  series_id: cerebras-rag
+  url: https://www.instagram.com/p/DfUs241E1cU/
+  published_at: 2026-11-04T14:45:17+0000
+  hook_type: 情境痛點
+  mentions: []
+  backfilled: []
+- post_id: rag-planner-single-round-vs-agentic:threads_thread
+  format: threads_thread
+  series_id: cerebras-rag
+  url: https://www.threads.com/@datasciocean/post/DfUtQ9NE_6k
+  published_at: 2026-11-04T14:48:49+0000
+  hook_type: 情境痛點
+  mentions: []
+  backfilled: []

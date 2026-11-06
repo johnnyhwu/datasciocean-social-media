@@ -1,0 +1,36 @@
+{
+  "round": 3,
+  "note": "第 6 張上一輪已通過、本輪未改動；仍照實看圖重新判定。第 12 張本輪重審（V1 列標籤與補充文字有改）。",
+  "slides": [
+    {"slide": 6,
+     "unchanged_since_last_round": true,
+     "items": [
+       {"what": "步驟 ①", "reproduced": "① 準備好 N 條候選", "original_position": "最左欄標題 1 Candidates 與 τ1…τN 方塊", "original": "1 Candidates；τ1, τ2, τ3, …, τN", "in_claim": "N 條候選", "verdict": "一致"},
+       {"what": "步驟 ②", "reproduced": "② 隨機繞一圈：只比相鄰的 N 場，粗略排名", "original_position": "第二欄 2 Ring Pass，中央文字與環狀箭頭", "original": "2 Ring Pass；Random Hamiltonian Cycle；τ1→τ2→…→τN→τ1 環狀箭頭（相鄰相連）", "in_claim": "隨機環狀比較 N 場（ring pass），得到粗略排名並消除位置偏誤", "verdict": "一致"},
+       {"what": "步驟 ③", "reproduced": "③ 取前 k 名當 pivot", "original_position": "第三欄 3 Pivot Selection", "original": "Pivots 1..k（w(1)=0.9 … w(k)=0.5），虛線下為 Non-Pivots k+1..N", "in_claim": "取前 k 名為 pivot 集合", "verdict": "一致"},
+       {"what": "步驟 ④", "reproduced": "④ 其他候選各跟 pivot 比，pivot 彼此也互比", "original_position": "第四欄 4 Pivot Tournament，底部標籤", "original": "Non-pivots (N-k) → Pivots (k)；標籤 non-pivot vs pivot、pivot vs pivot", "in_claim": "非 pivot 對 pivot、加上 pivot 彼此互比", "verdict": "一致"},
+       {"what": "步驟 ⑤", "reproduced": "⑤ 平均每場贏最多的那條勝出", "original_position": "第五欄 5 Selection，表格 w_i / c_i 欄與 Winner", "original": "Score Aggregation and Normalization；w_i/c_i 最高 0.691 的 τ3 為 Winner", "in_claim": "累積每條的平均勝分，取最高者", "verdict": "一致"},
+       {"what": "步驟順序與箭頭", "reproduced": "①→②→③→④→⑤ 由上而下", "original_position": "五欄之間的灰色箭頭", "original": "1→2→3→4→5 由左而右", "in_claim": "PPT 分五個階段", "verdict": "一致"},
+       {"what": "補充：每條候選只跟一小群 pivot 比；重點在用便宜的一圈找值得當 pivot 的候選", "reproduced": "PPT（Probabilistic Pivot Tournament）讓每條候選只跟一小群 pivot 比。…重點在②：用便宜的一圈找出值得當 pivot 的候選。", "original_position": "", "original": "沒有", "in_claim": "PPT 的核心想法是每條候選只跟一小群 pivot（當作比較基準的候選）比…怎麼用一個便宜的前置步驟，找出值得當 pivot 的候選", "verdict": "僅來自主張"}
+     ],
+     "errors": []},
+    {"slide": 12,
+     "items": [
+       {"what": "PPT k=1 準確率", "reproduced": "PPT k＝1｜65.83%", "original_position": "Table 9 第三區塊第一列（PPT k=1），Accuracy 欄", "original": "65.83", "in_claim": "PPT k=1 用 2,570 個查詢配對、準確率 65.83%", "verdict": "一致"},
+       {"what": "PPT k=5 準確率與『往上』", "reproduced": "PPT k＝5｜66.27%，往上", "original_position": "第三區塊第三列（PPT k=5 (ours)），Accuracy 欄", "original": "66.27（高於 k=1 的 65.83）", "in_claim": "k=5 用 6,609 對、66.27%", "verdict": "一致"},
+       {"what": "PPT k=9 準確率與『再往上』", "reproduced": "PPT k＝9｜67.13%，再往上", "original_position": "第三區塊第五列（PPT k=9 (ours)），Accuracy 欄", "original": "67.13（高於 k=5 的 66.27）", "in_claim": "k=9 用 9,630 對、67.13%", "verdict": "一致"},
+       {"what": "完整循環賽準確率", "reproduced": "完整循環賽｜67.42%，每對各比一次", "original_position": "最後一列 Full Round-Robin，Accuracy 欄", "original": "67.42", "in_claim": "完整循環賽用 13,111 對、67.42%", "verdict": "一致"},
+       {"what": "完整循環賽的說明『每對各比一次』", "reproduced": "每對各比一次", "original_position": "", "original": "沒有（只有名稱 Full Round-Robin）", "in_claim": "", "verdict": "僅來自主張"},
+       {"what": "省略 PPT k=3、k=7 兩列（主張沒列）", "reproduced": "表上只有 k=1、5、9", "original_position": "第三區塊第二、四列", "original": "k=3 66.17、k=7 66.67；仍為單調上升，省略不改變『一路往上』的關係", "in_claim": "", "verdict": "一致"},
+       {"what": "V1 數字", "reproduced": "65.85% → 65.53%，掉了", "original_position": "第二區塊第三、四列 V1 (5N budget) 與 V1 (7N budget)，Accuracy 欄", "original": "65.85 → 65.53", "in_claim": "基準線 V1 在 5N 預算之後不升反降（65.85% → 65.53%）", "verdict": "一致"},
+       {"what": "V1 列標籤『加 4 成預算』", "reproduced": "V1 加 4 成預算", "original_position": "第二區塊第三、四列 Method 欄與 Pairs queried 欄", "original": "V1 (5N budget) 7,000 對 → V1 (7N budget) 9,800 對（7N/5N＝1.4，即 4 成是由原表推算）", "in_claim": "", "verdict": "主張沒寫"},
+       {"what": "V1 列省略起點『5N 預算之後』", "reproduced": "標籤只寫增量『加 4 成預算』，沒有寫是從 5N 預算往上加", "original_position": "第二區塊四列 V1 (1N/3N/5N/7N budget)", "original": "64.64 → 65.62 → 65.85 → 65.53：V1 在 5N 之前是上升的，只有 5N→7N 這一步下降", "in_claim": "基準線 V1 在 5N 預算之後不升反降", "verdict": "不一致"},
+       {"what": "補充：每題 20 條候選，比主實驗多", "reproduced": "這組實驗每題 20 條候選，比主實驗多", "original_position": "", "original": "沒有", "in_claim": "N=20 候選…候選數跟主結果表不同（主實驗的 N 只有 3 到 5）", "verdict": "僅來自主張"},
+       {"what": "補充：準確率越高代表挑得越準（名詞說明）", "reproduced": "準確率越高，代表挑得越準", "original_position": "", "original": "沒有（表頭只有 Accuracy (%)）", "in_claim": "", "verdict": "僅來自主張"},
+       {"what": "補充：V1 是論文前一代的排名方法（論文沒說明怎麼運作）", "reproduced": "V1 是論文前一代的排名方法（論文沒說明怎麼運作）", "original_position": "", "original": "沒有（表上只有 V1 [5]）", "in_claim": "表裡的基準線 V1 是論文拿來對照的前一代排名方法，論文全文沒有解釋 V1 怎麼運作", "verdict": "僅來自主張"},
+       {"what": "圖註：共 89 題、Terminus-2", "reproduced": "簡化重畫；共 89 題，agent 由 Terminus-2 程式驅動。", "original_position": "", "original": "沒有", "in_claim": "N=20 候選、89 題、Terminus-2 harness（驅動 agent 的那層腳手架）", "verdict": "僅來自主張"},
+       {"what": "主標的關係：PPT 一路往上沒有掉頭", "reproduced": "pivot 越多越準，一路往上沒有掉頭", "original_position": "第三區塊 Accuracy 欄與 Full Round-Robin", "original": "65.83 → 66.17 → 66.27 → 66.67 → 67.13（單調上升）", "in_claim": "PPT 則是單調上升", "verdict": "一致"}
+     ],
+     "errors": ["圖上超出主張", "圖例或範圍被省略"]}
+  ]
+}
