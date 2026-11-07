@@ -1,0 +1,23 @@
+concept: ppt-pivot-tournament
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: ppt-pivot-tournament:ig_carousel
+  format: ig_carousel
+  series_id: llm-as-a-verifier
+  url: https://www.instagram.com/p/DfbIBi-k-4J/
+  published_at: 2026-11-07T02:39:01+0000
+  hook_type: 並列重點
+  mentions: []
+  backfilled: []
+- post_id: ppt-pivot-tournament:threads_thread
+  format: threads_thread
+  series_id: llm-as-a-verifier
+  url: https://www.threads.com/@datasciocean/post/DfbIeHfE8g2
+  published_at: 2026-11-07T02:41:59+0000
+  hook_type: 並列重點
+  mentions: []
+  backfilled: []

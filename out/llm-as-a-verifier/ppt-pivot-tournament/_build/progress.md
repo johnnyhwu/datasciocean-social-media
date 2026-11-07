@@ -1,6 +1,7 @@
 # 進度：ppt-pivot-tournament（llm-as-a-verifier 第 2 則）
 
-## 現況（2026-11-06）
+## 現況（2026-11-07）
+- **已發布**：IG https://www.instagram.com/p/DfbIBi-k-4J/ 、Threads https://www.threads.com/@datasciocean/post/DfbIeHfE8g2 （2026-11-07）。第 1 則 Threads 已回補（reply_id 17881844124631719）。
 - **審查完成**：忠實者 r3 通過、讀者 r3 通過、重製圖 r2 通過（r3 擋「V1 加 4 成預算」→ 已還原成 r2 審過的「V1 預算 5→7 倍」，屬刪除新增內容、免重審）、編輯 r1 建議已處理主要項。
 - **待人**：接受審查結果 → 跑 spec_diff --mark。封面刻度帶：人 2026-11-06 選 A 不改。threads.last 已補第 3 則標題。
 - 讀者 r3 不擋建議（未採用）：p13 沒說幾分才進 pivot、p14 N×k 與「預算實驗」首次出現。

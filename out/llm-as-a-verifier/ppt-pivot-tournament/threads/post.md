@@ -41,6 +41,7 @@ LLM-as-a-Verifier 的 AI 評審一次只能比兩條軌跡（agent 做同一題�
 ```text
 PPT：先繞一圈粗排，再只跟前幾名細比；但候選只有幾條時，省不了多少。
 文章：datasciocean.com/paper-intro/llm-as-a-verifier
-同系列：叫 AI 打 1 到 5 分，為什麼一堆平手？（尚未發布）
+同系列：叫 AI 打 1 到 5 分，為什麼一堆平手？
+https://www.threads.com/@datasciocean/post/DfYQGXSEyKm
 同系列：論文說 LLM-as-a-Verifier 表現最好，功勞真的是它的嗎？（尚未發布）
 ```

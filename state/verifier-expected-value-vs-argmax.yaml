@@ -20,4 +20,5 @@ posts:
   published_at: 2026-11-05T23:50:57+0000
   hook_type: 讀者疑問
   mentions: []
-  backfilled: []
+  backfilled:
+  - ppt-pivot-tournament

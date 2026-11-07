@@ -133,6 +133,16 @@ o = S.load(A)
 check("state：發布後併入的卡也是 published、標 merged_into，且不另記一筆貼文",
       o["formats"]["ig_carousel"] == {"status": "published", "merged_into": "jev-overview"} and o["posts"] == [], str(o))
 check("state：主卡有發布紀錄", len(S.load("jev-overview")["posts"]) == 1)
+# 已隨第 1 則發布的併入卡，被後面另一則貼文也引用時，不可被改回 ready 或改併入對象（2026-11-07 發現）
+_orig_also = S.also_of
+S.also_of = lambda c: [A] if c == "schema-valid-not-correct" else _orig_also(c)
+with contextlib.redirect_stdout(io.StringIO()):
+    S.set_format("schema-valid-not-correct", "ig_carousel", status="ready", pack="out/y")
+    S.record("schema-valid-not-correct", "ig_carousel", "https://ig/2", "2026-10-06T20:00", "jev-teardown", "情境痛點", [])
+S.also_of = _orig_also
+o = S.load(A)["formats"]["ig_carousel"]
+check("state：已發布的併入卡被下一則也引用時，保持 published、仍併入原本那一則",
+      o == {"status": "published", "merged_into": "jev-overview"}, str(o))
 check("state：沒有 also 的貼文不受影響", S.also_of("schema-valid-not-correct") == [])
 
 # ---------------------------------------------------------------- verify_faithful：多張卡

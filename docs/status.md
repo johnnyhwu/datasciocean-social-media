@@ -69,7 +69,15 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 
 ## LLM-as-a-Verifier 系列（2026-11-03 起，製作中；濃淡帶風格 `band`）
 
-4 卡合成 3 則（人選方案 B：期望值＋G/K/C 雙卡 → PPT → 實驗怎麼讀）；系列名「拆解 LLM-as-a-Verifier：AI 怎麼替 AI 打分數」、hashtag `#LLMVerifier`（人 2026-11-03 定）。第 1 則 spec 19 張、審查第 2 輪後已修，第 3 輪待人決定「%／百分點」後再派（進度：`out/llm-as-a-verifier/verifier-expected-value-vs-argmax/_build/progress.md`）。第 2、3 則還沒做，`series.md` 未鎖定。
+4 卡合成 3 則（人選方案 B：期望值＋G/K/C 雙卡 → PPT → 實驗怎麼讀）；系列名「拆解 LLM-as-a-Verifier：AI 怎麼替 AI 打分數」、hashtag `#LLMVerifier`（人 2026-11-03 定）。三則 spec 審查完成，`series.md` 已鎖定（2026-11-06）。
+
+| # | 觀念 | IG | Threads |
+|---|---|---|---|
+| 1 | `verifier-expected-value-vs-argmax`（＋`verifier-three-knobs-g-k-c`） | https://www.instagram.com/p/DfYPlVKkwB2/ | https://www.threads.com/@datasciocean/post/DfYQGXSEyKm |
+| 2 | `ppt-pivot-tournament` | https://www.instagram.com/p/DfbIBi-k-4J/ | https://www.threads.com/@datasciocean/post/DfbIeHfE8g2 |
+| 3 | `verifier-results-how-to-read` | 未發布 | 未發布 |
+
+2026-11-06 發第 1 則；2026-11-07 發第 2 則（`series_links.py` 已補第 1 則連結）。第 1 則 Threads 已回補（reply_id 17881844124631719）。
 
 ## 跨系列的人的決定與待決事項
 

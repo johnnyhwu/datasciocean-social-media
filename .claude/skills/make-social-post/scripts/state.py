@@ -97,6 +97,12 @@ def provisional_hook(pack: str) -> str | None:
     return cand if re.search(r"暫定|待人", cand) else None
 
 
+def _published_elsewhere(o: dict, fmt: str, concept: str) -> bool:
+    """併入的卡已經隨別則貼文（或自己）發布過：不覆蓋，保留它原本併入的那一則。"""
+    cur = o["formats"].get(fmt) or {}
+    return cur.get("status") == "published" and cur.get("merged_into") != concept
+
+
 def set_format(concept: str, fmt: str, **fields) -> None:
     assert concept in concept_ids(), f"觀念不存在：{concept}"
     assert fields["status"] in STATUSES
@@ -107,6 +113,8 @@ def set_format(concept: str, fmt: str, **fields) -> None:
     for other in also_of(concept):      # 併入的卡：狀態同步，標明併入哪一則（不計入存量）
         assert other in concept_ids(), f"併入的觀念不存在：{other}"
         o = load(other)
+        if _published_elsewhere(o, fmt, concept):
+            continue
         o["formats"][fmt] = {**fields, "merged_into": concept}
         save(o)
 
@@ -123,6 +131,8 @@ def record(concept: str, fmt: str, url: str, published_at: str, series_id: str |
     save(d)
     for other in also_of(concept):      # 併入的卡：標為已發布，但不另記一筆貼文（網址只記在主卡，回補清單才不會重複）
         o = load(other)
+        if _published_elsewhere(o, fmt, concept):
+            continue
         o["formats"][fmt] = {"status": "published", "merged_into": concept}
         save(o)
     backfill()

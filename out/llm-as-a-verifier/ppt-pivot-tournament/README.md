@@ -5,8 +5,8 @@
 | 系列 | 拆解 LLM-as-a-Verifier：AI 怎麼替 AI 打分數 |
 | 觀念 | `ppt-pivot-tournament`（卡：`concept-wiki/wiki/concepts/ppt-pivot-tournament.md`）；併入 `verifier-three-knobs-g-k-c` |
 | hook 樣態 | 並列重點 |
-| IG 輪播 | 未做（16 張） |
-| Threads 串文 | 未做（2 則） |
+| IG 輪播 | 已發布（16 張） |
+| Threads 串文 | 已發布（2 則） |
 
 ## 要看／要發的檔案
 
@@ -23,11 +23,10 @@
 - 程式 B：16/16 張通過（模板版本 `54ba3a776259`）
 - 程式 A、批次檢查、忠實者與讀者審查的結果不存在發布包裡（審查產出放暫存，不進 repo）；最後確認時由 Claude 在報告中說明
 
-## 發布前
+## 已發布
 
-- [ ] 人最後確認圖、文字、caption
-- [ ] IG（API）：`ig_publish.py prepare` → push `ig/jpg/` → `preflight` → `publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）
-- [ ] Threads（API）：`threads_publish.py publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）
+- IG：https://www.instagram.com/p/DfbIBi-k-4J/
+- Threads：https://www.threads.com/@datasciocean/post/DfbIeHfE8g2
 
 ## 發布後
 
