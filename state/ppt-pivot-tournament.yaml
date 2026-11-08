@@ -20,4 +20,5 @@ posts:
   published_at: 2026-11-07T02:41:59+0000
   hook_type: 並列重點
   mentions: []
-  backfilled: []
+  backfilled:
+  - verifier-results-how-to-read

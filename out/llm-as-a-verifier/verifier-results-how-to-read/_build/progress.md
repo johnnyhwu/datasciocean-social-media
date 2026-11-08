@@ -1,7 +1,7 @@
 # 進度：verifier-results-how-to-read（llm-as-a-verifier 第 3 則）
 
 ## 已發布（2026-11-08）
-- IG https://www.instagram.com/p/DfdwFqLE46O/ 、Threads https://www.threads.com/@datasciocean/post/DfdwdkTk3Qb 。第 1、2 則 Threads 回補待人說「發」。
+- IG https://www.instagram.com/p/DfdwFqLE46O/ 、Threads https://www.threads.com/@datasciocean/post/DfdwdkTk3Qb 。第 1、2 則 Threads 已回補（reply_id 18121555519955559、18004499750828828）。
 
 ## 現況（2026-11-06）
 - 審查完成：忠實者 r3 通過、讀者 r2 通過、重製圖 r1 通過、編輯 r1 建議已處理主要項；spec_diff --mark 已記。

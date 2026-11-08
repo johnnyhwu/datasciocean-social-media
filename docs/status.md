@@ -77,7 +77,7 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 | 2 | `ppt-pivot-tournament` | https://www.instagram.com/p/DfbIBi-k-4J/ | https://www.threads.com/@datasciocean/post/DfbIeHfE8g2 |
 | 3 | `verifier-results-how-to-read` | https://www.instagram.com/p/DfdwFqLE46O/ | https://www.threads.com/@datasciocean/post/DfdwdkTk3Qb |
 
-2026-11-06 發第 1 則；2026-11-07 發第 2 則（`series_links.py` 已補第 1 則連結）。第 1 則 Threads 已回補（reply_id 17881844124631719）。2026-11-08 發第 3 則（`series_links.py` 已補第 1、2 則連結）；第 1、2 則 Threads 回補待人說「發」。**系列 3 則全發完。**
+2026-11-06 發第 1 則；2026-11-07 發第 2 則（`series_links.py` 已補第 1 則連結）。第 1 則 Threads 已回補（reply_id 17881844124631719）。2026-11-08 發第 3 則（`series_links.py` 已補第 1、2 則連結）；第 1、2 則 Threads 已回補（reply_id 18121555519955559、18004499750828828）。**系列 3 則全發完。**
 
 ## 跨系列的人的決定與待決事項
 
