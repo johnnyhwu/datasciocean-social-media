@@ -67,7 +67,7 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 
 2026-11-01 發第 1 則；2026-11-03 發第 2 則（`series_links.py` 已補第 1 則連結；第 1 則 Threads 已回補，reply_id 18137195164732568）。2026-11-04 發第 3 則（`series_links.py` 已補第 1、2 則連結）；第 1、2 則 Threads 已回補（reply_id 17974440342156192、18016075967980030）。**系列 3 則全發完。**人的回饋整理成 `ig-carousel.md` §0b（敘事順序、主角先對照後、順序圖、敘事口吻）。
 
-## LLM-as-a-Verifier 系列（2026-11-03 起，製作中；濃淡帶風格 `band`）
+## LLM-as-a-Verifier 系列（2026-11-03 起；濃淡帶風格 `band`）
 
 4 卡合成 3 則（人選方案 B：期望值＋G/K/C 雙卡 → PPT → 實驗怎麼讀）；系列名「拆解 LLM-as-a-Verifier：AI 怎麼替 AI 打分數」、hashtag `#LLMVerifier`（人 2026-11-03 定）。三則 spec 審查完成，`series.md` 已鎖定（2026-11-06）。
 
@@ -75,9 +75,9 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 |---|---|---|---|
 | 1 | `verifier-expected-value-vs-argmax`（＋`verifier-three-knobs-g-k-c`） | https://www.instagram.com/p/DfYPlVKkwB2/ | https://www.threads.com/@datasciocean/post/DfYQGXSEyKm |
 | 2 | `ppt-pivot-tournament` | https://www.instagram.com/p/DfbIBi-k-4J/ | https://www.threads.com/@datasciocean/post/DfbIeHfE8g2 |
-| 3 | `verifier-results-how-to-read` | 未發布 | 未發布 |
+| 3 | `verifier-results-how-to-read` | https://www.instagram.com/p/DfdwFqLE46O/ | https://www.threads.com/@datasciocean/post/DfdwdkTk3Qb |
 
-2026-11-06 發第 1 則；2026-11-07 發第 2 則（`series_links.py` 已補第 1 則連結）。第 1 則 Threads 已回補（reply_id 17881844124631719）。
+2026-11-06 發第 1 則；2026-11-07 發第 2 則（`series_links.py` 已補第 1 則連結）。第 1 則 Threads 已回補（reply_id 17881844124631719）。2026-11-08 發第 3 則（`series_links.py` 已補第 1、2 則連結）；第 1、2 則 Threads 回補待人說「發」。**系列 3 則全發完。**
 
 ## 跨系列的人的決定與待決事項
 

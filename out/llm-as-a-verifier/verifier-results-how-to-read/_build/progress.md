@@ -1,5 +1,8 @@
 # 進度：verifier-results-how-to-read（llm-as-a-verifier 第 3 則）
 
+## 已發布（2026-11-08）
+- IG https://www.instagram.com/p/DfdwFqLE46O/ 、Threads https://www.threads.com/@datasciocean/post/DfdwdkTk3Qb 。第 1、2 則 Threads 回補待人說「發」。
+
 ## 現況（2026-11-06）
 - 審查完成：忠實者 r3 通過、讀者 r2 通過、重製圖 r1 通過、編輯 r1 建議已處理主要項；spec_diff --mark 已記。
 - 封面副標依讀者／編輯建議改為「同一批答案只換它來挑：成功率多 2.1～3.4%；同一個模型只換它的打分法：準確率多 16.6%」（已告知人）。

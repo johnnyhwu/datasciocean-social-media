@@ -150,8 +150,10 @@ LLM-as-a-Verifier 讓 LLM 替另一個 LLM 的輸出打分數，再從同一題�
 ### 最後一則（置頂）
 看論文成績，只看「只換掉它、其他條件不變」的比較：挑答案成功率多 2.1～3.4%，機器人準確率多 16.6%。
 文章：datasciocean.com/paper-intro/llm-as-a-verifier
-同系列：叫 AI 打 1 到 5 分，為什麼一堆平手？（尚未發布）
-同系列：從 20 個答案挑最好的，AI 評審不必兩兩都比（尚未發布）
+同系列：叫 AI 打 1 到 5 分，為什麼一堆平手？
+https://www.threads.com/@datasciocean/post/DfYQGXSEyKm
+同系列：從 20 個答案挑最好的，AI 評審不必兩兩都比
+https://www.threads.com/@datasciocean/post/DfbIeHfE8g2
 
 ## IG caption
 
