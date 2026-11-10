@@ -9,14 +9,14 @@
 | `bound_to_source`、`evidence_from_single_source` | 預設組成系列（同一篇文章的觀念） |
 | `standalone_classic` | 預設獨立 post |
 | 系列只剩一則 | 視為獨立 post |
-| 兩張卡互相依賴、分開發都不好懂 | **由人決定**合成一則（雙卡貼文，spec 與 state 的做法見 `spec-json.md`「雙卡貼文」）。例：`judge-readable-vs-derive` 後半要用到 AUROC，AUROC 在 `confidence-three-metrics` 才定義 |
+| 兩張卡互相依賴、分開發都不好懂 | **合成一則**（Claude 決定）（雙卡貼文，spec 與 state 的做法見 `spec-json.md`「雙卡貼文」）。例：`judge-readable-vs-derive` 後半要用到 AUROC，AUROC 在 `confidence-three-metrics` 才定義 |
 
-### 規劃系列時一定要問人：哪些卡要合併？（B1）
+### 規劃系列時決定：哪些卡要合併？（B1；2026-11-10 起由 Claude 決定）
 
 做系列規劃（決定成員與發文順序）時，**一定要走這一步，不論腳本有沒有信號**：
 1. 跑 `uv run python .claude/skills/make-social-post/scripts/series_deps.py <系列 id>`，列出候選（重複的主張、用到對方主題術語…）。**它不是偵測器**：2026-10-08 實測，它挑不出我們後來合併的那一對，真正的理由靠讀者角度判斷。
 2. 用讀者的角度逐則看：這則的圖上會出現哪些術語？各在哪一則定義？只要有兩個以上的關鍵術語要靠別則才懂，或兩則的後半段在講同一件事，就是合併候選。
-3. 把候選與你的建議用白話交給人決定（合併、調整發文順序、維持分開）；合併做法見 `spec-json.md`「雙卡貼文」。
+3. 自己決定（合併、調整發文順序、維持分開），理由寫進 `series.md` 的規劃備忘，交成品時說明；合併做法見 `spec-json.md`「雙卡貼文」。
 
 ## 2. 系列檔 `series/<series-id>/series.md`（同資料夾還有 `philosophy.md`、`templates/`）
 
@@ -53,9 +53,9 @@ status: planning                 # planning | publishing | done
 
 **存量不夠時，寧可跳過一天，也不降低審查標準。** 「每天一則」是內部目標，不對外公開承諾。
 
-## 5. 人最後確認
+## 5. 交成品、人 review
 
-交給人看：每則貼文的 `README.md`（含縮圖）、`ig/post.md`、`threads/post.md`；報告裡說明：被審查者改過的 hook、被刪掉的投影片、HINT 與未解決的 minor、任何和先前慣例不同的地方（例如導流行寫法）。人確認後才進入發布包。
+交給人看：每則貼文的 `README.md`（含縮圖）、`ig/post.md`、`threads/post.md`；報告裡說明：被審查者改過的 hook、被刪掉的投影片、HINT 與未解決的 minor、任何和先前慣例不同的地方（例如導流行寫法）。人 review 說沒問題，就視為接受 hook、系列名與標題（`CLAUDE.md` 規則 12）。
 
 ## 6. 輸出
 
@@ -67,7 +67,7 @@ status: planning                 # planning | publishing | done
 
 `out/README.md` 是全部貼文的總入口（待發布清單與各系列狀態），`out/<series>/README.md` 是系列的發文順序。
 
-確認後：`state.py ready <concept> <format> <pack-dir>`（每個格式各一次），接著依 `publish-flow.md` 發布。**標 ready 的同一則回報裡，順便問人要不要整串授權**（附上那句：「prepare、push `ig/jpg/`、發佈到兩個平台」），人說了才能連續執行。
+確認後：`state.py ready <concept> <format> <pack-dir> --hook-accepted`（每個格式各一次），接著依 `publish-flow.md` 發布。**標 ready 的同一則回報裡，順便問人要不要整串授權**（附上那句：「prepare、push `ig/jpg/`、發佈到兩個平台」），人說了才能連續執行。
 
 ## 7. 發布後：寫回狀態
 

@@ -1,0 +1,111 @@
+{
+  "post": "universalrag-router-design-and-rollout",
+  "blocks": [
+    {"block": "hook（第 1 張主標與副標）", "atoms": [
+      {"text": "主標是問題：AI 怎麼決定這題去哪裡查", "verdict": "完全支持", "card_quote": "Router 的任務是分析 Query 的意圖，並從 7 個 Pathways 中選出最佳組合。", "note": "問句對應 Router 的任務。"},
+      {"text": "UniversalRAG 從 7 個選項挑組合", "verdict": "完全支持", "card_quote": "Router 的任務是分析 Query 的意圖，並從 7 個 Pathways 中選出最佳組合。", "note": "7 個與挑組合都在卡上。"},
+      {"text": "一題可以同時查好幾處", "verdict": "完全支持", "card_quote": "Router 並非做單選題，而是多選題。", "note": "多選題加並行檢索（c10「同時去文字段落庫和影像庫中搜尋」）支持。"},
+      {"text": "企業可以先用免訓練版起步", "verdict": "完全支持", "card_quote": "初期 (冷啟動)：採用「免訓練路由器 (Prompt-based) 」並結合「混合檢索 (Hybrid Search) 」", "note": "部落格判斷用作者口吻寫，可以；c1#1 限定條件出現在第 11 張與 Threads 正文。"}
+    ], "errors": []},
+    {"block": "第 2 張", "atoms": [
+      {"text": "只問 10 秒的動作卻抓回兩小時的影片（抓太粗的例子）", "verdict": "完全支持", "card_quote": "太粗略 (Too Coarse-grained)：例如為了回答一個 10 秒鐘的動作問題，卻抓取了整段兩小時的影片。", "note": "主標沒寫主詞，以例子呈現，和卡一致。"},
+      {"text": "論文指出抓多大塊的資料（粒度）很關鍵", "verdict": "完全支持", "card_quote": "數據的「大小」或「長度」——也就是檢索粒度 (Granularity) ，對生成品質有著決定性的影響", "note": "原作者解讀用「論文指出」當主詞，符合錨點寫法；「很關鍵」比「決定性」弱。"},
+      {"text": "現有 AI 搜尋常固定一種大小", "verdict": "完全支持", "card_quote": "現有的 RAG 系統通常固定在某一種檢索單位 (如 Paragraph-level) ，缺乏靈活調整的能力。", "note": "「常」對應「通常」。"},
+      {"text": "Router 連大小一起選", "verdict": "完全支持", "card_quote": "它會從以下這組 Modality-Granularity Pair 中挑選：", "note": "選項就是模態加粒度的組合。"},
+      {"text": "抓太粗：雜訊多、干擾回答，又浪費運算資源", "verdict": "完全支持", "card_quote": "這會引入大量無關雜訊，干擾模型生成，且極度浪費計算資源。", "note": "沒有比卡強。"},
+      {"text": "抓太細：只抓一句話，往往漏掉回答複雜問題需要的前後文", "verdict": "完全支持", "card_quote": "太細碎 (Too Fine-grained)：例如檢索一個極短的句子。這雖然精準，但往往會遺漏回答複雜邏輯問題所需的上下文環境 (Context) 。", "note": "保留了「往往」。"}
+    ], "errors": []},
+    {"block": "系列檔 summary（第 2 則）", "atoms": [
+      {"text": "Router 一次能選好幾個櫃子", "verdict": "完全支持", "card_quote": "Router 並非做單選題，而是多選題。", "note": "多選。"},
+      {"text": "「不用查」也算一個選項", "verdict": "完全支持", "card_quote": "None: 直接回答，不需檢索。", "note": "None 是 7 個選項之一。"},
+      {"text": "企業可先用免訓練版起步，之後再訓練自己的", "verdict": "完全支持", "card_quote": "後期 (優化期)：訓練專屬於企業環境的輕量化路由器", "note": "部落格判斷；配合初期免訓練路由器的原句。"}
+    ], "errors": []},
+    {"block": "第 4 張", "atoms": [
+      {"text": "UniversalRAG 是 KAIST 團隊提出的 AI 搜尋方法（RAG）", "verdict": "完全支持", "card_quote": "我們得先認識這篇由 KAIST 團隊所提出的作品: UniversalRAG: Retrieval-Augmented Generation over Corpora of Diverse Modalities and Granularities", "note": "「AI 搜尋方法」是已授權的白話。"},
+      {"text": "它把資料按種類和大小分櫃放（索引）", "verdict": "完全支持", "card_quote": "UniversalRAG 建議將資料庫根據模態與粒度進行「解耦」", "note": "櫃子＝索引已授權。"},
+      {"text": "查之前先由 Router 判斷該去哪個櫃子", "verdict": "完全支持", "card_quote": "我們不需要一個萬能的向量空間來容納所有資料，而是需要一個萬能的指揮中心 (Router) 來決定去哪裡找資料。", "note": "一致。"},
+      {"text": "流程是先選路、再到選中的櫃子找、最後用找回的資料回答", "verdict": "完全支持", "card_quote": "整個流程可以分為三個階段：Routing、Targeted Retrieval 與 Generation。", "note": "三階段白話。"}
+    ], "errors": []},
+    {"block": "第 5 張", "atoms": [
+      {"text": "Router 有 7 個選項，可以一次勾好幾個", "verdict": "完全支持", "card_quote": "Router 並非做單選題，而是多選題。", "note": "加上「從 7 個 Pathways 中選出最佳組合」。"},
+      {"text": "Router 的判斷方式：訓練一個小模型，或直接問 LLM", "verdict": "完全支持", "card_quote": "實作細節: 訓練型 (Training-based) 與免訓練 (Training-free) Router 的具體作法。", "note": "小模型對應 c5 的輕量化模型；直接問 LLM 對應 c8。"},
+      {"text": "企業導入：先用免訓練版，再訓練自己的 Router", "verdict": "完全支持", "card_quote": "初期 (冷啟動)：採用「免訓練路由器 (Prompt-based) 」並結合「混合檢索 (Hybrid Search) 」", "note": "部落格判斷；限定條件在第 11 張。"}
+    ], "errors": []},
+    {"block": "第 6 張", "atoms": [
+      {"text": "Router 看問題在問什麼，從 7 個選項挑組合", "verdict": "完全支持", "card_quote": "Router 的任務是分析 Query 的意圖，並從 7 個 Pathways 中選出最佳組合。", "note": "一致。"},
+      {"text": "選項依資料種類和大小分成", "verdict": "完全支持", "card_quote": "它會從以下這組 Modality-Granularity Pair 中挑選：", "note": "依模態與粒度白話已授權。"},
+      {"text": "可以複選", "verdict": "完全支持", "card_quote": "Router 並非做單選題，而是多選題。", "note": "一致。"},
+      {"text": "不用查：直接回答", "verdict": "完全支持", "card_quote": "None: 直接回答，不需檢索。", "note": "一致。"},
+      {"text": "段落：文字，一小段", "verdict": "完全支持", "card_quote": "Paragraph: 文字 - 細粒度。", "note": "一致。"},
+      {"text": "文件：文字，整份（要串起多段內容時）", "verdict": "完全支持", "card_quote": "文字模態：分為 Paragraph (段落級) 與 Document (文件級，適合多跳推理) 。", "note": "「要串起多段內容時」是多跳推理的白話，沒有加新範圍。"},
+      {"text": "表格：表格", "verdict": "完全支持", "card_quote": "Table: 結構化表格。", "note": "一致。"},
+      {"text": "圖片：圖片", "verdict": "完全支持", "card_quote": "Image: 靜態影像。", "note": "一致。"},
+      {"text": "短片段：影片，一小段（定位特定動作）", "verdict": "完全支持", "card_quote": "影片模態：分為 Clip (短片段，定位特定動作) 與 Video (整部影片，理解長時序劇情) 。", "note": "一致。"},
+      {"text": "整部影片：影片，整部（理解長時間的劇情）", "verdict": "完全支持", "card_quote": "影片模態：分為 Clip (短片段，定位特定動作) 與 Video (整部影片，理解長時序劇情) 。", "note": "一致。"}
+    ], "errors": []},
+    {"block": "第 7 張", "atoms": [
+      {"text": "選定段落＋圖片後，同時到這兩個櫃子各找最相關的幾筆", "verdict": "完全支持", "card_quote": "並行檢索：同時去文字段落庫和影像庫中搜尋最相關的 Top-K 證據。", "note": "例子和卡上的例子相同。"},
+      {"text": "再一起交給能同時看文字和圖片的大模型（LVLM）", "verdict": "完全支持", "card_quote": "證據整合：將找回來的文字碎片與影像特徵同時餵給多模態大模型 (LVLM) 。", "note": "一致。"},
+      {"text": "綜合判斷後回答", "verdict": "完全支持", "card_quote": "生成回答：模型根據多模態證據進行綜合推理，給出最終答案。", "note": "一致。"},
+      {"text": "主標：勾了兩個，就同時去兩個櫃子找", "verdict": "完全支持", "card_quote": "一旦 Router 決定了路徑 (例如：Paragraph+Image) ，系統會：", "note": "以例子為主標，和卡上的流程一致。"}
+    ], "errors": []},
+    {"block": "第 8 張", "atoms": [
+      {"text": "訓練型 Router 微調現成的輕量模型，例如 Qwen3-VL-2B", "verdict": "完全支持", "card_quote": "當我們有固定的硬體資源且追求極速時，會採用微調 (Fine-tuning) 輕量化模型 (如 Qwen3-VL-2B) 的做法。", "note": "一致。"},
+      {"text": "替每個選項各打一個 0 到 1 的分數", "verdict": "完全支持", "card_quote": "我們對模型輸出的每個類別 \\( i \\) 的邏輯值 \\( z_i \\) 進行 Sigmoid 轉換得到機率 \\( \\hat{y}_i \\)", "note": "機率本來就在 0 到 1 之間，「分數」是白話。"},
+      {"text": "超過 0.8 就去查那一類資料", "verdict": "完全支持", "card_quote": "在推論時，只要機率超過閾值 \\(\\tau = 0.8\\)，該路徑就會被啟動。", "note": "門檻數字對上。"},
+      {"text": "所以能一次查好幾類", "verdict": "完全支持", "card_quote": "這是一個多標籤分類問題。", "note": "多標籤分類推得出來。"},
+      {"text": "要先花功夫訓練，適合有固定硬體、追求極速時", "verdict": "完全支持", "card_quote": "當我們有固定的硬體資源且追求極速時，會採用微調 (Fine-tuning) 輕量化模型 (如 Qwen3-VL-2B) 的做法。", "note": "「適合」對應卡上的採用時機；主詞是訓練型 Router，不是「最佳」。"},
+      {"text": "圖上門檻 0.8 是 UniversalRAG 的設定；超過門檻的兩條（0.91、0.87）是金色", "verdict": "完全支持", "card_quote": "在推論時，只要機率超過閾值 \\(\\tau = 0.8\\)，該路徑就會被啟動。", "note": "假設分數和門檻自洽（見 recalculations），勾段落＋圖片和例題一致。"}
+    ], "errors": []},
+    {"block": "第 9 張", "atoms": [
+      {"text": "免訓練型 Router 直接寫提示詞讓強大的 LLM 判斷", "verdict": "完全支持", "card_quote": "我們直接透過 Prompt Engineering 讓強大的 LLM", "note": "一致。"},
+      {"text": "看懂問題的意圖", "verdict": "完全支持", "card_quote": "這個 Prompt 的設計邏輯在於 「意圖識別」：", "note": "一致。"},
+      {"text": "放幾個範例（Few-shot）教它處理複雜的組合，例如段落＋短片段", "verdict": "完全支持", "card_quote": "透過 Few-shot 範例教會模型處理複雜意圖 (例如：Paragraph+Clip) 。", "note": "一致。"},
+      {"text": "比較、加總、數值 → 表格", "verdict": "完全支持", "card_quote": "如果問題涉及「比較、加總、數值」，引導至 Table。", "note": "一致。"},
+      {"text": "外觀、顏色、結構 → 圖片", "verdict": "完全支持", "card_quote": "如果涉及「外觀、顏色、結構」，引導至 Image。", "note": "例子「外殼是什麼顏色？→ 圖片」和這條規則自洽。"},
+      {"text": "和訓練型比，它省掉訓練這一步", "verdict": "完全支持", "card_quote": "實作細節: 訓練型 (Training-based) 與免訓練 (Training-free) Router 的具體作法。", "note": "「免訓練」的字面定義，沒有加新的優劣判斷。"}
+    ], "errors": []},
+    {"block": "第 10 張", "atoms": [
+      {"text": "企業的私有資料裡，表格和文字的界線往往很模糊", "verdict": "完全支持", "card_quote": "在企業私有數據場景中，Table (結構化) 與 Text (非結構化) 的界線往往很模糊。", "note": "保留了「往往」；部落格判斷用作者口吻寫，可以。"},
+      {"text": "分不清資料類型、大小又沒選對，搜尋就會出問題：抓回不相干的資料、或慢到無法使用", "verdict": "完全支持", "card_quote": "如果我們不能明確地區分數據類型，並針對性地選擇檢索粒度，就會陷入「檢索回來的資料牛頭不對馬嘴」或「檢索速度慢到無法使用」的泥沼。", "note": "條件與兩種下場都對得上。"}
+    ], "errors": []},
+    {"block": "第 11 張", "atoms": [
+      {"text": "初期（剛上線）：免訓練版 Router＋混合搜尋，先求穩、該找回的資料盡量找回來", "verdict": "完全支持", "card_quote": "初期 (冷啟動)：採用「免訓練路由器 (Prompt-based) 」並結合「混合檢索 (Hybrid Search) 」，確保系統的穩定性與召回率。", "note": "白話已授權。"},
+      {"text": "中期：讓 LLM 當老師替真實使用紀錄自動貼標籤，分清楚什麼題目該用表格、文字、圖片", "verdict": "完全支持", "card_quote": "中期 (積累期)：利用 Teacher LLM 對真實的 User Logs 進行自動化標記，區分出 Table、Text 與 Image 的使用邊界。", "note": "一致。"},
+      {"text": "後期：訓練企業專屬的輕量 Router", "verdict": "完全支持", "card_quote": "後期 (優化期)：訓練專屬於企業環境的輕量化路由器，實現真正的「UniversalRAG」形態。", "note": "一致。"},
+      {"text": "這是針對企業私有資料整理出的實務建議，不是論文在 Benchmark 上驗證過的做法", "verdict": "完全支持", "card_quote": "雖然論文在 Benchmark 上表現優異，但面對企業內部的私有數據 (Private Data) ，我們總結出了一套更具溫度的落地策略", "note": "c13#1、c1#1 限定條件都帶出了。"}
+    ], "errors": []},
+    {"block": "第 12 張", "atoms": [
+      {"text": "Router 替 7 個選項打分（訓練型）", "verdict": "完全支持", "card_quote": "我們對模型輸出的每個類別 \\( i \\) 的邏輯值 \\( z_i \\) 進行 Sigmoid 轉換得到機率 \\( \\hat{y}_i \\)", "note": "一致。"},
+      {"text": "或直接問 LLM，挑出要查的櫃子", "verdict": "完全支持", "card_quote": "我們直接透過 Prompt Engineering 讓強大的 LLM", "note": "一致。"},
+      {"text": "企業可先用免訓練版起步", "verdict": "完全支持", "card_quote": "初期 (冷啟動)：採用「免訓練路由器 (Prompt-based) 」並結合「混合檢索 (Hybrid Search) 」", "note": "部落格判斷；限定條件在第 11 張。"}
+    ], "errors": []},
+    {"block": "Threads 正文", "atoms": [
+      {"text": "只問 10 秒的動作，AI 搜尋卻抓回兩小時的影片（直述句）", "verdict": "部分支持", "card_quote": "太粗略 (Too Coarse-grained)：例如為了回答一個 10 秒鐘的動作問題，卻抓取了整段兩小時的影片。", "note": "卡上這是說明「太粗略」的假設例子（「例如」）；這裡主詞寫成「AI 搜尋」、用直述句，讀起來像現有 AI 搜尋確實會這樣做，範圍比卡上的例子大。"},
+      {"text": "UniversalRAG 把文字、表格、圖片、影片按種類和大小分櫃放", "verdict": "完全支持", "card_quote": "UniversalRAG 建議將資料庫根據模態與粒度進行「解耦」", "note": "四種模態都在 c4 上。"},
+      {"text": "查之前先讓 Router 從 7 個選項挑組合，可以複選，連不用查、直接回答也算一個", "verdict": "完全支持", "card_quote": "Router 並非做單選題，而是多選題。", "note": "加上「None: 直接回答，不需檢索。」"},
+      {"text": "訓練一個輕量模型替每個選項打分數，超過 0.8 就去查那一類", "verdict": "完全支持", "card_quote": "在推論時，只要機率超過閾值 \\(\\tau = 0.8\\)，該路徑就會被啟動。", "note": "一致。"},
+      {"text": "或者不訓練，直接寫提示詞讓 LLM 判斷", "verdict": "完全支持", "card_quote": "我們直接透過 Prompt Engineering 讓強大的 LLM", "note": "一致。"},
+      {"text": "企業可以先用免訓練版起步，累積真實使用紀錄後再訓練自己的 Router", "verdict": "完全支持", "card_quote": "中期 (積累期)：利用 Teacher LLM 對真實的 User Logs 進行自動化標記，區分出 Table、Text 與 Image 的使用邊界。", "note": "把中期簡化成累積紀錄，比卡少但沒有違背卡。"},
+      {"text": "這是針對企業資料的實務建議，不是論文在 Benchmark 上驗證過的做法", "verdict": "完全支持", "card_quote": "雖然論文在 Benchmark 上表現優異，但面對企業內部的私有數據 (Private Data) ，我們總結出了一套更具溫度的落地策略", "note": "限定條件帶出了。"}
+    ], "errors": ["範圍被放大"]},
+    {"block": "Threads 最後一則", "atoms": [
+      {"text": "UniversalRAG 的 Router 從 7 個選項挑組合、可以複選", "verdict": "完全支持", "card_quote": "Router 並非做單選題，而是多選題。", "note": "一致。"},
+      {"text": "企業可以先用免訓練版起步，累積使用紀錄再訓練自己的 Router", "verdict": "完全支持", "card_quote": "後期 (優化期)：訓練專屬於企業環境的輕量化路由器", "note": "部落格判斷；c1#1 限定條件在同一串的正文裡。"}
+    ], "errors": []},
+    {"block": "IG caption", "atoms": [
+      {"text": "第一句：只問 10 秒的動作，AI 搜尋卻抓回兩小時影片？UniversalRAG 的 Router 這樣選", "verdict": "部分支持", "card_quote": "太粗略 (Too Coarse-grained)：例如為了回答一個 10 秒鐘的動作問題，卻抓取了整段兩小時的影片。", "note": "用問句，字面上不是斷言；但主詞「AI 搜尋」把卡上的假設例子寫成一般 AI 搜尋的行為，和 Threads 正文第一句一樣有範圍放大的傾向。Router 選粒度有「Modality-Granularity Pair」支持。"},
+      {"text": "逐張摘要：能選什麼，Router 的答案卡，選項有 7 個，可以複選", "verdict": "完全支持", "card_quote": "Router 並非做單選題，而是多選題。", "note": "單獨看也成立。"},
+      {"text": "逐張摘要：選完之後，勾了兩個，就同時去兩個櫃子找", "verdict": "完全支持", "card_quote": "並行檢索：同時去文字段落庫和影像庫中搜尋最相關的 Top-K 證據。", "note": "單獨看也成立。"},
+      {"text": "逐張摘要：怎麼判斷，訓練一個小模型，替每個選項打分數", "verdict": "完全支持", "card_quote": "當我們有固定的硬體資源且追求極速時，會採用微調 (Fine-tuning) 輕量化模型 (如 Qwen3-VL-2B) 的做法。", "note": "加上 c7 每類一個機率。"},
+      {"text": "逐張摘要：不想訓練？寫提示詞讓 LLM 判斷", "verdict": "完全支持", "card_quote": "我們直接透過 Prompt Engineering 讓強大的 LLM", "note": "單獨看也成立。"},
+      {"text": "逐張摘要：企業導入，到了企業內部，表格和文字往往分不清", "verdict": "完全支持", "card_quote": "在企業私有數據場景中，Table (結構化) 與 Text (非結構化) 的界線往往很模糊。", "note": "保留了「往往」。"},
+      {"text": "逐張摘要：企業導入的三步，先免訓練、累積紀錄再訓練", "verdict": "完全支持", "card_quote": "初期 (冷啟動)：採用「免訓練路由器 (Prompt-based) 」並結合「混合檢索 (Hybrid Search) 」，確保系統的穩定性與召回率。", "note": "字面上沒有說成論文驗證過的做法；限定條件在第 11 張。"},
+      {"text": "逐張摘要：只問 10 秒的動作，卻抓回兩小時的影片", "verdict": "完全支持", "card_quote": "太粗略 (Too Coarse-grained)：例如為了回答一個 10 秒鐘的動作問題，卻抓取了整段兩小時的影片。", "note": "沒寫主詞，以例子呈現。"}
+    ], "errors": []}
+  ],
+  "recalculations": [
+    {"what": "第 8 張假設分數和門檻 0.8 是否自洽", "inputs": [0.05, 0.91, 0.32, 0.12, 0.87, 0.04, 0.02], "result": "只有 0.91（段落）與 0.87（圖片）超過 0.8，和金色橫條、例題勾段落＋圖片一致"}
+  ],
+  "gaps": []
+}

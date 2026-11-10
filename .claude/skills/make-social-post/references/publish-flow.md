@@ -12,7 +12,7 @@ P=out/<系列>/<觀念>                              # 要發的發布包資料�
 | 前提 | 怎麼確認 |
 |---|---|
 | 系列成員已定案（`series.md` 有 `members_locked: true`；第 1 則發布前） | dry-run 的 `warnings` 沒有「成員清單還沒定案」 |
-| 貼文已做完並經人最後確認 | `state.py status` 該觀念兩個格式都是 `ready`；人已看過貼文的 `README.md`、`ig/post.md`、`threads/post.md` |
+| 貼文已做完並經人 review | `state.py status` 該觀念兩個格式都是 `ready` |
 | `.env` 有憑證 | 有 `IG_ACCESS_TOKEN`、`IG_USER_ID`、`THREADS_ACCESS_TOKEN`、`THREADS_USER_ID`（範本 `.env.example`）。**不要 `cat .env`，也不要請人貼 token**；只用下面的指令檢查 |
 | `.env` 不存在或缺欄位 | 停下來，請人照 `instagram-publish.md`「一次性設定」與 `threads-publish.md` 設定；token 由人自己貼進 `.env` |
 | token 還有效 | `ig_publish.py token-status`、`threads_publish.py token-status`（剩不到 14 天會警告，並在發文前自動 refresh）；`threads_publish.py token-info` 可查實際權限與到期時間 |
@@ -25,7 +25,7 @@ P=out/<系列>/<觀念>                              # 要發的發布包資料�
 
 **人一次授權整串（2026-10-10 人同意）**：人在同一則訊息明確說「prepare、push `ig/jpg/`、發佈到兩個平台」（或等義，例如「直接發 threads 和 IG」「發佈完 commit and push」）時，視為已經說了「發」和同意 push，可以連續執行：前提檢查 → `prepare` → push `ig/jpg/`（只 add 這個資料夾）→ IG 預檢 → IG dry-run → IG `--confirm` → Threads dry-run → Threads `--confirm`。**每一個 dry-run 都還是要跑、要看**；只要出現 `problems`、`warnings`、圖片網址抓不到、額度不足，或內容和人確認的不一樣，就**停下來問人**。人只說「ready」或「準備發」不算授權發布。
 
-**標 `ready` 時就問一次**（省掉發布當天多一輪來回）：先列出還沒定的事（hook 是否暫用、編輯建議有沒有回覆）；暫用的 hook 要人明講接受才發（發布不能撤回）：**單獨問一句「hook 用 X，你接受嗎」，「目前可以」「好的、可以發」都不算接受**。`state.py ready` 發現 `hook.candidate` 含「暫定」或「待人」會拒絕，人明講接受後才加 `--hook-accepted`。再問人要不要整串授權，並附上現成的那句話讓人直接照說——「prepare、push `ig/jpg/`、發佈到兩個平台」。人只說「發」（沒有整串）時，prepare 做完、push 前還是要問。
+**標 `ready`**（2026-11-10 起，`CLAUDE.md` 規則 12）：人 review 成品說沒問題，就視為接受 hook、系列名與標題，`state.py ready … --hook-accepted`。標 ready 的回報裡順便問要不要整串授權，附上現成那句話（「prepare、push `ig/jpg/`、發佈到兩個平台」）；人只說「發」（沒有整串）時，prepare 做完、push 前還是要問。
 
 | # | 做什麼 | 指令 | 誰 |
 |---|---|---|---|

@@ -1,0 +1,393 @@
+{
+  "series": "universal-rag",
+  "concept": "universalrag-router-design-and-rollout",
+  "also_concepts": [],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "讀者疑問",
+    "title": "AI 怎麼決定\n[[這題去哪裡查？]]",
+    "subtitle": "UniversalRAG（一種 AI 搜尋方法）從 7 個選項挑組合，\n一題可以同時查好幾處；\n企業可以先用免訓練版起步",
+    "refs": [
+      "c1",
+      "c10",
+      "c4"
+    ],
+    "candidate": "A（人 2026-11-10 review 成品後接受）"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "AI 怎麼決定\n[[這題去哪裡查？]]",
+      "body": "UniversalRAG（一種 AI 搜尋方法）從 7 個選項挑組合，\n一題可以同時查好幾處；\n企業可以先用免訓練版起步",
+      "refs": [
+        "c1",
+        "c10",
+        "c4"
+      ],
+      "branches": [
+        "不用查",
+        "段落 ✓",
+        "文件",
+        "表格",
+        "圖片 ✓",
+        "短片段",
+        "整部影片"
+      ],
+      "hot": [
+        1,
+        4
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "grain",
+      "title": "只問 10 秒的動作\n[[卻抓回兩小時的影片]]",
+      "body": "UniversalRAG 論文指出：抓多大塊的資料（粒度）很關鍵，現有 AI 搜尋卻常固定一種大小。它的 Router（負責決定去哪查）連大小一起選。",
+      "refs": [
+        "c3",
+        "c4"
+      ],
+      "heads": [
+        "抓太粗：抓回整部影片",
+        "抓太細：只抓一句話"
+      ],
+      "nodes": [
+        {
+          "text": "整部影片長達兩小時，金色那一小段才是需要的 10 秒"
+        },
+        {
+          "text": "只抓到中間這一句（深色）"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "雜訊多、干擾回答，又浪費運算資源"
+        },
+        {
+          "text": "往往漏掉回答複雜問題\n需要的前後文"
+        }
+      ],
+      "note": "示意圖：金色那段畫得比實際寬。"
+    },
+    {
+      "layout": "recap",
+      "title": "[[前情提要]]與這一則重點",
+      "current": "universalrag-router-design-and-rollout",
+      "refs": [
+        "結構"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "查資料之前\n[[先讓 Router 判斷去哪找]]",
+      "body": "UniversalRAG 是 KAIST 團隊提出的 AI 搜尋方法（RAG：先找資料，再交給 LLM，也就是大型語言模型，來回答）。它把資料按種類和大小分櫃放（索引），查之前先由 Router 判斷該去哪個櫃子。整個流程是：先選路，再到選中的櫃子找，最後用找回的資料回答。",
+      "refs": [
+        "c2",
+        "c4"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "route",
+      "title": "這一則分三段\n[[從選項講到企業導入]]",
+      "body": "外殼顏色的例子會一路用下去。",
+      "refs": [
+        "c1",
+        "c8"
+      ],
+      "label": "路線圖",
+      "nodes": [
+        {
+          "text": "Router 能選什麼？",
+          "sub": "7 個選項，可以一次勾好幾個"
+        },
+        {
+          "text": "Router 怎麼判斷？",
+          "sub": "訓練一個小模型，或直接問 LLM"
+        },
+        {
+          "text": "企業怎麼導入？",
+          "sub": "先用免訓練版，再訓練自己的 Router"
+        }
+      ],
+      "heads": [
+        "這一則的路線",
+        "為什麼要先分流？第 1 則有講"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "ballot",
+      "title": "Router 的答案卡\n[[選項有 7 個，可以複選]]",
+      "body": "UniversalRAG 的 Router 看問題在問什麼，從依資料種類和大小分成的 7 個選項挑組合，連「不用查、直接回答」也算一個。",
+      "refs": [
+        "c1",
+        "c4"
+      ],
+      "label": "能選什麼",
+      "nodes": [
+        {
+          "text": "舉例：外殼是什麼顏色？設計理念是什麼？"
+        }
+      ],
+      "heads": [
+        "Router 的答案卡"
+      ],
+      "outcomes": [
+        {
+          "text": "不用查",
+          "sub": "直接回答"
+        },
+        {
+          "text": "段落",
+          "sub": "文字，一小段",
+          "on": true
+        },
+        {
+          "text": "文件",
+          "sub": "文字，整份（要串起多段內容時）"
+        },
+        {
+          "text": "表格",
+          "sub": "表格"
+        },
+        {
+          "text": "圖片",
+          "sub": "圖片",
+          "on": true
+        },
+        {
+          "text": "短片段",
+          "sub": "影片，一小段（定位特定動作）"
+        },
+        {
+          "text": "整部影片",
+          "sub": "影片，整部（理解長時間的劇情）"
+        }
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "fan",
+      "title": "勾了兩個\n[[就同時去兩個櫃子找]]",
+      "body": "選定段落＋圖片後，UniversalRAG 同時到這兩個櫃子各找最相關的幾筆，再一起交給能同時看文字和圖片的大模型（LVLM），綜合判斷後回答。",
+      "refs": [
+        "c10"
+      ],
+      "label": "選完之後",
+      "heads": [
+        "段落櫃：找最相關的幾段",
+        "圖片櫃：找最相關的幾張"
+      ],
+      "nodes": [
+        {
+          "text": "Router 勾了：段落＋圖片"
+        },
+        {
+          "text": "能同時看文字和圖片的大模型",
+          "sub": "綜合判斷，給出答案"
+        }
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "thresh",
+      "title": "訓練一個小模型\n[[替每個選項打分數]]",
+      "body": "訓練型 Router 把現成的輕量模型再訓練一次（微調，例如 Qwen3-VL-2B），替每個選項各打一個 0 到 1 的分數；超過 0.8 就去查那一類資料，所以能一次查好幾類。要先花功夫訓練，適合有固定硬體、追求極速時。",
+      "refs": [
+        "c5",
+        "c7"
+      ],
+      "label": "怎麼判斷",
+      "heads": [
+        "假設的分數"
+      ],
+      "ref": {
+        "name": "門檻",
+        "value": 0.8
+      },
+      "nodes": [
+        {
+          "text": "不用查",
+          "p": 0.05
+        },
+        {
+          "text": "段落",
+          "p": 0.91
+        },
+        {
+          "text": "文件",
+          "p": 0.32
+        },
+        {
+          "text": "表格",
+          "p": 0.12
+        },
+        {
+          "text": "圖片",
+          "p": 0.87
+        },
+        {
+          "text": "短片段",
+          "p": 0.04
+        },
+        {
+          "text": "整部影片",
+          "p": 0.02
+        }
+      ],
+      "note": "分數是假設的例子；門檻 0.8 是 UniversalRAG 的設定。"
+    },
+    {
+      "layout": "diagram",
+      "kind": "pairs",
+      "title": "不想訓練？\n[[寫提示詞讓 LLM 判斷]]",
+      "body": "免訓練型 Router 直接寫提示詞（Prompt），讓強大的 LLM 判斷該走哪條路：看懂問題的意圖，再放幾個範例（Few-shot）教它處理複雜的組合。和訓練型比，它省掉訓練這一步。",
+      "refs": [
+        "c8",
+        "c9"
+      ],
+      "label": "怎麼判斷",
+      "heads": [
+        "提示詞裡寫：問題提到…",
+        "就引導到…"
+      ],
+      "pairs": [
+        [
+          "比較、加總、數值",
+          "表格"
+        ],
+        [
+          "外觀、顏色、結構",
+          "圖片"
+        ],
+        [
+          "複雜的組合（附範例教它）",
+          "例如段落＋短片段"
+        ]
+      ],
+      "outcomes": [
+        {
+          "text": "「外殼是什麼顏色？」→ 圖片",
+          "tone": "good"
+        }
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "murky",
+      "title": "到了企業內部\n[[表格和文字往往分不清]]",
+      "body": "實務上，企業的私有資料裡，表格（結構化）和文字（非結構化）的界線往往很模糊；分不清資料類型、大小又沒選對，搜尋就會出問題。",
+      "refs": [
+        "c11"
+      ],
+      "label": "企業導入",
+      "heads": [
+        "一份企業內部的報告",
+        "這算表格，還是文字？"
+      ],
+      "nodes": [
+        {
+          "text": "分不清是表格還是文字"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "抓回不相干的資料"
+        },
+        {
+          "text": "搜尋慢到無法使用"
+        }
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "stops",
+      "title": "企業導入的三步\n[[先免訓練、累積紀錄再訓練]]",
+      "body": "這是針對企業私有資料整理出的實務建議，不是論文在 Benchmark（論文用來比成績的標準測試）上驗證過的做法。",
+      "refs": [
+        "c13",
+        "c1",
+        "c8"
+      ],
+      "quals": [
+        "c13#1",
+        "c1#1"
+      ],
+      "label": "企業導入",
+      "nodes": [
+        {
+          "text": "初期（剛上線）：免訓練版 Router＋混合搜尋",
+          "sub": "混合搜尋（Hybrid Search）混用多種搜尋方式；先求穩，該找回的資料盡量找回來",
+          "emph": true
+        },
+        {
+          "text": "中期：讓 LLM 當老師，替真實使用紀錄自動貼標籤",
+          "sub": "分清楚什麼題目該用表格、文字、圖片"
+        },
+        {
+          "text": "後期：訓練企業專屬的輕量 Router"
+        }
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "UniversalRAG 怎麼決定這題去哪裡查？",
+      "title": "Router 替 7 個選項打分，\n或直接問 LLM，挑出要查的櫃子；\n企業可先用免訓練版起步。",
+      "refs": [
+        "c1",
+        "c7",
+        "c8"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "這個系列共兩則",
+      "current": "universalrag-router-design-and-rollout",
+      "nav": "完整文章：datasciocean.com/paper-intro/universal-rag",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "假設只問一個 10 秒的動作，系統卻抓回整部兩小時的影片：這就是資料抓得太粗。\n\nUniversalRAG 是一種 AI 搜尋方法：它把文字、表格、圖片、影片按種類和大小分櫃放，查之前先讓 Router（負責決定去哪查）從 7 個選項挑組合，而且可以複選，連「不用查、直接回答」也算一個。\n\nRouter 有兩種做法：訓練一個輕量模型替每個選項打分數，超過 0.8 就去查那一類；或者不訓練，直接寫提示詞讓 LLM 判斷。企業可以先用免訓練版起步，累積真實使用紀錄後再訓練自己的 Router；這是針對企業資料的實務建議，不是論文在 Benchmark（論文用來比成績的標準測試）上驗證過的做法。細節看圖。\n\n這是 UniversalRAG 系列的第 2 則；為什麼要先分流，在這個系列的第 1 則。",
+      "refs": [
+        "c1",
+        "c3",
+        "c4",
+        "c5",
+        "c7",
+        "c8",
+        "c13"
+      ],
+      "quals": [
+        "c13#1",
+        "c1#1"
+      ]
+    },
+    "last": {
+      "text": "UniversalRAG 的 Router：從 7 個選項挑組合、可以複選；企業可以先用免訓練版起步，累積使用紀錄再訓練自己的 Router。\n文章：datasciocean.com/paper-intro/universal-rag\n同系列：答案明明在圖片裡，AI 搜尋卻先去翻文字（尚未發布）",
+      "refs": [
+        "c1"
+      ],
+      "link": "https://datasciocean.com/paper-intro/universal-rag/"
+    }
+  },
+  "caption": {
+    "first": "只問 10 秒的動作，卻抓回兩小時影片怎麼辦？UniversalRAG 的 Router 這樣選",
+    "first_refs": [
+      "c3",
+      "c4"
+    ],
+    "nav": "完整文章在 datasciocean.com，搜「UniversalRAG」",
+    "hashtags": [
+      "UniversalRAG",
+      "多模態RAG",
+      "RAG"
+    ]
+  }
+}

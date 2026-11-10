@@ -79,6 +79,10 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 
 2026-11-06 發第 1 則；2026-11-07 發第 2 則（`series_links.py` 已補第 1 則連結）。第 1 則 Threads 已回補（reply_id 17881844124631719）。2026-11-08 發第 3 則（`series_links.py` 已補第 1、2 則連結）；第 1、2 則 Threads 已回補（reply_id 18121555519955559、18004499750828828）。**系列 3 則全發完。**
 
+## UniversalRAG 系列（2026-11-09 起；分岔軌道風格 `junction`）
+
+2 卡 2 則；人 2026-11-10 review 成品後接受系列名、標題與 hook（`members_locked: true`），兩則都 ready。第 1 則 2026-11-10 發布：IG https://www.instagram.com/p/DfioeFskwS6/ 、Threads https://www.threads.com/@datasciocean/post/DfipBuME42W 。第 2 則待發，發後要做 Threads 回補（第 1 則的「同系列」）。這是第一次由 Claude 從頭做到尾、人只 review 成品（`CLAUDE.md` 規則 12）。第 1 則 `out/universal-rag/universalrag-routing-over-unified-embedding/`（2026-11-10 依讀者與編輯審查重整成 12 張：併掉重複的「三個階段」「Router 看的是什麼」與「只查一種資料」，提早揭曉原因）；第 2 則 `out/universal-rag/universalrag-router-design-and-rollout/`（13 張）。採用 instagram-agent-skill 的建議（第 2 張是第二封面、帶走張能單獨轉傳、caption 停在懸念、縮圖檢查…），2026-11-10 學到的寫進 `ig-carousel.md`、`hooks.md`、`threads-and-caption.md`、`self-check.md`、`spec-json.md`、`brand-and-layouts.md` §4.2。新圖型：第 1 則 9 種、第 2 則 `grain`、`ballot`、`thresh`、`murky`，封面岔路的站牌（`branches`／`hot`／`fork`）；未做草圖與樣張（人只 review 成品）。
+
 ## 跨系列的人的決定與待決事項
 
 - 封面主標可放寬成 3 行（人，2026-10-28，`cover_title_max_lines: 3`；探照燈封面超過 2.5 行自動縮成 56px，其他風格要自己確認）。

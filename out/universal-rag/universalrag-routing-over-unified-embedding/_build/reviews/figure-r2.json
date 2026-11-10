@@ -1,0 +1,90 @@
+{
+  "slides": [
+    {
+      "slide": 7,
+      "items": [
+        {
+          "what": "上方群集的標籤",
+          "reproduced": "圖片（畫面上方的一群點，標籤在左上）",
+          "original_position": "原圖上方藍色群集，左上角的藍字標籤，以及右上圖例第三列",
+          "original": "Image Corpus；圖例 Image",
+          "in_claim": "把文字、圖片和影片全部映射到同一個向量空間",
+          "verdict": "一致"
+        },
+        {
+          "what": "左下群集的標籤",
+          "reproduced": "影片（畫面左下的一群點，標籤在左下）",
+          "original_position": "原圖左下紅色群集，下方的紅字標籤，以及右上圖例第四列",
+          "original": "Video Corpus；圖例 Video",
+          "in_claim": "把文字、圖片和影片全部映射到同一個向量空間",
+          "verdict": "一致"
+        },
+        {
+          "what": "右下群集的標籤",
+          "reproduced": "文字（畫面右下的一群點，標籤在右下）",
+          "original_position": "原圖右下綠色群集，右上方的綠字標籤，以及右上圖例第二列",
+          "original": "Text Corpus；圖例 Text",
+          "in_claim": "把文字、圖片和影片全部映射到同一個向量空間",
+          "verdict": "一致"
+        },
+        {
+          "what": "三個群集的相對位置與彼此分離的關係",
+          "reproduced": "圖片在上、影片在左下、文字在右下，三群彼此分開",
+          "original_position": "原圖整體版面的三個凸包區域",
+          "original": "Image Corpus 在上、Video Corpus 在左下、Text Corpus 在右下，三區彼此分開",
+          "in_claim": "資料點傾向於根據「模態」而非「語意」聚集",
+          "verdict": "一致"
+        },
+        {
+          "what": "查詢點的標籤",
+          "reproduced": "文字問題",
+          "original_position": "原圖右上圖例第一列（黃點）",
+          "original": "Query（圖上未印出 Query 是文字；「文字」來自主張）",
+          "in_claim": "文字查詢與文字資料的距離",
+          "verdict": "僅來自主張"
+        },
+        {
+          "what": "查詢點與文字群集的位置關係",
+          "reproduced": "一個橘黃色大點，位於文字群集左緣、與部分文字點相鄰",
+          "original_position": "原圖右下，綠色 Text Corpus 區域的左側與下緣",
+          "original": "許多黃色 Query 點，與 Text Corpus 左側及下緣重疊，部分落在區域外的左下方；重製圖以單點示意，圖註已標明示意圖、點的位置不是實際資料",
+          "in_claim": "文字查詢與文字資料的距離，往往比它與語意更相關的影像資料還要近",
+          "verdict": "一致"
+        },
+        {
+          "what": "虛線與註解：查詢點到圖片群集的距離",
+          "reproduced": "語意更相關的圖片，往往反而比較遠（虛線由查詢點連向圖片群集）",
+          "original_position": "原圖沒有此註解與連線；原圖僅可見黃色 Query 點與上方藍色 Image Corpus 之間有空白間隔，圖上未標示哪些圖片語意相關",
+          "original": "無此文字；語意相關性未在圖上呈現",
+          "in_claim": "文字查詢與文字資料的距離，往往比它與語意更相關的影像資料還要近",
+          "verdict": "僅來自主張"
+        },
+        {
+          "what": "圖註",
+          "reproduced": "示意圖，改繪自論文的分布圖，點的位置不是實際資料。",
+          "original_position": "原圖本身無圖註；材料說明原圖是 blog 從論文截來的參考圖",
+          "original": "圖上無此文字；圖註未搬用 blog 圖說原文，也未說成自己的實驗",
+          "in_claim": "",
+          "verdict": "原圖沒有"
+        },
+        {
+          "what": "主標用語「形式／意思」（名詞說明）",
+          "reproduced": "但資料傾向按形式分群，而不是按意思",
+          "original_position": "原圖沒有此文字",
+          "original": "無",
+          "in_claim": "資料點傾向於根據「模態」而非「語意」聚集",
+          "verdict": "僅來自主張"
+        },
+        {
+          "what": "補充文字：模態偏見與 Modality Gap",
+          "reproduced": "資料傾向依「模態」而不是「語意」（內容的意思）聚在一起，文字問題離文字資料，往往比離語意更相關的圖片還要近。這種偏見叫 Modality Gap。",
+          "original_position": "原圖沒有此文字",
+          "original": "無",
+          "in_claim": "資料點傾向於根據「模態」而非「語意」聚集，文字查詢與文字資料的距離，往往比它與語意更相關的影像資料還要近；blog 把這種檢索偏見稱為 Modality Gap",
+          "verdict": "僅來自主張"
+        }
+      ],
+      "errors": []
+    }
+  ]
+}

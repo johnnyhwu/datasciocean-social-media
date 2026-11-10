@@ -503,6 +503,64 @@ EQ4 = dict(ops=["+", "+", "="], nodes=[{"text": "20", "sub": "對"}, {"text": "7
 expect("equation 指定 ops 時，整條算式會進 texts()（審查者看得到 + 還是 ×）", "算式：20 + 75 + 10 = 105" in _D.texts(D("equation", **EQ4)), str(_D.texts(D("equation", **EQ4))))
 code, out = render(D("equation", **EQ4))
 expect("正確的四項算式（20＋75＋10＝105）通過程式 B", code == 0, out)
+# 2026-11-09 新增（UniversalRAG）：magnet、puzzle、merge、clusters、shelves、switch、duel、matrix、race
+N1 = [{"text": "問題"}]
+UR = {"magnet": dict(nodes=N1, outcomes=[{"text": "文字", "sub": "被抓回來"}, {"text": "圖片", "sub": "答案在這"}], heads=["優先", "被晾著"]),
+      "puzzle": dict(nodes=[{"text": "問題"}, {"text": "文字"}, {"text": "圖片"}], outcomes=[{"text": "答不出來"}]),
+      "merge": dict(outcomes=[{"text": "文字"}, {"text": "圖片"}, {"text": "影片"}], nodes=[{"text": "編碼器", "sub": "CLIP"}, {"text": "同一個空間"}]),
+      "clusters": dict(heads=["圖片", "影片", "文字"], nodes=[{"text": "問題"}], outcomes=[{"text": "比較遠"}]),
+      "shelves": dict(columns=[{"head": "文字", "items": [{"text": "段落"}, {"text": "文件", "sub": "多跳"}]}, {"head": "表格", "items": [{"text": "表格"}]}]),
+      "switch": dict(nodes=[{"text": "問題"}, {"text": "Router"}], heads=["這題要看圖"], outcomes=[{"text": "文字"}, {"text": "圖片", "on": True}, {"text": "影片"}]),
+      "duel": dict(heads=["以前", "現在"], nodes=[{"text": "文字庫"}, {"text": "影像庫"}], outcomes=[{"text": "要看圖"}]),
+      "matrix": dict(heads=["甲", "乙"], nodes=[{"text": "舊"}, {"text": "新"}], cells=[[["抓文字"], ["抓文字"]], [["影像"], ["影片"]]], hot=1),
+      "race": dict(heads=["統一", "新"], nodes=[{"text": "10M"}])}
+for k_, kw_ in UR.items():
+    code, out = render(D(k_, **kw_))
+    expect(f"正確的 {k_} 通過程式 B", code == 0, out)
+    code, out = render(D(k_, **{**kw_, "body": "很長的補充" * 40}))
+    expect(f"故意做壞：{k_} 的補充太長放不下 → 抓得到", code != 0, out)
+code, out = render(D("duel", **{**UR["duel"], "body": "補充寫得比較長，" * 9, "note": "圖註一行。"}))
+expect("duel 的補充很長、空間變少時仍通過程式 B（兩個庫的框不重疊）", code == 0, out)
+import diagrams as DG_
+cv_ = DG_.Canvas(DG_.Ctx(lambda s, n: 1, lambda s: s, lambda s: s))
+DG_.BOTTOM = 1180
+DG_.duel(cv_, D("duel", **UR["duel"]), 1180 - (2 * (56 + 144) + 44))
+ys_ = sorted(float(m.split('y="')[1].split('"')[0]) for m in cv_.svg if m.startswith('<rect class="bg" x="740.0"'))
+hs_ = [float(m.split('height="')[1].split('"')[0]) for m in cv_.svg if m.startswith('<rect class="bg" x="740.0"')]
+expect("duel 在最小空間時，同一段的兩個庫框上下不重疊", len(ys_) == 4 and ys_[0] + hs_[0] <= ys_[1] and ys_[2] + hs_[2] <= ys_[3], f"{ys_} {hs_}")
+DG_.BOTTOM = 1235
+code, out = render(D("switch", **{**UR["switch"], "outcomes": [{"text": "文字"}, {"text": "圖片"}, {"text": "影片"}]}))
+expect("故意做壞：switch 沒有 on → 報錯", code != 0 and "on" in out, out)
+code, out = render(D("matrix", **{**UR["matrix"], "cells": [[["抓文字"]]]}))
+expect("故意做壞：matrix 的 cells 列數不對 → 報錯", code != 0 and "cells" in out, out)
+expect("matrix 的格子文字會進 texts()", "抓文字" in _D.texts(D("matrix", **UR["matrix"])), "")
+# 2026-11-10 新增（UniversalRAG 第 2 則）：grain、ballot、thresh、murky；race 的關卡（outcomes[0]）
+OPT7 = [{"text": t} for t in ("不用查", "段落", "文件", "表格", "圖片", "短片段", "整部影片")]
+UR2 = {"grain": dict(heads=["抓太粗：整部影片", "抓太細：一句話"], nodes=[{"text": "金色那段才是需要的"}, {"text": "只抓到這一句"}],
+                     outcomes=[{"text": "雜訊多又浪費算力"}, {"text": "漏掉前後文"}], note="示意圖：金色那段畫得比實際寬。"),
+       "ballot": dict(heads=["Router 的答案卡", "可以複選"], nodes=[{"text": "舉例：外殼是什麼顏色？"}],
+                      outcomes=[{**o, "on": i in (1, 4)} for i, o in enumerate(OPT7)]),
+       "thresh": dict(heads=["假設的分數"], ref={"name": "門檻", "value": 0.8},
+                      nodes=[{**o, "p": p} for o, p in zip(OPT7, (0.05, 0.91, 0.32, 0.12, 0.87, 0.04, 0.02))], note="分數是假設的例子。"),
+       "murky": dict(heads=["一份報告", "這算表格，還是文字？"], nodes=[{"text": "分不清類型"}], outcomes=[{"text": "抓錯資料"}, {"text": "慢到不能用"}])}
+for k_, kw_ in UR2.items():
+    code, out = render(D(k_, **kw_))
+    expect(f"正確的 {k_} 通過程式 B", code == 0, out)
+    code, out = render(D(k_, **{**kw_, "body": "很長的補充" * 40}))
+    expect(f"故意做壞：{k_} 的補充太長放不下 → 抓得到", code != 0, out)
+code, out = render(D("grain", **{**UR2["grain"], "outcomes": [{"text": "只有一個"}]}))
+expect("故意做壞：grain 的下場只有一個 → 報錯", code != 0 and "grain" in out, out)
+code, out = render(D("ballot", **{**UR2["ballot"], "outcomes": OPT7[:2]}))
+expect("故意做壞：ballot 只有兩個選項 → 報錯", code != 0 and "ballot" in out, out)
+code, out = render(D("thresh", **{**UR2["thresh"], "nodes": [{"text": "甲", "p": 1.3}]}))
+expect("故意做壞：thresh 的分數超過 1 → 報錯", code != 0 and "thresh" in out, out)
+code, out = render(D("murky", **{**UR2["murky"], "outcomes": [{"text": "只有一個"}]}))
+expect("故意做壞：murky 的下場只有一個 → 報錯", code != 0 and "murky" in out, out)
+tx = _D.texts(D("thresh", **UR2["thresh"]))
+expect("thresh 的每個分數與門檻都會進 texts()（程式 A 與審查者看得到假設的數字）", all(v in tx for v in ("0.91", "0.87", "0.02", "門檻", "0.8")), str(tx))
+code, out = render(D("race", **{**UR["race"], "outcomes": [{"text": "Router"}], "note": "路的長短只是示意。"}))
+expect("race 的直線那條路上多一道關卡（outcomes[0]）通過程式 B", code == 0, out)
+expect("race 的關卡文字會進 texts()", "Router" in _D.texts(D("race", **{**UR["race"], "outcomes": [{"text": "Router"}]})), "")
 # 矮格子共用的 cell()：一定用 28px 粗體（dl），字框才不會高過格子讓程式 B 的對比取樣取到邊線
 import html
 cv = DG.Canvas(DG.Ctx(lambda s, n: 1, lambda s: s, html.escape))

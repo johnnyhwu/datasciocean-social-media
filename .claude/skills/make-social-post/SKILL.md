@@ -12,17 +12,17 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 1. `git submodule update --remote`（卡要是最新的）。第一次 clone 用 `git submodule update --init --remote`。
 2. `uv sync`；Chromium 在 repo 內，沒有就 `PLAYWRIGHT_BROWSERS_PATH=$PWD/.playwright-browsers uv run playwright install chromium`（細節見 `references/setup.md`）。腳本一律 `uv run python .claude/skills/make-social-post/scripts/<name>.py`。
 3. **看現況**：`state.py status`（每個觀念各格式是 `not_tried`／`ready`／`published`、存量），再看 `out/README.md`（待發布與各系列狀態）。
-4. **（新系列／規劃時）** 跑 `series_deps.py <系列 id>` 並**一定要問人哪些卡要合併**（`references/batch-and-publish.md` §1）；成員與 `planned_title` 定案後在 `series.md` 加 `members_locked: true`，再發第 1 則（預設先做完整個系列的 spec；人要求先發的例外與要講明的代價見 `CLAUDE.md`「工作方式」）。
-4b. **決定這次做哪一則**：照系列檔 `series/<id>/series.md` 的 `members` 順序，找第一個還是 `not_tried` 的觀念；這是預設，要不要照做由人決定。
+4. **（新系列／規劃時）** 跑 `series_deps.py <系列 id>`，**由 Claude 決定哪些卡合併、系列名與各則標題**（`references/batch-and-publish.md` §1），理由寫進 `series.md` 的規劃備忘；整個系列做完、人 review 成品接受後才加 `members_locked: true` 並發第 1 則。
+4b. **決定這次做哪一則**：照系列檔 `series/<id>/series.md` 的 `members` 順序，找第一個還是 `not_tried` 的觀念。
 5. 要做的觀念，**只讀它的卡**（`concept-wiki/wiki/concepts/<id>.md`），不讀 blog。同時讀 `concept-wiki/docs/card-format.md`（卡格式與 status 語意）。**卡上主張若附 `figures`，用 Read 實際打開圖檔看**（路徑 `concept-wiki/wiki/<file>`），不要只看路徑或圖說；圖只是參考，貼文要用就重製（`references/anchor-writing-rules.md`「參考圖」）。
 6. 如果這次要**發布**，先看 `references/publish-flow.md` 的「發文前的前提」。
 
 ## 流程
 
 ```
-[1] 選觀念、系列規劃 → [2] hook 候選（人挑）→ [3] 寫內容規格 spec.json
+[1] 選觀念、系列規劃 → [2] hook 候選（Claude 選一個）→ [3] 寫內容規格 spec.json
  → [4] 程式 A（check_a）→ [5] 渲染 + 程式 B（render）→ [6] 組發布文字（build_package）
- → [6b] 人看初稿（結構、順序、圖）→ [7] 自檢 + 審查：忠實者（嚴格）、讀者（預設一般讀者，要看圖）、編輯（不擋，但易懂／圖／所以呢／制式要處理；要看圖）→ [8] 批次層檢查（batch_check）
+ → [7] 自檢 + 審查：忠實者（嚴格）、讀者（預設一般讀者，要看圖）、編輯（不擋，但易懂／圖／所以呢／制式要處理；要看圖）→ [8] 批次層檢查（batch_check）
  → [9] 人最後確認 → [10] state.py ready → [11] 發布到 IG 與 Threads（人確認後）→ 寫回狀態
 ```
 
@@ -31,15 +31,14 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | 步驟 | 做什麼 | 細節 |
 |---|---|---|
 | 1 | 選觀念、決定獨立或系列、系列檔 | `references/batch-and-publish.md` §1–3 |
-| 2 | 5～6 個大膽的 hook 候選（至少 3 種樣態），最多一次 haiku 讀者參考，**用純文字列出完整候選讓人挑（不用 AskUserQuestion）** | `references/hooks.md` |
+| 2 | 5～6 個大膽的 hook 候選（至少 3 種樣態），最多一次 haiku 讀者參考，**Claude 選一個放封面，候選存 `_build/hook-candidates.md`，交成品時列出** | `references/hooks.md` |
 | 3 | **先做版型規劃**（每張選好版型、圖上術語在哪張定義，`references/ig-carousel.md` §0；**卡上附了圖的主張，先看圖再決定要不要重製：圖能讓觀念更好懂就用程式重畫一張（`fig_refs`，內容以主張為準），不需要就不用**；**機制類的圖：每張先寫一句「畫面」（誰在哪、什麼被擋、什麼被補上），寫不出就換；看 `design-series-visuals/references/brand-and-layouts.md` §4.2「機制 → 圖型」，沒有合適的就發明新圖型；圖要大膽、有創意、有變化（`CLAUDE.md` 圖像那條），連續兩張不同圖型；Threads 預設輪播**；**每張帶數字的圖先用 `chart-thinking` skill 想過：要比什麼、圖有沒有直接支撐主標；每張圖寫一句「比文字多給什麼」，定義與機制類預設用具體的假設例子**；獨立貼文的轉折張、延伸閱讀、導流連結、Threads 回覆打包成一個問題先問人；機制／數學類先做概念依賴表），再寫 `out/<series>/<concept>/_build/spec.json`：投影片、Threads、caption、每個區塊標引用的 claim id | `references/spec-json.md`、`references/ig-carousel.md`、`references/threads-and-caption.md`、`references/anchor-writing-rules.md` |
 | 4 | `check_a.py <spec.json>`，ERROR 清零 | `references/program-a.md` |
 | 5 | `render.py <spec.json>`，程式 B 全過；`contact_sheet.py <發布包資料夾>` 拼縮圖；**自己看一次渲染後的 PNG** | `references/program-b.md` |
 | 6 | （在 `contact_sheet.py` 之後）`build_package.py <spec.json>`：產生人看的 `README.md`、`ig/post.md`、`threads/post.md`、審查用的 `_build/post-with-refs.md`／`post-reader.md`，並更新 `out/README.md` 索引 | `references/threads-and-caption.md` |
-| 6b | **人看初稿**（人 2026-11-01 決定）：先照 `self-check.md` 自檢，再把 `_build/contact-sheet.png` 與 `ig/post.md` 給人看結構、順序、口吻、圖；說明「這是審查前的初稿，結構與圖現在改最便宜」。人點頭（或回饋改完）才派審查者。人的回饋一次改完，不邊改邊審 | `references/ig-carousel.md` §0、§0b |
 | 7 | **先照 `references/self-check.md` 自檢**，再派忠實者、讀者（一般讀者，附圖）、編輯（附圖）；**有 `fig_refs` 再派重製圖審查者**（`references/figure-prompt.md`，看原圖＋主張＋重製圖）；`verify_faithful.py`、`verify_reader.py`、`verify_figure.py`。**審查通過後再新增文字或改數字，要重審改過的區塊**：`spec_diff.py` 列出範圍、`--mark` 記下通過版本 | `references/review-loop.md`、`references/self-check.md` |
 | 8 | `batch_check.py <spec>...`（參數順序 = 預計發文順序） | `references/batch-and-publish.md` §4 |
-| 9–10 | 給人看貼文 `README.md`（含縮圖）、`ig/post.md`、`threads/post.md`；**交貼文時列出還沒定的事（hook 是否暫用、編輯建議沒回覆的）並請人明確回答**，確認後 `state.py ready <觀念> <格式> <發布包>`（兩個格式各一次） | `references/batch-and-publish.md` §5–6 |
+| 9–10 | 給人看貼文 `README.md`（含縮圖）、`ig/post.md`、`threads/post.md`；交成品時列出 hook 候選與選擇理由、新增的圖型、沒採用的審查建議與理由；人 review 說沒問題後 `state.py ready <觀念> <格式> <發布包> --hook-accepted`（兩個格式各一次） | `references/batch-and-publish.md` §5–6 |
 | 11 | **發布**：`prepare` → push `ig/jpg/` → IG `preflight` → IG dry-run → 人說「發」→ `--confirm` → `series_links.py`（系列已有發布的前幾則時）→ Threads dry-run → 人說「發」→ `--confirm`；成功後自動寫回 state | **`references/publish-flow.md`**（照做）、`references/instagram-publish.md`、`references/threads-publish.md` |
 
 第一次是新系列時，先用 `design-series-visuals` 把視覺哲學與各版型的樣張做出來、**由人審過**才量產。系列已有模板就直接用，同一系列的所有貼文用同一版模板。
@@ -63,7 +62,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | `publish_common.py`、`hosting.py` | 兩個平台共用：`.env` 讀寫、token 效期與自動 refresh、JPEG 驗證；圖片託管介面（GitHub raw 網址） |
 | `spec_diff.py` | 審查後的改動範圍：目前 spec 與上次審查通過的版本差在哪些區塊（給忠實者的 `{ONLY_BLOCKS}`）；`--mark` 記下通過版本；也記每張 PNG 的雜湊，審查後圖變了會列「圖變了」 |
 | `series_links.py` | Threads 最後一則的「同系列」：把已發布的貼文從「（尚未發布）」補成標題＋網址（dry-run／`--write`）；發布 dry-run 會擋沒補的 |
-| `series_deps.py` | 系列規劃：列出該合併成一則的候選（輔助，不是偵測器；規劃時一定要問人） |
+| `series_deps.py` | 系列規劃：列出該合併成一則的候選（輔助，不是偵測器；最後由 Claude 判斷） |
 | `state.py` | 各觀念各格式的狀態（`not_tried`／`ready`／`published`／`unsuitable`）、發布紀錄、回補清單（`state/`） |
 | `cardlib.py` | 共用：唯讀解析觀念卡（含主張附的 `figures`：圖路徑、缺檔報錯、sha256 核對）、系列與發布包路徑、文字正規化與逐字比對 |
 
@@ -83,4 +82,5 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 
 品質基準：skillopt 第 2、3 則（`out/skillopt/skillopt-batch-evidence-minibatch/`、`…/skillopt-blind-acceptance-gate/`；雙卡、17 張）、SAG 第 1 則（`out/sag/sag-latent-hyperedge-one-hop/`；雙卡、19 張、卡上參考圖重製）。圖像大膽度與實驗頁：SAG 第 2、3 則（`recap`、`scoreboard`、`rails`、`gate`）。敘事順序（路線圖、小標籤、主角先對照後）：Cerebras 三則（`out/cerebras-rag/`）。單卡＋diagram：`skillopt-overview`；LaTeX：`out/standalone/bradley-terry-pairwise-preference/`。jev-cascade 寫法過時，不當範例；`tests/fixtures/` 只給測試用。
 - 審查者遇到用量限制或電腦睡眠中斷時，用 `SendMessage` 對同一個 subagent 說「繼續」，它會接著跑；不要重派（會多花一輪）。
+- **做系列時並行**（2026-11-10）：第 N 則的審查在背景跑時就先寫第 N+1 則；第 N 則審查學到的寫法（用語、節奏、標題句型），派第 N+1 則審查之前先套用，省一輪。
 - **改動集中再派**：同一輪的文字修改（讀者建議、人的回饋）一次改完，跑完程式 A、B，再用 `spec_diff.py` 的區塊當 `{ONLY_BLOCKS}` 派一位忠實者；邊改邊審會多出好幾輪（sag 把例子換成真實公司那次，忠實者第一輪就抓出例子與機制不符，修完又審一輪）。

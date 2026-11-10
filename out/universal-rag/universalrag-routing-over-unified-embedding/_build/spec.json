@@ -1,0 +1,401 @@
+{
+  "series": "universal-rag",
+  "concept": "universalrag-routing-over-unified-embedding",
+  "also_concepts": [],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "情境痛點",
+    "title": "答案明明在圖片裡，\n[[AI 搜尋卻先去翻文字]]",
+    "subtitle": "文字、圖片、影片全混在一起比對，\n就可能這樣。UniversalRAG 的解法：\n查之前，先判斷該去哪一類資料找",
+    "refs": [
+      "c1",
+      "c4",
+      "c5"
+    ],
+    "candidate": "A（人 2026-11-10 review 成品後接受）"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "答案明明在圖片裡，\n[[AI 搜尋卻先去翻文字]]",
+      "body": "文字、圖片、影片全混在一起比對，\n就可能這樣。UniversalRAG 的解法：\n查之前，先判斷該去哪一類資料找",
+      "refs": [
+        "c1",
+        "c4",
+        "c5",
+        "c2"
+      ],
+      "branches": [
+        "文字",
+        "表格",
+        "圖片 ✓",
+        "影片"
+      ],
+      "hot": [
+        2
+      ],
+      "fork": "先判斷"
+    },
+    {
+      "layout": "diagram",
+      "kind": "magnet",
+      "title": "問「外殼是什麼顏色？」\n[[文字先被抓回來]]",
+      "body": "假設答案就在產品照片裡。UniversalRAG 的論文指出，把所有資料混在一起比對時，用文字發問，系統會因為問題和文字資料的形式相近（同樣是字），優先抓文字回來。",
+      "refs": [
+        "c4",
+        "c5"
+      ],
+      "nodes": [
+        {
+          "text": "這款產品的外殼是什麼顏色？"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "文字資料",
+          "sub": "和問題一樣是字"
+        },
+        {
+          "text": "產品照片",
+          "sub": "答案在這裡"
+        }
+      ],
+      "heads": [
+        "先抓",
+        "被晾著"
+      ],
+      "note": "這是舉例，不是論文裡的案例。"
+    },
+    {
+      "layout": "context",
+      "title": "當資料庫[[不只有文字]]",
+      "body": "RAG 是先去資料庫找資料、再交給 LLM（ChatGPT 背後那種模型）回答的 AI 搜尋做法。KAIST 團隊提出的 UniversalRAG，面對的資料庫同時有好幾種形式，大小也不一。以產品資料庫為例：",
+      "rows": [
+        [
+          "文字",
+          "一段產品說明、一整份保固條款"
+        ],
+        [
+          "表格",
+          "規格表、價目表"
+        ],
+        [
+          "圖片",
+          "產品照片"
+        ],
+        [
+          "影片",
+          "幾秒的操作片段、整部教學影片"
+        ]
+      ],
+      "key_w": 210,
+      "refs": [
+        "c2"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "route",
+      "title": "為什麼先抓文字、怎麼改？\n[[分三段拆解]]",
+      "body": "先找原因，再看解法和效果。",
+      "refs": [
+        "c1",
+        "c3",
+        "c4"
+      ],
+      "label": "路線圖",
+      "nodes": [
+        {
+          "text": "舊做法卡在哪？",
+          "sub": "只查一種資料，或全部混在一起比對"
+        },
+        {
+          "text": "UniversalRAG 怎麼改？",
+          "sub": "資料分櫃放，查之前先判斷去哪查"
+        },
+        {
+          "text": "真的有用嗎？",
+          "sub": "有沒有找對資料？資料很多時快不快？"
+        }
+      ],
+      "heads": [
+        "這一則的路線",
+        "怎麼判斷該去哪查、實際怎麼導入：留到這個系列的第 2 則"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "merge",
+      "title": "最直觀的做法\n[[把所有資料放進同一個空間]]",
+      "body": "只查一種資料的 RAG，遇到要同時看文字和照片的題目就答不了。論文說最直觀的解法，是用 CLIP 這類編碼器把文字、圖片、影片換成一串數字，全放進同一個向量空間（用數字比遠近的地方），再看誰離問題最近。",
+      "refs": [
+        "c3",
+        "c4"
+      ],
+      "label": "舊做法",
+      "outcomes": [
+        {
+          "text": "文字"
+        },
+        {
+          "text": "圖片"
+        },
+        {
+          "text": "影片"
+        }
+      ],
+      "nodes": [
+        {
+          "text": "多模態編碼器",
+          "sub": "例如 CLIP"
+        },
+        {
+          "text": "同一個向量空間"
+        }
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "clusters",
+      "title": "但資料[[多半按形式分群]]，\n而不是按意思",
+      "body": "論文發現，在這個空間裡，資料多半依形式（模態）而不是意思（語意）聚在一起。明明有張圖片更對題，文字問題卻往往離文字資料比較近。這種偏見叫 Modality Gap。",
+      "refs": [
+        "c4"
+      ],
+      "label": "舊做法",
+      "fig_refs": [
+        "universal-rag/figure2.png"
+      ],
+      "heads": [
+        "圖片",
+        "影片",
+        "文字"
+      ],
+      "nodes": [
+        {
+          "text": "文字問題"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "語意更相關的圖片，往往反而比較遠"
+        }
+      ],
+      "note": "示意圖，改繪自論文的分布圖，點的位置不是實際資料。"
+    },
+    {
+      "layout": "diagram",
+      "kind": "shelves",
+      "title": "UniversalRAG 把資料\n[[按形式和大小分櫃放]]",
+      "body": "它依形式和大小把資料庫拆成多個索引（像分門別類的櫃子）。每櫃只放一種資料、各用最適合的編碼器，不必硬塞進同一個空間，也就避開了 Modality Gap。",
+      "refs": [
+        "c6",
+        "c4"
+      ],
+      "label": "UniversalRAG",
+      "columns": [
+        {
+          "head": "文字",
+          "items": [
+            {
+              "text": "段落",
+              "sub": "一小段"
+            },
+            {
+              "text": "文件",
+              "sub": "整份；要串起多段的題目用"
+            }
+          ]
+        },
+        {
+          "head": "表格",
+          "items": [
+            {
+              "text": "結構化的表格資料"
+            }
+          ]
+        },
+        {
+          "head": "圖片",
+          "items": [
+            {
+              "text": "圖片自己一櫃，保留原本的視覺資訊"
+            }
+          ]
+        },
+        {
+          "head": "影片",
+          "items": [
+            {
+              "text": "短片段",
+              "sub": "定位特定動作"
+            },
+            {
+              "text": "整部影片",
+              "sub": "理解長時間的劇情"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "duel",
+      "title": "Router 先判斷\n[[這題該去哪個櫃子]]",
+      "body": "Router 負責幫問題分流：先看懂問題在問什麼，再決定去哪查。以前問題直接跟所有資料比遠近，文字問題天生比較親近文字；現在 Router 判斷這題要看圖，就只去圖片櫃找，文字干擾不了。",
+      "refs": [
+        "c7",
+        "c1"
+      ],
+      "label": "UniversalRAG",
+      "heads": [
+        "以前：問題直接跟所有資料比遠近",
+        "現在：先看懂問題在問什麼"
+      ],
+      "nodes": [
+        {
+          "text": "文字資料"
+        },
+        {
+          "text": "圖片資料"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "Router：這題要看圖"
+        }
+      ],
+      "note": "沿用開頭外殼顏色的例子；要查好幾個櫃子的題目，見系列第 2 則。"
+    },
+    {
+      "layout": "diagram",
+      "kind": "matrix",
+      "title": "題目要看圖片或影片時\n[[UniversalRAG 照題意去找]]",
+      "body": "實驗中，GME、VLM2Vec 這類資料全擠在一起的模型，題目就算要看圖片或影片，多半還是抓文字；UniversalRAG 的 Router 則依題意分配。可見先判斷再搜尋，能繞過偏向文字的毛病。",
+      "refs": [
+        "c8",
+        "c9",
+        "c4",
+        "c7"
+      ],
+      "label": "實驗",
+      "heads": [
+        "要看圖片才答得出",
+        "要看影片才答得出"
+      ],
+      "nodes": [
+        {
+          "text": "GME、VLM2Vec",
+          "sub": "資料全擠在一起"
+        },
+        {
+          "text": "UniversalRAG",
+          "sub": "Router 依題意分配"
+        }
+      ],
+      "cells": [
+        [
+          [
+            "多半抓文字"
+          ],
+          [
+            "多半抓文字"
+          ]
+        ],
+        [
+          [
+            "去找圖片"
+          ],
+          [
+            "去找影片"
+          ]
+        ]
+      ],
+      "hot": 1
+    },
+    {
+      "layout": "diagram",
+      "kind": "race",
+      "title": "多了 Router 這一關\n[[資料到千萬級反而更快]]",
+      "body": "論文指出，把資料全放一起搜（統一檢索）時，資料越多，等結果的時間（延遲）越長。實驗發現，資料到千萬、甚至億級時，UniversalRAG 的延遲遠低於統一檢索；多一步雖要多花點時間，這麼多資料時還是划算。",
+      "refs": [
+        "c4",
+        "c11",
+        "c13",
+        "c1"
+      ],
+      "label": "實驗",
+      "heads": [
+        "統一檢索（全部一起搜）",
+        "UniversalRAG"
+      ],
+      "nodes": [
+        {
+          "text": "資料規模到千萬、甚至億級時"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "Router"
+        }
+      ],
+      "note": "路的長短只是示意，不是實測數字。"
+    },
+    {
+      "layout": "takeaway",
+      "question": "答案在照片裡，怎麼讓 AI 別先翻文字？",
+      "title": "UniversalRAG 的答案：\n資料按形式和大小分櫃放，\n查之前先用 Router\n判斷該去哪個櫃子。",
+      "refs": [
+        "c1",
+        "c15"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "這個系列共兩則",
+      "current": "universalrag-routing-over-unified-embedding",
+      "nav": "完整文章：datasciocean.com/paper-intro/universal-rag",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "答案明明在圖片裡，AI 搜尋卻先去翻文字。\n\n假設你問「這款產品的外殼是什麼顏色？」，答案在產品照片裡（這是舉例）。論文指出，把文字、圖片、影片全混在一起比對時，資料多半依形式而不是意思聚在一起，用文字發問就容易先抓到文字。\n\nUniversalRAG 的做法是把資料按形式和大小分櫃放，查之前先讓 Router（負責幫問題分流）判斷這題該去哪個櫃子：要看圖，就只去圖片櫃找。\n\n實驗中，把所有資料擠在一起的模型，就算題目要看圖片或影片才答得出來，多半還是抓文字；UniversalRAG 則照題意去找。資料多到千萬級時，它反而比全部一起搜的做法快，細節在圖裡。\n\n這是 UniversalRAG 系列的第 1 則；Router 怎麼判斷去哪查，在這個系列的第 2 則。",
+      "refs": [
+        "c1",
+        "c4",
+        "c5",
+        "c6",
+        "c7",
+        "c8",
+        "c13"
+      ],
+      "quals": []
+    },
+    "last": {
+      "text": "UniversalRAG：資料按形式和大小分櫃放，查之前先用 Router 判斷該去哪個櫃子。\n文章：datasciocean.com/paper-intro/universal-rag\n同系列：AI 怎麼決定這題去哪裡查？（尚未發布）",
+      "refs": [
+        "c1",
+        "c15"
+      ],
+      "link": "https://datasciocean.com/paper-intro/universal-rag/"
+    }
+  },
+  "caption": {
+    "first": "把文字、圖片混在一起比對的多模態 RAG，為什麼反而先抓文字？UniversalRAG 這樣解",
+    "first_refs": [
+      "c4",
+      "c5"
+    ],
+    "nav": "完整文章在 datasciocean.com，搜「UniversalRAG」",
+    "hashtags": [
+      "UniversalRAG",
+      "多模態RAG",
+      "RAG"
+    ]
+  }
+}

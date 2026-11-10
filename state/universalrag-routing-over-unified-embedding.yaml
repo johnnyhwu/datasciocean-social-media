@@ -1,0 +1,23 @@
+concept: universalrag-routing-over-unified-embedding
+formats:
+  ig_carousel:
+    status: published
+  threads_thread:
+    status: published
+posts:
+- post_id: universalrag-routing-over-unified-embedding:ig_carousel
+  format: ig_carousel
+  series_id: universal-rag
+  url: https://www.instagram.com/p/DfioeFskwS6/
+  published_at: 2026-11-10T00:37:17+0000
+  hook_type: 情境痛點
+  mentions: []
+  backfilled: []
+- post_id: universalrag-routing-over-unified-embedding:threads_thread
+  format: threads_thread
+  series_id: universal-rag
+  url: https://www.threads.com/@datasciocean/post/DfipBuME42W
+  published_at: 2026-11-10T00:41:10+0000
+  hook_type: 情境痛點
+  mentions: []
+  backfilled: []

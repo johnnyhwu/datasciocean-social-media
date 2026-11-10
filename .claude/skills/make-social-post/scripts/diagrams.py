@@ -78,6 +78,20 @@
             每站一個編號圓與一句「這一站要回答什麼」；這一則不走的那一段畫成虛線與空心終點。
             nodes = 站 2～4 個 [{text, sub?}]、選用 heads = [最上面的標籤, 虛線那一段的說明]
 
+  magnet    文字問題把文字吸過來、有答案的圖片被晾著（2026-11-09，UniversalRAG）：nodes[0] = {text}（問題）、outcomes = [{text, sub?}（文字）, {text, sub?}（圖片，金色＝答案在這）]、heads = [粗箭頭標籤, 虛線標籤]；純示意
+  puzzle    一個問題要兩塊拼圖、只拿得到一塊（2026-11-09）：nodes = [{text}（問題）, {text}（拿得到的那塊）, {text}（缺的那塊）]、outcomes[0] = {text}（結果）；純示意
+  merge     幾種資料經同一個編碼器進同一個空間（2026-11-09）：outcomes = 來源 2～4 個 [{text}]、nodes = [{text, sub?}（編碼器）, {text}（空間）]；純示意
+  clusters  向量空間裡依形式分群（2026-11-09，重畫論文的分布圖）：heads = 三群標籤 [上, 左下, 右下]、nodes[0] = {text}（問題的標籤）、outcomes[0] = {text}（虛線旁的說明）；點的位置固定、純示意，圖註要標
+  shelves   一列一種資料、每列幾個抽屜（2026-11-09）：columns = [{head, items:[{text, sub?}]}]，每列 1～2 個抽屜；純示意
+  switch    問題過 Router、只亮一條軌道到一個庫（2026-11-09）：nodes = [{text}（問題）, {text, sub?}（Router）]、heads[0] = Router 旁的話、outcomes = 庫 3～5 個 [{text, on?}]（剛好一個 on）；純示意
+  duel      同一題兩種決定方式（2026-11-09）：heads = [上段標, 下段標]、nodes = [{text}（文字庫）, {text}（影像庫）]、outcomes[0] = {text}（下段的判斷）；上段粗線連文字、細虛線連影像，下段文字庫被打叉；純示意
+  matrix    列是系統、欄是情況的小矩陣（2026-11-09）：heads = 欄標籤、nodes = 列 [{text, sub?}]、cells[列][欄] = [文字]、選用 hot = 要塗金色的列序號
+  grain     粒度抓錯的兩種下場（2026-11-10，UniversalRAG 第 2 則）：heads = [上段標籤, 下段標籤]、nodes = [{text}（膠捲下的說明）, {text}（文字段右邊的說明）]、outcomes = [{text}, {text}]（上下兩段的下場，畫成打叉）；
+            上段整部影片的膠捲只有一小段金色、下段一段文字只抓到中間一行；金色那段寬度不按比例，圖註要標「示意」
+  ballot    答案卡（2026-11-10）：heads = [抬頭, 選用：抬頭右邊的金色小字]、選用 nodes[0] = {text}（上方的問題）、outcomes = 選項 3～8 個 [{text, sub?, on?}]（on 打勾、整列淡金底）；純示意
+  thresh    各自打分、超過門檻才啟動（2026-11-10）：nodes = [{text, p}]（p 在 0～1）、ref = {name, value}（門檻）、heads = [上方標籤]；超過門檻的橫條金色、長度與分數成正比；分數通常是假設的，圖註要標
+  murky     表格和文字混在同一份文件、分不清（2026-11-10）：heads = [文件上方標籤, 右邊的問話]、nodes[0] = {text}（箭頭旁的話）、outcomes = 兩個下場 [{text}]（打叉）；純示意
+  race      兩條路到同一個答案，不帶數字（2026-11-09）：heads = [繞路那一方, 直線那一方]、nodes = [{text}]（規模）、選用 outcomes[0] = {text}（直線那條路上的關卡，2026-11-10）；路的長短是固定示意，圖註要標「不是實測數字」
   dist      機率分佈直條（2026-11-03，LLM-as-a-Verifier）：nodes = 每個分數一根 [{text（1、2、3…）, p}]（加總 1）、pick = argmax（最高那根金色、其餘虛線）／ev（金針停在期望值，程式算）、heads = [上方標籤, 針的標籤前綴]、選用 outcomes[0]
   snap      刻度上的點（2026-11-03）：nodes = 2～3 列 [{text, sub?, lo?, hi, marks:[{v, text}], tie?}]；數值相同的點往上疊，旁邊放金色小牌 tie；點的位置由程式 B 檢查
   stack     結果切三段的橫條（2026-11-03）：heads = 三個圖例、nodes = 2～4 列 [{text, sub?, parts:[a,b,c]}]（加總 total，預設 100）；長度由程式 B 檢查
@@ -2240,6 +2254,10 @@ DESC = {      # 給審查者與人看的「畫面」描述（build_package 輸�
     "combo": "上面：左邊一個框，金色箭頭指向右邊視窗，視窗裡也有一個同名的金邊框；下面：左邊兩個來源框各連一條線，匯到右邊同一個金色方塊",
     "compact": "左邊視窗很多行灰條（亮色是保留的，暗色是丟掉的），金色箭頭通向右邊視窗：只剩兩個框和一個游標；底下一個虛線框提醒",
     "sidecar": "左邊主視窗只有兩行（派出任務、收到摘要）；右邊側視窗滿是灰條；上面一條箭頭送出任務，下面一條金色箭頭只把摘要帶回來",
+    "grain": "上段一條深色膠捲（整部影片），只有中間一小段是金色（真正需要的那一段，寬度不按比例）；膠捲下一行說明、一個被打叉的下場。下段一段文字（五行淡灰條），只有中間一行是深色（只抓到這一句），右邊一行說明與一個被打叉的下場",
+    "ballot": "一張答案卡：深色抬頭，下面一列一個選項，每列左邊一個方格；打勾的格子是金色、整列墊淡金色；上方可有一個問題框，箭頭指向答案卡",
+    "thresh": "每個選項一條橫條（長度與分數成正比，軸 0 到 1），一條直的虛線標出門檻；超過門檻的橫條是金色，其餘是半透明藍綠；每條右邊寫分數",
+    "murky": "左邊一頁報告：上下是文字灰條、中間夾一張小表格，表格角落一個金色問號；右邊一句問話，箭頭往下指向兩個被打叉的下場",
     "layers": "兩排各一道防線：上排是指令先經過一道關卡；下排是指令在一個虛線容器裡，容器裡有金色的工作目錄，指令想往外走被叉掉、碰不到容器外的框",
 }
 
@@ -3547,6 +3565,527 @@ def ring(c: Canvas, spec: dict, y0: float) -> float:
     return y
 
 
+# ------------------------------------------------------------------ UniversalRAG（2026-11-09）
+def _docs(c, x, y, w, n=3, col=DEEP):
+    for i in range(n):
+        c.rect(x, y + i * 26, w, 14, fill=col, rx=4, op=.75 if i else 1)
+
+
+def _picture(c, x, y, w, h, gold=True):
+    c.rect(x, y, w, h, fill="none", stroke=DEEP, sw=5, rx=10)
+    b = y + h - 8
+    c.poly([(x + 10, b), (x + w * .34, y + h * .42), (x + w * .55, y + h * .72), (x + w * .72, y + h * .5), (x + w - 10, b)], fill=TEAL, closed=True, op=.55)
+    c.circle(x + w * .76, y + h * .28, min(w, h) * .13, fill=GOLD if gold else TEAL)
+
+
+def magnet(c: Canvas, spec: dict, y0: float) -> float:
+    """上面一個問題；粗箭頭吸到左邊的文字，右邊有答案的圖片只連到一條被叉掉的細虛線。"""
+    q, (A, B) = spec["nodes"][0], spec["outcomes"][:2]
+    heads, w = spec.get("heads", ["", ""]), X1 - X0
+    pw = (w - 40) / 2
+    qh = c.lines(q["text"], w - 44, 34) * 44.2 + 40
+    lab = 39.2
+    ph = 260
+    th = max(c.lines(n["text"], pw - 44, 34) * 44.2 + (c.lines(n["sub"], pw - 44, 28) * 39.2 + 6 if n.get("sub") else 0) for n in (A, B))
+    total = qh + 110 + ph
+    _fit(total, BOTTOM - y0, "magnet")
+    ph = min(ph + (BOTTOM - y0 - total) * .6, 340)
+    gap = 110 + min((BOTTOM - y0 - qh - 110 - ph) * .6, 40)
+    y = y0
+    c.textbox(X0, y, w, q["text"], fill=DEEP, h=qh, align="center")
+    y += qh
+    xa, xb = X0 + pw / 2, X0 + pw + 40 + pw / 2
+    c.arrow(X0 + w / 2 - 60, y + 6, xa, y + gap - 8, DEEP, 12, head=30)
+    c.line(X0 + w / 2 + 60, y + 6, xb, y + gap - 12, TEAL, 4, dash="10 10")
+    mx, my = (X0 + w / 2 + 60 + xb) / 2, y + gap / 2
+    c.line(mx - 15, my - 15, mx + 15, my + 15, DEEP, 7); c.line(mx - 15, my + 15, mx + 15, my - 15, DEEP, 7)
+    if heads[0]:
+        c.text(X0, y + 14, pw * .62, heads[0], "ds", DEEP, "left")
+    if len(heads) > 1 and heads[1]:
+        c.text(X0 + w - pw * .62, y + 14, pw * .62, heads[1], "ds", TEAL, "right")
+    y += gap
+    c.rect(X0, y, pw, ph, fill=CREAM, stroke=DEEP, sw=4)
+    c.rect(X0 + pw + 40, y, pw, ph, fill=CREAM, stroke=GOLD, sw=8)
+    ih = max(ph - th - 66, 70)
+    _docs(c, X0 + 80, y + 24, pw - 160, min(int(ih // 26), 4))
+    _picture(c, X0 + pw + 40 + (pw - ih * 1.3) / 2, y + 22, ih * 1.3, ih)
+    for x, n in ((X0, A), (X0 + pw + 40, B)):
+        ty = y + 22 + ih + 18
+        c.text(x + 22, ty, pw - 44, n["text"], "dn", DEEP, "center", (x, y, pw, ph))
+        if n.get("sub"):
+            c.text(x + 22, ty + c.lines(n["text"], pw - 44, 34) * 44.2 + 6, pw - 44, n["sub"], "ds", TEAL, "center", (x, y, pw, ph))
+    return y + ph
+
+
+def puzzle(c: Canvas, spec: dict, y0: float) -> float:
+    """一個問題要兩塊：左邊實心的拿得到，右邊虛線的「？」拿不到；底下金色框是結果。"""
+    q, a, b = spec["nodes"][:3]
+    out, w = spec["outcomes"][0], X1 - X0
+    qh, rh = c.lines(q["text"], w - 44, 34) * 44.2 + 40, c.lines(out["text"], w - 44, 34) * 44.2 + 40
+    piece = 230
+    total = qh + 60 + piece + 50 + rh
+    _fit(total, BOTTOM - y0, "puzzle")
+    piece = min(piece + (BOTTOM - y0 - total) * .7, 300)
+    y = y0
+    c.textbox(X0, y, w, q["text"], h=qh, align="center")
+    y += qh
+    pw, knob = 340, 34
+    xl = X0 + w / 2 - pw
+    c.arrow(X0 + w / 2 - pw / 2, y + 6, X0 + w / 2 - pw / 2, y + 54, DEEP, 6)
+    c.arrow(X0 + w / 2 + pw / 2, y + 6, X0 + w / 2 + pw / 2, y + 54, TEAL, 4)
+    y += 60
+    c.rect(xl, y, pw, piece, fill=TEAL, rx=8)
+    c.circle(xl + pw, y + piece / 2, knob, fill=TEAL)
+    c.rect(xl + pw + 6, y, pw - 6, piece, fill="none", stroke=DEEP, sw=4, dash="12 10", rx=8)
+    c.circle(xl + pw + 6, y + piece / 2, knob + 6, fill="none", stroke=DEEP, sw=4, dash="10 8")
+    c.text(xl + 22, y + piece / 2 - c.lines(a["text"], pw - 44 - knob, 34) * 22, pw - 44 - knob, a["text"], "dn", CREAM, "center", (xl, y, pw, piece))
+    c.text(xl + pw + 50, y + 26, pw - 74, "？", "dv", DEEP, "center")
+    c.text(xl + pw + 50, y + piece / 2 + 16, pw - 74, b["text"], "dn", DEEP, "center", (xl + pw, y, pw, piece))
+    y += piece + 50
+    c.textbox(X0, y, w, out["text"], fill=GOLD, tcolor=DEEP, h=rh, align="center")
+    return y + rh
+
+
+def merge(c: Canvas, spec: dict, y0: float) -> float:
+    """左邊幾種資料，箭頭匯入中間的編碼器，再全部進右邊同一個大圓。"""
+    src, (enc, sp) = spec["outcomes"], spec["nodes"][:2]
+    if not 2 <= len(src) <= 4:
+        raise ValueError("merge 的 outcomes 要 2～4 個來源")
+    h = BOTTOM - y0
+    _fit(420, h, "merge")
+    h = min(h, 560)
+    y, sw, sh = y0, 180, min(96, (h - 20 * (len(src) - 1)) / len(src))
+    gap = (h - sh * len(src)) / max(len(src) - 1, 1) if len(src) > 1 else 0
+    ew = 250
+    ex, ey, eh = X0 + sw + 60, y + h / 2 - 110, 220
+    r = (X1 - (ex + ew + 50)) / 2
+    r = min(r, h / 2)
+    cx, cy = X1 - r, y + h / 2
+    pal = (DEEP, TEAL, MID, LIGHT)      # 第 k 個來源 = 圓裡第 k 種點（2026-11-10 編輯：方塊兩種顏色、點三種顏色，讀者對不起來）
+    for i, n in enumerate(src):
+        sy = y + i * (sh + gap)
+        c.rect(X0, sy, sw, sh, fill=CREAM, stroke=DEEP, sw=4, rx=12)
+        c.circle(X0 + 30, sy + sh / 2, 13, fill=pal[i])
+        c.text(X0 + 50, sy + (sh - 44.2) / 2, sw - 60, n["text"], "dn", DEEP, "center", (X0, sy, sw, sh))
+        c.arrow(X0 + sw + 4, sy + sh / 2, ex - 6, y + h / 2, DEEP, 5)
+    c.textbox(ex, ey, ew, enc["text"], enc.get("sub"), fill=CREAM, tcolor=DEEP, scolor=TEAL, stroke=DEEP, h=eh, align="center", pad=14)
+    c.arrow(ex + ew + 4, y + h / 2, cx - r - 4, y + h / 2, DEEP, 10, head=26)
+    c.circle(cx, cy, r, fill=LIGHT, op=.35, stroke=DEEP, sw=4)
+    dots = [(-.5, -.45, 0), (-.2, -.62, 1), (.15, -.55, 2), (.48, -.4, 0), (.62, -.08, 1), (-.65, -.05, 2), (-.4, .42, 1), (.05, .62, 0), (.45, .42, 2), (.1, -.25, 1), (-.22, -.3, 2)]
+    for dx, dy, k in dots:
+        if k < len(src):
+            c.circle(cx + dx * r, cy + dy * r, 13, fill=pal[k])
+    tw = r * 1.5
+    c.text(cx - tw / 2, cy - c.lines(sp["text"], tw, 34) * 22 + 34, tw, sp["text"], "dn", DEEP, "center")
+    return y + h
+
+
+CL_PTS = ((.50, .17, .22, .12), (.17, .74, .13, .12), (.74, .68, .21, .15))     # 三群的中心與半徑（相對座標）
+
+
+def clusters(c: Canvas, spec: dict, y0: float) -> float:
+    """向量空間的方框裡三群點，各自一種形式；問題（金星）落在文字那一群旁邊，到圖片那群是一條長虛線。"""
+    heads, q, out = spec["heads"], spec["nodes"][0], spec["outcomes"][0]
+    if len(heads) != 3:
+        raise ValueError("clusters 的 heads 要三個（上、左下、右下）")
+    _fit(420, BOTTOM - y0, "clusters")
+    y, w, h = y0, X1 - X0, BOTTOM - y0
+    c.rect(X0, y, w, h, fill="none", stroke=DEEP, sw=4, rx=10)
+    cols = (TEAL, MID, DEEP)
+    for k, (fx, fy, rx, ry) in enumerate(CL_PTS):
+        cx, cy = X0 + fx * w, y + fy * h
+        n = 46
+        for i in range(n):                # 黃金角螺旋：點的位置固定，重渲不會變
+            a, f = i * 2.39996, math.sqrt((i + .5) / n)
+            c.circle(cx + math.cos(a) * f * rx * w, cy + math.sin(a) * f * ry * h, 8, fill=cols[k], op=.75)
+    # 群的標籤放在群的外側，不壓在點上
+    c.text(X0 + 40, y + 24, 300, heads[0], "dn", TEAL, "left")
+    c.text(X0 + 24, y + h - 62, 300, heads[1], "dn", TEAL, "left")
+    c.text(X1 - 324, y + h - 62, 300, heads[2], "dn", DEEP, "right")
+    qx, qy = X0 + (CL_PTS[2][0] - CL_PTS[2][2] + .05) * w, y + (CL_PTS[2][1] - .03) * h
+    ix, iy = X0 + CL_PTS[0][0] * w, y + (CL_PTS[0][1] + CL_PTS[0][3] + .03) * h
+    c.line(qx, qy, ix, iy, DEEP, 4, dash="10 10")
+    c.circle(qx, qy, 24, fill=GOLD, stroke=DEEP, sw=4)
+    c.text(qx - 240, qy - 20, 200, q["text"], "dl", DEEP, "right")
+    mx, my = (qx + ix) / 2, (qy + iy) / 2
+    c.text(mx - 330, my - 62, 300, out["text"], "ds", DEEP, "right")
+    return y + h
+
+
+def shelves(c: Canvas, spec: dict, y0: float) -> float:
+    """一列一種資料，左邊深色標籤，右邊 1～2 個抽屜（每個抽屜有把手）。"""
+    cols = spec["columns"]
+    if not 2 <= len(cols) <= 5:
+        raise ValueError("shelves 的 columns 要 2～5 列")
+    gap, lw, w = 18, 136, X1 - X0
+    rw = w - lw - 14
+    need = []
+    for col in cols:
+        iw = (rw - 14 * (len(col["items"]) - 1)) / len(col["items"]) - 90
+        need.append(max(c.lines(it["text"], iw, 34) * 44.2 + (c.lines(it["sub"], iw, 28) * 39.2 + 6 if it.get("sub") else 0) for it in col["items"]) + 36)
+    total = sum(need) + gap * (len(cols) - 1)
+    _fit(total, BOTTOM - y0, "shelves")
+    add = min((BOTTOM - y0 - total) / len(cols), 34)
+    y = y0
+    for col, h in zip(cols, need):
+        h += add
+        c.textbox(X0, y, lw, col["head"], h=h, align="center", pad=8)
+        n = len(col["items"])
+        dw = (rw - 14 * (n - 1)) / n
+        for j, it in enumerate(col["items"]):
+            x = X0 + lw + 14 + j * (dw + 14)
+            c.rect(x, y, dw, h, fill=CREAM, stroke=DEEP, sw=4, rx=10)
+            c.rect(x + 22, y + h / 2 - 24, 14, 48, fill=TEAL, rx=6)
+            iw = dw - 90
+            th = c.lines(it["text"], iw, 34) * 44.2 + (c.lines(it["sub"], iw, 28) * 39.2 + 6 if it.get("sub") else 0)
+            ty = y + (h - th) / 2
+            c.text(x + 62, ty, iw, it["text"], "dn", DEEP, "left", (x, y, dw, h))
+            if it.get("sub"):
+                c.text(x + 62, ty + c.lines(it["text"], iw, 34) * 44.2 + 6, iw, it["sub"], "ds", TEAL, "left", (x, y, dw, h))
+        y += h + gap
+    return y - gap
+
+
+def switch(c: Canvas, spec: dict, y0: float) -> float:
+    """問題 → Router → 一排庫：只有 on 的那條軌道是金色粗線，其他是淡虛線、庫上打叉。"""
+    q, r_ = spec["nodes"][:2]
+    libs, heads, w = spec["outcomes"], spec.get("heads", [""]), X1 - X0
+    if not 3 <= len(libs) <= 5 or sum(1 for n in libs if n.get("on")) != 1:
+        raise ValueError("switch 的 outcomes 要 3～5 個，且剛好一個 on")
+    qh = c.lines(q["text"], w - 44, 34) * 44.2 + 36
+    rw = 380
+    rh = c.lines(r_["text"], rw - 44, 34) * 44.2 + (c.lines(r_["sub"], rw - 44, 28) * 39.2 + 6 if r_.get("sub") else 0) + 36
+    lh, arr, fan_h = 112, 46, 150
+    total = qh + arr + rh + fan_h + lh
+    _fit(total, BOTTOM - y0, "switch")
+    fan_h = min(fan_h + BOTTOM - y0 - total, 250)
+    y = y0
+    c.textbox(X0, y, w, q["text"], fill=CREAM, tcolor=DEEP, stroke=DEEP, h=qh, align="center")
+    y += qh
+    cx = X0 + w / 2
+    c.arrow(cx, y + 4, cx, y + arr - 4, DEEP, 6)
+    y += arr
+    c.textbox(cx - rw / 2, y, rw, r_["text"], r_.get("sub"), h=rh, align="center")
+    if heads and heads[0]:
+        c.text(cx + rw / 2 + 24, y + (rh - 39.2 * c.lines(heads[0], X1 - cx - rw / 2 - 24, 28)) / 2, X1 - cx - rw / 2 - 24, heads[0], "ds", DEEP, "left")
+    y += rh
+    n = len(libs)
+    lw = (w - 18 * (n - 1)) / n
+    y2 = y + fan_h
+    for off_first in (True, False):
+        for i, l in enumerate(libs):
+            if bool(l.get("on")) == off_first:
+                continue
+            x = X0 + i * (lw + 18) + lw / 2
+            d = f"M{cx:.1f} {y:.1f} C{cx:.1f} {y + fan_h * .55:.1f},{x:.1f} {y + fan_h * .45:.1f},{x:.1f} {y2:.1f}"
+            if l.get("on"):
+                c.raw(f'<path class="bg" d="{d}" fill="none" stroke="{GOLD}" stroke-width="16" stroke-linecap="round"/>')
+            else:
+                c.raw(f'<path class="bg" d="{d}" fill="none" stroke="{TEAL}" stroke-width="4" stroke-dasharray="10 12" stroke-opacity=".6"/>')
+    for i, l in enumerate(libs):
+        x = X0 + i * (lw + 18)
+        on = l.get("on")
+        c.rect(x, y2, lw, lh, fill=GOLD if on else CREAM, stroke=None if on else TEAL, sw=3, dash=None if on else "10 8", rx=10)
+        c.text(x + 8, y2 + (lh - 44.2) / 2, lw - 16, l["text"], "dn", DEEP, "center", (x, y2, lw, lh))
+    return y2 + lh
+
+
+def _lib(c, x, y, w, h, s, gold=False, dash=None):
+    c.rect(x, y, w, h, fill=GOLD if gold else CREAM, stroke=None if gold else DEEP, sw=4, dash=dash, rx=10)
+    c.text(x + 10, y + (h - 44.2) / 2, w - 20, s, "dn", DEEP, "center", (x, y, w, h))
+
+
+def duel(c: Canvas, spec: dict, y0: float) -> float:
+    """上段：問題用距離比，粗線連文字庫、細虛線連影像庫。下段：先判斷，金線直達影像庫，文字庫被打叉。"""
+    heads, (txt, img), out = spec["heads"], spec["nodes"][:2], spec["outcomes"][0]
+    lab, row = 56, 2 * 60 + 24            # 每段兩個庫上下排，框最矮 60（34px 字放得下），中間至少留 8
+    h = BOTTOM - y0
+    _fit(2 * (lab + row) + 44, h, "duel")
+    row = min((h - 2 * lab - 44) / 2, 220)
+    sx, lw = X0 + 50, 260
+    lh = min(92, (row - 24) / 2)          # 2026-11-10：空間不夠時兩個框會疊在一起（讀者：文字資料壓在虛線框上），框高跟著縮
+    lx = X1 - lw
+    y = y0
+    c.text(X0, y, X1 - X0, heads[0], "dl", TEAL, "left")
+    y += lab
+    ty, iy = y + 8, y + row - lh - 8
+    cy = y + row / 2
+    c.circle(sx, cy, 34, fill=DEEP)
+    c.text(sx - 30, cy - 20, 60, "問", "dl", CREAM, "center", (sx - 30, cy - 26, 60, 52))
+    c.line(sx + 36, cy, lx - 6, ty + lh / 2, DEEP, 12)
+    c.line(sx + 36, cy, lx - 6, iy + lh / 2, TEAL, 4, dash="10 10")
+    _lib(c, lx, ty, lw, lh, txt["text"])
+    _lib(c, lx, iy, lw, lh, img["text"], dash="10 8")
+    y += row + 44
+    c.text(X0, y, X1 - X0, heads[1], "dl", TEAL, "left")
+    y += lab
+    ty, iy = y + 8, y + row - lh - 8
+    cy = y + row / 2
+    c.circle(sx, cy, 34, fill=DEEP)
+    c.text(sx - 30, cy - 20, 60, "問", "dl", CREAM, "center", (sx - 30, cy - 26, 60, 52))
+    jw, jh = 270, c.lines(out["text"], 270 - 28, 34) * 44.2 + 30
+    jx = sx + 70
+    c.line(sx + 36, cy, jx, cy, DEEP, 6)
+    c.line(jx + jw, cy, lx - 6, iy + lh / 2, GOLD, 14)
+    c.line(jx + jw, cy, lx - 6, ty + lh / 2, TEAL, 4, dash="10 10", op=.6)
+    mx, my = (jx + jw + lx) / 2, (cy + ty + lh / 2) / 2
+    c.line(mx - 14, my - 14, mx + 14, my + 14, DEEP, 7); c.line(mx - 14, my + 14, mx + 14, my - 14, DEEP, 7)
+    c.textbox(jx, cy - jh / 2, jw, out["text"], fill=DEEP, h=jh, align="center", pad=14)
+    _lib(c, lx, ty, lw, lh, txt["text"], dash="10 8")
+    _lib(c, lx, iy, lw, lh, img["text"], gold=True)
+    return y + row
+
+
+def matrix(c: Canvas, spec: dict, y0: float) -> float:
+    """列是系統、欄是情況。hot 的列塗金色。"""
+    heads, rows, cells, hot, w = spec["heads"], spec["nodes"], spec["cells"], spec.get("hot"), X1 - X0
+    if len(cells) != len(rows) or any(len(r) != len(heads) for r in cells):
+        raise ValueError("matrix 的 cells 要和列、欄數一致")
+    kw_, gap = 300, 16
+    cw = (w - kw_ - gap * len(heads)) / len(heads)
+    hh = max(c.lines(h_, cw - 20, 28) * 39.2 for h_ in heads) + 24
+    rh = [max(c.lines(r["text"], kw_ - 36, 34) * 44.2 + (c.lines(r["sub"], kw_ - 36, 28) * 39.2 + 6 if r.get("sub") else 0),
+              max(c.lines(x[0], cw - 28, 34) * 44.2 for x in row)) + 44 for r, row in zip(rows, cells)]
+    total = hh + sum(rh) + gap * len(rows)
+    _fit(total, BOTTOM - y0, "matrix")
+    add = min((BOTTOM - y0 - total) / len(rows), 90)
+    y = y0
+    for j, h_ in enumerate(heads):
+        c.text(X0 + kw_ + gap + j * (cw + gap) + 10, y, cw - 20, h_, "ds", TEAL, "center")
+    y += hh
+    for i, (r, row, h) in enumerate(zip(rows, cells, rh)):
+        h += add
+        is_hot = i == hot
+        c.textbox(X0, y, kw_, r["text"], r.get("sub"), h=h, align="center", pad=18)
+        for j, x in enumerate(row):
+            cx_ = X0 + kw_ + gap + j * (cw + gap)
+            c.rect(cx_, y, cw, h, fill=GOLD if is_hot else CREAM, stroke=None if is_hot else DEEP, sw=4, rx=10)
+            c.text(cx_ + 14, y + (h - c.lines(x[0], cw - 28, 34) * 44.2) / 2, cw - 28, x[0], "dn", DEEP, "center", (cx_, y, cw, h))
+        y += h + gap
+    return y - gap
+
+
+def race(c: Canvas, spec: dict, y0: float) -> float:
+    """兩條路到同一個答案：對照那條繞來繞去、主角那條是一段金色直線。不帶數字，路的長短只是示意，圖註要標。"""
+    heads, w = spec["heads"], X1 - X0
+    if len(heads) != 2 or len(spec["nodes"]) != 1:
+        raise ValueError("race 的 heads 要兩個、nodes 要一個（規模）")
+    lab, lane = 50, 120
+    total = lab + 30 + 2 * (lab + lane) + 30
+    _fit(total, BOTTOM - y0, "race")
+    lane = min(lane + (BOTTOM - y0 - total) / 2, 190)
+    y = y0
+    c.text(X0, y, w, spec["nodes"][0]["text"], "dn", DEEP, "left")
+    y += lab + 30
+    gx = X1 - 50
+    c.text(X0, y, w, heads[0], "dl", TEAL, "left")
+    y += lab
+    cy, n, sx, ex = y + lane / 2, 7, X0 + 24, gx - 40
+    pts = [(sx + (ex - sx) * i / (n * 8), cy + (lane / 2 - 16) * math.sin(i / 8 * math.pi)) for i in range(n * 8 + 1)]
+    c.poly(pts, stroke=TEAL, sw=10)
+    c.circle(sx, cy, 18, fill=DEEP); c.circle(gx, cy, 34, fill=TEAL)
+    y += lane + 30
+    c.text(X0, y, w, heads[1], "dl", TEAL, "left")
+    y += lab
+    cy = y + lane / 2
+    gate = (spec.get("outcomes") or [None])[0]       # 選用（2026-11-10）：直線那條路上多畫一道關卡，標籤是 outcomes[0]
+    if gate:
+        gw, gx0 = max(160, len(gate["text"]) * 22 + 48), sx + 60
+        c.line(sx, cy, gx0, cy, GOLD, 16)
+        c.textbox(gx0, cy - 36, gw, gate["text"], fill=DEEP, h=72, align="center", pad=10)
+        c.line(gx0 + gw, cy, gx - 34, cy, GOLD, 16)
+    else:
+        c.line(sx, cy, gx - 34, cy, GOLD, 16)
+    c.circle(sx, cy, 18, fill=DEEP); c.circle(gx, cy, 34, fill=GOLD)
+    return y + lane
+
+
+# ------------------------------------------------------------------ UniversalRAG 第 2 則（2026-11-10）
+def _miss(c: Canvas, x: float, y: float, w: float, s: str) -> float:
+    """一個被打叉的下場：深色圓裡一個米色叉，右邊一句話（34px）。回傳高度。"""
+    h = c.lines(s, w - 64, 34) * 44.2
+    c.circle(x + 22, y + h / 2, 22, fill=DEEP)
+    _cross(c, x + 22, y + h / 2, 9, CREAM, 4)
+    c.text(x + 60, y, w - 60, s, "dn", DEEP, "left")
+    return h
+
+
+def grain(c: Canvas, spec: dict, y0: float) -> float:
+    """粒度抓錯的兩種下場：上段一條整部影片的膠捲，只有一小段金色是真正需要的；下段一段文字只抓到中間一行。
+    heads = [上段標籤, 下段標籤]、nodes = [{text}（膠捲下的說明）, {text}（文字段右邊的說明）]、outcomes = [{text}（上段的下場）, {text}（下段的下場）]。
+    金色那段的寬度不按比例（真的按比例會細到看不見），圖註要標「示意」。"""
+    heads, nodes, outs = spec["heads"], spec["nodes"], spec["outcomes"]
+    if len(heads) != 2 or len(nodes) != 2 or len(outs) != 2:
+        raise ValueError("grain 的 heads、nodes、outcomes 都要剛好兩個")
+    w, lab, film = X1 - X0, 44, 84
+    cap = c.lines(nodes[0]["text"], w, 28) * 39.2
+    o1 = c.lines(outs[0]["text"], w - 64, 34) * 44.2
+    bw = 430
+    rw = w - bw - 44
+    para = 5 * 30 + 34
+    right = c.lines(nodes[1]["text"], rw, 28) * 39.2 + 16 + c.lines(outs[1]["text"], rw - 64, 34) * 44.2
+    blk = max(para, right)
+    gap = 40
+    total = lab + 12 + film + 14 + cap + 16 + o1 + gap + lab + 12 + blk
+    _fit(total, BOTTOM - y0, "grain")
+    gap += min(BOTTOM - y0 - total, 80)
+    y = y0
+    c.text(X0, y, w, heads[0], "dl", TEAL, "left")
+    y += lab + 12
+    c.rect(X0, y, w, film, fill=DEEP, rx=8)
+    for k in range(int((w - 24) // 36)):          # 膠捲上下緣的齒孔
+        fx = X0 + 14 + k * 36
+        c.rect(fx, y + 9, 18, 11, fill=CREAM, rx=3, op=.5)
+        c.rect(fx, y + film - 20, 18, 11, fill=CREAM, rx=3, op=.5)
+    c.rect(X0 + w * .62, y - 12, 14, film + 24, fill=GOLD, rx=4)
+    y += film + 14
+    c.text(X0, y, w, nodes[0]["text"], "ds", DEEP, "left")
+    y += cap + 16
+    _miss(c, X0, y, w, outs[0]["text"])
+    y += o1 + gap
+    c.text(X0, y, w, heads[1], "dl", TEAL, "left")
+    y += lab + 12
+    py = y + (blk - para) / 2
+    c.rect(X0, py, bw, para, fill="none", stroke=TEAL, sw=3, dash="8 8", rx=12)
+    for k in range(5):
+        on = k == 2
+        c.rect(X0 + 24, py + 20 + k * 30, (bw - 48) * (.94, .82, .9, .86, .6)[k], 14, fill=DEEP, rx=6, op=None if on else .22)
+    rx_ = X0 + bw + 44
+    ry = y + (blk - right) / 2
+    c.text(rx_, ry, rw, nodes[1]["text"], "ds", DEEP, "left")
+    _miss(c, rx_, ry + c.lines(nodes[1]["text"], rw, 28) * 39.2 + 16, rw, outs[1]["text"])
+    return y + blk
+
+
+def ballot(c: Canvas, spec: dict, y0: float) -> float:
+    """答案卡：heads = [卡片抬頭, 選用：抬頭右邊的小字]；選用 nodes[0] = {text}（上方的問題，箭頭指向答案卡）；
+    outcomes = 選項 3～8 個 [{text, sub?, on?}]（on 的格子打勾、整列墊淡金色）。純示意。"""
+    opts, heads = spec["outcomes"], spec.get("heads", [])
+    if not 3 <= len(opts) <= 8:
+        raise ValueError(f"ballot 的 outcomes（選項）要 3～8 個，現在 {len(opts)} 個")
+    if not heads:
+        raise ValueError("ballot 要有 heads[0]（答案卡抬頭）")
+    q = (spec.get("nodes") or [None])[0]
+    w = X1 - X0
+    qh = c.lines(q["text"], w - 44, 34) * 44.2 + 40 if q else 0
+    qgap = 56 if q else 0
+    hh, rh, nw = 60, 58, 230
+    total = qh + qgap + hh + 12 + len(opts) * rh + 12
+    _fit(total, BOTTOM - y0, "ballot")
+    rh = min(rh + (BOTTOM - y0 - total) / len(opts), 72)
+    y = y0
+    if q:
+        c.textbox(X0, y, w, q["text"], fill=DEEP, h=qh, align="center")
+        y += qh
+        c.arrow(X0 + w / 2, y + 8, X0 + w / 2, y + qgap - 6, DEEP, 6, head=18)
+        y += qgap
+    ch = hh + 12 + len(opts) * rh + 12
+    c.rect(X0, y, w, ch, fill=CREAM, stroke=DEEP, sw=4, rx=18)
+    c.rect(X0, y, w, hh, fill=DEEP, rx=18)
+    c.rect(X0, y + hh - 20, w, 20, fill=DEEP, rx=0)
+    c.text(X0 + 28, y + (hh - 39.2) / 2, w * .62, heads[0], "dl", CREAM, "left", (X0, y, w, hh))
+    if len(heads) > 1 and heads[1]:
+        c.text(X0 + w * .62, y + (hh - 39.2) / 2, w * .38 - 28, heads[1], "dl", GOLD, "right", (X0, y, w, hh))
+    yy = y + hh + 12
+    for o in opts:
+        on = o.get("on")
+        cy = yy + rh / 2
+        if on:
+            c.rect(X0 + 14, yy + 4, w - 28, rh - 8, fill=GOLD, rx=10, op=.38)
+        c.rect(X0 + 36, cy - 18, 36, 36, fill=GOLD if on else "none", stroke=DEEP if on else TEAL, sw=4, rx=6)
+        if on:
+            _tick(c, X0 + 54, cy, DEEP, 5)
+        c.text(X0 + 94, cy - 22, nw - 10, o["text"], "dn", DEEP, "left")
+        if o.get("sub"):
+            c.text(X0 + 94 + nw, cy - 19.6, w - 94 - nw - 28, o["sub"], "ds", DEEP if on else TEAL, "left")
+        yy += rh
+    return y + ch
+
+
+def thresh(c: Canvas, spec: dict, y0: float) -> float:
+    """每個選項各自打分、超過門檻才啟動：nodes = 選項 [{text, p}]（p 在 0～1，通常是假設的分數）、ref = {name, value}（門檻）、
+    heads = [上方標籤]。分數超過門檻的橫條金色，其餘半透明藍綠；長度與分數成正比（軸 0～1），一條直虛線標門檻。圖註要說明分數是假設的。"""
+    nodes, ref, heads = spec["nodes"], spec["ref"], spec.get("heads", [""])
+    tau = ref["value"]
+    if not 0 < tau < 1 or any(not 0 <= n["p"] <= 1 for n in nodes):
+        raise ValueError("thresh 的門檻與分數都要在 0～1 之間")
+    w, nw, vw = X1 - X0, 210, 96
+    bx0, bx1 = X0 + nw, X1 - vw
+    bl = bx1 - bx0
+    hh, rh = 52, 48
+    total = hh + 26 + len(nodes) * rh
+    _fit(total, BOTTOM - y0, "thresh")
+    rh = min(rh + (BOTTOM - y0 - total) / len(nodes), 74)
+    y = y0
+    xt = bx0 + bl * tau
+    if heads[0]:
+        c.text(X0, y, xt - X0 - 160, heads[0], "dl", TEAL, "left")
+    c.text(xt - 150, y, 300, f"{ref['name']} {tau:g}", "dl", DEEP, "center")
+    y += hh + 26
+    top = y
+    for n in nodes:
+        on = n["p"] > tau
+        cy = y + rh / 2
+        c.text(X0, cy - 22, nw - 16, n["text"], "dn", DEEP if on else TEAL, "left")
+        c.rect(bx0, cy - 15, bl, 30, fill=DEEP, rx=6, op=.07)
+        if n["p"] > 0:
+            c.rect(bx0, cy - 15, max(bl * n["p"], 12), 30, fill=GOLD if on else TEAL, rx=6, op=None if on else .5)
+        c.text(bx1 + 12, cy - 19.6, vw - 12, f"{n['p']:g}", "dl", DEEP if on else TEAL, "left")
+        y += rh
+    c.line(xt, top - 18, xt, y + 4, DEEP, 4, dash="10 8")
+    return y
+
+
+def murky(c: Canvas, spec: dict, y0: float) -> float:
+    """企業文件裡表格和文字混在一起、分不清：左邊一頁報告（上下是文字灰條、中間夾一張小表格，表格角落一個金色問號）；
+    右邊一句問話，箭頭往下指向兩個被打叉的下場。heads = [文件上方標籤, 右邊的問話]、nodes[0] = {text}（箭頭旁的話）、outcomes = 兩個下場 [{text}]。純示意。"""
+    heads, al, outs = spec["heads"], spec["nodes"][0], spec["outcomes"]
+    if len(heads) != 2 or len(outs) != 2:
+        raise ValueError("murky 的 heads 要兩個、outcomes 要兩個")
+    w, pw, lab = X1 - X0, 400, 44
+    rx = X0 + pw + 60
+    rw = X1 - rx
+    qh = c.lines(heads[1], rw, 34) * 44.2
+    ah = c.lines(al["text"], rw - 40, 28) * 39.2
+    oh = [c.lines(o["text"], rw - 64, 34) * 44.2 for o in outs]
+    arr = max(ah + 24, 96)
+    right = qh + 20 + arr + 20 + oh[0] + 26 + oh[1]
+    ph = 430
+    total = lab + 12 + max(ph, right)
+    _fit(total, BOTTOM - y0, "murky")
+    ph = min(max(ph, right) + (BOTTOM - y0 - total) * .5, 520)
+    y = y0
+    c.text(X0, y, pw, heads[0], "dl", TEAL, "left")
+    y += lab + 12
+    c.rect(X0, y, pw, ph, fill=CREAM, stroke=DEEP, sw=4, rx=12)
+    ty = y + 32
+    for k in range(3):
+        c.rect(X0 + 30, ty + k * 30, (pw - 60) * (.95, .82, .58)[k], 12, fill=DEEP, rx=6, op=.25)
+    tby, tbw = ty + 3 * 30 + 18, pw - 60
+    tbh = ph - 2 * (3 * 30 + 18 + 32) - 6
+    c.rect(X0 + 30, tby, tbw, tbh, fill="none", stroke=TEAL, sw=3, rx=4)
+    c.rect(X0 + 30, tby, tbw, tbh / 4, fill=TEAL, rx=4, op=.3)
+    for i in range(1, 4):
+        c.line(X0 + 30, tby + tbh * i / 4, X0 + 30 + tbw, tby + tbh * i / 4, TEAL, 2)
+    for j in range(1, 3):
+        c.line(X0 + 30 + tbw * j / 3, tby, X0 + 30 + tbw * j / 3, tby + tbh, TEAL, 2)
+    by = tby + tbh + 22
+    for k in range(3):
+        c.rect(X0 + 30, by + k * 30, (pw - 60) * (.9, .97, .7)[k], 12, fill=DEEP, rx=6, op=.25)
+    qx, qy = X0 + 30 + tbw, tby
+    c.circle(qx, qy, 34, fill=GOLD)
+    c.text(qx - 34, qy - 22.1, 68, "?", "dn", DEEP, "center")
+    ry = y + (ph - right) / 2
+    c.text(rx, ry, rw, heads[1], "dn", DEEP, "left")
+    ry += qh + 20
+    c.arrow(rx + 16, ry, rx + 16, ry + arr, DEEP, 6, head=18)
+    c.text(rx + 40, ry + (arr - ah) / 2, rw - 40, al["text"], "ds", DEEP, "left")
+    ry += arr + 20
+    _miss(c, rx, ry, rw, outs[0]["text"])
+    _miss(c, rx, ry + oh[0] + 26, rw, outs[1]["text"])
+    return y + ph
+
+
 KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "paths": paths, "epochs": epochs,
          "dotgrid": dotgrid, "dumbbell": dumbbell, "range": range_chart, "funnel": funnel,
          "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation, "tokens": tokens,
@@ -3557,7 +4096,9 @@ KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "
          "sockets": sockets, "lazy": lazy, "hub": hub, "pinned": pinned, "compact": compact, "sidecar": sidecar, "combo": combo,
          "waist": waist, "schema": schema, "branch": branch, "gates": gates, "route": route, "depend": depend,
          "pick": pick, "pile": pile, "addlane": addlane,
-         "dist": dist, "snap": snap, "stack": stack, "target": target, "ring": ring}
+         "dist": dist, "snap": snap, "stack": stack, "target": target, "ring": ring,
+         "magnet": magnet, "puzzle": puzzle, "merge": merge, "clusters": clusters, "shelves": shelves, "switch": switch, "duel": duel, "matrix": matrix, "race": race,
+         "grain": grain, "ballot": ballot, "thresh": thresh, "murky": murky}
 
 
 def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:
@@ -3593,6 +4134,8 @@ def texts(sl: dict) -> list[str]:
         out.append(f"{sl['count']}")
     if "on" in sl:
         out.append(f"{sl['on']}")
+    if sl.get("kind") == "thresh":      # 每條橫條旁的分數（通常是假設的例子），審查者與程式 A 都要看得到
+        out += [f"{n['p']:g}" for n in sl.get("nodes", [])]
     if sl.get("kind") == "dist":
         out += [f"{n['p']:g}" for n in sl.get("nodes", [])]
         if sl.get("pick", "ev") == "ev":

@@ -33,7 +33,7 @@ RP = PARAMS["render"]
 WD, HT, SAFE_X, PAD_X = RP["width"], RP["height"], RP["safe_x"], RP["pad_x"]
 CREAM, TEAL, DEEP, GOLD = "#F2E0C0", "#076876", "#01353F", "#DDA642"
 MID, LIGHT, ABYSS = "#1F8A8D", "#69B4AA", "#032027"
-SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD, "seesaw": GOLD, "spotlight": GOLD, "window": GOLD, "hourglass": GOLD, "band": GOLD}
+SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD, "seesaw": GOLD, "spotlight": GOLD, "window": GOLD, "hourglass": GOLD, "band": GOLD, "junction": GOLD}
 ALLOWED_FONT_PX = {28, 34, 38, 40, 56, 72, 76}
 ZERO_Y = 706          # 測深圖水面（0）
 
@@ -700,6 +700,69 @@ def hg_takeaway():
     return s
 
 
+# ---------------------------------------------------------------- 分岔軌道系列（style: junction）的 SVG 元件
+# 哲學 series/universal-rag/philosophy.md：一條主線進來，在岔口分成好幾條軌道，只有一條是金色。都用 class "bg"。
+def jc_fork(x0, y0, ys, hot, trunk=DEEP, col=TEAL, sw=10, trunk_sw=16, x_end=WD, x_start=0):
+    """主線從 (x_start, y0) 到岔口 x0，再分成 ys 這幾條軌道到 x_end；hot 那一條（或那幾條：list，多選）是金色、畫在最上層。"""
+    s = ""
+    mid = x0 + (x_end - x0) * .42
+    hots = set(hot) if isinstance(hot, (list, tuple, set)) else {hot}
+    for i, y in sorted(enumerate(ys), key=lambda k: k[0] in hots):
+        c_, w_ = (GOLD, sw + 6) if i in hots else (col, sw)
+        s += (f'<path class="bg" d="M{x0} {y0} C{mid:.1f} {y0},{mid:.1f} {y},{x_end} {y}" fill="none" '
+              f'stroke="{c_}" stroke-width="{w_}" stroke-linecap="round"/>')
+    s += f'<line class="bg" x1="{x_start}" y1="{y0}" x2="{x0}" y2="{y0}" stroke="{trunk}" stroke-width="{trunk_sw}" stroke-linecap="round"/>'
+    s += f'<circle class="bg" cx="{x0}" cy="{y0}" r="{trunk_sw * 1.5:.0f}" fill="{trunk}"/>'
+    return s
+
+
+def jc_ys(y0, gap, n=6):
+    return [y0 + gap * i for i in range(n)]
+
+
+def jc_cover(mi, branches=None, hot=None, fork=None):
+    """封面：下半一個大岔口，軌道通到畫面右緣；每一則亮的軌道不同。回傳 (svg, html)。
+    branches（選用，2026-11-10）：每條軌道右端的標籤（2～7 個，例如文字／表格／圖片／影片），封面圖就說出這則在講哪條路；
+    hot：亮哪幾條（list，可多條＝多選；有 branches 就必填，金色那條是內容）。標籤是內容：要被封面引用的主張涵蓋（程式 A）。"""
+    if not branches:
+        return jc_fork(250, 985, jc_ys(760, 90), (3 + 2 * mi) % 6), ""
+    if not 2 <= len(branches) <= 7:
+        raise ValueError(f"封面 branches 要 2～7 個，現在 {len(branches)} 個")
+    n = len(branches)
+    if not hot or not all(isinstance(h, int) and 0 <= h < n for h in hot):
+        raise ValueError(f"封面有 branches 就要寫 hot（亮起的軌道序號 list，0～{n - 1}）")
+    ys = [760 + 450 * i / (n - 1) for i in range(n)]
+    hots = list(hot)
+    pills, html = "", ""
+    fs, ph = (34, 76) if n <= 5 else (28, 62)          # 軌道多（6、7 條）時站牌與字都小一號，站牌才不會疊在一起
+    for i, (b, y) in enumerate(zip(branches, ys)):      # 軌道右端一塊站牌（軌道從站牌底下穿過）；字的背景是站牌，對比才量得準
+        on = i in hots
+        tw = sum(fs if ord(ch) > 0x2E80 else fs * .58 for ch in b)
+        x_ = 1000 - tw - 56
+        pills += (f'<rect class="bg" x="{x_:.1f}" y="{y - ph / 2:.1f}" width="{tw + 56:.1f}" height="{ph}" rx="{ph / 2:.0f}" '
+                  f'fill="{GOLD if on else CREAM}" stroke="{GOLD if on else TEAL}" stroke-width="4"/>')
+        html += (f'<div class="t abs {"dn" if fs == 34 else "dl"}" style="left:{x_ + 28:.1f}px;top:{y - fs * .65:.1f}px;width:{tw:.1f}px;text-align:center;white-space:nowrap;'
+                 f'color:{DEEP if on else TEAL}">{esc(b)}</div>')
+    if fork:      # 選用：岔口上方一句話（例如「先判斷」），讓冷讀者看得出是在岔口挑路（2026-11-10 編輯、讀者：金色那條是「該走的路」還是「AI 走的路」）
+        html += f'<div class="t abs dn" style="left:90px;top:{985 - 96}px;width:320px;text-align:center;white-space:nowrap;color:{DEEP}">{esc(fork)}</div>'
+    return jc_fork(250, 985, ys, hots) + pills, html
+
+
+def jc_corner(idx, n):
+    """內頁右上角的小岔口：金色軌道隨讀到第幾張往下換。"""
+    return jc_fork(930, 90, jc_ys(60, 20, 4), min(3, 4 * (idx - 1) // max(n - 1, 1)), sw=4, trunk_sw=6, x_end=1000, x_start=896)
+
+
+def jc_deco(idx, n):
+    """文字張與沒有名詞表的脈絡張：下半一個中型岔口，金色軌道隨張數換。"""
+    return jc_fork(220, 1035, jc_ys(900, 54), min(5, 6 * (idx - 1) // max(n - 1, 1)), sw=8, trunk_sw=12)
+
+
+def jc_takeaway(mi):
+    """帶走張（深色底）：底部的岔口，軌道淺色、金色那一條不變。"""
+    return jc_fork(250, 1120, jc_ys(1030, 36), (3 + 2 * mi) % 6, trunk=CREAM, col=MID, sw=6, trunk_sw=10)
+
+
 # ---------------------------------------------------------------- 濃淡帶系列（style: band）的 SVG 元件
 # 哲學 series/llm-as-a-verifier/philosophy.md：一條橫貫全寬的帶子，越可能的分數越濃；金針停在濃淡分佈的期望值。
 # 都用 class "bg"（背景層），排版時自己確保不壓到文字。分佈純示意（不是實驗數據），每一則一種。
@@ -834,6 +897,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     win = series.get("style") == "window"
     hg = series.get("style") == "hourglass"
     bd = series.get("style") == "band"
+    jc = series.get("style") == "junction"
     idx, n_sl = spec.get("_idx", 1), spec.get("_n", 1)          # 第幾張／共幾張（render_all 填入）
     mi, mn = spec.get("_mi", 0), spec.get("_mn", 1)            # 這則是系列的第幾則／共幾則
     kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", ""))), "FAM": "", "BODY_STYLE": "", "FOOT_CLS": ""}
@@ -851,6 +915,10 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         if spec.get("note") and "{{NOTE_BLOCK}}" not in tpl:
             raise ValueError(f"封面模板沒有 NOTE_BLOCK，放不下 note：{tdir / 'cover.html'}")
         kw["NOTE_BLOCK"] = f'<div class="t abs note" style="left:80px;top:1196px">{esc(spec["note"])}</div>' if spec.get("note") else ""
+        if (spec.get("branches") or spec.get("fork")) and not jc:      # 軌道標籤只有分岔軌道風格畫得出來；其他風格不默默丟掉
+            raise ValueError("封面的 branches／fork 只有分岔軌道風格（style: junction）支援")
+        if spec.get("fork") and not spec.get("branches"):
+            raise ValueError("封面的 fork（岔口標籤）要和 branches 一起用")
     if lay == "cover" and contour:
         k = 4 + round(3 * mi / max(mn - 1, 1))                  # 越後面的一則，金點越靠近谷底
         kw["SVG"] = svg_wrap(contours(800, 1010, COVER_RADII, sc, .38) + step_path(COVER_PATH[:k], sc, rejected=[(610, 1090)]))
@@ -882,6 +950,12 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["TITLE_TOP"] = 530 - sum(est_lines(seg, 920 / 76 - 0.4) for seg in re.sub(r"\[\[|\]\]", "", spec.get("title", "")).split("\n")) * 95   # 標題底緣貼著帶子上方（針頂 y=564）
         kw["SUB_TOP"] = 920
         kw["BODY"] = kw["BODY"].replace("\n", "<br>")
+    elif lay == "cover" and jc:        # 米色底，標題在上、副標接著標題，下半一個大岔口（選用 branches：軌道右端的標籤）
+        svg_, kw["BRANCHES"] = jc_cover(mi, spec.get("branches"), spec.get("hot"), spec.get("fork"))
+        kw["SVG"] = svg_wrap(svg_)
+        kw["TITLE_TOP"] = 150
+        kw["SUB_TOP"] = 560
+        kw["BODY"] = kw["BODY"].replace("\n", "<br>")
     elif lay == "cover" and seesaw:    # 米色底，標題在上，下半一座蹺蹺板；副標固定在 y=400
         kw["SVG"] = svg_wrap(ss_cover())
         kw["SUB_TOP"] = 400
@@ -901,7 +975,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             parts, cells, _ = table_block(spec["rows"], y0_ + shift, spec.get("key_w", 300))
             kw["SVG"], kw["CELLS"] = svg_wrap(parts), cells
         else:
-            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else (svg_wrap(ss_mid(idx, n_sl)) if seesaw else (svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False)) if spot else (svg_wrap(wn_deco(idx)) if win else (svg_wrap(hg_deco(idx, n_sl)) if hg else (svg_wrap(bd_deco(idx, n_sl, mi)) if bd else ""))))))), ""
+            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else (svg_wrap(ss_mid(idx, n_sl)) if seesaw else (svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False)) if spot else (svg_wrap(wn_deco(idx)) if win else (svg_wrap(hg_deco(idx, n_sl)) if hg else (svg_wrap(bd_deco(idx, n_sl, mi)) if bd else (svg_wrap(jc_deco(idx, n_sl)) if jc else "")))))))), ""
             if horizon:
                 kw["FOOT_CLS"] = "light"
     elif lay == "text" and contour:
@@ -922,6 +996,8 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["SVG"] = svg_wrap(hg_deco(idx, n_sl))
     elif lay == "text" and bd:         # 下半一條中等高度的濃淡帶，針隨張數往右移
         kw["SVG"] = svg_wrap(bd_deco(idx, n_sl, mi))
+    elif lay == "text" and jc:
+        kw["SVG"] = svg_wrap(jc_deco(idx, n_sl))
     elif lay == "text" and seesaw:     # 中段一座蹺蹺板，傾斜角隨張數轉向
         kw["SVG"] = svg_wrap(ss_mid(idx, n_sl))
     elif lay == "text":
@@ -1086,14 +1162,14 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         lab = spec.get("label")
         kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
         kw["SVG"] = svg_wrap(hg_takeaway())
-    elif lay == "takeaway" and bd:
+    elif lay == "takeaway" and (bd or jc):
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
         q = spec.get("question")
         kw["QUESTION"] = f'<div class="t abs take-q" style="top:320px">{esc(q)}</div>' if q else ""
         kw["TAKE_STYLE"] = f"top:{320 + math.ceil(len(q) / 15.0) * 73 + 36}px" if q else ""
         lab = spec.get("label")
         kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
-        kw["SVG"] = svg_wrap(bd_takeaway(mi))
+        kw["SVG"] = svg_wrap(jc_takeaway(mi) if jc else bd_takeaway(mi))
     elif lay == "takeaway" and seesaw:
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
         q = spec.get("question")
@@ -1225,6 +1301,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     if hg and lay not in ("cover", "takeaway"):
         corner = hg_corner(idx, n_sl)
         kw["SVG"] = kw["SVG"].replace("</svg>", corner + "</svg>", 1) if kw.get("SVG") else svg_wrap(corner)
+    if jc and lay not in ("cover", "takeaway", "text") and not (lay == "context" and not spec.get("rows")):
+        corner = jc_corner(idx, n_sl)
+        kw["SVG"] = kw["SVG"].replace("</svg>", corner + "</svg>", 1) if kw.get("SVG") else svg_wrap(corner)
     if bd and lay not in ("cover", "takeaway", "text") and not (lay == "context" and not spec.get("rows")):
         strip = bd_strip(idx, n_sl, mi)      # 頂端一條細濃淡帶（文字張與沒有名詞表的脈絡張下半已經有一條）
         kw["SVG"] = kw["SVG"].replace("</svg>", strip + "</svg>", 1) if kw.get("SVG") else svg_wrap(strip)
@@ -1236,6 +1315,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         if cards and not split:      # 圖表類版型：右緣的索引欄（金框 = 這一張對應的版本；系列地圖用這一則）
             dots += rail(mi % 4 if lay == "series_map" else (idx - 1) % 4)
         kw["SVG"] = kw["SVG"].replace("</svg>", dots + "</svg>") if kw.get("SVG") else svg_wrap(dots)
+
+    if jc and lay != "takeaway":      # 分岔軌道系列：主標照 spec 的 \n 換行（2026-11-10：不換的話 \n 變成空格，中文標題中間多一格空白，例如「先把資料 按形式…」）
+        kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
 
     # 模板填入
     for k, v in kw.items():
@@ -1470,7 +1552,9 @@ def render_all(spec_path: Path, only: set[int] | None = None, force: bool = Fals
                 alts[f"{i:02d}.png"] = plain(sl["title"]) + "。" + "、".join(names)
             else:
                 alts[f"{i:02d}.png"] = ((sl["question"] + "　" if sl.get("question") else "") + plain(sl.get("title", "")) + ("。" + body if body else "")
-                                        + ("。圖上寫：" + "、".join(W.tex_plain(x) for x in D.texts(sl)) if sl["layout"] == "diagram" else ""))
+                                        + ("。圖上寫：" + "、".join(W.tex_plain(x) for x in D.texts(sl)) if sl["layout"] == "diagram" else "")
+                                        + ("。岔路通往：" + "、".join(sl["branches"]) if sl.get("branches") else "")
+                                        + (f"（岔口寫著「{sl['fork']}」）" if sl.get("fork") else ""))
         b.close()
     (bld / "alt-text.json").write_text(json.dumps(alts, ensure_ascii=False, indent=2), encoding="utf-8")
     (bld / "checks-b.json").write_text(json.dumps({"template_hash": thash, "slides": report}, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -4,7 +4,7 @@
 
 ## 待發布
 
-（目前沒有）
+- 拆解 UniversalRAG：先問這題該去哪裡查 第 2 則：[AI 怎麼決定這題去哪裡查？](universal-rag/universalrag-router-design-and-rollout/README.md)
 
 ## 拆解 Cerebras 知識庫：資料怎麼進來，答案怎麼出去（`cerebras-rag`）
 
@@ -61,6 +61,13 @@
 | 1 | `skillopt-overview` | Skill 怎麼調才有效？讓 AI 照紀律自己調 | 已發布 | 已發布 | [README](skillopt-overview/README.md) |
 | 2 | `skillopt-batch-evidence-minibatch`＋`skillopt-bounded-edit-budget` | 該改哪裡、改多少？別被一次失敗牽著走 | 已發布 | 已發布 | [README](skillopt-batch-evidence-minibatch/README.md) |
 | 3 | `skillopt-blind-acceptance-gate`＋`skillopt-epoch-level-control` | 改完真的有變好嗎？拿沒看過的題目測試它 | 已發布 | 已發布 | [README](skillopt-blind-acceptance-gate/README.md) |
+
+## 拆解 UniversalRAG：先問這題該去哪裡查（`universal-rag`）
+
+| 發文順序 | 觀念 | 標題（planned_title） | IG | Threads | 打開 |
+|---|---|---|---|---|---|
+| 1 | `universalrag-routing-over-unified-embedding` | 答案明明在圖片裡，AI 搜尋卻先去翻文字 | 已發布 | 已發布 | [README](universalrag-routing-over-unified-embedding/README.md) |
+| 2 | `universalrag-router-design-and-rollout` | AI 怎麼決定這題去哪裡查？ | 待發布 | 待發布 | [README](universalrag-router-design-and-rollout/README.md) |
 
 ## 獨立貼文（沒有系列）
 

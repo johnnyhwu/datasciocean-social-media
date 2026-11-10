@@ -37,6 +37,7 @@ def strip_marks(s: str) -> str:
 
 
 def numbers(s: str) -> list[str]:
+    s = re.sub(r"(?<=[A-Za-z])\d+(?=[A-Za-z])", "", s)   # 名稱裡的數字（VLM2Vec）不是數字（2026-11-09）
     return NUM.findall(re.sub(r"(?<=\w)-(?=\w)", " ", s)) if s else []
 
 
@@ -54,6 +55,8 @@ def slide_texts(sl: dict) -> list[str]:
         if "value2" in b:
             out.append(f"{b['value2']:g}")
     out += list(sl.get("legend", []))
+    out += list(sl.get("branches", []))      # 封面岔路的標籤（分岔軌道風格）
+    out += [sl["fork"]] if sl.get("fork") else []
     if sl.get("layout") == "diagram":
         out += D.texts(sl)
     return out
@@ -260,8 +263,8 @@ def main(spec_path: str) -> int:
         if series.get("standalone") or sl.get("current") not in mids:
             err.append(f"slide{i:02d}({sl['layout']}): 要有 current，而且是這個系列的成員"); continue
         if sl["layout"] == "recap":
-            if i != 2:
-                err.append(f"slide{i:02d}(recap): 回顧頁固定放第 2 頁")
+            if i not in (2, 3):     # 2026-11-09 起第 2 張是「為什麼在乎」、回顧頁排在它後面；已發布的貼文在第 2 頁
+                err.append(f"slide{i:02d}(recap): 回顧頁要放第 2 或第 3 頁")
             if mids.index(sl["current"]) == 0:
                 err.append(f"slide{i:02d}(recap): 系列第 1 則沒有「前面介紹過」的內容，不用回顧頁")
             if sl["current"] != doc["concept"]:
@@ -278,8 +281,8 @@ def main(spec_path: str) -> int:
     # 系列第 2 則以後：第 2 頁要有回顧頁（人的規定，2026-10-25）；系列檔沒有 summary 的舊系列不要求
     mids_ = [m["concept"] for m in series.get("members", [])]
     if doc["concept"] in mids_ and mids_.index(doc["concept"]) > 0 and all(m.get("summary") for m in series["members"]):
-        if len(doc["slides"]) < 2 or doc["slides"][1]["layout"] != "recap":
-            err.append("系列第 2 則以後，第 2 頁要是回顧頁（layout: recap）：前面介紹過什麼、這一則要講什麼")
+        if not any(s["layout"] == "recap" for s in doc["slides"][1:3]):
+            err.append("系列第 2 則以後，第 2 或第 3 頁要是回顧頁（layout: recap）：前面介紹過什麼、這一則要講什麼")
     # 系列標籤與標題一致（由渲染引擎從 wiki 填入；這裡確認 series_map 的 current 存在）
     cur = [s.get("current") for s in doc["slides"] if s["layout"] == "series_map"]
     if cur and not series.get("standalone") and cur[0] not in [m["concept"] for m in series["members"]]:

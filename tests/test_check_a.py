@@ -133,9 +133,9 @@ def main():
     for name, spec, sd, expect in (
             ("正確的貼文：系列第 2 則、第 2 頁是回顧頁、系列檔有 summary（必須通過，測誤殺）", recap_ok, SS, None),
             ("正確的貼文：系列第 1 則不需要回顧頁（必須通過，測誤殺）", GOOD_A, SS, None),
-            ("抓得到：系列第 2 則沒有回顧頁", mut(GOOD_B, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items"))), SS, "第 2 頁要是回顧頁"),
+            ("抓得到：系列第 2 則沒有回顧頁", mut(GOOD_B, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items"))), SS, "第 2 或第 3 頁要是回顧頁"),
             ("抓得到：系列第 1 則放了回顧頁", mut(GOOD_A, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["slides"].insert(1, {**RECAP, "current": "jev-overview"}))), SS, "沒有「前面介紹過」"),
-            ("抓得到：回顧頁不在第 2 頁", mut(GOOD_B, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["slides"].insert(3, copy.deepcopy(RECAP)))), SS, "回顧頁固定放第 2 頁"),
+            ("抓得到：回顧頁不在第 2 頁", mut(GOOD_B, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["slides"].insert(3, copy.deepcopy(RECAP)))), SS, "回顧頁要放第 2 或第 3 頁"),
             ("抓得到：回顧頁的 current 不是這一則", mut(recap_ok, lambda s: s["slides"][1].update(current="jev-overview")), SS, "current 要是這一則"),
             ("抓得到：系列檔有成員沒有 summary", recap_ok, SS_DROP, "沒有 summary"),
             ("抓得到：系列檔 summary 太長（第 4 則放不下）", recap_ok, SS_LONG, "超過")):

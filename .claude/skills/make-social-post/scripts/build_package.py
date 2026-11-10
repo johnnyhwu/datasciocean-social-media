@@ -33,7 +33,7 @@ CONTENT = {"text", "table", "chart_bars", "chart_sounding", "diagram"}
 # 避免「新增欄位、卻漏了輸出」（審查者與人都看不到那段內容）。
 CONTENT_KEYS = {"title", "body", "label", "question", "rows", "bars", "note", "nav", "legend",
                 "nodes", "outcomes", "loop", "columns", "heads", "pairs", "count", "points", "ref", "ranges", "group", "start", "end",
-                "items", "steps", "cells", "on", "total", "labels", "ops"}   # on：點陣裡實心的點數；total：stack 的總次數；labels：ring 每條邊的標籤；ops：equation 的運算符號（都會經 diagrams.texts() 輸出）
+                "items", "steps", "cells", "on", "total", "labels", "ops", "branches", "fork"}   # on：點陣裡實心的點數；total：stack 的總次數；labels：ring 每條邊的標籤；ops：equation 的運算符號（都會經 diagrams.texts() 輸出）；branches：封面岔路的標籤（slide_lines 輸出）
 LAYOUT_KEYS = {"layout", "refs", "quals", "fig_refs", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols", "more", "edges", "hot", "fade", "chain", "hops", "pick"}   # pick：dist 只取最高或期望值； cols：點陣每列幾個點；hops：leak 第一條的跳數（版面參數，不含文字）
 
 
@@ -73,19 +73,24 @@ def figure_credit(d: dict) -> str:
     return ("圖片來源：" + "、".join(parts) + "改繪自原始論文的圖表") if parts else ""
 
 
+def one_line(t: str) -> str:
+    """圖上兩行的標題併成一行：換行處前面沒有標點就補一個逗號（2026-11-10：分岔軌道系列的標題照 \\n 換行、行尾不放逗號，直接接起來會變成「只問 10 秒的動作卻抓回…」）。"""
+    return re.sub(r"(?<![，。？！：；、,.?!:;])\n", "，", t).replace("\n", "")
+
+
 def caption_text(d: dict) -> str:
     cap = d["caption"]
     lines = [cap["first"], ""]
     prev_label = None
     for sl in d["slides"]:
-        if sl["layout"] in CONTENT:
+        if sl["layout"] in CONTENT and sl.get("kind") != "route":     # 路線圖對 caption 沒有內容（編輯，2026-11-09）
             fc = first_clause(sl.get("body", ""))
             lab = sl.get("label")
             # 小標籤放在前面；標題已經以同樣的詞開頭就不重複（「第一關：第一關：」）。
             # 小標籤當分段標記用時（每張都有、連著好幾張同一段），同一段只印一次，否則 caption 會像資料庫輸出（編輯，2026-10-31）
             lead = f"{lab}：" if lab and lab != prev_label and not mark(sl["title"]).startswith(lab) else ""
             prev_label = lab
-            lines.append(f"・{lead}{mark(sl['title']).replace(chr(10), '')}" + (f"（{fc}）" if fc else ""))   # 標題裡的 \n 是圖上的換行，caption 一張一行
+            lines.append(f"・{lead}{one_line(mark(sl['title']))}" + (f"（{fc}）" if fc else ""))   # 標題裡的 \n 是圖上的換行，caption 一張一行
     if figure_credit(d):
         lines += ["", figure_credit(d)]
     lines += ([""] + [cap["nav"]] if cap.get("nav") else []) + ["", " ".join("#" + h for h in cap["hashtags"])]   # 導流行可省略（獨立貼文，人決定不導回來源文章）
@@ -118,6 +123,10 @@ def slide_lines(sl: dict, with_refs: bool) -> list[str]:
         for b in sl["bars"]:
             v2 = f"｜{sl['legend'][1]} {b['value2']:g} {sl.get('unit', '')}" if "value2" in b else ""
             out.append(f"圖表項目：{b['name']}｜{'／'.join(b.get('subs', []))}｜{(sl['legend'][0] + ' ') if v2 else ''}{b['value']:g} {sl.get('unit', '')}{v2}" + ("｜強調" if b.get("emphasize") else ""))
+    if sl.get("branches"):      # 封面岔路的標籤與亮起的那幾條（圖上的內容，審查者要看得到）
+        hot_ = set(sl.get("hot") or [])
+        out.append("封面岔路的標籤（由上到下）：" + "｜".join(b + ("（金色）" if i in hot_ else "") for i, b in enumerate(sl["branches"]))
+                   + (f"；岔口寫著「{sl['fork']}」" if sl.get("fork") else ""))
     if sl["layout"] == "diagram":
         out.append(f"示意圖（{sl['kind']}）上的文字與數字：" + "｜".join(D.texts(sl)))
         if sl["kind"] in D.DESC:

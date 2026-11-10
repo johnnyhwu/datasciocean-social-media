@@ -37,7 +37,7 @@ datasciocean-concept-wiki（Stage 1，submodule：concept-wiki/）
 9. **發布一定要經人確認；經確認後 IG 與 Threads 都用官方 API 發布。** `ig_publish.py`、`threads_publish.py` 預設是 dry-run，**只有人明確說「發」之後才加 `--confirm`**，不可在同一輪自己決定（人在同一則訊息明確說「prepare、push `ig/jpg/`、發佈到兩個平台」視為整串授權，可連續執行，但每個 dry-run 都要看，出現 problems 或 warnings 就停下來問）；已發布過的不重複發；不用真實貼文做測試（用專用測試包與 `--no-record`，測完刪掉）。Threads 回補由 Claude 用 API 做（`backfill`，dry-run 給人看、人說「發」才發）；IG 回補、限時動態、精選集、置頂都不做。細節見 `publish-flow.md`。
 10. **貼文不提 podcast，不加 AI 揭露。** podcast 連結只放個人檔案。
 11. **寧可暫停，也不降低標準。** 存量不足時暫停發文，不為了維持每天一則而放行未通過審查的內容。
-12. **不確定就停下來問人。** hook（由人挑；暫用的 hook 要單獨問、人明講接受才發，「目前可以」不算；`state.py ready` 會擋）、審查者爭議、最後確認、任何與先前慣例不同的做法，都由人決定。**新圖型不必先出樣張**（2026-10-12）：可直接在貼文裡做，但要附程式 B 檢查與回歸測試，交貼文時明講新增了哪些圖型。**問人時要說明選項的下游後果**，並附發出去的樣子。
+12. **預設由 Claude 從頭做到尾，人只 review 成品**（人 2026-11-10，UniversalRAG 兩則實測滿意）：選卡與合併、系列名與標題、hook、版型、審查迴圈都由 Claude 照 skill 自己決定，不中途問人；審查全部通過才交成品，交付時列出 hook 候選與選擇理由。人 review 成品說沒問題，就視為接受 hook、系列名與標題（`state.py ready --hook-accepted`，系列加 `members_locked`）。**仍要停下來問人**：審查者爭議、輪數用完仍有 blocker、要違反本檔規則才做得出來的取捨、發布。**新圖型不必先出樣張**（2026-10-12）：可直接在貼文裡做，但要附程式 B 檢查與回歸測試，交貼文時明講新增了哪些圖型。**問人時要說明選項的下游後果**，並附發出去的樣子。
 13. **審查者要求改人選的 hook 時，要告知人**（原文、改後、原因）。與審查者對語氣或留白有爭議時，標「爭議」交給人，人可以改審查者提示詞。
 14. **封面 hook 以吸引點擊為先，不欺騙為界**：可以沒說完整（留白、反差、口語語氣詞），但主標副標合看字面為真、範圍不放大、限定條件在內文出現（`references/hooks.md`）。取捨時預設選更吸引人。封面要**獨立可懂**（不假設讀者看過系列），口語活潑；圖上不放 emoji。
 15. **不要自己 commit 或 push**；commit 與 push 由人決定時機（人明確要求時例外；commit 時 `git status` 裡不是這次改的變更，例如 submodule 指標，先說明再問）。發布前要 push `ig/jpg/`（託管是這個公開 repo 的 raw 網址）；人沒有一次授權整串時，push 前先問人。
@@ -85,21 +85,21 @@ tests/                                  回歸測試 `test_*.py`（`test_*_style
 ## 目前狀態（各系列進度、網址、待決事項：`docs/status.md`）
 
 - 已發布：系列 `skillopt`、`persona-aware-d2s`、`jev-cascade`、`sag`、`claude-code`、`cerebras-rag`、`llm-as-a-verifier`，獨立貼文 `decision-transformer-reward-conditioning`、`bradley-terry-pairwise-preference`。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。
-- 進行中：無。
+- 進行中：`universal-rag`（第 1 則已發布，第 2 則 ready 待發，見 `docs/status.md`）。
 - 獨立貼文（沒有系列）：spec 寫 `series: null`，視覺在 `standalone/<觀念 id>/`，發布包在 `out/standalone/`。
 
 ## 工作方式
 
 細節都在 skill 裡，這裡只列原則與去處；**同一條規則只寫在一處**（人的回饋寫進對應的 reference，不在這裡、memory、skill 各寫一次）。
 
-- **流程**：`make-social-post/SKILL.md`。程式 B 通過後**先給人看初稿**（縮圖＋`ig/post.md`，看結構、順序、圖），人點頭才派審查者（步驟 6b，人 2026-11-01 決定）。
+- **流程**：`make-social-post/SKILL.md`（規則 12：一路做到審查全過才交成品）。
 - **寫法**（讀者是沒有 AI 背景的一般人、口語白話、資訊密度夠、寧可多一點也不要讓讀者猜；整則要像一段旅程；主角先、對照後；敘事口吻不寫第三人稱「作者」；實驗頁要有所以呢；用語偏好）：`references/ig-carousel.md` §0、§0b、§4，用語在 `config/terms.yaml`。
 - **圖**（要大膽、有創意、直接支撐主標、比文字多給資訊；畫面句要有具體物件；沒有合適的就發明新圖型）：`ig-carousel.md` §0、`design-series-visuals/references/brand-and-layouts.md` §4.2、`principles.md`；帶數字的圖用 `chart-thinking`。
-- **系列規劃**（問人哪些卡合併、整個系列 spec 做完才鎖定並發第 1 則、第 2 則以後有 `recap`）：`references/batch-and-publish.md` §1–2、`spec-json.md`。
+- **系列規劃**（Claude 決定哪些卡合併、整個系列做完才鎖定並發第 1 則、第 2 則以後有 `recap`）：`references/batch-and-publish.md` §1–2、`spec-json.md`。
 - **送審前自檢**：`references/self-check.md`（最上面四類是忠實者最常退回的）。審查：`review-loop.md`。
-- **進度寫進檔案**：每則 `_build/progress.md`，最上面是 10 行內的「現況＋待人決定」；要人挑的清單（hook 候選、合併方案）也寫進檔案，對話壓縮後才不會丟。
-- **請人拍板的事用白話說清楚**（這是什麼、選了會怎樣、代價、我的建議）；做完一個階段，主動列出人接下來要確認或決定的事。人不做手動事項：需要手動的，Claude 做或不做，不丟給人。
-- skill 與 `references/` 是依實測整理出來的，有疑問以它們為準，沒寫到的先問人。
+- **進度寫進檔案**：每則 `_build/progress.md`，最上面是 10 行內的「現況＋下一步」；hook 候選、合併方案也寫進檔案，對話壓縮或用量上限中斷後才接得上。
+- **要問人時用白話說清楚**（這是什麼、選了會怎樣、代價、我的建議）。人不做手動事項：需要手動的，Claude 做或不做，不丟給人。
+- skill 與 `references/` 是依實測整理出來的，有疑問以它們為準；沒寫到的照最接近的前例判斷，交成品時說明。
 - 修改任何程式檢查、審查或發布流程後，**重跑全部回歸測試**：`for f in tests/test_*.py; do uv run python $f; done`（約 10 分鐘以上，用背景執行）；新增檢查要加「故意做壞的版本」，新增圖型要在 `tests/test_diagrams.py` 補正案與壞案。
 - 整理 repo 或文件時，順便檢查：回饋是否已寫進對應的 reference、有沒有過時內容可刪、memory 有沒有和 repo 重複（重複的刪 memory）。
 - 範例貼文：`make-social-post/SKILL.md`「範例」。
