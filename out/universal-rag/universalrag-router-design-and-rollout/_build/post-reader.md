@@ -123,7 +123,8 @@ Router 有兩種做法：訓練一個輕量模型替每個選項打分數，超�
 ### 最後一則（置頂）
 UniversalRAG 的 Router：從 7 個選項挑組合、可以複選；企業可以先用免訓練版起步，累積使用紀錄再訓練自己的 Router。
 文章：datasciocean.com/paper-intro/universal-rag
-同系列：答案明明在圖片裡，AI 搜尋卻先去翻文字（尚未發布）
+同系列：答案明明在圖片裡，AI 搜尋卻先去翻文字
+https://www.threads.com/@datasciocean/post/DfipBuME42W
 
 ## IG caption
 

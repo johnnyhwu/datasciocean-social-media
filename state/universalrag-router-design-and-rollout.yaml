@@ -1,9 +1,23 @@
 concept: universalrag-router-design-and-rollout
 formats:
   ig_carousel:
-    status: ready
-    pack: out/universal-rag/universalrag-router-design-and-rollout
+    status: published
   threads_thread:
-    status: ready
-    pack: out/universal-rag/universalrag-router-design-and-rollout
-posts: []
+    status: published
+posts:
+- post_id: universalrag-router-design-and-rollout:ig_carousel
+  format: ig_carousel
+  series_id: universal-rag
+  url: https://www.instagram.com/p/DflJQEaEjYw/
+  published_at: 2026-11-11T00:02:06+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []
+- post_id: universalrag-router-design-and-rollout:threads_thread
+  format: threads_thread
+  series_id: universal-rag
+  url: https://www.threads.com/@datasciocean/post/DflJnf3EpSq
+  published_at: 2026-11-11T00:04:24+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []
