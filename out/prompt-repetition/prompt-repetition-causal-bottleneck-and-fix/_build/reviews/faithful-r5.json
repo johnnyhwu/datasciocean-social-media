@@ -1,0 +1,35 @@
+{
+  "post": "prompt-repetition-causal-bottleneck-and-fix",
+  "blocks": [
+    {"block": "第 2 張", "atoms": [
+      {"text": "（舉例）AI 讀「The bark was rough.」，讀到 bark 時只看得到前兩個字", "verdict": "完全支持", "card_quote": "以輸入語句「The bark was rough.」為例：模型讀到 bark 時只看得到「The bark」", "note": "「前兩個字」即 The bark；圖註標明是舉例，符合部落格舉例寫法。"},
+      {"text": "分不出狗叫聲還是樹皮", "verdict": "完全支持", "card_quote": "無法確定是指「狗叫聲」還是「樹皮」", "note": "同義。"},
+      {"text": "只能先記下一份模糊的理解", "verdict": "完全支持", "card_quote": "生成的 Key/Value 向量可能是模糊的混合體；…它回頭抓取的 bark 的 Value 向量是早期生成的、品質低落且含糊不清的", "note": "白話化 Key/Value；卡在後半句直述其含糊不清，未比卡強。"},
+      {"text": "讀到 rough（粗糙的）才知道在講樹皮", "verdict": "完全支持", "card_quote": "讀到後面的 rough（粗糙的）時，雖然這個 Token 知道整句在講樹皮", "note": "同義。"},
+      {"text": "於是回頭翻前面的字留下的紀錄；但 bark 那份是早先記的，翻到的仍然模糊", "verdict": "完全支持", "card_quote": "它回頭抓取的 bark 的 Value 向量是早期生成的、品質低落且含糊不清的", "note": "把 Value 向量白話成「早先記下的紀錄」，未改變意思、未加新事實（無新因果、範圍或數字）。"},
+      {"text": "圖上文字：讀到 bark 時（後面的字還沒出現）／讀到 rough 時／回頭翻 bark 的紀錄，仍然模糊／狗叫聲？樹皮？", "verdict": "完全支持", "card_quote": "模型讀到 bark 時只看得到「The bark」，無法確定是指「狗叫聲」還是「樹皮」", "note": "與補充文字一致。"}],
+     "errors": []},
+    {"block": "第 8 張", "atoms": [
+      {"text": "CoT：先叫 AI 一步步寫出推理", "verdict": "完全支持", "card_quote": "讓模型 \"Think step by step\" 或先複述問題", "note": "名詞白話定義，未加用途。"},
+      {"text": "CoT 寫推理時重新處理資訊，修得好", "verdict": "完全支持", "card_quote": "透過生成過程強迫自己重新處理資訊，解決了表徵問題", "note": "同義。"},
+      {"text": "CoT 代價：多寫字，延遲與成本上升", "verdict": "完全支持", "card_quote": "因為它增加了生成的 Token 數量（Decode 階段），直接導致 Latency 增加和 API 成本上升", "note": "同義。"},
+      {"text": "雙向注意力（BERT、T5）：Token 互相看見，從根本解決", "verdict": "完全支持", "card_quote": "像 BERT 或 T5 那樣的 Bidirectional Attention / Prefix LM，允許 Input Token 互相看見，從根本上解決表徵問題", "note": "同義。"},
+      {"text": "雙向注意力代價：要改架構或訓練；只用 API 時做不到", "verdict": "完全支持", "card_quote": "需要改變模型架構或訓練目標，對只能透過 API 呼叫的現成 Decoder-only 模型（如 GPT-4、Claude 3）是不可能的任務", "note": "「訓練」為「訓練目標」的簡寫，意思未變。"},
+      {"text": "貼兩次（Prompt Repetition）不改架構，就能模擬出雙向注意力的效果", "verdict": "完全支持", "card_quote": "可以被視為在 Decoder-only 架構上模擬雙向注意力的手段", "note": "部落格推論以作者口吻直述、無驗證語氣；不改架構來自做法本身（c2 只是複製 Prompt）。"},
+      {"text": "貼兩次好處：第二遍看見整個第一遍", "verdict": "完全支持", "card_quote": "第二遍中的每一個位置都能完整地「看見」整個第一遍", "note": "同義。"},
+      {"text": "貼兩次代價：只多貼一遍，不改架構", "verdict": "完全支持", "card_quote": "做法是將使用者的輸入 Prompt 原封不動地複製一遍：模型的輸入從 P 變成 [P ; P]", "note": "未宣稱零延遲，故 c10 的延遲限定條件不需出現。"}],
+     "errors": []},
+    {"block": "Threads 正文", "atoms": [
+      {"text": "提示詞貼兩次，不是囉嗦，是在補 AI 的盲點", "verdict": "完全支持", "card_quote": "Token 的表徵品質受限於它出現的時間點；Prompt Repetition 把輸入的 Prompt 複製一遍", "note": "hook，「盲點」指出現時間點的限制，字面可由卡支持，內文有交代。"},
+      {"text": "主流的 LLM（GPT-4、Gemini 等）大多只能往前看", "verdict": "完全支持", "card_quote": "主流大型語言模型（如 GPT-4、Gemini、Llama）大多採用 Transformer Decoder-only 架構，這類模型是 Causal 的：處理序列中第 i 個 Token 時，只能「看見」位置 j ≤ i 的 Token", "note": "保留「大多」。"},
+      {"text": "（舉個例子）讀到 bark 時後面的 rough 還沒出現，分不出狗叫聲還是樹皮，只能先記下一份模糊的理解", "verdict": "完全支持", "card_quote": "模型讀到 bark 時只看得到「The bark」，無法確定是指「狗叫聲」還是「樹皮」，生成的 Key/Value 向量可能是模糊的混合體", "note": "「舉個例子」標明是假設例子。"},
+      {"text": "讀到 rough 知道是樹皮，回頭去翻 bark 那份早先記下的紀錄，翻到的仍然模糊", "verdict": "完全支持", "card_quote": "雖然這個 Token 知道整句在講樹皮，但它回頭抓取的 bark 的 Value 向量是早期生成的、品質低落且含糊不清的", "note": "「早先記下的紀錄」是 Value 向量的白話說法，未改變意思、未加卡上沒有的事實。"},
+      {"text": "Google Research 2025 年 12 月的論文提出 Prompt Repetition：把整段提示詞原封不動再貼一次", "verdict": "完全支持", "card_quote": "Prompt Repetition 出自 Google Research 團隊於 2025 年 12 月發表的論文〈Prompt Repetition Improves Non-Reasoning LLMs〉，做法是將使用者的輸入 Prompt 原封不動地複製一遍", "note": "設計參數主詞為方法名。"},
+      {"text": "第二遍的每個字都看得到整個第一遍", "verdict": "完全支持", "card_quote": "第二遍中的每一個位置都能完整地「看見」整個第一遍", "note": "同義。"},
+      {"text": "不改模型，就能模擬出讓字前後互相看見的效果", "verdict": "完全支持", "card_quote": "創造出一種偽雙向注意力（Pseudo-Bidirectional Attention）的效果，可以被視為在 Decoder-only 架構上模擬雙向注意力的手段", "note": "「前後互相看見」是雙向注意力的白話（c9：允許 Input Token 互相看見），用「模擬…效果」未比卡強。"},
+      {"text": "只在前面塞一串點點拉長輸入則完全無效", "verdict": "完全支持", "card_quote": "另一個變體 Padding 在 <QUERY> 前面填入點號，用來驗證性能提升是因為「重複了有意義的資訊」，還是僅僅因為「輸入變長了，讓模型有更多運算空間」；結論是 Padding 完全無效", "note": "同義。"}],
+     "errors": []}
+  ],
+  "recalculations": [],
+  "gaps": []
+}

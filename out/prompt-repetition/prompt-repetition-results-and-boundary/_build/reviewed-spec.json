@@ -1,0 +1,277 @@
+{
+  "series": "prompt-repetition",
+  "concept": "prompt-repetition-results-and-boundary",
+  "also_concepts": [],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "數字落差",
+    "title": "找第 25 個名字，\n[[答對率 21.33% 變 97.33%]]",
+    "subtitle": "Gemini 2.0 Flash-Lite 在 50 個名字裡找第 25 個：\n只貼一次 21.33%，提示詞貼兩次 97.33%",
+    "refs": [
+      "c10",
+      "c11"
+    ],
+    "candidate": "A"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "找第 25 個名字，\n[[答對率 21.33% 變 97.33%]]",
+      "body": "Gemini 2.0 Flash-Lite 在 50 個名字裡找第 25 個：\n只貼一次 21.33%，提示詞貼兩次 97.33%",
+      "refs": [
+        "c10",
+        "c11"
+      ]
+    },
+    {
+      "layout": "chart_bars",
+      "title": "50 個名字找第 25 個：\n[[只貼一次，答對兩成出頭]]",
+      "body": "NameIndex 是作者設計的極端查找任務：給一串 50 個名字，問「第 25 個名字是誰？」。Gemini 2.0 Flash-Lite 只貼一次時答對 21.33%，提示詞貼兩次後是 97.33%，接近完美。",
+      "refs": [
+        "c10",
+        "c11"
+      ],
+      "quals": [
+        "c11#1"
+      ],
+      "unit": "%",
+      "bars": [
+        {
+          "name": "只貼一次",
+          "value": 21.33
+        },
+        {
+          "name": "提示詞貼兩次",
+          "value": 97.33,
+          "emphasize": true
+        }
+      ],
+      "note": "同一個模型、同一個任務，只差在提示詞貼一次還是兩次。"
+    },
+    {
+      "layout": "recap",
+      "title": "[[前情提要]]與這一則重點",
+      "current": "prompt-repetition-results-and-boundary",
+      "refs": [
+        "結構"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "scan",
+      "title": "為什麼差這麼多？\n[[第二遍帶著問題找]]",
+      "body": "只貼一次時，模型讀到第 25 個名字，還不知道問題要找第 25 個，所以沒特別記住；等讀完問題，已經來不及回頭。貼兩次後，模型讀第二遍時，就是帶著「我要找第 25 個」去看名單，自然一抓一個準。",
+      "refs": [
+        "c12",
+        "c10"
+      ],
+      "label": "為什麼",
+      "count": 50,
+      "on": 25,
+      "nodes": [
+        {
+          "text": "第一遍：讀名單時，還不知道要找第幾個"
+        },
+        {
+          "text": "第二遍：帶著「找第 25 個」去掃"
+        }
+      ],
+      "heads": [
+        "問題：第 25 個名字是誰？"
+      ],
+      "outcomes": [
+        {
+          "text": "第 25 個 ↓"
+        }
+      ],
+      "note": "一格是一個名字；名字內容省略。"
+    },
+    {
+      "layout": "context",
+      "title": "看整體成績之前，\n[[先認識兩個詞]]",
+      "body": "Prompt Repetition 出自 Google Research 2025 年 12 月的論文，把提示詞原封不動複製一遍，拿來和只貼一次比。",
+      "rows": [
+        [
+          "McNemar 檢定",
+          "統計方法，看兩種做法的差距是不是碰巧；作者設 p < 0.1"
+        ],
+        [
+          "CoT",
+          "強迫模型先「Think step by step」，一步步推理"
+        ]
+      ],
+      "key_w": 290,
+      "refs": [
+        "c2",
+        "c3",
+        "c7",
+        "c1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "dotgrid",
+      "title": "70 個組合：\n[[47 勝，0 敗]]",
+      "body": "作者在 70 個「模型－任務」組合上比較貼兩次和只貼一次：47 組明顯勝出，0 組落後，其餘平手或沒有明顯差異。我認為這很少見：它跨越了不同模型架構與參數量級，不像一般技巧常只對某家模型有效。",
+      "refs": [
+        "c3",
+        "c4",
+        "c1"
+      ],
+      "label": "整體成績",
+      "count": 70,
+      "cols": 14,
+      "on": 47,
+      "nodes": [
+        {
+          "text": "貼兩次明顯比較好（47 組）"
+        },
+        {
+          "text": "平手或沒有明顯差異；落後 0 組"
+        }
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "tally",
+      "title": "叫 AI 先一步步推理，\n[[貼兩次的效果變中性]]",
+      "body": "作者強迫模型開啟 CoT，再和同樣開了 CoT 的只貼一次比：只剩 5 勝 1 敗 22 平，中性，頂多小幅加分。我的解讀是：開了 CoT，模型寫答案時自己就會重複、思考；再幫它重複一次，效益就遞減了。",
+      "refs": [
+        "c7",
+        "c8",
+        "c1",
+        "c3",
+        "c4"
+      ],
+      "quals": [
+        "c3#1",
+        "c4#1"
+      ],
+      "label": "邊界",
+      "heads": [
+        "明顯勝出",
+        "平手或無明顯差異",
+        "明顯落後"
+      ],
+      "nodes": [
+        {
+          "text": "主實驗",
+          "sub": "70 組：47 勝 0 敗，其餘平手或無明顯差異",
+          "parts": [
+            47,
+            23,
+            0
+          ]
+        },
+        {
+          "text": "強迫開啟 CoT 的對照實驗",
+          "sub": "5 勝 1 敗 22 平",
+          "parts": [
+            5,
+            22,
+            1
+          ]
+        }
+      ],
+      "hot": 1,
+      "note": "一顆點是一個組合；開 CoT 的對照實驗共 28 組（5＋1＋22）。"
+    },
+    {
+      "layout": "diagram",
+      "kind": "ballot",
+      "title": "需要精準讀懂的任務，\n[[最適合貼兩次]]",
+      "body": "我認為它最適合需要精準理解、不需要好幾步複雜推理的任務，例如資訊提取、閱讀測驗。會先想再答的推理模型（如 o1），常會自己學會把問題重說一遍；貼兩次也許正是這種策略，用在直接回答的模型上。",
+      "refs": [
+        "c1",
+        "c9",
+        "c14",
+        "c8"
+      ],
+      "label": "怎麼用",
+      "heads": [
+        "適合貼兩次嗎？"
+      ],
+      "outcomes": [
+        {
+          "text": "資訊提取",
+          "on": true
+        },
+        {
+          "text": "閱讀測驗",
+          "on": true
+        },
+        {
+          "text": "複雜推理",
+          "sub": "要好幾步：不在最適合的範圍"
+        },
+        {
+          "text": "已先推理",
+          "sub": "已經開了 CoT：效益遞減"
+        }
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "提示詞貼兩次，什麼時候最有用？",
+      "title": "Prompt Repetition\n最適合要精準讀懂的任務，\n像資訊提取、閱讀測驗；\n已先推理就幫助不大。",
+      "refs": [
+        "c1",
+        "c9",
+        "c8"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "這個系列共三則",
+      "current": "prompt-repetition-results-and-boundary",
+      "nav": "完整文章在 datasciocean.com，搜「Prompt Repetition」",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "找第 25 個名字，答對率從 21.33% 變 97.33%。\n\n這是作者設計的極端查找任務 NameIndex：給 50 個名字，問第 25 個是誰；數字是 Gemini 2.0 Flash-Lite 的結果。讀第二遍時，模型已經知道要找第幾個。\n\n整體來看，70 個「模型－任務」組合裡，貼兩次 47 勝 0 敗，其餘平手或沒有明顯差異。但強迫模型先一步步推理（CoT）時，只剩 5 勝 1 敗 22 平：中性，頂多小幅加分。所以我認為它最適合需要精準理解、不需要好幾步複雜推理的任務，例如資訊提取、閱讀測驗。細節在圖裡。\n\n這是 Prompt Repetition 系列的最後一則。",
+      "refs": [
+        "c10",
+        "c11",
+        "c12",
+        "c3",
+        "c1",
+        "c7",
+        "c9"
+      ],
+      "quals": [
+        "c11#1",
+        "c3#1"
+      ]
+    },
+    "last": {
+      "text": "Prompt Repetition 在 70 組裡 47 勝 0 敗；模型先一步步推理時，效果變成中性，頂多小幅加分。\n文章：datasciocean.com/paper-intro/prompt-repetition\n同系列：把提示詞貼兩次，第二遍就看得到全文（尚未發布）\n同系列：輸入變兩倍長，為什麼幾乎沒變慢？（尚未發布）",
+      "refs": [
+        "c1",
+        "c3"
+      ],
+      "quals": [
+        "c3#1"
+      ],
+      "link": "https://datasciocean.com/paper-intro/prompt-repetition/"
+    }
+  },
+  "caption": {
+    "first": "Prompt Repetition 實測：70 個組合 47 勝 0 敗，什麼情況下效果會變中性？",
+    "first_refs": [
+      "c1",
+      "c3"
+    ],
+    "nav": "完整文章在 datasciocean.com，搜「Prompt Repetition」",
+    "hashtags": [
+      "PromptRepetition",
+      "LLM",
+      "提示詞"
+    ]
+  }
+}

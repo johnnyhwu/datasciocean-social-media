@@ -1,0 +1,91 @@
+{
+ "post": "prompt-repetition-causal-bottleneck-and-fix",
+ "blocks": [
+  {
+   "block": "第 8 張",
+   "atoms": [
+    {
+     "text": "主標：不改模型，也能模擬雙向注意力",
+     "verdict": "完全支持",
+     "card_quote": "可以被視為在 Decoder-only 架構上模擬雙向注意力的手段",
+     "note": "做法只是把輸入複製一遍（c2「將使用者的輸入 Prompt 原封不動地複製一遍」），在現成 Decoder-only 架構上模擬，「不改模型」是此做法的直述，未加新事實；c1 為部落格推論，主標未比卡更強。"
+    },
+    {
+     "text": "補充：原本有兩種修法：CoT（先叫 AI 一步步寫出推理）和雙向注意力",
+     "verdict": "完全支持",
+     "card_quote": "在 Prompt Repetition 之前的第一種解法是 Chain-of-Thought（CoT）：讓模型 \"Think step by step\" 或先複述問題",
+     "note": "第二種見 c9「第二種解法是像 BERT 或 T5 那樣的 Bidirectional Attention / Prefix LM」。括號白話不改變意思。"
+    },
+    {
+     "text": "補充：貼兩次不改架構，就能模擬出雙向注意力的效果（偽雙向注意力）",
+     "verdict": "完全支持",
+     "card_quote": "創造出一種偽雙向注意力（Pseudo-Bidirectional Attention）的效果，可以被視為在 Decoder-only 架構上模擬雙向注意力的手段",
+     "note": "背景說明的 c9 對照「需要改變模型架構」，與「不改架構」對比一致。"
+    },
+    {
+     "text": "圖：CoT｜先一步步寫出推理",
+     "verdict": "完全支持",
+     "card_quote": "讓模型 \"Think step by step\" 或先複述問題",
+     "note": ""
+    },
+    {
+     "text": "圖：CoT 怎麼修好理解｜寫推理時，再處理一次資訊",
+     "verdict": "完全支持",
+     "card_quote": "透過生成過程強迫自己重新處理資訊，解決了表徵問題",
+     "note": "c8 背景說明，直述可。"
+    },
+    {
+     "text": "圖：CoT 代價｜多寫字，延遲與成本上升",
+     "verdict": "完全支持",
+     "card_quote": "它增加了生成的 Token 數量（Decode 階段），直接導致 Latency 增加和 API 成本上升",
+     "note": ""
+    },
+    {
+     "text": "圖：雙向注意力｜BERT、T5",
+     "verdict": "完全支持",
+     "card_quote": "像 BERT 或 T5 那樣的 Bidirectional Attention / Prefix LM",
+     "note": ""
+    },
+    {
+     "text": "圖：雙向注意力 怎麼修好理解｜Token 互相看見",
+     "verdict": "完全支持",
+     "card_quote": "允許 Input Token 互相看見，從根本上解決表徵問題",
+     "note": ""
+    },
+    {
+     "text": "圖：雙向注意力 代價｜要改架構，或訓練；只用 API 時，做不到",
+     "verdict": "完全支持",
+     "card_quote": "缺點是需要改變模型架構或訓練目標，對只能透過 API 呼叫的現成 Decoder-only 模型（如 GPT-4、Claude 3）是不可能的任務",
+     "note": "「或訓練」為「或訓練目標」的白話簡寫，未改變意思。"
+    },
+    {
+     "text": "圖：貼兩次｜Prompt Repetition",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 把輸入的 Prompt 複製一遍",
+     "note": ""
+    },
+    {
+     "text": "圖：Prompt Repetition 怎麼修好理解｜第二遍看見，整個第一遍",
+     "verdict": "完全支持",
+     "card_quote": "第二遍中的每一個位置都能完整地「看見」整個第一遍",
+     "note": "c11 亦支持（P2 生成的 Key/Value 是「已經看過全文」的高品質表徵）。"
+    },
+    {
+     "text": "圖：Prompt Repetition 代價｜只多貼一遍，不改架構",
+     "verdict": "完全支持",
+     "card_quote": "做法是將使用者的輸入 Prompt 原封不動地複製一遍",
+     "note": "字面只描述做法，未宣稱延遲或成本不變；放在「代價」欄與 CoT 對照時，讀者可能推想沒有延遲或成本增加，但本張未明寫，卡上此卡的延遲宣稱見 c10 且有限定條件（本張未引用 c10）。不判錯。"
+    },
+    {
+     "text": "圖欄名：怎麼修好理解｜代價",
+     "verdict": "完全支持",
+     "card_quote": "**優點:** 模型透過生成過程，強迫自己重新處理資訊",
+     "note": "欄名為結構文字，對應卡上 c8、c9 的優點／缺點。"
+    }
+   ],
+   "errors": []
+  }
+ ],
+ "recalculations": [],
+ "gaps": []
+}

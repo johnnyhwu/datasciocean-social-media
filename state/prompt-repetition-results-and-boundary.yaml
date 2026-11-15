@@ -1,0 +1,9 @@
+concept: prompt-repetition-results-and-boundary
+formats:
+  ig_carousel:
+    status: ready
+    pack: out/prompt-repetition/prompt-repetition-results-and-boundary
+  threads_thread:
+    status: ready
+    pack: out/prompt-repetition/prompt-repetition-results-and-boundary
+posts: []

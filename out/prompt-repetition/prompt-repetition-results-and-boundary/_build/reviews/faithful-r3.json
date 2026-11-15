@@ -1,0 +1,118 @@
+{
+ "post": "prompt-repetition-results-and-boundary",
+ "blocks": [
+  {
+   "block": "hook（第 1 張主標與副標）",
+   "atoms": [
+    {
+     "text": "主標：找第 25 個名字，答對率 21.33% 變 97.33%",
+     "verdict": "完全支持",
+     "card_quote": "在 NameIndex 上，Gemini 2.0 Flash-Lite 的 Baseline 只有 21.33%，使用 Prompt Repetition 後達到 97.33%",
+     "note": "主標沒寫模型與任務，副標第一句補上 Gemini 2.0 Flash-Lite 與 50 個名字找第 25 個，主副合看範圍正確；限定條件 c11#1（作者設計的極端查找任務）在第 2 張出現。「答對率」卡上沒有逐字寫，但 21.33%／97.33% 由「幾乎是瞎猜」「接近完美」可知是答對比例，不列錯。"
+    },
+    {
+     "text": "Gemini 2.0 Flash-Lite 在 50 個名字裡找第 25 個",
+     "verdict": "完全支持",
+     "card_quote": "給一串 50 個名字，問「第 25 個名字是誰？」",
+     "note": "c10＋c11。"
+    },
+    {
+     "text": "只貼一次 21.33%，提示詞貼兩次 97.33%",
+     "verdict": "完全支持",
+     "card_quote": "Gemini 2.0 Flash-Lite 的 Baseline 只有 21.33%，使用 Prompt Repetition 後達到 97.33%",
+     "note": "「只貼一次」對應 Baseline（不重複 Prompt），「貼兩次」對應 [P ; P]。"
+    },
+    {
+     "text": "不過在強迫 AI 先一步步推理的實驗裡，效果變中性",
+     "verdict": "部分支持",
+     "card_quote": "強制模型開啟 \"Think step by step\"（CoT）；結果 Prompt Repetition 的效果變成「中性至微幅正面」（5 勝 1 敗 22 平）",
+     "note": "卡上 CoT 結果是整個對照實驗（5＋1＋22＝28 組）的整體結果。封面這句以「不過」緊接在 Gemini 2.0 Flash-Lite／NameIndex 單一例子之後，主詞只寫「效果」，讀者容易讀成「這個 21.33%→97.33% 的例子在開 CoT 後變中性」；卡上沒有說 NameIndex 或 Gemini 2.0 Flash-Lite 有在 CoT 對照實驗裡，也沒有它在 CoT 下的結果，等於把整體結果暗示成單一模型、單一任務的結果。省略「微幅正面」本身不列錯（較保守，且第 7 張有「頂多小幅加分」）。"
+    }
+   ],
+   "errors": [
+    "其他"
+   ]
+  },
+  {
+   "block": "第 7 張",
+   "atoms": [
+    {
+     "text": "主標：叫 AI 先一步步推理，貼兩次的效果變中性",
+     "verdict": "完全支持",
+     "card_quote": "強制模型開啟 \"Think step by step\"（CoT）；結果 Prompt Repetition 的效果變成「中性至微幅正面」",
+     "note": "主標省略「微幅正面」，同張補充有「頂多小幅加分」，限定在同張出現。主標的主詞是「貼兩次的效果」、沒有綁到單一模型，範圍正確。"
+    },
+    {
+     "text": "作者強迫模型開啟 CoT，再和同樣開了 CoT 的只貼一次比",
+     "verdict": "完全支持",
+     "card_quote": "為了探討邊界，作者做了對照實驗，強制模型開啟 \"Think step by step\"（CoT）",
+     "note": "比較對象對應 comparison_target「Baseline + CoT（不重複 Prompt、同樣開啟 CoT）」。"
+    },
+    {
+     "text": "只剩 5 勝 1 敗 22 平，中性，頂多小幅加分",
+     "verdict": "完全支持",
+     "card_quote": "結果 Prompt Repetition 的效果變成「中性至微幅正面」（5 勝 1 敗 22 平）",
+     "note": "放行項：「中性，頂多小幅加分」是「中性至微幅正面」的白話。"
+    },
+    {
+     "text": "我的解讀是：開了 CoT，模型寫答案時自己就會重複、思考；再幫它重複一次，效益就遞減了",
+     "verdict": "完全支持",
+     "card_quote": "Baseline + CoT 時，模型自己在 Output 階段做了重複／思考，修復了表徵問題；所以 Repetition + CoT 時，在 Input 端幫它重複一次的邊際效益就遞減了",
+     "note": "部落格推論，以作者口吻「我的解讀」呈現，語氣沒有比卡強；「寫答案時」對應 Output 階段；省略「修復了表徵問題」屬子集。"
+    },
+    {
+     "text": "圖：主實驗｜70 組：47 勝 0 敗，其餘平手或無明顯差異",
+     "verdict": "完全支持",
+     "card_quote": "在總共 70 個「模型－任務」組合中，Prompt Repetition 取得 47 勝 0 敗，其餘為平手或無顯著差異",
+     "note": "「明顯勝出／明顯落後」對應 McNemar 檢定（p < 0.1）的顯著勝敗。"
+    },
+    {
+     "text": "圖：明顯勝出 47・平手或無明顯差異 23・明顯落後 0",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 取得 47 勝 0 敗，其餘為平手或無顯著差異",
+     "note": "放行項：23＝70−47−0，已重算。"
+    },
+    {
+     "text": "圖：強迫開啟 CoT 的對照實驗｜5 勝 1 敗 22 平；明顯勝出 5・平手或無明顯差異 22・明顯落後 1",
+     "verdict": "完全支持",
+     "card_quote": "作者做了對照實驗，強制模型開啟 \"Think step by step\"（CoT）；結果 Prompt Repetition 的效果變成「中性至微幅正面」（5 勝 1 敗 22 平）",
+     "note": ""
+    },
+    {
+     "text": "圖註：一顆點是一個組合；開 CoT 的對照實驗共 28 組（5＋1＋22）",
+     "verdict": "完全支持",
+     "card_quote": "5 勝 1 敗 22 平",
+     "note": "放行項：28＝5＋1＋22，已重算；一顆點是一個「模型－任務」組合屬放行項。"
+    }
+   ],
+   "errors": []
+  }
+ ],
+ "recalculations": [
+  {
+   "block": "第 7 張",
+   "expression": "70 - 47 - 0",
+   "result": "23"
+  },
+  {
+   "block": "第 7 張",
+   "expression": "5 + 1 + 22",
+   "result": "28"
+  },
+  {
+   "block": "第 7 張",
+   "expression": "47 + 23 + 0",
+   "result": "70"
+  }
+ ],
+ "gaps": [
+  {
+   "description": "卡上沒有說 CoT 對照實驗的 28 組包含哪些模型與任務，也沒有說 NameIndex 或 Gemini 2.0 Flash-Lite 在 CoT 下的結果；封面把 CoT 結果接在單一例子之後，卡無法支持這種連結。",
+   "card_quote": "結果 Prompt Repetition 的效果變成「中性至微幅正面」（5 勝 1 敗 22 平）"
+  },
+  {
+   "description": "卡上沒有說 CoT 對照實驗的 28 組與主實驗的 70 組是否重疊；第 7 張兩列並排只是並列兩組實驗，文字沒有宣稱重疊，不列錯。",
+   "card_quote": "為了探討邊界，作者做了對照實驗，強制模型開啟 \"Think step by step\"（CoT）"
+  }
+ ]
+}

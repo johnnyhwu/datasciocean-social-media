@@ -4,7 +4,9 @@
 
 ## 待發布
 
-（目前沒有）
+- 拆解 Prompt Repetition：提示詞為什麼要貼兩次 第 1 則：[把提示詞貼兩次，第二遍就看得到全文](prompt-repetition/prompt-repetition-causal-bottleneck-and-fix/README.md)
+- 拆解 Prompt Repetition：提示詞為什麼要貼兩次 第 2 則：[輸入變兩倍長，為什麼幾乎沒變慢？](prompt-repetition/prompt-repetition-free-lunch-latency/README.md)
+- 拆解 Prompt Repetition：提示詞為什麼要貼兩次 第 3 則：[70 組裡 47 勝 0 敗，叫 AI 先推理就變中性](prompt-repetition/prompt-repetition-results-and-boundary/README.md)
 
 ## 拆解 Cerebras 知識庫：資料怎麼進來，答案怎麼出去（`cerebras-rag`）
 
@@ -44,6 +46,14 @@
 | 1 | `persona-d2s-task-and-pipeline` | 同一份文件，怎麼長出四種簡報？ | 已發布 | 已發布 | [README](persona-d2s-task-and-pipeline/README.md) |
 | 2 | `persona-d2s-training-design-flaws` | 80 筆資料訓出來的模型，能信嗎？ | 已發布 | 已發布 | [README](persona-d2s-training-design-flaws/README.md) |
 | 3 | `persona-d2s-what-to-borrow` | 不用訓練就能抄的兩招，各有什麼代價？ | 已發布 | 已發布 | [README](persona-d2s-what-to-borrow/README.md) |
+
+## 拆解 Prompt Repetition：提示詞為什麼要貼兩次（`prompt-repetition`）
+
+| 發文順序 | 觀念 | 標題（planned_title） | IG | Threads | 打開 |
+|---|---|---|---|---|---|
+| 1 | `prompt-repetition-causal-bottleneck-and-fix` | 把提示詞貼兩次，第二遍就看得到全文 | 待發布 | 待發布 | [README](prompt-repetition-causal-bottleneck-and-fix/README.md) |
+| 2 | `prompt-repetition-free-lunch-latency` | 輸入變兩倍長，為什麼幾乎沒變慢？ | 待發布 | 待發布 | [README](prompt-repetition-free-lunch-latency/README.md) |
+| 3 | `prompt-repetition-results-and-boundary` | 70 組裡 47 勝 0 敗，叫 AI 先推理就變中性 | 待發布 | 待發布 | [README](prompt-repetition-results-and-boundary/README.md) |
 
 ## SAG：不先建圖，查詢時才連（`sag`）
 

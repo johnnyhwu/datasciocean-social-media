@@ -1,0 +1,467 @@
+{
+  "series": "prompt-repetition",
+  "concept": "prompt-repetition-causal-bottleneck-and-fix",
+  "also_concepts": [],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "反直覺斷言",
+    "title": "提示詞貼兩次，\n[[不是囉嗦，是在補 AI 的盲點]]",
+    "subtitle": "AI 讀前面的字時，還不知道後面要問什麼；\nGoogle 提出的 Prompt Repetition 貼第二遍，\n讓第二遍的每個字都看得到全文",
+    "refs": [
+      "c1",
+      "c2",
+      "c4",
+      "c11"
+    ],
+    "candidate": "A"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "提示詞貼兩次，\n[[不是囉嗦，是在補 AI 的盲點]]",
+      "body": "AI 讀前面的字時，還不知道後面要問什麼；\nGoogle 提出的 Prompt Repetition 貼第二遍，\n讓第二遍的每個字都看得到全文",
+      "refs": [
+        "c1",
+        "c2",
+        "c4",
+        "c11"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "ambig",
+      "title": "讀到「bark」時，\n[[AI 還分不出狗叫還是樹皮]]",
+      "body": "AI 讀「The bark was rough.」：讀到 bark 時只看得到前兩個字，分不出狗叫聲還是樹皮，只能先記下一份模糊的理解。讀到 rough（粗糙的）才知道在講樹皮，於是回頭翻前面的字留下的紀錄；但 bark 那份是早先記的，翻到的仍然模糊。",
+      "refs": [
+        "c5"
+      ],
+      "nodes": [
+        {
+          "text": "The"
+        },
+        {
+          "text": "bark",
+          "focus": true
+        },
+        {
+          "text": "was"
+        },
+        {
+          "text": "rough",
+          "late": true
+        },
+        {
+          "text": "."
+        }
+      ],
+      "heads": [
+        "狗叫聲？",
+        "樹皮？"
+      ],
+      "outcomes": [
+        {
+          "text": "讀到 bark 時（後面的字還沒出現）"
+        },
+        {
+          "text": "讀到 rough 時"
+        },
+        {
+          "text": "回頭翻 bark 的紀錄，仍然模糊"
+        }
+      ],
+      "note": "這是舉例，用來說明機制，不是論文的實驗。"
+    },
+    {
+      "layout": "context",
+      "title": "Prompt Repetition：\n[[把提示詞原封不動貼兩次]]",
+      "body": "Google Research 團隊 2025 年 12 月的論文〈Prompt Repetition Improves Non-Reasoning LLMs〉，把提示詞原封不動複製一遍，模型收到「提示詞＋提示詞」。先認識三個詞：",
+      "rows": [
+        [
+          "Token",
+          "模型讀文字的單位，大約是一個詞"
+        ],
+        [
+          "Decoder-only",
+          "GPT-4、Gemini、Llama 等主流 LLM 大多採用，讀字時只能看前面"
+        ],
+        [
+          "雙向注意力",
+          "輸入的 Token 互相看見，前面也看得到後面（如 BERT）"
+        ]
+      ],
+      "key_w": 270,
+      "refs": [
+        "c2",
+        "c3",
+        "c9"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "route",
+      "title": "貼兩次為什麼有用？\n[[分三段拆解]]",
+      "body": "先看 AI 卡在哪，再看貼兩次怎麼補，最後看證據。",
+      "refs": [
+        "c1",
+        "c11",
+        "c12",
+        "c14"
+      ],
+      "label": "路線圖",
+      "nodes": [
+        {
+          "text": "AI 讀提示詞卡在哪？",
+          "sub": "只能往前看，前面的字不知道後文"
+        },
+        {
+          "text": "貼兩次怎麼補？",
+          "sub": "第二遍的每個字都看得到第一遍"
+        },
+        {
+          "text": "有什麼證據？",
+          "sub": "選項擺哪裡、三種貼法的比較"
+        }
+      ],
+      "heads": [
+        "這一則的路線",
+        "會不會變慢、整體成績：留到這個系列的下兩則"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "peek",
+      "title": "AI 讀字\n[[只能往前看]]",
+      "body": "Decoder-only 模型讀到某個 Token 時，只看得到它和它前面的 Token，看不到後面的。所以前面的字被理解時，對後文一無所知：它留給後面的字取用的資訊，只包含當時以前的內容。",
+      "refs": [
+        "c3",
+        "c4",
+        "c5"
+      ],
+      "label": "卡在哪",
+      "nodes": [
+        {
+          "text": "The"
+        },
+        {
+          "text": "bark",
+          "focus": true
+        },
+        {
+          "text": "was"
+        },
+        {
+          "text": "rough"
+        },
+        {
+          "text": "."
+        }
+      ],
+      "heads": [
+        "看得到哪些 Token",
+        "正在讀"
+      ],
+      "outcomes": [
+        {
+          "text": "實心＝看得到，深色＝正在讀的字，虛線＝還看不到"
+        }
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "blend",
+      "title": "最後一個字看完整句，\n[[也救不回模糊的原料]]",
+      "body": "最後一個 Token 雖然看過所有內容，它的理解卻是把前面每個 Token 留下的資訊（Value）按比重混在一起。如果前面的資訊因為缺乏上下文而模糊，比重分配得再好，也還原不出完美的意思。",
+      "refs": [
+        "c6",
+        "c5"
+      ],
+      "label": "卡在哪",
+      "nodes": [
+        {
+          "text": "The"
+        },
+        {
+          "text": "bark",
+          "sub": "狗叫？樹皮？分不清",
+          "murky": true
+        },
+        {
+          "text": "was"
+        },
+        {
+          "text": "rough"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "最後一個 Token 的理解",
+          "sub": "原料模糊，還原不出完美的意思"
+        }
+      ],
+      "heads": [
+        "前面每個 Token 留下的資訊（原料）",
+        "比重給得再高"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "repeat",
+      "title": "貼第二遍，\n[[每個字都看得到整個第一遍]]",
+      "body": "模型收到的是第一遍接著第二遍。讀第一遍時和平常一樣看不到後文；讀到第二遍，開頭的內容就能回頭查第一遍結尾的問題，所以第二遍每個字的理解，都是「已經看過全文」的。模型最後回答時，會很依賴這些資訊。",
+      "refs": [
+        "c11",
+        "c1",
+        "c2"
+      ],
+      "label": "貼兩次",
+      "nodes": [
+        {
+          "text": "內容",
+          "focus": true
+        },
+        {
+          "text": "內容"
+        },
+        {
+          "text": "內容"
+        },
+        {
+          "text": "問題"
+        }
+      ],
+      "heads": [
+        "第一遍",
+        "第二遍"
+      ],
+      "outcomes": [
+        {
+          "text": "讀內容時，還不知道問題是什麼"
+        },
+        {
+          "text": "開頭的內容，就看得到第一遍的問題"
+        }
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "matrix",
+      "title": "CoT 和雙向注意力，\n[[也修得好，但各有代價]]",
+      "body": "原本有兩種修法：CoT（先叫 AI 一步步寫出推理）和雙向注意力，都修得好，但各有代價。貼兩次不改架構，就能模擬出雙向注意力的效果。",
+      "heads": [
+        "好處",
+        "代價"
+      ],
+      "nodes": [
+        {
+          "text": "CoT",
+          "sub": "先一步步寫出推理"
+        },
+        {
+          "text": "雙向注意力",
+          "sub": "BERT、T5"
+        },
+        {
+          "text": "貼兩次",
+          "sub": "Prompt Repetition"
+        }
+      ],
+      "cells": [
+        [
+          [
+            "寫推理時，重新處理資訊"
+          ],
+          [
+            "多寫字，延遲與成本上升"
+          ]
+        ],
+        [
+          [
+            "Token 互相看見，從根本解決"
+          ],
+          [
+            "要改架構，或訓練；只用 API 時，做不到"
+          ]
+        ],
+        [
+          [
+            "第二遍看見，整個第一遍"
+          ],
+          [
+            "只多貼一遍，不改架構"
+          ]
+        ]
+      ],
+      "hot": 2,
+      "refs": [
+        "c1",
+        "c8",
+        "c9",
+        "c11"
+      ],
+      "label": "貼兩次"
+    },
+    {
+      "layout": "diagram",
+      "kind": "catchup",
+      "title": "選項放前面會吃虧？\n[[貼兩次就追上]]",
+      "body": "像附選項的考題，選項擺問題前面，模型讀選項時還不知道問題，抓不到重點；問題擺前面，內容一長又可能忘了問題。實驗發現，只貼一次時選項在前通常較差；貼兩次後，追平或超越問題在前。選項放前面也不怕了。",
+      "refs": [
+        "c7",
+        "c12"
+      ],
+      "quals": [
+        "c12#1",
+        "c12#2"
+      ],
+      "label": "證據",
+      "heads": [
+        "只貼一次",
+        "貼兩次"
+      ],
+      "nodes": [
+        {
+          "text": "問題在前（只貼一次）"
+        },
+        {
+          "text": "選項在前"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "通常較差"
+        },
+        {
+          "text": "追平或超越問題在前"
+        }
+      ],
+      "note": "這張圖只表示誰比較好，高低不是實際分數。"
+    },
+    {
+      "layout": "diagram",
+      "kind": "variants",
+      "title": "前面塞一串點點拉長輸入，\n[[完全無效]]",
+      "body": "在前面塞一串點點、只把輸入拉長（Padding），完全無效。可見提升來自重複有意義的內容、模擬雙向注意力，不是輸入變長。兩遍中間加一句「Let me repeat that:」（Verbose），效果和標準重複差不多，只是多幾個 Token。",
+      "refs": [
+        "c13",
+        "c14",
+        "c15",
+        "c2"
+      ],
+      "label": "證據",
+      "steps": [
+        {
+          "label": "標準",
+          "cells": [
+            {
+              "text": "提示詞",
+              "tone": "prompt"
+            },
+            {
+              "text": "提示詞",
+              "tone": "prompt"
+            }
+          ],
+          "verdict": {
+            "text": "標準做法：兩遍直接接起來",
+            "tone": "good"
+          }
+        },
+        {
+          "label": "Verbose",
+          "cells": [
+            {
+              "text": "提示詞",
+              "tone": "prompt"
+            },
+            {
+              "text": "Let me repeat that:",
+              "tone": "extra"
+            },
+            {
+              "text": "提示詞",
+              "tone": "prompt"
+            }
+          ],
+          "verdict": {
+            "text": "差不多，多幾個 Token",
+            "tone": "same"
+          }
+        },
+        {
+          "label": "Padding",
+          "cells": [
+            {
+              "text": "．．．．．．",
+              "tone": "pad"
+            },
+            {
+              "text": "提示詞",
+              "tone": "prompt"
+            }
+          ],
+          "verdict": {
+            "text": "完全無效",
+            "tone": "bad"
+          }
+        }
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "同一段提示詞，為什麼要貼兩次？",
+      "title": "讀到 bark 還分不清？\nPrompt Repetition\n貼第二遍，\n就看得到全文。",
+      "refs": [
+        "c1",
+        "c5",
+        "c11"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "這個系列共三則",
+      "current": "prompt-repetition-causal-bottleneck-and-fix",
+      "nav": "完整文章在 datasciocean.com，搜「Prompt Repetition」",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "提示詞貼兩次，不是囉嗦，是在補 AI 的盲點。\n\n主流的 LLM（GPT-4、Gemini 等）大多只能往前看。舉個例子，讀「The bark was rough.」讀到 bark 時，後面的 rough 還沒出現，分不出是狗叫聲還是樹皮；只能先記下一份模糊的理解；等讀到 rough 知道是樹皮，回頭去翻 bark 那份早先記下的紀錄，翻到的仍然模糊。\n\nGoogle Research 2025 年 12 月的論文提出 Prompt Repetition：把整段提示詞原封不動再貼一次，第二遍的每個字都看得到整個第一遍，不改模型，就能模擬出讓字前後互相看見的效果。只在前面塞一串點點拉長輸入則完全無效。細節在圖裡。\n\n這是 Prompt Repetition 系列的第一則；輸入變兩倍會不會變慢，在這個系列的下一則。",
+      "refs": [
+        "c3",
+        "c5",
+        "c2",
+        "c1",
+        "c9",
+        "c14"
+      ],
+      "quals": []
+    },
+    "last": {
+      "text": "Prompt Repetition：把提示詞原封不動貼兩次，第二遍的每個字都看得到整個第一遍。\n文章：datasciocean.com/paper-intro/prompt-repetition\n同系列：輸入變兩倍長，為什麼幾乎沒變慢？（尚未發布）\n同系列：70 組裡 47 勝 0 敗，叫 AI 先推理就變中性（尚未發布）",
+      "refs": [
+        "c1",
+        "c11",
+        "c2"
+      ],
+      "link": "https://datasciocean.com/paper-intro/prompt-repetition/"
+    }
+  },
+  "caption": {
+    "first": "Prompt Repetition 把提示詞貼兩次，為什麼 AI 就看得到全文？",
+    "first_refs": [
+      "c2",
+      "c11"
+    ],
+    "nav": "完整文章在 datasciocean.com，搜「Prompt Repetition」",
+    "hashtags": [
+      "PromptRepetition",
+      "提示詞",
+      "LLM"
+    ]
+  }
+}

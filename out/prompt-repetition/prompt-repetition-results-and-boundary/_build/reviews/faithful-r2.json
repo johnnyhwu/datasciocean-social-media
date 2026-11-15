@@ -1,0 +1,365 @@
+{
+ "post": "prompt-repetition-results-and-boundary",
+ "blocks": [
+  {
+   "block": "第 1 張",
+   "atoms": [
+    {
+     "text": "找第 25 個名字，答對率 21.33% 變 97.33%",
+     "verdict": "完全支持",
+     "card_quote": "在 NameIndex 上，Gemini 2.0 Flash-Lite 的 Baseline 只有 21.33%，使用 Prompt Repetition 後達到 97.33%",
+     "note": "主標未寫模型，副標補上單一模型 Gemini 2.0 Flash-Lite；極端查找任務的限定條件在第 2 張出現"
+    },
+    {
+     "text": "Gemini 2.0 Flash-Lite 在 50 個名字裡找第 25 個",
+     "verdict": "完全支持",
+     "card_quote": "給一串 50 個名字，問「第 25 個名字是誰？」",
+     "note": ""
+    },
+    {
+     "text": "只貼一次 21.33%，提示詞貼兩次 97.33%",
+     "verdict": "完全支持",
+     "card_quote": "Gemini 2.0 Flash-Lite 的 Baseline 只有 21.33%，使用 Prompt Repetition 後達到 97.33%",
+     "note": "只貼一次＝Baseline（不重複 Prompt）"
+    },
+    {
+     "text": "不過整體來看，叫 AI 先一步步推理時，效果就變中性",
+     "verdict": "完全支持",
+     "card_quote": "強制模型開啟 \"Think step by step\"（CoT）後，效果變成「中性至微幅正面」（5 勝 1 敗 22 平）",
+     "note": "封面省略「至微幅正面」，內文第 7 張有「頂多小幅加分」，屬封面可沒說完整的範圍"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 2 張",
+   "atoms": [
+    {
+     "text": "50 個名字找第 25 個：只貼一次，答對兩成出頭",
+     "verdict": "完全支持",
+     "card_quote": "Gemini 2.0 Flash-Lite 的 Baseline 只有 21.33%",
+     "note": "兩成出頭為 21.33% 的白話（放行項 4）"
+    },
+    {
+     "text": "NameIndex 是作者設計的極端查找任務：給一串 50 個名字，問「第 25 個名字是誰？」",
+     "verdict": "完全支持",
+     "card_quote": "作者設計了兩個極端的「查找任務」（Appendix A.3），其中最經典的是 NameIndex：給一串 50 個名字，問「第 25 個名字是誰？」",
+     "note": "帶出 c11 限定條件"
+    },
+    {
+     "text": "Gemini 2.0 Flash-Lite 只貼一次時答對 21.33%，提示詞貼兩次後是 97.33%，接近完美",
+     "verdict": "完全支持",
+     "card_quote": "**Prompt Repetition:** **97.33%** (接近完美)。",
+     "note": ""
+    },
+    {
+     "text": "圖：只貼一次 21.33 %、提示詞貼兩次 97.33 %，單位 %，軸從 0 起",
+     "verdict": "完全支持",
+     "card_quote": "在 NameIndex 上，Gemini 2.0 Flash-Lite 的 Baseline 只有 21.33%，使用 Prompt Repetition 後達到 97.33%",
+     "note": "有單位與比較對象"
+    },
+    {
+     "text": "同一個模型、同一個任務，只差在提示詞貼一次還是兩次",
+     "verdict": "完全支持",
+     "card_quote": "同一模型（Gemini 2.0 Flash-Lite）在 NameIndex 上的 Baseline（21.33%）",
+     "note": "comparison_target"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 3 張",
+   "atoms": [
+    {
+     "text": "recap 結構頁",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "結構元素，不需對證"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 4 張",
+   "atoms": [
+    {
+     "text": "只貼一次時，模型讀到第 25 個名字，還不知道問題要找第 25 個，所以沒特別記住；等讀完問題，已經來不及回頭",
+     "verdict": "完全支持",
+     "card_quote": "因為在 Baseline 中，模型讀到第 25 個名字時，還不知道問題是「找第 25 個」，所以它沒有特別記住那個名字。等到讀完問題，已經來不及回頭了",
+     "note": "c12 部落格推論，語氣未比卡強"
+    },
+    {
+     "text": "貼兩次後，模型讀第二遍時，就是帶著「我要找第 25 個」去看名單，自然一抓一個準",
+     "verdict": "完全支持",
+     "card_quote": "而 Prompt Repetition 讓模型在讀 **第二遍** 時，帶著「我要找第 25 個」的強烈意圖去掃描列表，自然一抓一個準。",
+     "note": ""
+    },
+    {
+     "text": "圖：50 格、第 25 格標出，第一遍不知道要找第幾個、第二遍帶著問題掃",
+     "verdict": "完全支持",
+     "card_quote": "給一串 50 個名字，問「第 25 個名字是誰？」",
+     "note": "放行項 2"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 5 張",
+   "atoms": [
+    {
+     "text": "Prompt Repetition 出自 Google Research 2025 年 12 月的論文",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 出自 Google Research 團隊於 2025 年 12 月發表的論文",
+     "note": ""
+    },
+    {
+     "text": "把提示詞原封不動複製一遍，拿來和只貼一次比",
+     "verdict": "完全支持",
+     "card_quote": "做法是將使用者的輸入 Prompt 原封不動地複製一遍",
+     "note": "比較對象見 comparison_target：Baseline（不重複 Prompt）"
+    },
+    {
+     "text": "McNemar 檢定：統計方法，看差距是不是碰巧；作者設 p < 0.1",
+     "verdict": "完全支持",
+     "card_quote": "作者使用 McNemar 檢定評估統計顯著性（設定 p < 0.1）",
+     "note": "白話定義為放行項 1"
+    },
+    {
+     "text": "CoT：強迫模型先「Think step by step」，一步步推理",
+     "verdict": "完全支持",
+     "card_quote": "強制模型開啟 \"Think step by step\"（CoT）",
+     "note": ""
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 6 張",
+   "atoms": [
+    {
+     "text": "70 個「模型－任務」組合上比較貼兩次和只貼一次：47 組明顯勝出，0 組落後，其餘平手或沒有明顯差異",
+     "verdict": "完全支持",
+     "card_quote": "在總共 70 個「模型－任務」組合中，Prompt Repetition 取得 47 勝 0 敗，其餘為平手或無顯著差異",
+     "note": "c3 的限定條件（CoT 中性）在第 7 張出現"
+    },
+    {
+     "text": "我認為這很少見：它跨越了不同模型架構與參數量級",
+     "verdict": "完全支持",
+     "card_quote": "blog 認為這在機器學習領域極為罕見",
+     "note": "部落格判斷以作者口吻寫，「很少見」比「極為罕見」弱"
+    },
+    {
+     "text": "不像一般技巧常只對某家模型有效",
+     "verdict": "完全支持",
+     "card_quote": "通常某個 Trick 可能對 GPT 有效、對 Claude 卻無效",
+     "note": "白話，未加強"
+    },
+    {
+     "text": "圖：70 點、47 點明顯較好、落後 0 組",
+     "verdict": "完全支持",
+     "card_quote": "取得 47 勝 0 敗，其餘為平手或無顯著差異",
+     "note": "70−47−0=23 為平手或無顯著差異"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 7 張",
+   "atoms": [
+    {
+     "text": "作者強迫模型開啟 CoT，再和同樣開了 CoT 的只貼一次比",
+     "verdict": "完全支持",
+     "card_quote": "為了探討邊界，作者做了對照實驗，強制模型開啟 \"Think step by step\"（CoT）",
+     "note": "比較對象 Baseline + CoT（不重複 Prompt、同樣開啟 CoT）"
+    },
+    {
+     "text": "只剩 5 勝 1 敗 22 平，中性，頂多小幅加分",
+     "verdict": "完全支持",
+     "card_quote": "結果 Prompt Repetition 的效果變成「中性至微幅正面」（5 勝 1 敗 22 平）",
+     "note": "放行項 1 的白話"
+    },
+    {
+     "text": "我的解讀是：開了 CoT，模型寫答案時自己就會重複、思考；再幫它重複一次，效益就遞減了",
+     "verdict": "完全支持",
+     "card_quote": "Baseline + CoT 時，模型自己在 Output 階段做了重複／思考，修復了表徵問題；所以 Repetition + CoT 時，在 Input 端幫它重複一次的邊際效益就遞減了",
+     "note": "部落格推論標為解讀，未寫成已驗證"
+    },
+    {
+     "text": "圖列標「不開 CoT」：47 勝、23 平手或無明顯差異、0 敗",
+     "verdict": "部分支持",
+     "card_quote": "另一組強制開啟 CoT 的對照實驗中",
+     "note": "數字 23＝70−47−0 正確；但卡只說 CoT 組是「強制開啟 CoT」的另一組對照實驗，沒有寫 70 組主實驗的設定是「不開 CoT」；把主實驗標成「不開 CoT」是由對照關係推出的，比卡多一步"
+    },
+    {
+     "text": "圖列「開了 CoT」：5 勝、22 平、1 敗；圖註共 28 組（5＋1＋22）",
+     "verdict": "完全支持",
+     "card_quote": "效果變成「中性至微幅正面」（5 勝 1 敗 22 平）",
+     "note": "28 為三數加總，卡未直接寫總數"
+    }
+   ],
+   "errors": [
+    "措辭與卡不同"
+   ]
+  },
+  {
+   "block": "第 8 張",
+   "atoms": [
+    {
+     "text": "我認為它最適合需要精準理解、不需要好幾步複雜推理的任務，例如資訊提取、閱讀測驗",
+     "verdict": "完全支持",
+     "card_quote": "blog 舉的適用任務例子是資訊提取、閱讀測驗這類「需要精準理解，但不需要複雜多步推理」的任務",
+     "note": "部落格判斷"
+    },
+    {
+     "text": "會先想再答的推理模型（如 o1），常會自己學會把問題重說一遍",
+     "verdict": "完全支持",
+     "card_quote": "經過強化學習（RL）訓練的 Reasoning Models（如 o1）往往會在推理過程中自發性地學會「把問題重說一遍」",
+     "note": "省略「經過強化學習訓練」；以 o1 為例，白話屬放行項 1"
+    },
+    {
+     "text": "貼兩次也許正是這種策略，用在直接回答的模型上",
+     "verdict": "完全支持",
+     "card_quote": "blog 認為這暗示 Prompt Repetition 也許是模型為了克服注意力瓶頸而演化出的一種隱式策略（Implicit Strategy），而這篇論文的貢獻就是把這個策略「顯式化」並應用在非推理模型上",
+     "note": "保留「也許」，未比卡強"
+    },
+    {
+     "text": "圖：資訊提取、閱讀測驗打勾；複雜推理要好幾步不在最適合範圍；已經開了 CoT 效益遞減",
+     "verdict": "完全支持",
+     "card_quote": "在 Input 端幫它重複一次的邊際效益就遞減了",
+     "note": ""
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 9 張",
+   "atoms": [
+    {
+     "text": "Prompt Repetition 最適合要精準讀懂的任務，像資訊提取、閱讀測驗",
+     "verdict": "完全支持",
+     "card_quote": "blog 舉的適用任務例子是資訊提取、閱讀測驗這類「需要精準理解，但不需要複雜多步推理」的任務",
+     "note": "本頁省略「不需要複雜多步推理」，第 8 張完整寫出"
+    },
+    {
+     "text": "已先推理就幫助不大",
+     "verdict": "完全支持",
+     "card_quote": "效果變成「中性至微幅正面」（5 勝 1 敗 22 平）",
+     "note": "「幫助不大」與中性至微幅正面、邊際效益遞減一致"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 10 張",
+   "atoms": [
+    {
+     "text": "系列地圖與導流行",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "結構元素"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "Threads 正文",
+   "atoms": [
+    {
+     "text": "找第 25 個名字，答對率從 21.33% 變 97.33%",
+     "verdict": "完全支持",
+     "card_quote": "在 NameIndex 上，Gemini 2.0 Flash-Lite 的 Baseline 只有 21.33%，使用 Prompt Repetition 後達到 97.33%",
+     "note": "第一句可沒說完整，下一句補上模型與任務"
+    },
+    {
+     "text": "這是作者設計的極端查找任務 NameIndex：給 50 個名字，問第 25 個是誰；數字是 Gemini 2.0 Flash-Lite 的結果",
+     "verdict": "完全支持",
+     "card_quote": "作者設計了兩個極端的「查找任務」（Appendix A.3），其中最經典的是 NameIndex：給一串 50 個名字，問「第 25 個名字是誰？」",
+     "note": ""
+    },
+    {
+     "text": "讀第二遍時，模型已經知道要找第幾個",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 讓模型在讀第二遍時，帶著「要找哪一個」的意圖去掃描列表",
+     "note": "部落格推論，直述但未寫成已驗證"
+    },
+    {
+     "text": "70 個「模型－任務」組合裡，貼兩次 47 勝 0 敗，其餘平手或沒有明顯差異",
+     "verdict": "完全支持",
+     "card_quote": "在總共 70 個「模型－任務」組合中，Prompt Repetition 取得 47 勝 0 敗，其餘為平手或無顯著差異",
+     "note": ""
+    },
+    {
+     "text": "但強迫模型先一步步推理（CoT）時，只剩 5 勝 1 敗 22 平：中性，頂多小幅加分",
+     "verdict": "完全支持",
+     "card_quote": "強制模型開啟 \"Think step by step\"（CoT）後，效果變成「中性至微幅正面」（5 勝 1 敗 22 平）",
+     "note": ""
+    },
+    {
+     "text": "所以我認為它最適合需要精準理解、不需要好幾步複雜推理的任務，例如資訊提取、閱讀測驗",
+     "verdict": "完全支持",
+     "card_quote": "blog 據此認為 Prompt Repetition 最適合那些「需要精準理解，但不需要複雜多步推理」的任務",
+     "note": "「所以」對應卡上「據此」"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "Threads 最後一則",
+   "atoms": [
+    {
+     "text": "Prompt Repetition 在 70 組裡 47 勝 0 敗；模型先一步步推理時，效果變成中性，頂多小幅加分",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 在總共 70 個「模型－任務」組合中取得 47 勝 0 敗；但強制模型開啟 \"Think step by step\"（CoT）後，效果變成「中性至微幅正面」（5 勝 1 敗 22 平）",
+     "note": "網址與同系列為結構元素"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "IG caption",
+   "atoms": [
+    {
+     "text": "Prompt Repetition 實測：70 個組合 47 勝 0 敗，什麼情況下效果會變中性？",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 在總共 70 個「模型－任務」組合中取得 47 勝 0 敗；但強制模型開啟 \"Think step by step\"（CoT）後，效果變成「中性至微幅正面」",
+     "note": "caption 第一句可沒說完整"
+    },
+    {
+     "text": "各條列為各張主標",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "已在各張對證；hashtag、導流行為結構元素"
+    }
+   ],
+   "errors": []
+  }
+ ],
+ "recalculations": [
+  {
+   "block": "第 7 張",
+   "expression": "70 - 47 - 0",
+   "result": "23"
+  },
+  {
+   "block": "第 7 張",
+   "expression": "5 + 1 + 22",
+   "result": "28"
+  },
+  {
+   "block": "第 6 張",
+   "expression": "47 + 23 + 0",
+   "result": "70"
+  },
+  {
+   "block": "第 2 張",
+   "expression": "21.33 / 100",
+   "result": "0.2133（兩成出頭）"
+  }
+ ],
+ "gaps": [
+  {
+   "description": "第 7 張把 70 組主實驗標成「不開 CoT」，卡上只說 CoT 組是另一組「強制開啟 CoT」的對照實驗，未說主實驗的 CoT 設定",
+   "card_quote": "另一組強制開啟 CoT 的對照實驗中，Prompt Repetition 的效果變成「中性至微幅正面」（5 勝 1 敗 22 平）"
+  }
+ ]
+}

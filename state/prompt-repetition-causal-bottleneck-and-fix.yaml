@@ -1,0 +1,9 @@
+concept: prompt-repetition-causal-bottleneck-and-fix
+formats:
+  ig_carousel:
+    status: ready
+    pack: out/prompt-repetition/prompt-repetition-causal-bottleneck-and-fix
+  threads_thread:
+    status: ready
+    pack: out/prompt-repetition/prompt-repetition-causal-bottleneck-and-fix
+posts: []

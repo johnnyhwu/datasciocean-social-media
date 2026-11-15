@@ -83,6 +83,10 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 
 2 卡 2 則，**系列完成**；人 2026-11-10 review 成品後接受系列名、標題與 hook（`members_locked: true`）。第 1 則 2026-11-10 發布：IG https://www.instagram.com/p/DfioeFskwS6/ 、Threads https://www.threads.com/@datasciocean/post/DfipBuME42W 。第 2 則 2026-11-11 發布：IG https://www.instagram.com/p/DflJQEaEjYw/ 、Threads https://www.threads.com/@datasciocean/post/DflJnf3EpSq ；同日已回補第 1 則 Threads 的「同系列」。這是第一次由 Claude 從頭做到尾、人只 review 成品（`CLAUDE.md` 規則 12）。第 1 則 `out/universal-rag/universalrag-routing-over-unified-embedding/`（2026-11-10 依讀者與編輯審查重整成 12 張：併掉重複的「三個階段」「Router 看的是什麼」與「只查一種資料」，提早揭曉原因）；第 2 則 `out/universal-rag/universalrag-router-design-and-rollout/`（13 張）。採用 instagram-agent-skill 的建議（第 2 張是第二封面、帶走張能單獨轉傳、caption 停在懸念、縮圖檢查…），2026-11-10 學到的寫進 `ig-carousel.md`、`hooks.md`、`threads-and-caption.md`、`self-check.md`、`spec-json.md`、`brand-and-layouts.md` §4.2。新圖型：第 1 則 9 種、第 2 則 `grain`、`ballot`、`thresh`、`murky`，封面岔路的站牌（`branches`／`hot`／`fork`）；未做草圖與樣張（人只 review 成品）。
 
+## Prompt Repetition 系列（2026-11-11 起；複寫風格 `echo`）
+
+3 卡 3 則不合併（理由在 `series/prompt-repetition/series.md` 規劃備忘）；系列名「拆解 Prompt Repetition：提示詞為什麼要貼兩次」、hashtag `#PromptRepetition`（Claude 依規則 12 決定，2026-11-15 人接受）。Claude 從頭做到尾，草圖與樣張省略（前例 UniversalRAG）。新風格 `echo`（`render.py` 的 `ec_*`，`tests/test_echo_style.py`）；新圖型 12 種（`tests/test_diagrams.py`）。三則 spec 在 `out/prompt-repetition/`（12／10／10 張），2026-11-11 三則審查全過、系列 summary 忠實者審過、`batch_check` 通過；2026-11-15 人 review：第 2、3 則沒問題，已 ready（hook accepted）；第 1 則依回饋改第 2、8 張與 Threads 正文，忠實者 r5、讀者 r3 通過，人確認後 ready；系列 `members_locked: true`。存量 3，下一步：發第 1 則（等人授權）。
+
 ## 跨系列的人的決定與待決事項
 
 - 封面主標可放寬成 3 行（人，2026-10-28，`cover_title_max_lines: 3`；探照燈封面超過 2.5 行自動縮成 56px，其他風格要自己確認）。

@@ -1,0 +1,9 @@
+concept: prompt-repetition-free-lunch-latency
+formats:
+  ig_carousel:
+    status: ready
+    pack: out/prompt-repetition/prompt-repetition-free-lunch-latency
+  threads_thread:
+    status: ready
+    pack: out/prompt-repetition/prompt-repetition-free-lunch-latency
+posts: []

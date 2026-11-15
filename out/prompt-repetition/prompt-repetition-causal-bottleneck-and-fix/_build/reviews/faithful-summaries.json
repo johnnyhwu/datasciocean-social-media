@@ -1,0 +1,29 @@
+{"post":"系列 summary","blocks":[
+{"block":"第 1 則 summary","atoms":[
+{"text":"AI 讀到前面的字時還不知道後文","verdict":"部分支持","card_quote":"模型處理序列前端的 Token 時，生成的 Key 和 Value 僅包含該時間點之前的資訊，也就是這些早期的 Token 是在「對未來一無所知」的狀態下被編碼的","note":"卡上這個限制屬於 Decoder-only 架構（c3：主流大型語言模型「大多採用」Decoder-only、這類模型是 Causal 的）；summary 主詞寫成泛稱的「AI」，把範圍從 Decoder-only／Causal 模型放大到所有 AI。「字」＝Token、「還不知道後文」＝「對未來一無所知」屬白話，不算夾帶。"},
+{"text":"貼兩次之後，第二遍的每個字都看得到整個第一遍","verdict":"完全支持","card_quote":"Prompt Repetition 把輸入的 Prompt 複製一遍，第二遍中的每一個位置都能完整地「看見」整個第一遍","note":"c1，錨點為部落格推論，以作者口吻直述可接受。"}
+],"errors":["範圍被放大"]},
+{"block":"第 1 則 planned_title","atoms":[
+{"text":"把提示詞貼兩次","verdict":"完全支持","card_quote":"將使用者的輸入 Prompt 原封不動地複製一遍","note":"c2。"},
+{"text":"第二遍就看得到全文","verdict":"完全支持","card_quote":"P2 生成的 Key/Value 是「已經看過全文」的高品質表徵","note":"c11；另見 c1「第二遍中的每一個位置都能完整地「看見」整個第一遍」。"}
+],"errors":[]},
+{"block":"第 2 則 summary","atoms":[
+{"text":"多出來的輸入落在可以平行算的讀題階段","verdict":"完全支持","card_quote":"多出來的輸入落在 GPU 可以高度平行化運算的 Prefill 階段","note":"c1；Prefill 白話為讀題階段（c3：Prefill 階段是模型閱讀 <QUERY><QUERY> 的階段）。"},
+{"text":"主要花時間的是一個字一個字寫答案","verdict":"完全支持","card_quote":"Decode 階段是模型一個字一個字吐出 Output 的階段，這是序列化的過程，受限於記憶體頻寬（Memory Bandwidth），是造成 LLM 延遲的主要元兇","note":"c4。"},
+{"text":"答案長度沒變","verdict":"完全支持","card_quote":"模型生成的 Output 長度保持不變","note":"c1；c7 亦稱生成長度「高度一致」。本句只講機制、未宣稱延遲不變，Claude 極長文本例外不必在此出現。"}
+],"errors":[]},
+{"block":"第 2 則 planned_title","atoms":[
+{"text":"輸入變兩倍長，（延遲）幾乎沒變慢","verdict":"完全支持","card_quote":"輸入長度變兩倍卻幾乎不變慢","note":"c1。卡上此主張綁有限定條件「Claude 處理極長文本（Custom Tasks）時延遲有顯著增加；在絕大多數通用場景下成立」，標題可留白，但該限定條件須在該則內文出現（本審查看不到內文，無法確認）。"}
+],"errors":[]},
+{"block":"第 3 則 summary","atoms":[
+{"text":"70 個模型與任務的組合裡 47 勝 0 敗","verdict":"部分支持","card_quote":"在總共 70 個「模型－任務」組合中，Prompt Repetition 取得 47 勝 0 敗，其餘為平手或無顯著差異","note":"數字本身對得上（c3）。但卡上的比較對象是 Baseline（不重複 Prompt），summary 沒寫出勝負是跟什麼比，也沒寫主詞（貼兩次／Prompt Repetition）；勝負的比較對象只能靠上下文推。"},
+{"text":"要模型先一步步推理時，效果變成中性到小幅正面","verdict":"完全支持","card_quote":"強制模型開啟 \"Think step by step\"（CoT）；結果 Prompt Repetition 的效果變成「中性至微幅正面」（5 勝 1 敗 22 平）","note":"c7；「中性到小幅正面」＝「中性至微幅正面」。"}
+],"errors":["其他"]},
+{"block":"第 3 則 planned_title","atoms":[
+{"text":"70 組裡 47 勝 0 敗","verdict":"完全支持","card_quote":"在總共 70 個「模型－任務」組合中，Prompt Repetition 取得 47 勝 0 敗","note":"c3；標題可省略「模型－任務」與比較對象 Baseline，但內文須寫出。"},
+{"text":"叫 AI 先推理就變中性","verdict":"部分支持","card_quote":"效果變成「中性至微幅正面」（5 勝 1 敗 22 平）","note":"卡上 claims 一律寫「中性至微幅正面」（c1、c7），標題只取「中性」，丟掉「至微幅正面」，讓讀者以為開推理後完全沒效果；方向是比卡弱，非放大，但字面與卡的範圍描述不同。「叫 AI 先推理」＝強制開啟 Think step by step，屬白話。"}
+],"errors":["措辭與卡不同"]}
+],"recalculations":[],"gaps":[
+{"description":"47 勝 0 敗的統計判定方式（McNemar 檢定、p < 0.1）與「其餘為平手或無顯著差異」未在第 3 則 summary／標題出現","card_quote":"作者使用 McNemar 檢定評估統計顯著性（設定 p < 0.1）"},
+{"description":"「幾乎沒變慢」所綁的 Claude 極長文本例外未出現在第 2 則 summary／標題","card_quote":"唯一的例外是 Anthropic 的模型（Claude）在處理極長文本（Custom Tasks）時，延遲有顯著增加"}
+]}

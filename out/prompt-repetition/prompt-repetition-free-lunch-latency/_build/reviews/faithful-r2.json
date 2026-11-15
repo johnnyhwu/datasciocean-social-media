@@ -1,0 +1,392 @@
+{
+ "post": "prompt-repetition-free-lunch-latency",
+ "blocks": [
+  {
+   "block": "第 1 張",
+   "atoms": [
+    {
+     "text": "提示詞貼兩次、輸入變兩倍，為什麼幾乎沒變慢？",
+     "verdict": "完全支持",
+     "card_quote": "輸入長度變兩倍卻幾乎不變慢",
+     "note": "封面問句；Claude 例外在第 2 張內文出現。"
+    },
+    {
+     "text": "多出來的字，落在 GPU 能同時算的讀題階段",
+     "verdict": "完全支持",
+     "card_quote": "多出來的輸入落在 GPU 可以高度平行化運算的 Prefill 階段",
+     "note": "「同時算」是平行化的白話。"
+    },
+    {
+     "text": "真正花時間的是一個字一個字寫答案",
+     "verdict": "完全支持",
+     "card_quote": "Decode 階段是模型一個字一個字吐出 Output 的階段，這是序列化的過程，受限於記憶體頻寬（Memory Bandwidth），是造成 LLM 延遲的主要元兇",
+     "note": ""
+    },
+    {
+     "text": "而答案長度沒變",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 沒有改變 Prompt 的語意，模型生成的 Output 長度保持不變",
+     "note": ""
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 2 張",
+   "atoms": [
+    {
+     "text": "貼兩次、輸入變兩倍，延遲卻幾乎持平",
+     "verdict": "完全支持",
+     "card_quote": "延遲（Latency）方面兩者幾乎持平：即使輸入變兩倍長，End-to-End 的延遲幾乎沒有增加",
+     "note": ""
+    },
+    {
+     "text": "實驗中，貼兩次和只貼一次的答案長度高度一致",
+     "verdict": "完全支持",
+     "card_quote": "根據論文的實驗數據，blog 說兩者的生成長度（Output Length）高度一致",
+     "note": ""
+    },
+    {
+     "text": "不像 CoT 越寫越長",
+     "verdict": "完全支持",
+     "card_quote": "證明 Prompt Repetition 不會像 CoT 那樣觸發模型生成長篇大論的解釋",
+     "note": ""
+    },
+    {
+     "text": "延遲也幾乎沒增加",
+     "verdict": "完全支持",
+     "card_quote": "即使輸入變兩倍長，End-to-End 的延遲幾乎沒有增加",
+     "note": "比較對象（只貼一次）在同句出現。"
+    },
+    {
+     "text": "唯一例外是 Claude 這款模型處理極長文本時，延遲明顯增加",
+     "verdict": "完全支持",
+     "card_quote": "唯一的例外是 Anthropic 的模型（Claude）在處理極長文本（Custom Tasks）時，延遲有顯著增加",
+     "note": ""
+    },
+    {
+     "text": "論文作者推測和它的 Prefill 處理或快取方式有關",
+     "verdict": "完全支持",
+     "card_quote": "對這個例外，作者推測可能與 Claude API 內部的 Prefill 處理機制或緩存策略有關",
+     "note": "原作者解讀，主詞寫成論文作者，語氣為推測，符合錨點寫法。"
+    },
+    {
+     "text": "示意圖：延遲（多數情況）幾乎持平；Claude 處理極長文本明顯增加（唯一例外）",
+     "verdict": "完全支持",
+     "card_quote": "但在絕大多數通用場景下，「零延遲增加」的結論是成立的。",
+     "note": "橫條長度為示意（放行項 4）。"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 3 張",
+   "atoms": [
+    {
+     "text": "前情提要與系列各則細節",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "結構元素，不需對證。"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 4 張",
+   "atoms": [
+    {
+     "text": "Prompt Repetition 出自 Google Research 2025 年 12 月的論文",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 出自 Google Research 團隊於 2025 年 12 月發表的論文",
+     "note": ""
+    },
+    {
+     "text": "把提示詞原封不動複製一遍，模型收到「提示詞＋提示詞」",
+     "verdict": "完全支持",
+     "card_quote": "做法是將使用者的輸入 Prompt 原封不動地複製一遍：模型的輸入從 P 變成 [P ; P]",
+     "note": ""
+    },
+    {
+     "text": "讀題（Prefill）＝模型讀進整段提示詞；寫答案（Decode）＝模型一個字一個字吐出回答",
+     "verdict": "完全支持",
+     "card_quote": "Decode 階段是模型一個字一個字吐出 Output 的階段",
+     "note": "名詞表白話定義（放行項 2）；Prefill 對應「Prefill 階段是模型閱讀 <QUERY><QUERY> 的階段」。"
+    },
+    {
+     "text": "Token、延遲的白話定義",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "名詞的白話定義不是卡的主張（放行項 2）。"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 5 張",
+   "atoms": [
+    {
+     "text": "讀題時 GPU 同時算：1000 個和 500 個差不多快",
+     "verdict": "完全支持",
+     "card_quote": "GPU 可以高度平行化運算：同時計算 1000 個 Token 的 Attention Matrix 和計算 500 個 Token 的時間差異極小（通常在毫秒等級）",
+     "note": "「處理」簡化「計算 Attention Matrix」，不改意思。"
+    },
+    {
+     "text": "時間差異極小，通常在毫秒等級",
+     "verdict": "完全支持",
+     "card_quote": "時間差異極小（通常在毫秒等級）",
+     "note": "比較對象 500 個 Token 在同句。"
+    },
+    {
+     "text": "貼兩次多出來的那一倍輸入，就落在這一段",
+     "verdict": "完全支持",
+     "card_quote": "多出來的輸入落在 GPU 可以高度平行化運算的 Prefill 階段",
+     "note": ""
+    },
+    {
+     "text": "示意圖：500 個 Token 原本的提示詞（舉例）／1000 個 Token 貼兩次之後（舉例）；Token 多一倍，時間差通常只在毫秒等級",
+     "verdict": "完全支持",
+     "card_quote": "同時計算 1000 個 Token 的 Attention Matrix 和計算 500 個 Token 的時間差異極小（通常在毫秒等級）",
+     "note": "放行項 1：圖上綁著 1000 對 500 的例子並標舉例；Claude 例外在第 2 張出現。"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 6 張",
+   "atoms": [
+    {
+     "text": "寫答案只能一個字接一個字，要寫完一個字才能寫下一個，只能依序來，沒辦法同時算",
+     "verdict": "完全支持",
+     "card_quote": "Decode 階段是模型一個字一個字吐出 Output 的階段，這是序列化的過程",
+     "note": "「沒辦法同時算」是序列化的白話，不加新事實。"
+    },
+    {
+     "text": "這一段是 LLM 延遲的主要元兇",
+     "verdict": "完全支持",
+     "card_quote": "是造成 LLM 延遲的主要元兇",
+     "note": ""
+    },
+    {
+     "text": "示意圖：整段提示詞一起送進去，同時算（讀題 Prefill）",
+     "verdict": "完全支持",
+     "card_quote": "Prefill 階段是模型閱讀 <QUERY><QUERY> 的階段，GPU 可以高度平行化運算",
+     "note": "「答／案／是／…」為例子（放行項 3）。"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 7 張",
+   "atoms": [
+    {
+     "text": "多出來的字只加在讀題，寫答案那段沒變長",
+     "verdict": "完全支持",
+     "card_quote": "多出來的輸入落在 GPU 可以高度平行化運算的 Prefill 階段…模型生成的 Output 長度保持不變",
+     "note": ""
+    },
+    {
+     "text": "Prompt Repetition 沒有改變提示詞的意思，模型要寫的答案還是那麼長",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 沒有改變 Prompt 的語意，模型生成的 Output 長度保持不變",
+     "note": ""
+    },
+    {
+     "text": "多出來的輸入只讓讀題那一小段微幅變長，由平行運算吸收",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 輸入長（由平行化吸收）、輸出短，Prefill 時間快（微幅增加）",
+     "note": ""
+    },
+    {
+     "text": "CoT 讓模型多寫字，要等得久，也要多花 API 費用",
+     "verdict": "完全支持",
+     "card_quote": "它的缺點是昂貴且慢：增加了生成的 Token 數量（Decode 階段），直接導致 Latency 增加和 API 成本上升",
+     "note": ""
+    },
+    {
+     "text": "示意圖：只貼一次總延遲低；貼兩次讀題微幅增加、總延遲接近只貼一次；CoT 答案變長、總延遲高",
+     "verdict": "完全支持",
+     "card_quote": "Baseline 輸入短、輸出短，總延遲低；CoT 輸入短、輸出長（變慢的主因），Decode 時間慢，總延遲高；Prompt Repetition 輸入長（由平行化吸收）、輸出短，Prefill 時間快（微幅增加）、Decode 時間快，總延遲低（接近 Baseline）",
+     "note": "橫條長度為示意（放行項 4）；c6 的 Claude 限定條件在第 2 張出現。"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 8 張",
+   "atoms": [
+    {
+     "text": "論文作者大膽稱它是「Free Lunch」",
+     "verdict": "完全支持",
+     "card_quote": "blog 說作者因此大膽聲稱這是一個「Free Lunch」",
+     "note": ""
+    },
+    {
+     "text": "用 GPU 在讀題階段多出來的算力，換取模型對內容的精確理解，又不用多等",
+     "verdict": "完全支持",
+     "card_quote": "利用 GPU 在 Prefill 階段過剩的算力，換取模型對內容的精確理解，且沒有犧牲使用者的等待時間",
+     "note": "「過剩」寫成「多出來的」，意思相近；主詞為論文作者的宣稱。"
+    },
+    {
+     "text": "模型已經先一步步推理（CoT）時，效果變成中性到小幅正面",
+     "verdict": "完全支持",
+     "card_quote": "強制開啟 CoT 後，Prompt Repetition 的效果變成「中性至微幅正面」（5 勝 1 敗 22 平）",
+     "note": "c11 第 2 條限定條件已帶出。"
+    },
+    {
+     "text": "示意圖：等待時間幾乎不變（Claude 處理極長文本例外）；付出讀題時多出來的算力，換到模型對內容的精確理解",
+     "verdict": "完全支持",
+     "card_quote": "例外是 Claude 處理極長文本（Custom Tasks）時延遲有顯著增加；「零延遲增加」的結論是在絕大多數通用場景下成立",
+     "note": "「幾乎不變」比卡上「沒有犧牲」弱，可。"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 9 張",
+   "atoms": [
+    {
+     "text": "Prompt Repetition 多出來的輸入在讀題時同時算掉",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 輸入長（由平行化吸收）",
+     "note": ""
+    },
+    {
+     "text": "答案長度不變",
+     "verdict": "完全支持",
+     "card_quote": "模型生成的 Output 長度保持不變",
+     "note": ""
+    },
+    {
+     "text": "等待時間接近原本",
+     "verdict": "完全支持",
+     "card_quote": "總延遲低（接近 Baseline）",
+     "note": "Claude 例外在第 2 張出現。"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 10 張",
+   "atoms": [
+    {
+     "text": "系列地圖與導流行",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "結構元素，不需對證。"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "Threads 正文",
+   "atoms": [
+    {
+     "text": "提示詞貼兩次、輸入變兩倍，為什麼幾乎沒變慢？",
+     "verdict": "完全支持",
+     "card_quote": "輸入長度變兩倍卻幾乎不變慢",
+     "note": ""
+    },
+    {
+     "text": "LLM 回答分兩段：先讀題，再一個字一個字寫答案",
+     "verdict": "完全支持",
+     "card_quote": "答案在於 LLM 推理過程的 Prefill 與 Decode 兩個階段差異",
+     "note": ""
+    },
+    {
+     "text": "讀題時 GPU 可以同時算，多一倍的 Token，時間差通常只在毫秒等級",
+     "verdict": "部分支持",
+     "card_quote": "同時計算 1000 個 Token 的 Attention Matrix 和計算 500 個 Token 的時間差異極小（通常在毫秒等級）",
+     "note": "卡上的毫秒等級只綁在 1000 對 500 個 Token 這個例子；串文沒有這個例子，寫成泛稱的「多一倍的 Token」都只差毫秒，讀者會當成任何長度加倍都成立（卡上另有 Claude 處理極長文本延遲顯著增加的例外）。圖上同句有 500／1000 舉例支撐（放行項 1），但串文是獨立文字。"
+    },
+    {
+     "text": "寫答案只能一個接一個，才是延遲的主要元兇",
+     "verdict": "完全支持",
+     "card_quote": "這是序列化的過程，受限於記憶體頻寬（Memory Bandwidth），是造成 LLM 延遲的主要元兇",
+     "note": ""
+    },
+    {
+     "text": "Prompt Repetition 沒改變提示詞的意思，答案長度不變，所以多出來的輸入幾乎不拖慢回應",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 沒有改變 Prompt 的語意，模型生成的 Output 長度保持不變",
+     "note": ""
+    },
+    {
+     "text": "論文實驗中，答案長度高度一致、延遲幾乎持平",
+     "verdict": "完全支持",
+     "card_quote": "根據論文的實驗數據，blog 說兩者的生成長度（Output Length）高度一致",
+     "note": "延遲對應「延遲（Latency）方面兩者幾乎持平」。"
+    },
+    {
+     "text": "唯一例外是 Claude 處理極長文本時，延遲明顯增加",
+     "verdict": "完全支持",
+     "card_quote": "唯一的例外是 Anthropic 的模型（Claude）在處理極長文本（Custom Tasks）時，延遲有顯著增加",
+     "note": ""
+    },
+    {
+     "text": "系列第二則、下一則預告",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "結構元素。"
+    }
+   ],
+   "errors": [
+    "範圍被放大"
+   ]
+  },
+  {
+   "block": "Threads 最後一則",
+   "atoms": [
+    {
+     "text": "多出來的輸入落在可以同時算的讀題階段，答案長度不變，所以幾乎不會變慢",
+     "verdict": "完全支持",
+     "card_quote": "多出來的輸入落在 GPU 可以高度平行化運算的 Prefill 階段，對使用者幾乎無感",
+     "note": ""
+    },
+    {
+     "text": "Claude 處理極長文本是例外",
+     "verdict": "完全支持",
+     "card_quote": "唯一的例外是 Anthropic 的模型（Claude）在處理極長文本（Custom Tasks）時，延遲有顯著增加",
+     "note": "文章網址與同系列為結構元素。"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "IG caption",
+   "atoms": [
+    {
+     "text": "Prompt Repetition 把輸入變兩倍，LLM 回答卻幾乎沒變慢？",
+     "verdict": "完全支持",
+     "card_quote": "輸入長度變兩倍卻幾乎不變慢",
+     "note": ""
+    },
+    {
+     "text": "關鍵在 Prefill",
+     "verdict": "部分支持",
+     "card_quote": "答案在於 LLM 推理過程的 Prefill 與 Decode 兩個階段差異",
+     "note": "卡說關鍵是兩階段的差異（含 Decode 長度不變）；caption 第一句可沒說完整，Decode 部分在內文與列點出現，不列 blocker。"
+    },
+    {
+     "text": "列點（各張主標）",
+     "verdict": "完全支持",
+     "card_quote": "",
+     "note": "與第 2、5、6、7、8 張主標相同，已在各張判定。"
+    }
+   ],
+   "errors": []
+  }
+ ],
+ "recalculations": [
+  {
+   "block": "第 5 張",
+   "expression": "1000/500",
+   "result": "2.0（1000 個 Token 是 500 個的兩倍，與「輸入變兩倍」一致）"
+  },
+  {
+   "block": "第 5 張",
+   "expression": "1000-500",
+   "result": "500（多出來的 Token 數，與圖上舉例一致）"
+  }
+ ],
+ "gaps": []
+}

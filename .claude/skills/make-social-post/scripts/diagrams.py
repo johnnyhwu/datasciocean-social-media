@@ -90,6 +90,18 @@
             上段整部影片的膠捲只有一小段金色、下段一段文字只抓到中間一行；金色那段寬度不按比例，圖註要標「示意」
   ballot    答案卡（2026-11-10）：heads = [抬頭, 選用：抬頭右邊的金色小字]、選用 nodes[0] = {text}（上方的問題）、outcomes = 選項 3～8 個 [{text, sub?, on?}]（on 打勾、整列淡金底）；純示意
   thresh    各自打分、超過門檻才啟動（2026-11-10）：nodes = [{text, p}]（p 在 0～1）、ref = {name, value}（門檻）、heads = [上方標籤]；超過門檻的橫條金色、長度與分數成正比；分數通常是假設的，圖註要標
+  ambig     一句話分兩個時間點讀（2026-11-11，Prompt Repetition）：nodes = Token [{text, focus?, late?}]、heads = [focus 的兩個意思]、outcomes = [上排標籤, 下排標籤, 回頭箭頭的說明]
+  peek      階梯表：正在讀哪個 Token、看得到哪些（2026-11-11）：nodes = Token 3～6 個 [{text, focus?}]、heads = [欄說明, 列說明]、選用 outcomes[0]
+  blend     前面每個 Token 的原料加權匯進最後一個（2026-11-11）：nodes = 原料 2～5 個 [{text, sub?, murky?}]（剛好一個 murky，金色粗箭頭）、outcomes[0] = 結果、heads = [左欄標籤, 金箭頭標籤]
+  repeat    貼兩次：第二遍的金格拉線回到第一遍每一格（2026-11-11）：nodes = Token 3～6 個 [{text, focus?}]、heads = [第一遍, 第二遍]、outcomes = [第一遍說明, 第二遍說明]
+  catchup   追上基準線（2026-11-11）：heads = [左欄, 右欄]、nodes = [基準線, 主角]、outcomes = [左欄狀態, 右欄狀態]；高低只表示先後，圖註要標「示意」
+  variants  幾種貼法並排（2026-11-11）：steps = [{label, cells:[{text, tone: prompt／extra／pad}], verdict:{text, tone: good／same／bad}}]
+  grid2     兩塊格子並排、共用一條「同時算」的括號（2026-11-11，Prompt Repetition 第 2 則）：nodes = 2 個 [{text, count, sub?}]（text 的數字必須等於 count，寫 500 就畫 500 格）、heads = [括號上的字]、選用 outcomes[0]（金色橫框）
+  twostage  兩個階段並排：左邊輸入一起進方塊（同時算），右邊輸出一格一格長出來（2026-11-11）：heads = [左標題, 右標題]、nodes = [左說明, 右說明]、outcomes = 右邊的 Token 3～5 個
+  timeline  幾種做法的時間條：前段讀題、後段寫答案（2026-11-11）：nodes = 列 [{text, pre, dec, sub?, emph?}]（pre／dec 是相對長度，純示意）、heads = [前段圖例, 後段圖例]；圖註要標「示意」
+  twin      兩方並排比長短＋一句結論（2026-11-11）：heads = [a 圖例, b 圖例]、nodes = 列 [{text, a, b, sub, emph?}]（a／b 是相對長度，純示意）；圖註要標「示意」
+  scan      掃兩遍名單（2026-11-11，Prompt Repetition 第 3 則）：count 格（最多 60）、on＝第幾格金色、heads = [中間問題框]、nodes = [第一遍標籤, 第二遍標籤]、選用 outcomes[0]（金格下的標籤）
+  tally     勝平敗一顆點一場（2026-11-11）：heads = [勝, 平, 敗 的圖例]、nodes = 列 [{text, sub?, parts:[勝, 平, 敗]}]（點數＝場數）、選用 hot
   murky     表格和文字混在同一份文件、分不清（2026-11-10）：heads = [文件上方標籤, 右邊的問話]、nodes[0] = {text}（箭頭旁的話）、outcomes = 兩個下場 [{text}]（打叉）；純示意
   race      兩條路到同一個答案，不帶數字（2026-11-09）：heads = [繞路那一方, 直線那一方]、nodes = [{text}]（規模）、選用 outcomes[0] = {text}（直線那條路上的關卡，2026-11-10）；路的長短是固定示意，圖註要標「不是實測數字」
   dist      機率分佈直條（2026-11-03，LLM-as-a-Verifier）：nodes = 每個分數一根 [{text（1、2、3…）, p}]（加總 1）、pick = argmax（最高那根金色、其餘虛線）／ev（金針停在期望值，程式算）、heads = [上方標籤, 針的標籤前綴]、選用 outcomes[0]
@@ -4086,6 +4098,536 @@ def murky(c: Canvas, spec: dict, y0: float) -> float:
     return y + ph
 
 
+# ------------------------------------------------------------------ Prompt Repetition 第 1 則（2026-11-11）：Token 一格一格讀、第二遍回頭看第一遍
+def _tok(c: Canvas, x, y, w, h, s, mode="solid"):
+    """一個 Token 格子。mode：solid（深海實心）、teal（藍綠實心）、ghost（還沒讀到：藍綠虛線空框）、
+    murky（理解模糊：淺藍綠底＋深海虛線框）、gold（金色）。"""
+    if mode == "solid":
+        c.cell(x, y, w, h, s, fill=DEEP, color=CREAM)
+    elif mode == "teal":
+        c.cell(x, y, w, h, s, fill=TEAL, color=CREAM)
+    elif mode == "ghost":
+        c.cell(x, y, w, h, s, fill=CREAM, stroke=TEAL, dash="10 8", color=TEAL)
+    elif mode == "murky":
+        c.cell(x, y, w, h, s, fill=LIGHT, stroke=DEEP, dash="8 7", color=DEEP)
+    else:
+        c.cell(x, y, w, h, s, fill=GOLD, color=DEEP)
+
+
+def _tok_widths(texts, total, gap, mn=110, size=28):
+    """依字的長度分配格寬（至少 mn），加總剛好填滿 total。"""
+    raw = [max(_tw(t, size) + 44, mn) for t in texts]
+    k = (total - gap * (len(texts) - 1)) / sum(raw)
+    if k < 1:
+        raise ValueError(f"Token 格子放不下：需要 {sum(raw) + gap * (len(texts) - 1):.0f}px，只有 {total:.0f}px；縮短格子裡的字")
+    return [r * k for r in raw]
+
+
+def ambig(c: Canvas, spec: dict, y0: float) -> float:
+    """一句話分兩個時間點讀（2026-11-11）：上排「讀到 focus 時」：focus 之後的 Token 是虛線空框（還沒讀到），focus 是模糊格，
+    上方兩個意思的小牌（heads 兩個）；下排「讀到 late 時」：全部讀完，late 是金色，一條箭頭從 late 回頭指到仍模糊的 focus。
+    nodes = Token [{text, focus?, late?}]（各剛好一個）、heads = [意思一, 意思二]、outcomes = [{text}（上排標籤）, {text}（下排標籤）, {text}（回頭箭頭的說明）]。"""
+    toks, heads, outs = spec["nodes"], spec["heads"], spec["outcomes"]
+    fi = [i for i, t in enumerate(toks) if t.get("focus")]
+    li = [i for i, t in enumerate(toks) if t.get("late")]
+    if len(fi) != 1 or len(li) != 1 or li[0] <= fi[0] or len(heads) != 2 or len(outs) != 3:
+        raise ValueError("ambig 要剛好一個 focus、一個在它後面的 late；heads 兩個意思、outcomes 三句")
+    fi, li = fi[0], li[0]
+    w, gap, th = X1 - X0, 16, 72
+    ws = _tok_widths([t["text"] for t in toks], w, gap)
+    xs = [X0 + sum(ws[:k]) + gap * k for k in range(len(toks))]
+    lab, pill, conn, mid, arc = 39.2, 60, 30, 40, 88
+    total = lab + 10 + pill + conn + th + mid + lab + 10 + arc + th
+    _fit(total, BOTTOM - y0, "ambig")
+    mid += min((BOTTOM - y0 - total) * .5, 60)
+    y = y0
+    c.text(X0, y, w, outs[0]["text"], "dl", TEAL, "left")
+    y += lab + 10
+    fx = xs[fi] + ws[fi] / 2                                    # 兩個意思的小牌：並排在 focus 正上方（超出左右邊界就往內推）
+    pws = [_tw(h_, 28) + 48 for h_ in heads]
+    pw_all = sum(pws) + 24
+    px = min(max(fx - pw_all / 2, X0), X1 - pw_all)
+    for k, h_ in enumerate(heads):
+        x_ = px + sum(pws[:k]) + 24 * k
+        c.rect(x_, y, pws[k], pill, fill=CREAM, stroke=TEAL, sw=3, rx=30)
+        c.text(x_ + 16, y + (pill - 39.2) / 2, pws[k] - 32, h_, "dl", TEAL, "center", (x_, y, pws[k], pill))
+        c.line(x_ + pws[k] / 2, y + pill + 4, fx, y + pill + conn - 4, TEAL, 3, dash="6 6")
+    y += pill + conn
+    for k, t in enumerate(toks):
+        _tok(c, xs[k], y, ws[k], th, t["text"], "murky" if k == fi else ("solid" if k < fi else "ghost"))
+    y += th + mid
+    c.text(X0, y, w, outs[1]["text"], "dl", TEAL, "left")
+    y += lab + 10
+    ry = y + arc                                                # 下排的頂端；回頭的箭頭畫在它上方
+    lx = xs[li] + ws[li] / 2
+    c.raw(f'<path class="bg" d="M{lx:.1f} {ry - 6} C{lx:.1f} {ry - arc * .95:.1f},{fx:.1f} {ry - arc * .95:.1f},{fx:.1f} {ry - 14}" fill="none" stroke="{DEEP}" stroke-width="5"/>')
+    c.poly([(fx, ry - 4), (fx - 11, ry - 22), (fx + 11, ry - 22)], fill=DEEP, closed=True)
+    aw = _tw(outs[2]["text"], 28) + 8
+    ax = min(max((fx + lx) / 2 - aw / 2, X0), X1 - aw)
+    c.text(ax, ry - arc * .75 - 40, aw, outs[2]["text"], "ds", DEEP, "center")
+    for k, t in enumerate(toks):
+        _tok(c, xs[k], ry, ws[k], th, t["text"], "murky" if k == fi else ("gold" if k == li else "solid"))
+    return ry + th
+
+
+def peek(c: Canvas, spec: dict, y0: float) -> float:
+    """階梯表（2026-11-11）：一列＝正在讀哪個 Token，一欄＝哪個 Token；看得到的格子實心，看不到的是虛線空框。
+    nodes = Token [{text, focus?}]（3～6 個；focus 那一列底下墊金色淡底）、heads = [欄的說明, 列的說明]、選用 outcomes[0] = {text}（底下一條說明）。"""
+    toks, heads = spec["nodes"], spec["heads"]
+    foot = (spec.get("outcomes") or [None])[0]
+    n = len(toks)
+    if not 3 <= n <= 6:
+        raise ValueError("peek 的 nodes 要 3～6 個 Token")
+    w, lw, gap = X1 - X0, 250, 10
+    cw = (w - lw - gap * n) / n
+    hh, rh, vg = 39.2 + 10 + 48, 52, 10
+    fh = c.lines(foot["text"], w - 44, 28) * 39.2 + 36 if foot else 0
+    total = hh + n * (rh + vg) + (24 + fh if foot else 0)
+    _fit(total, BOTTOM - y0, "peek")
+    extra = BOTTOM - y0 - total
+    rh += min(extra * .5 / n, 14)
+    y = y0
+    c.text(X0 + lw + gap, y, w - lw - gap, heads[0], "dl", TEAL, "center")
+    c.text(X0, y + 49.2, lw - 10, heads[1], "dl", TEAL, "left")
+    for j, t in enumerate(toks):
+        c.text(X0 + lw + gap + j * (cw + gap), y + 49.2, cw, t["text"], "dl", DEEP, "center")
+    y += hh
+    for i, t in enumerate(toks):
+        if t.get("focus"):
+            c.rect(X0 - 12, y - vg / 2, w + 24, rh + vg, fill=GOLD, op=.32, rx=10)
+        c.text(X0 + 4, y + (rh - 39.2) / 2, lw - 14, f"讀到 {t['text']}", "dl", DEEP, "left")
+        for j in range(n):
+            x_ = X0 + lw + gap + j * (cw + gap)
+            if j <= i:
+                c.rect(x_, y, cw, rh, fill=DEEP if j == i else TEAL, rx=8)
+            else:
+                c.rect(x_, y, cw, rh, fill="none", stroke=TEAL, sw=3, dash="8 7", rx=8)
+        y += rh + vg
+    if foot:
+        y += 24 - vg
+        c.rect(X0, y, w, fh, fill=DEEP, rx=12)
+        c.text(X0 + 22, y + 18, w - 44, foot["text"], "ds", CREAM, "center", (X0, y, w, fh))
+        y += fh
+    return y
+
+
+def blend(c: Canvas, spec: dict, y0: float) -> float:
+    """前面每個 Token 的原料加權匯進最後一個 Token（2026-11-11）：左邊一欄原料框，murky 的那格是淺藍綠虛線框（品質不佳）、
+    它的箭頭最粗而且是金色（權重再高）；右邊一個深海色結果框。
+    nodes = 原料 2～5 個 [{text, sub?, murky?}]（剛好一個 murky）、outcomes[0] = {text, sub?}（結果）、heads = [左欄標籤, 金色箭頭的標籤]。"""
+    ins, out, heads = spec["nodes"], spec["outcomes"][0], spec["heads"]
+    if not 2 <= len(ins) <= 5 or sum(1 for n in ins if n.get("murky")) != 1:
+        raise ValueError("blend 的 nodes 要 2～5 個、剛好一個 murky")
+    w, lw = X1 - X0, 360
+    rw = 340
+    lab = 39.2 + 14
+    hs = [c.lines(n["text"], lw - 44, 34) * 44.2 + (c.lines(n["sub"], lw - 44, 28) * 39.2 + 6 if n.get("sub") else 0) + 30 for n in ins]
+    gap = 18
+    total = lab + sum(hs) + gap * (len(ins) - 1)
+    _fit(total, BOTTOM - y0, "blend")
+    gap += min((BOTTOM - y0 - total) / max(len(ins) - 1, 1) * .5, 18)
+    y = y0
+    c.text(X0, y, w * .62, heads[0], "dl", TEAL, "left")
+    c.rect(X1 - rw, y + 12, 44, 12, fill=GOLD, rx=4)
+    c.text(X1 - rw + 56, y, rw - 56, "金色＝" + heads[1], "ds", DEEP, "left")
+    y += lab
+    ys, top = [], y
+    for n, h in zip(ins, hs):
+        m = n.get("murky")
+        c.textbox(X0, y, lw, n["text"], n.get("sub"), fill=LIGHT if m else TEAL, tcolor=DEEP if m else CREAM,
+                  scolor=DEEP if m else CREAM, stroke=DEEP if m else None, dash="10 8" if m else None, h=h, align="center")
+        ys.append(y + h / 2)
+        y += h + gap
+    bot = y - gap
+    oh = c.lines(out["text"], rw - 44, 34) * 44.2 + (c.lines(out["sub"], rw - 44, 28) * 39.2 + 6 if out.get("sub") else 0) + 48
+    ox, oy = X1 - rw, (top + bot) / 2 - oh / 2
+    for n, cy in zip(ins, ys):
+        m = n.get("murky")
+        c.arrow(X0 + lw + 8, cy, ox - 10, (top + bot) / 2 + (cy - (top + bot) / 2) * .25, GOLD if m else TEAL, 12 if m else 4, head=22 if m else 14)
+        if m:
+            pass
+    c.textbox(ox, oy, rw, out["text"], out.get("sub"), fill=DEEP, h=oh, align="center")
+    return bot
+
+
+def repeat(c: Canvas, spec: dict, y0: float) -> float:
+    """貼兩次（2026-11-11）：上排第一遍（虛線空框）、下排第二遍（實心），第二遍的 focus 那格金色，拉細線回到第一遍的每一格；
+    指到第一遍最後一格（通常是「問題」）的那條畫粗。nodes = 一遍提示詞的 Token [{text, focus?}]（3～6 個；focus 預設第一個）、
+    heads = [第一遍標籤, 第二遍標籤]、outcomes = [{text}（第一遍的說明）, {text}（第二遍的說明）]。"""
+    toks, heads, outs = spec["nodes"], spec["heads"], spec["outcomes"]
+    n = len(toks)
+    if not 3 <= n <= 6 or len(heads) != 2 or len(outs) != 2:
+        raise ValueError("repeat 要 3～6 個 Token、heads 兩個、outcomes 兩句")
+    fi = next((i for i, t in enumerate(toks) if t.get("focus")), 0)
+    w, lw, gap, th = X1 - X0, 150, 14, 68
+    ws = _tok_widths([t["text"] for t in toks], w - lw, gap, mn=100)
+    xs = [X0 + lw + sum(ws[:k]) + gap * k for k in range(n)]
+    n1 = c.lines(outs[0]["text"], w - lw, 28) * 39.2
+    n2 = c.lines(outs[1]["text"], w - lw, 28) * 39.2
+    fan = 150
+    total = th + 12 + n1 + fan + th + 12 + n2
+    _fit(total, BOTTOM - y0, "repeat")
+    fan += min((BOTTOM - y0 - total) * .6, 80)
+    y = y0
+    c.text(X0 + lw, y, w - lw, outs[0]["text"], "ds", TEAL, "left")      # 第一遍的說明放在第一排上方，細線才不會穿過字
+    y += n1 + 12
+    c.text(X0, y + (th - 44.2) / 2, lw - 16, heads[0], "dn", TEAL, "left")
+    for k, t in enumerate(toks):
+        _tok(c, xs[k], y, ws[k], th, t["text"], "ghost")
+    y1 = y + th
+    y2 = y1 + fan
+    gx = xs[fi] + ws[fi] / 2
+    top_ = y1 + 10
+    for k in range(n):
+        cx_ = xs[k] + ws[k] / 2
+        last = k == n - 1
+        my = (top_ + y2) / 2
+        c.raw(f'<path class="bg" d="M{gx:.1f} {y2 - 4} C{gx:.1f} {my:.1f},{cx_:.1f} {my:.1f},{cx_:.1f} {y1 + 6}" fill="none" '
+              f'stroke="{DEEP if last else TEAL}" stroke-width="{7 if last else 3}" stroke-opacity="{1 if last else .7}"/>')
+    c.text(X0, y2 + (th - 44.2) / 2, lw - 16, heads[1], "dn", DEEP, "left")
+    for k, t in enumerate(toks):
+        _tok(c, xs[k], y2, ws[k], th, t["text"], "gold" if k == fi else "solid")
+    c.text(X0 + lw, y2 + th + 12, w - lw, outs[1]["text"], "ds", DEEP, "left")
+    return y2 + th + 12 + n2
+
+
+def catchup(c: Canvas, spec: dict, y0: float) -> float:
+    """追上基準線（2026-11-11）：一條橫的虛線是對照組的水準（nodes[0]），主角在左欄低於它、右欄到達或超過它（金點），箭頭相連；
+    高低只表示好壞的先後，不是分數，圖註要標「示意」。heads = [左欄, 右欄]（欄名在上方）、nodes = [{text}（基準線）, {text}（主角）]、
+    outcomes = [{text}（左欄主角的狀態）, {text}（右欄主角的狀態）]。"""
+    heads, (ref, mover), (lo, hi) = spec["heads"], spec["nodes"][:2], spec["outcomes"][:2]
+    w = X1 - X0
+    hh = 39.2 + 20
+    ph = 360
+    _fit(hh + ph, BOTTOM - y0, "catchup")
+    ph = min(ph + (BOTTOM - y0 - hh - ph) * .8, 470)
+    xl, xr = X0 + w * .2, X0 + w * .8
+    for x_, h_ in ((xl, heads[0]), (xr, heads[1])):
+        c.text(x_ - 200, y0, 400, h_, "dl", TEAL, "center")
+    yp = y0 + hh
+    c.line(xl, yp, xl, yp + ph, DEEP, 2, op=.25)
+    c.line(xr, yp, xr, yp + ph, DEEP, 2, op=.25)
+    yref = yp + ph * .42
+    ylo = yp + ph * .66
+    yhi = yref - 34
+    c.line(X0, yref, X1, yref, TEAL, 5, dash="14 10")
+    c.text(X0, yref + 12, w * .45, ref["text"], "ds", TEAL, "left")
+    c.arrow(xl + 34, ylo - 16, xr - 40, yhi + 18, DEEP, 6, head=20)
+    c.circle(xl, ylo, 26, fill=DEEP)
+    c.circle(xr, yhi, 30, fill=GOLD)
+    c.text(xl - 180, ylo + 36, 360, mover["text"], "dn", DEEP, "center")
+    c.text(xl - 180, ylo + 82, 360, lo["text"], "ds", DEEP, "center")
+    mw = 380
+    c.text(X1 - mw, yhi - 140, mw, mover["text"], "dn", DEEP, "right")
+    c.text(X1 - mw, yhi - 92, mw, hi["text"], "ds", DEEP, "right")
+    return yp + ph
+
+
+def variants(c: Canvas, spec: dict, y0: float) -> float:
+    """幾種貼法並排（2026-11-11）：一列一種，左邊名稱、右邊 Token 格子，格子下面一行結論（✓ 金色／≈／✕）。
+    steps = [{label, cells:[{text, tone}], verdict:{text, tone}}]；cells 的 tone：prompt（深海實心）、extra（淺藍綠：多加的話）、pad（點點：虛線框）；
+    verdict 的 tone：good（金色圓＋✓）、same（藍綠圓＋≈）、bad（深海圓＋✕）。"""
+    rows = spec["steps"]
+    w, lw, gap, th = X1 - X0, 170, 12, 64
+    cw_all = w - lw
+    vh = 50
+    rh = th + 12 + vh
+    vg = 30
+    total = rh * len(rows) + vg * (len(rows) - 1)
+    _fit(total, BOTTOM - y0, "variants")
+    vg += min((BOTTOM - y0 - total) / max(len(rows) - 1, 1) * .5, 40)
+    y = y0
+    for r in rows:
+        c.text(X0, y + (th - 39.2) / 2, lw - 12, r["label"], "dl", DEEP, "left")
+        ws = _tok_widths([ce["text"] for ce in r["cells"]], cw_all, gap, mn=120)
+        x = X0 + lw
+        for ce, cw in zip(r["cells"], ws):
+            tone = ce.get("tone", "prompt")
+            if tone == "prompt":
+                c.cell(x, y, cw, th, ce["text"], fill=DEEP, color=CREAM)
+            elif tone == "extra":
+                c.cell(x, y, cw, th, ce["text"], fill=LIGHT, color=DEEP)
+            else:
+                c.cell(x, y, cw, th, ce["text"], fill=CREAM, stroke=TEAL, dash="4 8", color=TEAL)
+            x += cw + gap
+        v = r["verdict"]
+        vx, cy = X0 + lw, y + th + 12 + vh / 2
+        col = {"good": GOLD, "same": TEAL, "bad": DEEP}[v.get("tone", "same")]
+        c.circle(vx + 22, cy, 21, fill=col)
+        if v.get("tone") == "good":
+            c.poly([(vx + 11, cy), (vx + 20, cy + 10), (vx + 34, cy - 10)], stroke=DEEP, sw=6)
+        elif v.get("tone") == "bad":
+            _cross(c, vx + 22, cy, 9, CREAM, 5)
+        else:
+            c.line(vx + 11, cy - 5, vx + 33, cy - 5, CREAM, 4); c.line(vx + 11, cy + 5, vx + 33, cy + 5, CREAM, 4)
+        c.text(vx + 58, cy - 19.6, cw_all - 58, v["text"], "ds", DEEP, "left")
+        y += rh + vg
+    return y - vg
+
+# ------------------------------------------------------------------ Prompt Repetition 第 2 則（2026-11-11）：讀題同時算、寫答案一個一個來
+def grid2(c: Canvas, spec: dict, y0: float) -> float:
+    """兩塊格子並排（2026-11-11）：每塊畫 count 個小方格（每列 50 格），寫 500 就畫 500 個；兩塊上方共用一條「同時算」的括號。
+    nodes = 2 個 [{text, count, sub?}]（text 裡的數字必須等於 count）、heads = [括號上的字]、選用 outcomes[0] = {text}（底下金色橫框）。"""
+    ns = spec["nodes"]
+    if len(ns) != 2:
+        raise ValueError("grid2 的 nodes 要 2 個")
+    for n in ns:
+        nums = re.findall(r"\d+", n["text"])
+        if nums and int(nums[0]) != n["count"]:
+            raise ValueError(f"grid2：「{n['text']}」寫的數字和畫的格數（{n['count']}）不一致")
+    foot = (spec.get("outcomes") or [None])[0]
+    w, gap, cols = X1 - X0, 60, 50
+    pw = (w - gap) / 2
+    cell = pw / cols
+    rows = [math.ceil(n["count"] / cols) for n in ns]
+    gh = max(rows) * cell
+    lab = 39.2 + 10
+    br = 40
+    th = max(c.lines(n["text"], pw, 34) * 44.2 + (c.lines(n["sub"], pw, 28) * 39.2 + 4 if n.get("sub") else 0) for n in ns)
+    fh = c.lines(foot["text"], w - 44, 34) * 44.2 + 40 if foot else 0
+    total = lab + br + gh + 16 + th + (24 + fh if foot else 0)
+    _fit(total, BOTTOM - y0, "grid2")
+    y = y0
+    c.text(X0, y, w, spec["heads"][0], "dl", TEAL, "center")
+    y += lab
+    c.poly([(X0 + 10, y + br - 10), (X0 + 10, y + 12), (X1 - 10, y + 12), (X1 - 10, y + br - 10)], stroke=TEAL, sw=4)
+    y += br
+    for k, n in enumerate(ns):
+        x0 = X0 + k * (pw + gap)
+        gy = y + gh - rows[k] * cell                   # 兩塊底部對齊，格子多的那塊比較高
+        for i in range(n["count"]):
+            r_, c_ = divmod(i, cols)
+            c.rect(x0 + c_ * cell + 1, gy + r_ * cell + 1, cell - 2.4, cell - 2.4, fill=TEAL if k == 0 else DEEP, rx=1.5)
+        ty = y + gh + 16
+        c.text(x0, ty, pw, n["text"], "dn", DEEP, "center")
+        if n.get("sub"):
+            c.text(x0, ty + c.lines(n["text"], pw, 34) * 44.2 + 4, pw, n["sub"], "ds", TEAL, "center")
+    y += gh + 16 + th
+    if foot:
+        y += 24
+        c.textbox(X0, y, w, foot["text"], fill=GOLD, tcolor=DEEP, h=fh, align="center")
+        y += fh
+    return y
+
+
+def twostage(c: Canvas, spec: dict, y0: float) -> float:
+    """兩個階段並排（2026-11-11）：左邊整段輸入的 Token 一起進同一個框（同時算），右邊輸出一個接一個長出來（階梯，帶序號）。
+    heads = [左標題, 右標題]、nodes = [{text}（左邊的說明）, {text}（右邊的說明）]、outcomes = 右邊依序吐出的 Token 3～5 個 [{text}]。"""
+    heads, (L, R), outs = spec["heads"], spec["nodes"][:2], spec["outcomes"]
+    if not 3 <= len(outs) <= 5:
+        raise ValueError("twostage 的 outcomes 要 3～5 個 Token")
+    w, gap = X1 - X0, 40
+    pw = (w - gap) / 2
+    lab = 44.2 + 14
+    ph = 330
+    nl = max(c.lines(L["text"], pw - 20, 28), c.lines(R["text"], pw - 20, 28)) * 39.2
+    total = lab + ph + 16 + nl
+    _fit(total, BOTTOM - y0, "twostage")
+    ph = min(ph + (BOTTOM - y0 - total) * .7, 420)
+    y = y0
+    xl, xr = X0, X0 + pw + gap
+    c.text(xl, y, pw, heads[0], "dn", TEAL, "center")
+    c.text(xr, y, pw, heads[1], "dn", DEEP, "center")
+    y += lab
+    c.rect(xl, y, pw, ph, fill="none", stroke=TEAL, sw=3, rx=14)
+    c.rect(xr, y, pw, ph, fill="none", stroke=DEEP, sw=3, rx=14)
+    n_in, th_ = 6, (ph - 60) / 6 - 10                     # 左：六格輸入，箭頭同時進右側的方塊
+    bx, bw = xl + pw - 150, 120
+    c.rect(bx, y + 30, bw, ph - 60, fill=TEAL, rx=12)
+    for i in range(n_in):
+        yy = y + 30 + i * (th_ + 10)
+        c.rect(xl + 28, yy, 150, th_, fill=CREAM, stroke=TEAL, sw=3, rx=8)
+        c.arrow(xl + 186, yy + th_ / 2, bx - 8, yy + th_ / 2, TEAL, 4, head=12)
+    k = len(outs)                                          # 右：階梯，一格一格往右下長，序號圓在格子正上方
+    cw_, ch_ = (pw - 60 - 20 * (k - 1)) / k, 56
+    top0 = y + 64
+    stepy = (y + ph - 26 - ch_ - top0) / max(k - 1, 1)
+    for i, o in enumerate(outs):
+        xx, yy = xr + 30 + i * (cw_ + 20), top0 + i * stepy
+        c.cell(xx, yy, cw_, ch_, o["text"], fill=GOLD if i == k - 1 else DEEP, color=DEEP if i == k - 1 else CREAM)
+        ncx, ncy = xx + cw_ / 2, yy - 26
+        c.circle(ncx, ncy, 18, fill=CREAM, stroke=DEEP, sw=3)
+        c.text(ncx - 18, ncy - 19.6, 36, str(i + 1), "dl", DEEP, "center", (ncx - 20, ncy - 21, 40, 42))
+        if i < k - 1:
+            c.arrow(xx + cw_ * .7, yy + ch_ + 4, xx + cw_ + 20 + cw_ * .12, yy + stepy - 4, DEEP, 4, head=12)
+    y += ph + 16
+    c.text(xl + 10, y, pw - 20, L["text"], "ds", TEAL, "center")
+    c.text(xr + 10, y, pw - 20, R["text"], "ds", DEEP, "center")
+    return y + nl
+
+
+def timeline(c: Canvas, spec: dict, y0: float) -> float:
+    """幾種做法的時間條（2026-11-11）：每列一條橫條，前段是讀題（淺）、後段是寫答案（深），長度只是示意（pre、dec 是相對長度），
+    列尾一個總結。nodes = 列 [{text, pre, dec, sub?, emph?}]（emph 的列墊金色淡底）、heads = [前段圖例, 後段圖例]；圖註要標「示意」。"""
+    rows, heads = spec["nodes"], spec["heads"]
+    w, lw = X1 - X0, 250
+    bw = w - lw
+    mx = max(r["pre"] + r["dec"] for r in rows)
+    k = bw / mx
+    lg = 39.2 + 20
+    rh = [56 + 10 + (c.lines(r["sub"], bw, 28) * 39.2 if r.get("sub") else 0) for r in rows]
+    vg = 34
+    total = lg + sum(rh) + vg * (len(rows) - 1)
+    _fit(total, BOTTOM - y0, "timeline")
+    vg += min((BOTTOM - y0 - total) / max(len(rows) - 1, 1) * .6, 40)
+    y = y0
+    x_ = X0 + lw                                           # 圖例
+    for col, h_ in ((LIGHT, heads[0]), (DEEP, heads[1])):
+        c.rect(x_, y + 8, 28, 24, fill=col, rx=4)
+        c.text(x_ + 38, y, 260, h_, "ds", DEEP, "left")
+        x_ += 330
+    y += lg
+    for r, h in zip(rows, rh):
+        if r.get("emph"):
+            c.rect(X0 - 12, y - 12, w + 24, h + 24, fill=GOLD, op=.3, rx=12)
+        c.text(X0, y + (56 - 44.2) / 2, lw - 16, r["text"], "dn", DEEP, "left")
+        pw_, dw_ = r["pre"] * k, r["dec"] * k
+        c.rect(X0 + lw, y, pw_, 56, fill=LIGHT, rx=8)
+        c.rect(X0 + lw + pw_ + 4, y, dw_ - 4, 56, fill=DEEP, rx=8)
+        if r.get("sub"):
+            c.text(X0 + lw, y + 66, bw, r["sub"], "ds", DEEP, "left")
+        y += h + vg
+    return y - vg
+
+
+def twin(c: Canvas, spec: dict, y0: float) -> float:
+    """兩方並排比長短（2026-11-11）：每列兩條細橫條（a、b 是相對長度，只是示意）與一句結論；emph 的列結論前放金點。
+    heads = [a 的圖例, b 的圖例]、nodes = 列 [{text, a, b, sub, emph?}]；圖註要標「示意」。"""
+    rows, heads = spec["nodes"], spec["heads"]
+    w, lw, vw = X1 - X0, 300, 230
+    bw = w - lw - vw - 20
+    mx = max(max(r["a"], r["b"]) for r in rows)
+    k = bw / mx
+    lg = 39.2 + 20
+    rh = [max(2 * 30 + 10, c.lines(r["text"], lw - 16, 34) * 44.2, c.lines(r["sub"], vw - 30, 28) * 39.2) for r in rows]
+    vg = 44
+    total = lg + sum(rh) + vg * (len(rows) - 1)
+    _fit(total, BOTTOM - y0, "twin")
+    vg += min((BOTTOM - y0 - total) / max(len(rows) - 1, 1) * .6, 40)
+    y = y0
+    x_ = X0 + lw
+    for col, h_ in ((TEAL, heads[0]), (DEEP, heads[1])):
+        c.rect(x_, y + 8, 28, 24, fill=col, rx=4)
+        c.text(x_ + 38, y, 260, h_, "ds", DEEP, "left")
+        x_ += 300
+    y += lg
+    for r, h in zip(rows, rh):
+        c.text(X0, y + (h - c.lines(r["text"], lw - 16, 34) * 44.2) / 2, lw - 16, r["text"], "dn", DEEP, "left")
+        by = y + (h - 70) / 2
+        c.rect(X0 + lw, by, r["a"] * k, 30, fill=TEAL, rx=6)
+        c.rect(X0 + lw, by + 40, r["b"] * k, 30, fill=DEEP, rx=6)
+        vx = X1 - vw
+        if r.get("emph"):
+            c.circle(vx + 10, y + h / 2, 12, fill=GOLD)
+        c.text(vx + 30, y + (h - c.lines(r["sub"], vw - 30, 28) * 39.2) / 2, vw - 30, r["sub"], "ds", DEEP, "left")
+        y += h + vg
+    return y - vg
+
+
+# ------------------------------------------------------------------ Prompt Repetition 第 3 則（2026-11-11）：帶著問題掃第二遍、勝平敗一顆點一場
+def scan(c: Canvas, spec: dict, y0: float) -> float:
+    """掃兩遍名單（2026-11-11）：上排第一遍 count 格（虛線，還不知道要找誰），中間一個問題框，下排第二遍 count 格（實心），第 on 格金色。
+    count、on（第幾格，1 起）、heads = [問題框的字]、nodes = [{text}（第一遍標籤）, {text}（第二遍標籤）]、選用 outcomes[0] = {text}（金格下方的標籤）。"""
+    n, tgt, (L1, L2) = spec["count"], spec["on"], spec["nodes"][:2]
+    if not 1 <= tgt <= n or n > 60:
+        raise ValueError("scan 的 on 要在 1～count 之間、count 最多 60")
+    lab = (spec.get("outcomes") or [None])[0]
+    w, per = X1 - X0, math.ceil(n / 2)
+    gap = 6
+    cw = (w - gap * (per - 1)) / per
+    ch = 40
+    blk = 2 * ch + 10
+    lh = 39.2 + 10
+    qh = 64
+    total = lh + blk + 34 + qh + 34 + lh + blk + (12 + 39.2 if lab else 0)
+    _fit(total, BOTTOM - y0, "scan")
+    sp = min((BOTTOM - y0 - total) / 4, 24)
+
+    def grid(y, solid):
+        for i in range(n):
+            r_, k_ = divmod(i, per)
+            x, yy = X0 + k_ * (cw + gap), y + r_ * (ch + 10)
+            if solid:
+                c.rect(x, yy, cw, ch, fill=GOLD if i == tgt - 1 else TEAL, rx=6)
+            else:
+                c.rect(x, yy, cw, ch, fill="none", stroke=TEAL, sw=2.5, dash="5 5", rx=6)
+        r_, k_ = divmod(tgt - 1, per)
+        return X0 + k_ * (cw + gap) + cw / 2, y + r_ * (ch + 10) + ch
+    y = y0
+    c.text(X0, y, w, L1["text"], "dl", TEAL, "left")
+    y += lh
+    grid(y, False)
+    y += blk + 34 + sp
+    qw = min(_tw(spec["heads"][0], 34) + 60, w)
+    qx = X0 + (w - qw) / 2
+    c.arrow(X0 + w / 2, y - 30 - sp, X0 + w / 2, y - 4, TEAL, 4, head=12)
+    c.textbox(qx, y, qw, spec["heads"][0], fill=DEEP, h=qh, align="center")
+    y += qh + 34 + sp
+    c.arrow(X0 + w / 2, y - 30 - sp, X0 + w / 2, y - 4, DEEP, 5, head=14)
+    c.text(X0, y, w, L2["text"], "dl", DEEP, "left")
+    gy0 = y + lh
+    gx, _ = grid(gy0, True)
+    if lab:                                                 # 金格的標籤放在第二遍標題那一行、金格正上方（金格在第一列時才不會擋到格子）
+        lw_ = _tw(lab["text"], 28) + 8
+        r_, _k = divmod(tgt - 1, per)
+        if r_ == 0:
+            c.text(min(max(gx - lw_ / 2, X0), X1 - lw_), y, lw_, lab["text"], "dl", DEEP, "center")
+        else:
+            c.text(min(max(gx - lw_ / 2, X0), X1 - lw_), gy0 + blk + 10, lw_, lab["text"], "dl", DEEP, "center")
+            return gy0 + blk + 10 + 39.2
+    return gy0 + blk
+
+
+def tally(c: Canvas, spec: dict, y0: float) -> float:
+    """勝、平、敗一顆點一場（2026-11-11）：每列一組實驗，點數＝場數（寫 70 就畫 70 顆），勝是深海實心、平是空心、敗是打叉。
+    heads = [勝的圖例, 平的圖例, 敗的圖例]、nodes = 列 [{text, sub?, parts:[勝, 平, 敗]}]；選用 hot = 要墊金色淡底的列序號。"""
+    rows, heads, hot = spec["nodes"], spec["heads"], spec.get("hot")
+    w, cols = X1 - X0, 30
+    d_ = w / cols
+    r_ = d_ * .34
+    lg = 39.2 + 22
+    th = [c.lines(r["text"], w, 34) * 44.2 + (c.lines(r["sub"], w, 28) * 39.2 + 4 if r.get("sub") else 0) + 12 for r in rows]
+    gh = [math.ceil(sum(r["parts"]) / cols) * d_ for r in rows]
+    vg = 36
+    total = lg + sum(th) + sum(gh) + vg * (len(rows) - 1)
+    _fit(total, BOTTOM - y0, "tally")
+    vg += min((BOTTOM - y0 - total) / max(len(rows) - 1, 1) * .6, 50)
+    y = y0
+    x_ = X0                                                 # 圖例
+    for k, h_ in enumerate(heads):
+        cx_, cy_ = x_ + 14, y + 20
+        if k == 0:
+            c.circle(cx_, cy_, 12, fill=DEEP)
+        elif k == 1:
+            c.circle(cx_, cy_, 11, fill="none", stroke=TEAL, sw=3)
+        else:
+            _cross(c, cx_, cy_, 10, DEEP, 4)
+        c.text(x_ + 36, y, 260, h_, "ds", DEEP, "left")
+        x_ += 36 + _tw(h_, 28) + 50
+    y += lg
+    for i, (r, t_, g_) in enumerate(zip(rows, th, gh)):
+        if i == hot:
+            c.rect(X0 - 14, y - 12, w + 28, t_ + g_ + 20, fill=GOLD, op=.28, rx=12)
+        c.text(X0, y, w, r["text"], "dn", DEEP, "left")
+        if r.get("sub"):
+            c.text(X0, y + c.lines(r["text"], w, 34) * 44.2 + 4, w, r["sub"], "ds", DEEP, "left")
+        y += t_
+        k = 0
+        for kind, cnt in zip(("win", "tie", "loss"), r["parts"]):
+            for _ in range(cnt):
+                rr, cc = divmod(k, cols)
+                cx_, cy_ = X0 + cc * d_ + d_ / 2, y + rr * d_ + d_ / 2
+                if kind == "win":
+                    c.circle(cx_, cy_, r_, fill=DEEP)
+                elif kind == "tie":
+                    c.circle(cx_, cy_, r_ - 1.5, fill="none", stroke=TEAL, sw=3)
+                else:
+                    _cross(c, cx_, cy_, r_ * .8, DEEP, 5)
+                k += 1
+        y += g_ + vg
+    return y - vg
+
+
 KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "paths": paths, "epochs": epochs,
          "dotgrid": dotgrid, "dumbbell": dumbbell, "range": range_chart, "funnel": funnel,
          "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation, "tokens": tokens,
@@ -4098,7 +4640,10 @@ KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "
          "pick": pick, "pile": pile, "addlane": addlane,
          "dist": dist, "snap": snap, "stack": stack, "target": target, "ring": ring,
          "magnet": magnet, "puzzle": puzzle, "merge": merge, "clusters": clusters, "shelves": shelves, "switch": switch, "duel": duel, "matrix": matrix, "race": race,
-         "grain": grain, "ballot": ballot, "thresh": thresh, "murky": murky}
+         "grain": grain, "ballot": ballot, "thresh": thresh, "murky": murky,
+         "ambig": ambig, "peek": peek, "blend": blend, "repeat": repeat, "catchup": catchup, "variants": variants,
+         "grid2": grid2, "twostage": twostage, "timeline": timeline, "twin": twin,
+         "scan": scan, "tally": tally}
 
 
 def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:
@@ -4116,6 +4661,8 @@ def texts(sl: dict) -> list[str]:
         out.append(st["label"])
         for cell in st["cells"]:
             out.append(cell["text"]); out += [cell["sub"]] if cell.get("sub") else []
+        if st.get("verdict"):
+            out.append(st["verdict"]["text"])
     for n in sl.get("nodes", []) + sl.get("outcomes", []):
         out.append(n["text"]); out += [n["sub"]] if n.get("sub") else []; out += [n["sub2"]] if n.get("sub2") else []; out += [n["win"]] if n.get("win") else []
     for row in sl.get("cells", []):
@@ -4140,7 +4687,7 @@ def texts(sl: dict) -> list[str]:
         out += [f"{n['p']:g}" for n in sl.get("nodes", [])]
         if sl.get("pick", "ev") == "ev":
             out.append(f"{(list(sl.get('heads', [])) + ['', ''])[1]} {dist_ev(sl['nodes']):.2f}".strip())
-    for r in sl.get("nodes", []) if sl.get("kind") in ("snap", "stack") else []:
+    for r in sl.get("nodes", []) if sl.get("kind") in ("snap", "stack", "tally") else []:
         out += [m["text"] for m in r.get("marks", [])] + ([r["tie"]] if r.get("tie") else [])
         if r.get("parts"):
             out.append("・".join(f"{h} {p}" for h, p in zip(sl.get("heads", []), r["parts"])))   # 和圖上那一行一字不差（讀者引用才對得上）

@@ -561,6 +561,55 @@ expect("thresh 的每個分數與門檻都會進 texts()（程式 A 與審查者
 code, out = render(D("race", **{**UR["race"], "outcomes": [{"text": "Router"}], "note": "路的長短只是示意。"}))
 expect("race 的直線那條路上多一道關卡（outcomes[0]）通過程式 B", code == 0, out)
 expect("race 的關卡文字會進 texts()", "Router" in _D.texts(D("race", **{**UR["race"], "outcomes": [{"text": "Router"}]})), "")
+# 2026-11-11 Prompt Repetition 系列新增的 12 種圖型：正案通過程式 B；補充太長要報錯；各自的壞案
+TOK5 = [{"text": "The"}, {"text": "bark"}, {"text": "was"}, {"text": "rough"}, {"text": "."}]
+PR = {"ambig": dict(nodes=[TOK5[0], {**TOK5[1], "focus": True}, TOK5[2], {**TOK5[3], "late": True}, TOK5[4]],
+                    heads=["狗叫聲？", "樹皮？"], outcomes=[{"text": "讀到 bark 時"}, {"text": "讀到 rough 時"}, {"text": "回頭拿到的仍然模糊"}]),
+      "peek": dict(nodes=[TOK5[0], {**TOK5[1], "focus": True}] + TOK5[2:], heads=["看得到哪些 Token", "正在讀"], outcomes=[{"text": "實心＝看得到，虛線＝還看不到"}]),
+      "blend": dict(nodes=[{"text": "The"}, {"text": "bark", "sub": "分不清", "murky": True}, {"text": "was"}],
+                    outcomes=[{"text": "最後一個 Token 的理解", "sub": "還原不出完美的意思"}], heads=["前面每個 Token 留下的資訊", "比重給得再高"]),
+      "repeat": dict(nodes=[{"text": "內容", "focus": True}, {"text": "內容"}, {"text": "問題"}], heads=["第一遍", "第二遍"],
+                     outcomes=[{"text": "讀內容時，還不知道問題"}, {"text": "開頭就看得到第一遍的問題"}]),
+      "catchup": dict(heads=["只貼一次", "貼兩次"], nodes=[{"text": "問題在前"}, {"text": "選項在前"}],
+                      outcomes=[{"text": "通常較差"}, {"text": "追平或超越"}], note="示意：高低不是分數。"),
+      "variants": dict(steps=[{"label": "標準", "cells": [{"text": "提示詞", "tone": "prompt"}, {"text": "提示詞", "tone": "prompt"}], "verdict": {"text": "對照組", "tone": "good"}},
+                              {"label": "Padding", "cells": [{"text": "．．．", "tone": "pad"}, {"text": "提示詞", "tone": "prompt"}], "verdict": {"text": "無效", "tone": "bad"}}]),
+      "grid2": dict(heads=["讀題時，GPU 同時算"], nodes=[{"text": "500 個 Token", "count": 500}, {"text": "1000 個 Token", "count": 1000}],
+                    outcomes=[{"text": "時間差通常在毫秒等級"}]),
+      "twostage": dict(heads=["讀題", "寫答案"], nodes=[{"text": "一起送進去"}, {"text": "一個接一個"}], outcomes=[{"text": "答"}, {"text": "案"}, {"text": "是"}]),
+      "timeline": dict(heads=["讀題", "寫答案"], nodes=[{"text": "只貼一次", "pre": 1, "dec": 4, "sub": "低"}, {"text": "CoT", "pre": 1, "dec": 9, "sub": "高", "emph": True}],
+                       note="示意。"),
+      "twin": dict(heads=["只貼一次", "貼兩次"], nodes=[{"text": "答案長度", "a": 1, "b": 1, "sub": "高度一致"}, {"text": "例外", "a": 1, "b": 1.6, "sub": "明顯增加", "emph": True}], note="示意。"),
+      "scan": dict(count=50, on=25, heads=["問題：第 25 個名字是誰？"], nodes=[{"text": "第一遍"}, {"text": "第二遍"}], outcomes=[{"text": "第 25 個"}]),
+      "tally": dict(heads=["勝", "平", "敗"], nodes=[{"text": "不開 CoT", "parts": [47, 23, 0]}, {"text": "開了 CoT", "sub": "5 勝 1 敗 22 平", "parts": [5, 22, 1]}], hot=1)}
+for k_, kw_ in PR.items():
+    code, out = render(D(k_, **kw_))
+    expect(f"正確的 {k_} 通過程式 B", code == 0, out)
+    code, out = render(D(k_, **{**kw_, "body": "很長的補充" * 40}))
+    expect(f"故意做壞：{k_} 的補充太長放不下 → 抓得到", code != 0, out)
+code, out = render(D("ambig", **{**PR["ambig"], "nodes": TOK5}))
+expect("故意做壞：ambig 沒有 focus／late → 報錯", code != 0 and "ambig" in out, out)
+code, out = render(D("peek", **{**PR["peek"], "nodes": TOK5[:2]}))
+expect("故意做壞：peek 只有兩個 Token → 報錯", code != 0 and "peek" in out, out)
+code, out = render(D("blend", **{**PR["blend"], "nodes": [{"text": "a"}, {"text": "b"}]}))
+expect("故意做壞：blend 沒有 murky → 報錯", code != 0 and "blend" in out, out)
+code, out = render(D("repeat", **{**PR["repeat"], "outcomes": [{"text": "只有一句"}]}))
+expect("故意做壞：repeat 的說明只有一句 → 報錯", code != 0 and "repeat" in out, out)
+code, out = render(D("variants", **{**PR["variants"], "steps": [{"label": "x", "cells": [{"text": "很長很長的格子文字" * 12, "tone": "prompt"}], "verdict": {"text": "x"}}]}))
+expect("故意做壞：variants 格子的字太長 → 報錯", code != 0 and "Token 格子放不下" in out, out)
+code, out = render(D("grid2", **{**PR["grid2"], "nodes": [{"text": "500 個 Token", "count": 400}, {"text": "1000 個 Token", "count": 1000}]}))
+expect("故意做壞：grid2 寫 500 卻畫 400 格 → 報錯", code != 0 and "grid2" in out, out)
+code, out = render(D("twostage", **{**PR["twostage"], "outcomes": [{"text": "答"}]}))
+expect("故意做壞：twostage 只有一個輸出 Token → 報錯", code != 0 and "twostage" in out, out)
+code, out = render(D("scan", **{**PR["scan"], "on": 70}))
+expect("故意做壞：scan 的 on 超過 count → 報錯", code != 0 and "scan" in out, out)
+tx = _D.texts(D("tally", **PR["tally"]))
+expect("tally 的勝平敗場數會進 texts()（程式 A 與審查者看得到）", any("47" in t and "23" in t for t in tx), str(tx))
+tx = _D.texts(D("variants", **PR["variants"]))
+expect("variants 的結論會進 texts()", "無效" in tx and "對照組" in tx, str(tx))
+tx = _D.texts(D("scan", **PR["scan"]))
+expect("scan 的格數與金格序號會進 texts()", "50" in tx and "25" in tx, str(tx))
+
 # 矮格子共用的 cell()：一定用 28px 粗體（dl），字框才不會高過格子讓程式 B 的對比取樣取到邊線
 import html
 cv = DG.Canvas(DG.Ctx(lambda s, n: 1, lambda s: s, html.escape))

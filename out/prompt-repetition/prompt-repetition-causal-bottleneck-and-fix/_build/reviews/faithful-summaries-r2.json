@@ -1,0 +1,10 @@
+{"post":"系列 summary","blocks":[
+{"block":"第 1 則 summary","atoms":[
+{"text":"主流 LLM 讀到前面的字時還不知道後文","verdict":"部分支持","card_quote":"主流大型語言模型（如 GPT-4、Gemini、Llama）大多採用 Transformer Decoder-only 架構，這類模型是 Causal 的：處理序列中第 i 個 Token 時，只能「看見」位置 j ≤ i 的 Token，無法看見未來的 Token","note":"機制本身有支持（c3；c4「這些早期的 Token 是在「對未來一無所知」的狀態下被編碼的」）。但卡上主詞是「主流大型語言模型…大多採用 Decoder-only 架構」，句子把「大多」拿掉，寫成主流 LLM 全體如此，範圍比卡寬。"},
+{"text":"貼兩次之後，第二遍的每個字都看得到整個第一遍","verdict":"完全支持","card_quote":"Prompt Repetition 把輸入的 Prompt 複製一遍，第二遍中的每一個位置都能完整地「看見」整個第一遍","note":"「貼兩次」對應 c2「將使用者的輸入 Prompt 原封不動地複製一遍」；字＝位置／Token 的白話。"}
+],"errors":["範圍被放大"]},
+{"block":"第 3 則 summary","atoms":[
+{"text":"和只貼一次比，70 個組合裡 47 勝 0 敗","verdict":"完全支持","card_quote":"Prompt Repetition 在總共 70 個「模型－任務」組合中取得 47 勝 0 敗","note":"比較對象 comparison_target 為 Baseline（不重複 Prompt），即只貼一次。"},
+{"text":"但要模型先一步步推理時，效果變成中性到小幅正面","verdict":"完全支持","card_quote":"但強制模型開啟 \"Think step by step\"（CoT）後，效果變成「中性至微幅正面」（5 勝 1 敗 22 平）","note":"CoT 設定下比較對象是 Baseline + CoT（仍是只貼一次），一致。c3 的限定條件（CoT 下變中性）已在句中。"}
+],"errors":[]}
+],"recalculations":[],"gaps":[]}

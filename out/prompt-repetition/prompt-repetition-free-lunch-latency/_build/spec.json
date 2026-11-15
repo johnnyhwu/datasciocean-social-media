@@ -1,0 +1,315 @@
+{
+ "series": "prompt-repetition",
+ "concept": "prompt-repetition-free-lunch-latency",
+ "also_concepts": [],
+ "lang": "zh-TW",
+ "status": "draft",
+ "hook": {
+  "style": "讀者疑問",
+  "title": "提示詞貼兩次、輸入變兩倍，\n[[為什麼幾乎沒變慢？]]",
+  "subtitle": "多出來的字，落在 GPU 能同時算的讀題階段；\n真正花時間的是一個字一個字寫答案，\n而答案長度沒變",
+  "refs": [
+   "c1",
+   "c2"
+  ],
+  "candidate": "A"
+ },
+ "slides": [
+  {
+   "layout": "cover",
+   "title": "提示詞貼兩次、輸入變兩倍，\n[[為什麼幾乎沒變慢？]]",
+   "body": "多出來的字，落在 GPU 能同時算的讀題階段；\n真正花時間的是一個字一個字寫答案，\n而答案長度沒變",
+   "refs": [
+    "c1",
+    "c2",
+    "c3",
+    "c4"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "twin",
+   "title": "貼兩次、輸入變兩倍，\n[[延遲卻幾乎持平]]",
+   "body": "實驗中，貼兩次和只貼一次的答案長度高度一致，不像 CoT（先叫 AI 一步步推理）越寫越長；延遲（等回應的時間）也幾乎沒增加。唯一例外是 Claude 這款模型處理極長文本時，延遲明顯增加，論文作者推測和 Claude API 內部的處理機制有關。",
+   "refs": [
+    "c7",
+    "c8",
+    "c9",
+    "c10",
+    "c1",
+    "c3",
+    "c6",
+    "c11"
+   ],
+   "quals": [
+    "c1#1",
+    "c3#1",
+    "c6#1",
+    "c8#1",
+    "c11#1"
+   ],
+   "heads": [
+    "只貼一次",
+    "貼兩次"
+   ],
+   "nodes": [
+    {
+     "text": "答案長度",
+     "a": 1,
+     "b": 1,
+     "sub": "高度一致"
+    },
+    {
+     "text": "延遲（多數情況）",
+     "a": 1,
+     "b": 1,
+     "sub": "幾乎持平"
+    },
+    {
+     "text": "延遲：Claude 處理極長文本",
+     "a": 1,
+     "b": 1.6,
+     "sub": "明顯增加（唯一例外）",
+     "emph": true
+    }
+   ],
+   "note": "這張是示意圖，長短只代表相近或變長，不是實測數字。"
+  },
+  {
+   "layout": "recap",
+   "title": "[[前情提要]]與這一則重點",
+   "current": "prompt-repetition-free-lunch-latency",
+   "refs": [
+    "結構"
+   ]
+  },
+  {
+   "layout": "context",
+   "title": "看懂這一則，\n[[先認識四個詞]]",
+   "body": "Prompt Repetition 出自 Google Research 2025 年 12 月的論文，把提示詞原封不動複製一遍，模型收到「提示詞＋提示詞」。先認識四個詞：",
+   "rows": [
+    [
+     "Token",
+     "模型讀文字的單位，約一個詞"
+    ],
+    [
+     "讀題（Prefill）",
+     "模型讀進整段提示詞"
+    ],
+    [
+     "寫答案（Decode）",
+     "模型一個字一個字吐出回答"
+    ],
+    [
+     "延遲",
+     "送出問題到收到回答，要等多久"
+    ]
+   ],
+   "key_w": 290,
+   "refs": [
+    "c2",
+    "c3",
+    "c4"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "grid2",
+   "title": "讀題時 GPU 同時算：\n[[1000 個和 500 個差不多快]]",
+   "body": "讀題階段，GPU（跑 AI 運算的晶片）可以高度平行、同時算。同時處理 1000 個 Token 和 500 個 Token，時間差異極小，通常在毫秒等級；貼兩次多出來的那一倍輸入，就落在這一段。",
+   "refs": [
+    "c3",
+    "c1"
+   ],
+   "heads": [
+    "讀題時，GPU 同時算"
+   ],
+   "nodes": [
+    {
+     "text": "500 個 Token",
+     "count": 500,
+     "sub": "原本的提示詞（舉例）"
+    },
+    {
+     "text": "1000 個 Token",
+     "count": 1000,
+     "sub": "貼兩次之後（舉例）"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "1000 個和 500 個，時間差通常在毫秒等級"
+    }
+   ],
+   "note": "一格是一個 Token，格子照數字畫；500 是舉例的長度。",
+   "label": "兩個階段"
+  },
+  {
+   "layout": "diagram",
+   "kind": "twostage",
+   "title": "寫答案\n[[只能一個字接一個字]]",
+   "body": "寫答案就不同了：模型要寫完一個字，才能寫下一個，只能依序來，沒辦法同時算。這一段是 LLM 延遲的主要元兇。",
+   "refs": [
+    "c4",
+    "c3",
+    "c1"
+   ],
+   "label": "兩個階段",
+   "heads": [
+    "讀題（Prefill）",
+    "寫答案（Decode）"
+   ],
+   "nodes": [
+    {
+     "text": "整段提示詞一起送進去，同時算"
+    },
+    {
+     "text": "寫完一個字，才能寫下一個"
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "答"
+    },
+    {
+     "text": "案"
+    },
+    {
+     "text": "是"
+    },
+    {
+     "text": "…"
+    }
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "timeline",
+   "title": "多出來的字只加在讀題，\n[[寫答案那段沒變長]]",
+   "body": "Prompt Repetition 沒有改變提示詞的意思，模型要寫的答案還是那麼長；多出來的輸入只讓讀題那一小段微幅變長，由平行運算吸收。CoT 就不同：它讓模型多寫字，要等得久，也要多花 API 費用。",
+   "refs": [
+    "c1",
+    "c5",
+    "c6"
+   ],
+   "label": "貼兩次",
+   "heads": [
+    "讀題",
+    "寫答案"
+   ],
+   "nodes": [
+    {
+     "text": "只貼一次",
+     "pre": 1,
+     "dec": 4,
+     "sub": "總延遲低"
+    },
+    {
+     "text": "貼兩次",
+     "pre": 1.6,
+     "dec": 4,
+     "sub": "讀題微幅增加，總延遲接近只貼一次",
+     "emph": true
+    },
+    {
+     "text": "CoT",
+     "pre": 1,
+     "dec": 9,
+     "sub": "答案變長，總延遲高"
+    }
+   ],
+   "note": "這張是示意圖，長度只代表快慢，不是實測時間。"
+  },
+  {
+   "layout": "diagram",
+   "kind": "pairs",
+   "title": "多出來的算力，\n[[換到精確的理解]]",
+   "body": "論文作者大膽稱它是「Free Lunch」（免費午餐）：用 GPU 在讀題階段多出來的算力，換取模型對內容的精確理解，又不用多等。不過好處有範圍：模型已先一步步推理（CoT）時，效果變成中性到小幅正面。",
+   "refs": [
+    "c11",
+    "c8"
+   ],
+   "quals": [
+    "c11#2"
+   ],
+   "label": "為什麼划算",
+   "heads": [
+    "拿來用的",
+    "換到"
+   ],
+   "pairs": [
+    [
+     "讀題時，多出來的算力",
+     "模型對內容的精確理解"
+    ]
+   ],
+   "outcomes": [
+    {
+     "text": "等待時間：幾乎不變（Claude 處理極長文本例外）",
+     "tone": "good"
+    }
+   ]
+  },
+  {
+   "layout": "takeaway",
+   "question": "提示詞貼兩次，為什麼幾乎不會變慢？",
+   "title": "Prompt Repetition\n多出來的輸入在讀題時\n同時算掉、答案長度不變，\n等待時間接近原本。",
+   "refs": [
+    "c1",
+    "c6"
+   ]
+  },
+  {
+   "layout": "series_map",
+   "title": "這個系列共三則",
+   "current": "prompt-repetition-free-lunch-latency",
+   "nav": "完整文章在 datasciocean.com，搜「Prompt Repetition」",
+   "refs": [
+    "結構"
+   ]
+  }
+ ],
+ "threads": {
+  "mode": "carousel",
+  "body": {
+   "text": "提示詞貼兩次、輸入變兩倍，為什麼幾乎沒變慢？\n\nLLM 回答分兩段：先讀題，再一個字一個字寫答案。讀題時 GPU 可以同時算，處理 1000 個和 500 個 Token，時間差異極小，通常在毫秒等級；寫答案只能一個接一個，才是延遲的主要元兇。Prompt Repetition 沒改變提示詞的意思，答案長度不變，所以多出來的輸入幾乎不拖慢回應。\n\n論文實驗中，答案長度高度一致、延遲幾乎持平；唯一例外是 Claude 處理極長文本時，延遲明顯增加。細節在圖裡。\n\n這是 Prompt Repetition 系列的第二則；效果有多好、什麼時候不靈，在這個系列的下一則。",
+   "refs": [
+    "c1",
+    "c3",
+    "c4",
+    "c7",
+    "c8",
+    "c9"
+   ],
+   "quals": [
+    "c1#1",
+    "c3#1",
+    "c8#1"
+   ]
+  },
+  "last": {
+   "text": "Prompt Repetition 多出來的輸入落在可以同時算的讀題階段，答案長度不變，所以幾乎不會變慢（Claude 處理極長文本是例外）。\n文章：datasciocean.com/paper-intro/prompt-repetition\n同系列：把提示詞貼兩次，第二遍就看得到全文（尚未發布）\n同系列：70 組裡 47 勝 0 敗，叫 AI 先推理就變中性（尚未發布）",
+   "refs": [
+    "c1",
+    "c9"
+   ],
+   "quals": [
+    "c1#1"
+   ],
+   "link": "https://datasciocean.com/paper-intro/prompt-repetition/"
+  }
+ },
+ "caption": {
+  "first": "Prompt Repetition 把輸入變兩倍，LLM 回答卻幾乎沒變慢？關鍵在 Prefill",
+  "first_refs": [
+   "c1",
+   "c2"
+  ],
+  "nav": "完整文章在 datasciocean.com，搜「Prompt Repetition」",
+  "hashtags": [
+   "PromptRepetition",
+   "LLM",
+   "提示詞"
+  ]
+ }
+}

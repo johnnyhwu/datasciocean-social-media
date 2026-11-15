@@ -1,0 +1,272 @@
+{
+ "post": "prompt-repetition-causal-bottleneck-and-fix",
+ "blocks": [
+  {
+   "block": "第 3 張",
+   "atoms": [
+    {
+     "text": "主標：Prompt Repetition 是把提示詞原封不動貼兩次",
+     "verdict": "完全支持",
+     "card_quote": "做法是將使用者的輸入 Prompt 原封不動地複製一遍",
+     "note": ""
+    },
+    {
+     "text": "Google Research 團隊 2025 年 12 月的論文〈Prompt Repetition Improves Non-Reasoning LLMs〉",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 出自 Google Research 團隊於 2025 年 12 月發表的論文〈Prompt Repetition Improves Non-Reasoning LLMs〉",
+     "note": ""
+    },
+    {
+     "text": "把提示詞原封不動複製一遍，模型收到「提示詞＋提示詞」",
+     "verdict": "完全支持",
+     "card_quote": "模型的輸入從 P 變成 [P ; P]，也就是 <QUERY><QUERY> 的形式",
+     "note": ""
+    },
+    {
+     "text": "Token：模型讀文字的單位，大約是一個詞",
+     "verdict": "完全支持",
+     "card_quote": "處理序列中第 i 個 Token 時",
+     "note": "放行項：白話定義，未被寫成卡上的事實。"
+    },
+    {
+     "text": "Decoder-only：GPT-4、Gemini、Llama 等主流 LLM 大多採用",
+     "verdict": "完全支持",
+     "card_quote": "主流大型語言模型（如 GPT-4、Gemini、Llama）大多採用 Transformer Decoder-only 架構",
+     "note": "「大多」有保留。"
+    },
+    {
+     "text": "Decoder-only 讀字時只能看前面",
+     "verdict": "完全支持",
+     "card_quote": "處理序列中第 i 個 Token 時，只能「看見」位置 j ≤ i 的 Token，無法看見未來的 Token",
+     "note": ""
+    },
+    {
+     "text": "雙向注意力：輸入的 Token 互相看見，前面也看得到後面（如 BERT）",
+     "verdict": "完全支持",
+     "card_quote": "像 BERT 或 T5 那樣的 Bidirectional Attention / Prefix LM，允許 Input Token 互相看見",
+     "note": "「前面也看得到後面」是「互相看見」的白話，放行項。"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 5 張",
+   "atoms": [
+    {
+     "text": "主標：AI 讀字只能往前看",
+     "verdict": "完全支持",
+     "card_quote": "這類模型是 Causal 的：處理序列中第 i 個 Token 時，只能「看見」位置 j ≤ i 的 Token，無法看見未來的 Token",
+     "note": "主標寫「AI」，內文限定為 Decoder-only，第 3 張已帶出「大多採用」；未放大範圍。"
+    },
+    {
+     "text": "Decoder-only 模型讀到某個 Token 時，只看得到它和它前面的 Token，看不到後面的",
+     "verdict": "完全支持",
+     "card_quote": "在 Decoder-only 架構中，模型是 **Causal** 的。這代表模型在生成或處理序列中的第 \\(i\\) 個 Token \\(x_i\\) 時，只能「看見 (Attend to) 」位置 \\(j \\le i\\) 的 Token，而無法看見未來的 Token",
+     "note": "j ≤ i 含自己，「它和它前面」相符。"
+    },
+    {
+     "text": "所以前面的字被理解時，對後文一無所知",
+     "verdict": "完全支持",
+     "card_quote": "這些早期的 Token 是在「對未來一無所知」的狀態下被編碼的",
+     "note": "卡用「也就是／這意味著」連接，因果強度相當。"
+    },
+    {
+     "text": "它留給後面的字取用的資訊，只包含當時以前的內容",
+     "verdict": "完全支持",
+     "card_quote": "模型處理序列前端的 Token 時，生成的 Key 和 Value 僅包含該時間點之前的資訊",
+     "note": "把 Key/Value 白話為「留給後面的字取用的資訊」，未加新事實。"
+    },
+    {
+     "text": "示意圖：The｜bark｜was｜rough｜. 逐字顯示看得到哪些 Token、正在讀哪個字",
+     "verdict": "完全支持",
+     "card_quote": "以輸入語句「The bark was rough.」為例：模型讀到 bark 時只看得到「The bark」",
+     "note": "圖上圖例只是說明符號，與 c3、c5 一致。"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 6 張",
+   "atoms": [
+    {
+     "text": "主標：最後一個字看完整句，也救不回模糊的原料",
+     "verdict": "完全支持",
+     "card_quote": "最後一個 Token 雖然看過所有內容，仍無法解決這個問題…也無法從這些「品質低落的原料」中還原出完美的語義",
+     "note": "「模糊」對應 c5「含糊不清」。"
+    },
+    {
+     "text": "最後一個 Token 雖然看過所有內容",
+     "verdict": "完全支持",
+     "card_quote": "最後一個 Token 雖然看過所有內容，仍無法解決這個問題",
+     "note": ""
+    },
+    {
+     "text": "它的理解是把前面每個 Token 留下的資訊（Value）按比重混在一起",
+     "verdict": "完全支持",
+     "card_quote": "最後一個 Token 的 Latent 是由前面所有 Token 的 Value 加權平均而來",
+     "note": "放行項：Value 與加權平均的白話。"
+    },
+    {
+     "text": "如果前面的資訊因為缺乏上下文而模糊，比重分配得再好，也還原不出完美的意思",
+     "verdict": "完全支持",
+     "card_quote": "如果前面的 Value 本身因為缺乏上下文而品質不佳，就算擁有再好的 Attention Weight，也無法從這些「品質低落的原料」中還原出完美的語義",
+     "note": "「品質不佳」寫成「模糊」，與 c5「含糊不清」一致，強度相當。"
+    },
+    {
+     "text": "圖：bark 標「狗叫？樹皮？分不清」",
+     "verdict": "完全支持",
+     "card_quote": "無法確定是指「狗叫聲」還是「樹皮」，生成的 Key/Value 向量可能是模糊的混合體",
+     "note": ""
+    },
+    {
+     "text": "圖：「比重給得再高」，最後一個 Token 的理解「原料模糊，還原不出完美的意思」",
+     "verdict": "完全支持",
+     "card_quote": "就算擁有再好的 Attention Weight，也無法從這些「品質低落的原料」中還原出完美的語義",
+     "note": "卡寫「再好」，圖寫「再高」；套在模糊原料上意思不比卡強，內文已用「分配得再好」。"
+    },
+    {
+     "text": "圖：「前面每個 Token 留下的資訊（原料）」",
+     "verdict": "完全支持",
+     "card_quote": "它回頭抓取的 bark 的 Value 向量是早期生成的、品質低落且含糊不清的",
+     "note": "放行項。"
+    }
+   ],
+   "errors": []
+  },
+  {
+   "block": "第 8 張",
+   "atoms": [
+    {
+     "text": "主標：不改模型，也能模擬雙向注意力",
+     "verdict": "完全支持",
+     "card_quote": "可以被視為在 Decoder-only 架構上模擬雙向注意力的手段",
+     "note": "「不改模型」另見 c10「在不改變模型架構（Black-box compatible）…的前提下」；c10 未列入引用，但為卡上原文。主標未提延遲，c10 延遲限定條件不必帶出。"
+    },
+    {
+     "text": "原本有兩種修法：CoT 和雙向注意力",
+     "verdict": "完全支持",
+     "card_quote": "在 Prompt Repetition 之前的第一種解法是 Chain-of-Thought（CoT）",
+     "note": "第二種見 c9「第二種解法是像 BERT 或 T5 那樣的 Bidirectional Attention / Prefix LM」。"
+    },
+    {
+     "text": "CoT：先叫 AI 一步步寫出推理",
+     "verdict": "完全支持",
+     "card_quote": "讓模型 \"Think step by step\" 或先複述問題",
+     "note": "只取 step by step 一半，是子集。"
+    },
+    {
+     "text": "CoT：寫推理時，再處理一次資訊",
+     "verdict": "完全支持",
+     "card_quote": "透過生成過程強迫自己重新處理資訊，解決了表徵問題",
+     "note": ""
+    },
+    {
+     "text": "CoT 代價：多寫字，延遲與成本上升",
+     "verdict": "完全支持",
+     "card_quote": "因為它增加了生成的 Token 數量（Decode 階段），直接導致 Latency 增加和 API 成本上升",
+     "note": ""
+    },
+    {
+     "text": "雙向注意力：BERT、T5，Token 互相看見",
+     "verdict": "完全支持",
+     "card_quote": "像 BERT 或 T5 那樣的 Bidirectional Attention / Prefix LM，允許 Input Token 互相看見",
+     "note": ""
+    },
+    {
+     "text": "雙向注意力代價：要改架構；只能呼叫 API 時，做不到",
+     "verdict": "部分支持",
+     "card_quote": "缺點是需要改變模型架構或訓練目標，對只能透過 API 呼叫的現成 Decoder-only 模型（如 GPT-4、Claude 3）是不可能的任務",
+     "note": "卡寫「架構或訓練目標」，圖只寫「要改架構」，把二擇一寫成單指架構；「只能呼叫 API 時，做不到」相符。"
+    },
+    {
+     "text": "貼兩次不改架構，就能模擬出雙向注意力的效果（偽雙向注意力）",
+     "verdict": "完全支持",
+     "card_quote": "創造出一種偽雙向注意力（Pseudo-Bidirectional Attention）的效果，可以被視為在 Decoder-only 架構上模擬雙向注意力的手段",
+     "note": "部落格推論，語氣未比卡強。"
+    },
+    {
+     "text": "圖：貼兩次「第二遍看見，整個第一遍」",
+     "verdict": "完全支持",
+     "card_quote": "第二遍中的每一個位置都能完整地「看見」整個第一遍",
+     "note": ""
+    },
+    {
+     "text": "圖：貼兩次代價「只多貼一遍，不改架構」",
+     "verdict": "完全支持",
+     "card_quote": "做法是將使用者的輸入 Prompt 原封不動地複製一遍",
+     "note": "字面只說多貼一遍、不改架構，沒有宣稱零延遲或零成本；與 CoT 欄並列可能讓人聯想到沒有延遲代價，但字面為真。"
+    }
+   ],
+   "errors": [
+    "措辭與卡不同"
+   ]
+  },
+  {
+   "block": "Threads 正文",
+   "atoms": [
+    {
+     "text": "提示詞貼兩次，不是囉嗦，是在補 AI 的盲點",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 把輸入的 Prompt 複製一遍，第二遍中的每一個位置都能完整地「看見」整個第一遍",
+     "note": "hook，口語比喻不算事實主張。"
+    },
+    {
+     "text": "主流的 LLM（GPT-4、Gemini 等）大多只能往前看",
+     "verdict": "完全支持",
+     "card_quote": "主流大型語言模型（如 GPT-4、Gemini、Llama）大多採用 Transformer Decoder-only 架構，這類模型是 Causal 的",
+     "note": "「大多」保留。"
+    },
+    {
+     "text": "舉例：讀「The bark was rough.」讀到 bark 時，後面的 rough 還沒出現，分不出是狗叫聲還是樹皮",
+     "verdict": "完全支持",
+     "card_quote": "以輸入語句「The bark was rough.」為例：模型讀到 bark 時只看得到「The bark」，無法確定是指「狗叫聲」還是「樹皮」",
+     "note": "有標「舉個例子」，符合部落格舉例寫法。"
+    },
+    {
+     "text": "等讀到 rough 知道是樹皮，回頭拿到的 bark 仍是那份模糊的理解",
+     "verdict": "完全支持",
+     "card_quote": "讀到後面的 rough（粗糙的）時，雖然這個 Token 知道整句在講樹皮，但它回頭抓取的 bark 的 Value 向量是早期生成的、品質低落且含糊不清的",
+     "note": ""
+    },
+    {
+     "text": "Google Research 2025 年 12 月的論文提出 Prompt Repetition：把整段提示詞原封不動再貼一次",
+     "verdict": "完全支持",
+     "card_quote": "Prompt Repetition 出自 Google Research 團隊於 2025 年 12 月發表的論文〈Prompt Repetition Improves Non-Reasoning LLMs〉，做法是將使用者的輸入 Prompt 原封不動地複製一遍",
+     "note": ""
+    },
+    {
+     "text": "第二遍的每個字都看得到整個第一遍",
+     "verdict": "完全支持",
+     "card_quote": "第二遍中的每一個位置都能完整地「看見」整個第一遍",
+     "note": ""
+    },
+    {
+     "text": "不改模型，就能模擬出讓字前後互相看見的效果",
+     "verdict": "完全支持",
+     "card_quote": "創造出一種偽雙向注意力（Pseudo-Bidirectional Attention）的效果，可以被視為在 Decoder-only 架構上模擬雙向注意力的手段",
+     "note": "「讓字前後互相看見」是 c9「允許 Input Token 互相看見」對雙向注意力的白話；「模擬出…效果」與卡等強。"
+    },
+    {
+     "text": "只在前面塞一串點點拉長輸入則完全無效",
+     "verdict": "完全支持",
+     "card_quote": "另一個變體 Padding 在 <QUERY> 前面填入點號…結論是 Padding 完全無效",
+     "note": ""
+    },
+    {
+     "text": "這是系列第一則；輸入變兩倍會不會變慢，在下一則",
+     "verdict": "完全支持",
+     "card_quote": "模型的輸入從 P 變成 [P ; P]",
+     "note": "結構性導流，未對延遲下結論，c10 延遲限定條件不必在此帶出。"
+    }
+   ],
+   "errors": []
+  }
+ ],
+ "recalculations": [],
+ "gaps": [
+  {
+   "description": "第 8 張的「不改模型／不改架構」實際由 c10 原文最直接支持，但 c10 未列入該張引用；c10 的延遲限定條件只在宣稱零延遲時才需帶出，本張未宣稱。",
+   "card_quote": ""
+  }
+ ]
+}
