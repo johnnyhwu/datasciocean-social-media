@@ -1,9 +1,23 @@
 concept: prompt-repetition-causal-bottleneck-and-fix
 formats:
   ig_carousel:
-    status: ready
-    pack: out/prompt-repetition/prompt-repetition-causal-bottleneck-and-fix
+    status: published
   threads_thread:
-    status: ready
-    pack: out/prompt-repetition/prompt-repetition-causal-bottleneck-and-fix
-posts: []
+    status: published
+posts:
+- post_id: prompt-repetition-causal-bottleneck-and-fix:ig_carousel
+  format: ig_carousel
+  series_id: prompt-repetition
+  url: https://www.instagram.com/p/Dfv2LISCfKg/
+  published_at: 2026-11-15T03:47:00+0000
+  hook_type: 反直覺斷言
+  mentions: []
+  backfilled: []
+- post_id: prompt-repetition-causal-bottleneck-and-fix:threads_thread
+  format: threads_thread
+  series_id: prompt-repetition
+  url: https://www.threads.com/@datasciocean/post/Dfv2hB6iT0h
+  published_at: 2026-11-15T03:49:08+0000
+  hook_type: 反直覺斷言
+  mentions: []
+  backfilled: []

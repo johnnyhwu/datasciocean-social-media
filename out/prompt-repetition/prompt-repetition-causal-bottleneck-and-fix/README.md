@@ -5,8 +5,8 @@
 | 系列 | 拆解 Prompt Repetition：提示詞為什麼要貼兩次 |
 | 觀念 | `prompt-repetition-causal-bottleneck-and-fix`（卡：`concept-wiki/wiki/concepts/prompt-repetition-causal-bottleneck-and-fix.md`） |
 | hook 樣態 | 反直覺斷言 |
-| IG 輪播 | 待發布（12 張） |
-| Threads 串文 | 待發布（2 則） |
+| IG 輪播 | 已發布（12 張） |
+| Threads 串文 | 已發布（2 則） |
 
 ## 要看／要發的檔案
 
@@ -23,11 +23,10 @@
 - 程式 B：12/12 張通過（模板版本 `20e9d2c069e1`）
 - 程式 A、批次檢查、忠實者與讀者審查的結果不存在發布包裡（審查產出放暫存，不進 repo）；最後確認時由 Claude 在報告中說明
 
-## 發布前
+## 已發布
 
-- [ ] 人最後確認圖、文字、caption
-- [ ] IG（API）：`ig_publish.py prepare` → push `ig/jpg/` → `preflight` → `publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）
-- [ ] Threads（API）：`threads_publish.py publish`（dry-run）→ 人說「發」後 `--confirm`（見 references/publish-flow.md）
+- IG：https://www.instagram.com/p/Dfv2LISCfKg/
+- Threads：https://www.threads.com/@datasciocean/post/Dfv2hB6iT0h
 
 ## 發布後
 

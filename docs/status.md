@@ -85,7 +85,7 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 
 ## Prompt Repetition 系列（2026-11-11 起；複寫風格 `echo`）
 
-3 卡 3 則不合併（理由在 `series/prompt-repetition/series.md` 規劃備忘）；系列名「拆解 Prompt Repetition：提示詞為什麼要貼兩次」、hashtag `#PromptRepetition`（Claude 依規則 12 決定，2026-11-15 人接受）。Claude 從頭做到尾，草圖與樣張省略（前例 UniversalRAG）。新風格 `echo`（`render.py` 的 `ec_*`，`tests/test_echo_style.py`）；新圖型 12 種（`tests/test_diagrams.py`）。三則 spec 在 `out/prompt-repetition/`（12／10／10 張），2026-11-11 三則審查全過、系列 summary 忠實者審過、`batch_check` 通過；2026-11-15 人 review：第 2、3 則沒問題，已 ready（hook accepted）；第 1 則依回饋改第 2、8 張與 Threads 正文，忠實者 r5、讀者 r3 通過，人確認後 ready；系列 `members_locked: true`。存量 3，下一步：發第 1 則（等人授權）。
+3 卡 3 則不合併（理由在 `series/prompt-repetition/series.md` 規劃備忘）；系列名「拆解 Prompt Repetition：提示詞為什麼要貼兩次」、hashtag `#PromptRepetition`（Claude 依規則 12 決定，2026-11-15 人接受）。Claude 從頭做到尾，草圖與樣張省略（前例 UniversalRAG）。新風格 `echo`（`render.py` 的 `ec_*`，`tests/test_echo_style.py`）；新圖型 12 種（`tests/test_diagrams.py`）。三則 spec 在 `out/prompt-repetition/`（12／10／10 張），2026-11-11 三則審查全過、系列 summary 忠實者審過、`batch_check` 通過；2026-11-15 人 review：第 2、3 則沒問題，已 ready（hook accepted）；第 1 則依回饋改第 2、8 張與 Threads 正文，忠實者 r5、讀者 r3 通過，人確認後 ready；系列 `members_locked: true`。2026-11-15 第 1 則已發布：IG https://www.instagram.com/p/Dfv2LISCfKg/ 、Threads https://www.threads.com/@datasciocean/post/Dfv2hB6iT0h 。存量 2（第 2、3 則 ready）；第 2 則發布前先跑 `series_links.py`。
 
 ## 跨系列的人的決定與待決事項
 

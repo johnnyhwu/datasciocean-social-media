@@ -1,7 +1,7 @@
 # 進度：prompt-repetition-causal-bottleneck-and-fix（系列第 1 則）
 
 ## 現況（2026-11-15）
-- 人 review：第 2、3 則沒問題；第 1 則改第 2 張（「回頭拿到」說清楚）與第 8 張（CoT／雙向注意力也修得好但各有代價，表頭改好處／代價），Threads 正文同步改。程式 A、B 過；忠實者 r5（slide02、slide08、threads.body）與讀者 r3（第 2、8 張）都通過，已 --mark。人 2026-11-15 確認「都沒問題了」：已 state.py ready --hook-accepted（兩格式），series.md 已 members_locked。下一步：人授權後 prepare → push ig/jpg/ → 發 IG 與 Threads。
+- 人 review：第 2、3 則沒問題；第 1 則改第 2 張（「回頭拿到」說清楚）與第 8 張（CoT／雙向注意力也修得好但各有代價，表頭改好處／代價），Threads 正文同步改。程式 A、B 過；忠實者 r5（slide02、slide08、threads.body）與讀者 r3（第 2、8 張）都通過，已 --mark。人 2026-11-15 確認「都沒問題了」：已 state.py ready --hook-accepted（兩格式），series.md 已 members_locked。2026-11-15 已發布 IG 與 Threads（網址在 state/）。這則完成。
 
 ## 前次現況（2026-11-11）
 - spec 12 張；程式 A、B 通過；審查全過：忠實者 r1→r4（r4 只審第 8 張）、讀者 r1→r2、編輯 r1；`spec_diff.py --mark` 已記通過版本。
