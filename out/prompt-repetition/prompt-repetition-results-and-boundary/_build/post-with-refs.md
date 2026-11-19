@@ -112,8 +112,10 @@
 ### 最後一則（置頂）
 Prompt Repetition 在 70 組裡 47 勝 0 敗；模型先一步步推理時，效果變成中性，頂多小幅加分。
 文章：datasciocean.com/paper-intro/prompt-repetition
-同系列：把提示詞貼兩次，第二遍就看得到全文（尚未發布）
-同系列：輸入變兩倍長，為什麼幾乎沒變慢？（尚未發布）
+同系列：把提示詞貼兩次，第二遍就看得到全文
+https://www.threads.com/@datasciocean/post/Dfv2hB6iT0h
+同系列：輸入變兩倍長，為什麼幾乎沒變慢？
+https://www.threads.com/@datasciocean/post/DfzPNAhn0d8
 引用：c1, c3
 
 ## IG caption

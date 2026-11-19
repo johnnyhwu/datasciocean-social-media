@@ -20,4 +20,6 @@ posts:
   published_at: 2026-11-15T03:49:08+0000
   hook_type: 反直覺斷言
   mentions: []
-  backfilled: []
+  backfilled:
+  - prompt-repetition-free-lunch-latency
+  - prompt-repetition-results-and-boundary

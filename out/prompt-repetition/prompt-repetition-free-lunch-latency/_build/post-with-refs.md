@@ -111,7 +111,8 @@ LLM 回答分兩段：先讀題，再一個字一個字寫答案。讀題時 GPU
 ### 最後一則（置頂）
 Prompt Repetition 多出來的輸入落在可以同時算的讀題階段，答案長度不變，所以幾乎不會變慢（Claude 處理極長文本是例外）。
 文章：datasciocean.com/paper-intro/prompt-repetition
-同系列：把提示詞貼兩次，第二遍就看得到全文（尚未發布）
+同系列：把提示詞貼兩次，第二遍就看得到全文
+https://www.threads.com/@datasciocean/post/Dfv2hB6iT0h
 同系列：70 組裡 47 勝 0 敗，叫 AI 先推理就變中性（尚未發布）
 引用：c1, c9
 
