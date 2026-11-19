@@ -94,6 +94,7 @@ CASES = [  # (名稱, 基底, 修改, 預期錯誤中要出現的字串)
     ("用語：貼文寫了「判官」而不是 Judge", GOOD_A, lambda s: s["threads"]["items"][0].update(text=s["threads"]["items"][0]["text"] + "這個判官很快。"), "用語"),
     ("用語：貼文寫了「找回率」而不是 Recall", GOOD_A, lambda s: s["threads"]["items"][0].update(text=s["threads"]["items"][0]["text"] + "找回率提高了。"), "用語"),
     ("圖註被截斷成片段（以「；」結尾）", GOOD_A, lambda s: s["slides"][4].update(note="Recall@5：前 5 筆找回的比例；"), "像被截斷"),
+    ("圖註太長、單行放不下（2026-11-17）", GOOD_A, lambda s: s["slides"][4].update(note="我的判斷：Jev 的 67.8% 一致率，量的是有多像，不是對不對；一致率高不代表答案正確，讀數字時要分開看"), "超過單行上限"),
     ("圖註以「上」結尾（HINT）", GOOD_A, lambda s: s["slides"][4].update(note="Recall@5：前 5 筆找回的比例；MuSiQue 上"), "確認是完整的一句"),
     ("Threads 輪播模式卻還有逐張 items", GOOD_A, lambda s: s["threads"].update(mode="carousel"), "不該有 items"),
     ("Threads 輪播超過 20 張", GOOD_A, lambda s: (s["threads"].update(mode="carousel", items=[]), s["slides"].extend([copy.deepcopy(s["slides"][2]) for _ in range(20)])), "輪播要 2～20 張"),
@@ -113,7 +114,7 @@ def main():
     carousel_ok = mut(GOOD_A, lambda s: (s["threads"].update(mode="carousel"), s["threads"].pop("items")))
     waived_ok = mut(GOOD_A, lambda s: (s.update(waived_quals=[{"id": q, "reason": "人決定刪除"} for q in s["threads"]["body"]["quals"]]), s["threads"]["body"].update(quals=[])))
     series_title_ok = mut(GOOD_A, lambda s: s["threads"]["last"].update(text=s["threads"]["last"]["text"] + "\n同系列：這一定要看（尚未發布）"))
-    for base, name in ((series_title_ok, "正確的貼文 A：最後一則「同系列」的標題含比較詞（標題是系列檔的，不檢查；必須通過，測誤殺）"), (waived_ok, "正確的貼文 A：限定條件有寫理由地放行（必須通過，測誤殺）"), (GOOD_A, "正確的貼文 A（必須通過）"), (GOOD_B, "正確的貼文 B（必須通過）"), (carousel_ok, "正確的貼文 A 改成 Threads 輪播模式（必須通過，測誤殺）"), (mut(GOOD_A, standalone), "正確的獨立貼文（series: null，延伸閱讀列已發布的貼文；必須通過，測誤殺）"), (mut(GOOD_A, lambda s: (standalone(s), s["slides"].pop())), "正確的獨立貼文：最後一張是帶走、沒有延伸閱讀（必須通過，測誤殺）"), (mut(GOOD_A, lambda s: (standalone(s), s["slides"].pop(), s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["threads"].pop("last"))), "正確的獨立貼文：Threads 輪播沒有最後一則回覆（必須通過，測誤殺）")):
+    for base, name in ((series_title_ok, "正確的貼文 A：最後一則「同系列」的標題含比較詞（標題是系列檔的，不檢查；必須通過，測誤殺）"), (waived_ok, "正確的貼文 A：限定條件有寫理由地放行（必須通過，測誤殺）"), (mut(GOOD_A, lambda s: s["slides"][6].update(note="這幾條失效模式，最後一條要特別留意。")), "正確的貼文 A：圖註有「最後」（不是比較詞「最」；必須通過，測誤殺）"), (GOOD_A, "正確的貼文 A（必須通過）"), (GOOD_B, "正確的貼文 B（必須通過）"), (carousel_ok, "正確的貼文 A 改成 Threads 輪播模式（必須通過，測誤殺）"), (mut(GOOD_A, standalone), "正確的獨立貼文（series: null，延伸閱讀列已發布的貼文；必須通過，測誤殺）"), (mut(GOOD_A, lambda s: (standalone(s), s["slides"].pop())), "正確的獨立貼文：最後一張是帶走、沒有延伸閱讀（必須通過，測誤殺）"), (mut(GOOD_A, lambda s: (standalone(s), s["slides"].pop(), s["threads"].update(mode="carousel"), s["threads"].pop("items"), s["threads"].pop("last"))), "正確的獨立貼文：Threads 輪播沒有最後一則回覆（必須通過，測誤殺）")):
         code, out = run(base)
         ok = code == 0
         fails += not ok

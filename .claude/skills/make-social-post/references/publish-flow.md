@@ -30,7 +30,7 @@ P=out/<系列>/<觀念>                              # 要發的發布包資料�
 | # | 做什麼 | 指令 | 誰 |
 |---|---|---|---|
 | 1 | 把投影片轉成 IG 與 Threads 都能用的 JPEG，驗證官方限制 | `ig_publish.py prepare $P` | Claude |
-| 2 | **commit 並 push `$P/ig/jpg/`**（Meta 要從這個公開 repo 的 raw 網址抓圖；沒 push 就抓不到）。只 add 這個資料夾，commit message 簡短說明 | `git add $P/ig/jpg && git commit … && git push origin main` | Claude，**push 前先問人** |
+| 2 | **commit 並 push `$P/ig/jpg/`**（Meta 要從這個公開 repo 的 raw 網址抓圖；沒 push 就抓不到）。只 add 這個資料夾，commit message 簡短說明。**被本機權限擋下時**（auto mode 曾兩次擋 push）不要重試或繞路，直接把整行 `! git add … && git commit … && git push origin main` 給人跑，人跑完就接著做 3 | `git add $P/ig/jpg && git commit … && git push origin main` | Claude，**push 前先問人** |
 | 3 | **IG 預檢**：建好所有 container、等到 FINISHED，**但不發佈**（帳號上看不到；23 小時內有效；19 張要 2 分鐘以上，用背景執行） | `ig_publish.py preflight $P` | Claude |
 | 4 | **IG dry-run**：印出將送出的請求、檢查網址與額度、報告預檢能不能沿用。把 caption、張數、預檢狀態用白話給人。**加 `--summary`**：只印 problems、warnings、張數、caption、額度（網址檢查只留數量與失敗的），不用另外寫程式摘要 | `ig_publish.py publish $P --summary` | Claude → 人看 |
 | 5 | 人說「發」→ **IG 發佈**（沿用預檢，只送一個 `media_publish`）；成功後自動寫回 state 與 `state/ig-publish-log.jsonl` | `ig_publish.py publish $P --confirm` | 人確認，Claude 執行 |

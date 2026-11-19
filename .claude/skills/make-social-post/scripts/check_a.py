@@ -152,6 +152,8 @@ def main(spec_path: str) -> int:
         # 9. 比較詞與全稱詞
         for w in P["comparative_words"]:
             for f in fields:
+                for ex in P.get("comparative_exempt", []):      # 「最後」「最初」裡的「最」不是比較詞（2026-11-17 CER 實測誤擋）
+                    f = f.replace(ex, "")
                 if w in f and w not in ref_text:
                     err.append(f"{name}: 比較詞/全稱詞 {w!r} 出現在貼文，卻不在引用主張原文")
                     break
@@ -210,6 +212,9 @@ def main(spec_path: str) -> int:
         if sl["layout"] == "context" and len(body) > P["context_body_max_chars"]:
             err.append(f"slide{i:02d}: 脈絡張補充 {len(body)} 字，超過 {P['context_body_max_chars']}")
         note = strip_marks(sl.get("note", "")).strip()      # 圖註、腳註要是完整的一句，不是為了塞進字數而截斷的片段（人的回饋，2026-10-27）
+        units = sum(.55 if ord(ch) < 128 else 1 for ch in note)      # 圖註只排一行、不換行（2026-11-17 CER：超過就被程式 B 的左右邊界擋，要重渲兩次）
+        if units > P.get("note_max_units", 38):
+            err.append(f"slide{i:02d}: 圖註約 {units:.0f} 字寬，超過單行上限 {P.get('note_max_units', 38)}（圖註不換行）；縮短或搬到補充")
         if note and re.search(r"[；：、，與和在]$", note):
             err.append(f"slide{i:02d}: 圖註「{note}」以「{note[-1]}」結尾，像被截斷的片段；寫成完整的一句，或搬到別頁")
         elif note and re.search(r"[的上]$", note):
@@ -219,7 +224,7 @@ def main(spec_path: str) -> int:
             btxt = re.sub(r"\s+", "", " ".join(strip_marks(sl.get(k, "")) for k in ("title", "body")))
             bg = BIGRAM(dtxt)
             if bg and len(bg & BIGRAM(btxt)) / len(bg) > P["diagram_text_overlap_hint"]:
-                hint.append(f"slide{i:02d}: 圖上文字有 {len(bg & BIGRAM(btxt)) / len(bg):.0%} 在重述同張的標題與補充；圖要多給文字沒有的資訊（具體例子、關係、對比），不是把字裝進框裡（self-check 31）")
+                hint.append(f"slide{i:02d}: 圖上文字有 {len(bg & BIGRAM(btxt)) / len(bg):.0%} 在重述同張的標題與補充；圖要多給文字沒有的資訊（具體例子、關係、對比），不是把字裝進框裡（ig-carousel.md §0「每張圖要比文字多給資訊」）")
         lim = P["cover_title_precheck_chars"] if sl["layout"] == "cover" else P["title_precheck_chars"]
         if len(strip_marks(sl.get("title", ""))) > lim + 10:
             hint.append(f"slide{i:02d}: 主標 {len(strip_marks(sl.get('title','')))} 字，預檢上限 {lim}（以渲染行數為準）")

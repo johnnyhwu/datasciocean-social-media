@@ -22,10 +22,9 @@ description: 設計 IG 輪播與 Threads 附圖的視覺：新系列的視覺哲
 ## 鐵則
 
 - **圖片由程式產生**（HTML 模板加 Playwright 截圖）；LLM 只產出內容規格 JSON。數據圖與文字圖**不用 AI 生圖**（文字常出錯、數字可能畫錯）。
-- **新系列的草圖**：一次出 3 個構圖骨架不同的方向，各做成「IG 首頁 3×3 格（與相鄰兩個系列並排）」，存到 `series/<id>/sketches/` 並告訴人路徑；定案後才寫該風格的回歸測試（`references/series-philosophy-and-templates.md` 5b）。
 - 同一系列用同一份視覺哲學與同一套模板；改模板會改 template hash，整個系列要重渲，所以不要為單一貼文改模板。
 - 精確優先於藝術：長度、刻度、間距由程式依數值計算，不由 LLM 決定。
-- **新系列（新的視覺哲學與整套模板）要先產生樣張，由人審過才量產。** 檢查全過不代表好看。**新的示意圖型（`diagram` 的 kind）不必先出樣張**（2026-10-12 人決定）：直接在貼文裡做，附程式 B 檢查與回歸測試，交貼文時明講新增了哪些，由人一併審；圖要大膽、有故事（`references/principles.md` 十）。
+- **新系列與新圖型都不先出草圖、樣張給人**（`CLAUDE.md` 規則 12，2026-11-10 起；UniversalRAG、Prompt Repetition、CER 都這樣做）：Claude 自己定風格，直接在貼文裡做，附程式 B 檢查與回歸測試（`tests/test_<style>_style.py`、`tests/test_diagrams.py`），交成品時明講新風格與新圖型，人 review 成品一併審。檢查全過不代表好看：自己把新封面和相鄰兩個系列的封面並排看（`references/series-philosophy-and-templates.md` 5b 的判準），圖要大膽、有故事（`references/principles.md` 十）。人要求看草圖時才照 5b 出 3 個方向。
 - 字型內嵌（Noto Sans CJK TC，`assets/fonts/`），不依賴系統字型；字重只用 400 與 700；字級只用 {28, 34, 38, 40, 56, 72, 76}。
 - 金色只給一個元素，且**禁止用於米色底上的文字**（對比度 1.7）。
 
