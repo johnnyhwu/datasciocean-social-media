@@ -85,7 +85,11 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 
 ## Prompt Repetition 系列（2026-11-11 起；複寫風格 `echo`）
 
-3 卡 3 則不合併（理由在 `series/prompt-repetition/series.md` 規劃備忘）；系列名「拆解 Prompt Repetition：提示詞為什麼要貼兩次」、hashtag `#PromptRepetition`（Claude 依規則 12 決定，2026-11-15 人接受）。Claude 從頭做到尾，草圖與樣張省略（前例 UniversalRAG）。新風格 `echo`（`render.py` 的 `ec_*`，`tests/test_echo_style.py`）；新圖型 12 種（`tests/test_diagrams.py`）。三則 spec 在 `out/prompt-repetition/`（12／10／10 張），2026-11-11 三則審查全過、系列 summary 忠實者審過、`batch_check` 通過；2026-11-15 人 review：第 2、3 則沒問題，已 ready（hook accepted）；第 1 則依回饋改第 2、8 張與 Threads 正文，忠實者 r5、讀者 r3 通過，人確認後 ready；系列 `members_locked: true`。2026-11-15 第 1 則已發布：IG https://www.instagram.com/p/Dfv2LISCfKg/ 、Threads https://www.threads.com/@datasciocean/post/Dfv2hB6iT0h 。存量 2（第 2、3 則 ready）；第 2 則發布前先跑 `series_links.py`。
+3 卡 3 則不合併（理由在 `series/prompt-repetition/series.md` 規劃備忘）；系列名「拆解 Prompt Repetition：提示詞為什麼要貼兩次」、hashtag `#PromptRepetition`（Claude 依規則 12 決定，2026-11-15 人接受）。Claude 從頭做到尾，草圖與樣張省略（前例 UniversalRAG）。新風格 `echo`（`render.py` 的 `ec_*`，`tests/test_echo_style.py`）；新圖型 12 種（`tests/test_diagrams.py`）。三則 spec 在 `out/prompt-repetition/`（12／10／10 張），2026-11-11 三則審查全過、系列 summary 忠實者審過、`batch_check` 通過；2026-11-15 人 review：第 2、3 則沒問題，已 ready（hook accepted）；第 1 則依回饋改第 2、8 張與 Threads 正文，忠實者 r5、讀者 r3 通過，人確認後 ready；系列 `members_locked: true`。2026-11-15 第 1 則已發布：IG https://www.instagram.com/p/Dfv2LISCfKg/ 、Threads https://www.threads.com/@datasciocean/post/Dfv2hB6iT0h 。2026-11-16 第 2 則已發布：IG https://www.instagram.com/p/DfzO40XH4jo/ 、Threads https://www.threads.com/@datasciocean/post/DfzPNAhn0d8 。2026-11-17 第 3 則已發布：IG https://www.instagram.com/p/Df0mjunn8VA/ 、Threads https://www.threads.com/@datasciocean/post/Df0m2_kH31t ；同日回補第 1、2 則 Threads 的「同系列」。**系列完成**。
+
+## CER 系列（2026-11-15 起；籌碼風格 `chips`）
+
+3 卡 3 則不合併；系列名「拆解 CER：不只數票，還要看 AI 有多大信心」（Claude 依規則 12 決定，2026-11-17 人接受）。新風格 `chips`（`tests/test_chips_style.py`）；新圖型 9 種：`chips`、`midfail`、`tagged`、`weights`、`watch`、`tokprob`、`extract`、`sieve`、`lens`（`tests/test_diagrams.py`）。三則在 `out/cer/`（12／12／10 張），審查全過。2026-11-17 人 review 回饋：「把握」一律改「信心」（三則全改，記進 `config/terms.yaml`）；第 1 則第 7 張拆成兩張（信心怎麼變路徑分數、猶豫挪到最後一步）、第 9 張籌碼標籤改寫；第 1 則忠實者 r4、r5、讀者 r3 通過。三則 ready（hook accepted）、系列 `members_locked: true`。存量 3；每則發布前先跑 `series_links.py`。
 
 ## 跨系列的人的決定與待決事項
 

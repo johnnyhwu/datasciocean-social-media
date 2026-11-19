@@ -110,6 +110,16 @@
   target    打靶（2026-11-03）：heads = [左靶, 右靶]、nodes = [{text}（靶心）, {text}（金色 ✕＝落點平均）]、選用 outcomes[0]；左散右集、兩邊都偏同一個方向；純示意
   dotgrid 的選用欄位 on（2026-11-03）：前 on 個點實心、其餘空心
 
+  chips     籌碼疊（2026-11-15，CER）：一個答案一疊、一枚一條推理路徑；nodes = [{text, chips:[自信度…]}]、mode = both／count／weight、heads 每欄一個、選用 outcomes、show_values（籌碼裡的自信度與合計，程式加總）；純示意
+  midfail   錯在中間（2026-11-15）：nodes = 步驟 3～6 個 [{text, bad?}]、heads = [壞步驟之後的括號字, 答案框上方的字]、outcomes = [答案框, 底下說明]；純示意
+  tagged    每一步結尾交出中間答案（2026-11-15）：heads = [上方說明, 金色小牌的標籤]、nodes = 路徑卡 [{text, answers:[…]}]；純示意
+  weights   加權平均，第 j 步權重 j（2026-11-15）：nodes = 步驟 [{text, c}]、heads = [直條區, 籌碼區, 結果]；算式與結果由程式算
+  tokprob   每個 Token 的機率（2026-11-15，CER 第 2 則）：steps = 1～2 列 [{label?, cells:[{text, p, tone: key／fill}]}]、mode = all（全部平均）／key（只算關鍵字）、heads = [平均標籤, 關鍵字標籤]；平均由程式算，機率是假設的
+  extract   從推理文字抓出中間答案（2026-11-15）：nodes = 步驟 [{text, tag, sub}]、heads = [左卡標題, 箭頭標籤, 右表標題]；純示意
+  watch     哪幾步被算進去（2026-11-15）：nodes = 列 [{text, sub?, counted:[bool…], best?}]、outcomes = 每列結果、heads = 兩個圖例；純示意
+  sieve     把握當篩子（2026-11-15，CER 第 3 則）：nodes = 2 列 [{text, sub?, paths:[{text, low?}], ok?}]（剛好一列 ok）、outcomes = 每列結果、heads = [篩子標籤, 被濾掉的標籤]；純示意
+  lens      看每一步 vs 只看最後一步（2026-11-15）：nodes = 步驟 [{text, p}]（最低的金色）、heads = [長括號標籤, 短括號標籤]、outcomes = 兩個結論（接在標籤後）；自信度是假設的
+
 規則：圖形全部用 class "bg"（不進程式 B 的文字與圖形重疊檢查），所以排版由這裡負責避開文字；框內的文字由程式 B 的「框內文字不超出框」檢查；
 比例（dumbbell／range）由程式 B 檢查圖形位置與數值成正比。字級只用 {28, 34, 40, 56}。
 """
@@ -4628,6 +4638,491 @@ def tally(c: Canvas, spec: dict, y0: float) -> float:
     return y - vg
 
 
+# ------------------------------------------------------------------ CER 系列（2026-11-15）：籌碼、等權的兩票、錯在中間、每步交出中間答案、加權平均、算哪幾步
+def _num(v: float) -> str:
+    """0.75 → "0.75"、1.0 → "1.0"、1.65 → "1.65"（至少一位小數，最多兩位）。"""
+    s = f"{round(v, 2):.2f}".rstrip("0")
+    return s + "0" if s.endswith(".") else s
+
+
+def _chip_stack(c: Canvas, cx, base, ths, w, gold_top=False, values=None, col=TEAL, gap=6):
+    """一疊籌碼：由 base 往上疊，ths 是每枚的厚度；回傳頂端 y。values 給定時，每枚右邊寫它的數字。"""
+    y = base
+    for k, t in enumerate(ths):
+        y -= t
+        top = k == len(ths) - 1
+        fill = GOLD if (gold_top and top) else col
+        c.rect(cx - w / 2, y, w, t, fill=fill, rx=min(10, t / 2))
+        if values is not None:          # 數字寫在籌碼右邊（米色底），一枚一個，垂直置中對齊那一枚
+            if t + gap < 40:
+                raise ValueError(f"chips 的籌碼太薄（{t:.0f}px），旁邊的自信度會疊在一起；減少籌碼或拉高圖")
+            c.text(cx + w / 2 + 10, y + t / 2 - 19.6, 80, values[k], "dl", DEEP, "left")
+        y -= gap
+    return y + gap
+
+
+def chips(c: Canvas, spec: dict, y0: float) -> float:
+    """籌碼疊（2026-11-15，CER）：一個答案一疊，一枚籌碼是一條推理路徑。
+    nodes = 答案 2～4 個 [{text（答案）, chips:[自信度 0～1, …]（一條路徑一枚，1～6 枚）}]；
+    mode = "both"（左右兩欄：左邊每枚一樣厚＝數票數，右邊厚度＝自信度）／"count"／"weight"；
+    heads = 每欄的標題（both 兩個，其他一個）；選用 outcomes = 每欄底下的結論 [{text}]；
+    count 欄每疊下面寫「N 票」；weight 欄 show_values: true 時籌碼裡寫自信度、疊下面寫「合計 x」（程式加總）。
+    count 欄枚數最多那疊標 ✓；weight 欄加總最高那疊頂端金色、標 ✓。純示意。"""
+    ans, mode, heads, outs = spec["nodes"], spec.get("mode", "both"), spec.get("heads", []), spec.get("outcomes", [])
+    if not 2 <= len(ans) <= 4 or any(not 1 <= len(a["chips"]) <= 6 or not all(0 < v <= 1 for v in a["chips"]) for a in ans):
+        raise ValueError("chips 要 2～4 個答案，每個 1～6 枚籌碼、自信度在 0～1 之間")
+    modes = ["count", "weight"] if mode == "both" else [mode]
+    if mode not in ("both", "count", "weight") or len(heads) != len(modes):
+        raise ValueError("chips 的 mode 要是 both／count／weight，heads 每欄一個（both 兩個）")
+    if outs and len(outs) != len(modes):
+        raise ValueError("chips 的 outcomes 要每欄一句")
+    cnt = [len(a["chips"]) for a in ans]
+    sums = [round(sum(a["chips"]), 2) for a in ans]
+    if cnt.count(max(cnt)) > 1 or sums.count(max(sums)) > 1:
+        raise ValueError("chips 的票數最多、加總最高都要只有一個答案（不能平手）")
+    show = spec.get("show_values", False)
+    gapx = 48
+    pw = (X1 - X0 - gapx * (len(modes) - 1)) / len(modes)
+    hh = max(c.lines(h, pw, 34) for h in heads) * 44.2 + 22
+    oh = max((c.lines(o["text"], pw, 28) for o in outs), default=0) * 39.2
+    foot = 12 + 44.2 + 6 + 39.2 + (18 + oh if oh else 0)          # 底線下：答案名、票數或合計、結論
+    H = BOTTOM - y0 - hh - foot - 14
+    if H < 200:
+        raise ValueError(f"chips 放不下：籌碼區只剩 {H:.0f}px（至少 200）；縮短補充或標題")
+    H = min(H, 560)
+    n = len(ans)
+    sw = min(170, (pw - 26 * (n - 1)) / n)
+    tops = []
+    for k, m in enumerate(modes):
+        px = X0 + k * (pw + gapx)
+        c.text(px, y0, pw, heads[k], "dn", DEEP, "center")
+        base = y0 + hh + H
+        c.line(px, base + 6, px + pw, base + 6, DEEP, 6)
+        sp_ = sw + (110 if (m == "weight" and show) else 26)          # 寫數字時疊與疊之間留出數字的位置
+        xs = [px + pw / 2 - (45 if (m == "weight" and show) else 0) + (i - (n - 1) / 2) * sp_ for i in range(n)]
+        if m == "count":
+            t = min(70, (H - 40 - 6 * (max(cnt) - 1)) / max(cnt))
+            win = cnt.index(max(cnt))
+            for i, a in enumerate(ans):
+                top = _chip_stack(c, xs[i], base, [t] * cnt[i], sw, col=MID)
+                tops.append(top)
+                if i == win:
+                    _tick(c, xs[i], top - 28, DEEP, 7)
+                c.text(xs[i] - sw / 2 - 13, base + 18, sw + 26, a["text"], "dn", DEEP, "center")
+                c.text(xs[i] - sw / 2 - 13, base + 18 + 44.2 + 6, sw + 26, f"{cnt[i]} 票", "ds", DEEP, "center")
+        else:
+            tmax = min(150, (H - 40 - 6 * (max(cnt) - 1)) / max(sums))
+            win = sums.index(max(sums))
+            for i, a in enumerate(ans):
+                ths = [max(12, tmax * v) for v in a["chips"]]
+                top = _chip_stack(c, xs[i], base, ths, sw, gold_top=i == win, values=[_num(v) for v in a["chips"]] if show else None)
+                tops.append(top)
+                if i == win:
+                    _tick(c, xs[i], top - 28, DEEP, 7)
+                c.text(xs[i] - sw / 2 - 13, base + 18, sw + 26, a["text"], "dn", DEEP, "center")
+                if show:
+                    c.text(xs[i] - sw / 2 - 13, base + 18 + 44.2 + 6, sw + 26, f"合計 {_num(sums[i])}", "ds", DEEP, "center")
+        if outs:
+            c.text(px, base + foot - oh, pw, outs[k]["text"], "ds", DEEP, "center")
+    return y0 + hh + H + foot
+
+
+def midfail(c: Canvas, spec: dict, y0: float) -> float:
+    """錯在中間（2026-11-15，CER）：一排步驟由左到右，其中一步（bad）算錯、畫成金色圓加叉；之後的步驟照樣實心，一路接到最後的答案框（打叉）。
+    nodes = 步驟 3～6 個 [{text, bad?}]（剛好一個 bad；text 是圓下面的小字）、heads = [壞步驟之後那一段上方的括號字, 答案框上方的小字]、
+    outcomes = [{text}（答案框裡的字）, {text}（底下的說明）]。純示意。"""
+    st, heads, outs = spec["nodes"], spec["heads"], spec["outcomes"]
+    if not 3 <= len(st) <= 6 or sum(1 for s in st if s.get("bad")) != 1 or len(heads) != 2 or len(outs) != 2:
+        raise ValueError("midfail 要 3～6 步（剛好一步 bad）、heads 兩個、outcomes 兩個")
+    bi = next(i for i, s in enumerate(st) if s.get("bad"))
+    if bi == len(st) - 1:
+        raise ValueError("midfail 的 bad 不能是最後一步（要畫出「之後照樣推下去」）")
+    w = X1 - X0
+    bxw = 220
+    bx0 = X1 - bxw
+    r = 38
+    sp = (bx0 - 60 - (X0 + r)) / (len(st) - 1) if len(st) > 1 else 0
+    xs = [X0 + r + i * sp for i in range(len(st))]
+    lab_w = min(sp - 8, 190)
+    lh = max(c.lines(s["text"], lab_w, 28) for s in st) * 39.2
+    a0, a1 = xs[bi + 1] - r, xs[-1] + r
+    tw0 = max(a1 - a0, 240)                  # 括號只罩一兩步時，括號字仍給足寬度（置中、不超出左右）
+    tx0 = min(max((a0 + a1) / 2 - tw0 / 2, X0), bx0 - 10 - tw0)
+    top_h = max(c.lines(heads[0], tw0, 28), c.lines(heads[1], bxw, 28)) * 39.2 + 26
+    nh = c.lines(outs[1]["text"], w, 28) * 39.2
+    total = top_h + 2 * r + 14 + lh + 40 + nh
+    _fit(total, BOTTOM - y0, "midfail")
+    y = y0 + min((BOTTOM - y0 - total) * .3, 60)
+    c.text(tx0, y, tw0, heads[0], "ds", DEEP, "center")
+    c.text(bx0, y, bxw, heads[1], "ds", DEEP, "center")
+    yb = y + top_h - 14
+    c.poly([(a0, yb), (a0, yb - 12), (a1, yb - 12), (a1, yb)], stroke=DEEP, sw=4)
+    cy = y + top_h + r
+    c.line(xs[0], cy, bx0 - 10, cy, DEEP, 6)
+    c.arrow(xs[-1] + r, cy, bx0 - 8, cy, DEEP, 6, head=18)
+    for i, (s, x) in enumerate(zip(st, xs)):
+        if i == bi:
+            c.circle(x, cy, r, fill=GOLD)
+            _cross(c, x, cy, 16, DEEP, 7)
+        else:
+            c.circle(x, cy, r, fill=DEEP)
+            c.text(x - 26, cy - 19.6, 52, str(i + 1), "dl", CREAM, "center", (x - 26, cy - 26, 52, 52))
+        c.text(x - lab_w / 2, cy + r + 14, lab_w, s["text"], "ds", DEEP, "center")
+    bh = 2 * r + 30
+    c.rect(bx0, cy - bh / 2, bxw, bh, fill=CREAM, stroke=DEEP, sw=5, rx=14)
+    c.text(bx0 + 10, cy - 22, bxw - 70, outs[0]["text"], "dn", DEEP, "center", (bx0, cy - bh / 2, bxw, bh))
+    _cross(c, bx0 + bxw - 38, cy, 13, DEEP, 6)
+    yy = cy + r + 14 + lh + 40
+    c.text(X0, yy, w, outs[1]["text"], "ds", TEAL, "left")
+    return yy + nh
+
+
+def tagged(c: Canvas, spec: dict, y0: float) -> float:
+    """每一步都交出中間答案（2026-11-15，CER）：2～3 張推理路徑卡並排，每張卡裡幾行步驟（淡色長條＝推理的文字，示意），
+    每行結尾一個深色小牌寫這一步的中間答案；第一張卡的第一個小牌是金色，上方一句標籤加箭頭指著它。
+    heads = [卡片上方的說明, 金色小牌上方的標籤]、nodes = 路徑卡 [{text（卡名）, answers:[中間答案, …]（2～4 個）}]。純示意。"""
+    cards, heads = spec["nodes"], spec["heads"]
+    if not 2 <= len(cards) <= 3 or any(not 2 <= len(k["answers"]) <= 4 for k in cards) or len(heads) != 2:
+        raise ValueError("tagged 要 2～3 張卡（每張 2～4 個中間答案）、heads 兩個")
+    w = X1 - X0
+    gap = 26
+    cw = (w - gap * (len(cards) - 1)) / len(cards)
+    h1 = c.lines(heads[0], w, 28) * 39.2 + 18
+    h2 = 39.2 + 40
+    rows = max(len(k["answers"]) for k in cards)
+    rh = 70
+    ch = 64 + rows * rh + 14
+    total = h1 + h2 + ch
+    _fit(total, BOTTOM - y0, "tagged")
+    rh += min((BOTTOM - y0 - total) / rows * .5, 30)
+    ch = 64 + rows * rh + 14
+    y = y0
+    c.text(X0, y, w, heads[0], "ds", TEAL, "left")
+    y += h1
+    lab_y = y
+    y += h2
+    for i, k in enumerate(cards):
+        x = X0 + i * (cw + gap)
+        c.rect(x, y, cw, ch, fill=CREAM, stroke=DEEP, sw=4, rx=18)
+        c.text(x + 22, y + 14, cw - 44, k["text"], "dl", DEEP, "left")
+        for j, a in enumerate(k["answers"]):
+            ry = y + 64 + j * rh + (rh - 52) / 2
+            tw_ = _tw(a, 28) + 34
+            tx = x + cw - 18 - tw_
+            c.rect(x + 22, ry + 8, max(40, tx - x - 40), 14, fill=LIGHT, rx=7, op=.6)
+            c.rect(x + 22, ry + 32, max(30, (tx - x - 40) * .6), 14, fill=LIGHT, rx=7, op=.6)
+            gold = i == 0 and j == 0
+            c.cell(tx, ry, tw_, 52, a, fill=GOLD if gold else DEEP, color=DEEP if gold else CREAM)
+            if gold:
+                gx = tx + tw_ / 2
+                lw_ = min(_tw(heads[1], 28) + 10, w)
+                lx = min(max(gx - lw_ / 2, X0), X1 - lw_)
+                c.text(lx, lab_y, lw_, heads[1], "dl", DEEP, "center")
+                c.arrow(gx, lab_y + 44, gx, ry - 8, DEEP, 4, head=14)
+    return y + ch
+
+
+def path_score(nodes) -> float:
+    """CER 的路徑分數：Σ j·c_j / Σ j（j 從 1 起）。"""
+    return sum((j + 1) * n["c"] for j, n in enumerate(nodes)) / sum(range(1, len(nodes) + 1))
+
+
+ZH_TIMES = ("一次", "兩次", "三次", "四次", "五次")
+
+
+def weights_formula(nodes) -> str:
+    """把加權平均寫成「重複相加再平均」：第 j 步的自信度加 j 次，除以總次數（一般讀者看得懂，不必先懂 Σ）。"""
+    terms = [_num(n["c"]) for j, n in enumerate(nodes) for _ in range(j + 1)]
+    return f"({' + '.join(terms)}) ÷ {len(terms)} ＝ {_num(path_score(nodes))}"
+
+
+def weights(c: Canvas, spec: dict, y0: float) -> float:
+    """一條路徑的分數＝各步自信度的加權平均，第 j 步的權重是 j（2026-11-15，CER）：一步一欄，
+    上面一根直條（高度＝自信度，0～1，從同一條底線起）、下面 j 枚小籌碼與「j 次」（權重），最下面一條「重複相加再平均」的算式與結果（程式算）。
+    nodes = 步驟 2～5 個 [{text, c}]、heads = [直條區的標籤, 籌碼區的標籤, 結果的標籤]。"""
+    st, heads = spec["nodes"], spec["heads"]
+    if not 2 <= len(st) <= 5 or not all(0 < n["c"] <= 1 for n in st) or len(heads) != 3:
+        raise ValueError("weights 要 2～5 步（c 在 0～1）、heads 三個")
+    w = X1 - X0
+    lw = 170
+    for h_ in heads[:2]:
+        if _tw(h_, 28) > lw - 14:
+            raise ValueError(f"weights 左欄標籤「{h_}」太長（最多約 5 個字）")
+    n = len(st)
+    colw = (w - lw) / n
+    bw = min(110, colw * .55)
+    fh = 44.2
+    k = len(st)
+    chip_h, chip_g = 16, 5
+    wh = k * chip_h + (k - 1) * chip_g
+    bar_h = 112
+    total = 39.2 + 10 + bar_h + 12 + 44.2 + 18 + wh + 10 + 39.2 + 16 + fh + 16 + 64
+    _fit(total, BOTTOM - y0, "weights")
+    bar_h += min(BOTTOM - y0 - total, 110)
+    y = y0
+    xs = [X0 + lw + colw * (i + .5) for i in range(n)]
+    base = y + 39.2 + 10 + bar_h
+    c.text(X0, y + 39.2 + 10 + bar_h / 2 - 39, lw - 14, heads[0], "dl", TEAL, "left")
+    c.line(X0 + lw - 10, base, X1, base, DEEP, 4)
+    for x, s in zip(xs, st):
+        h = bar_h * s["c"]
+        c.rect(x - bw / 2, base - h, bw, h, fill=MID, rx=8)
+        c.text(x - colw / 2, base - h - 44, colw, _num(s["c"]), "dl", DEEP, "center")
+        c.text(x - colw / 2, base + 12, colw, s["text"], "dn", DEEP, "center")
+    y = base + 12 + 44.2 + 18
+    c.text(X0, y + wh / 2 - 19.6, lw - 14, heads[1], "dl", TEAL, "left")
+    for j, x in enumerate(xs):
+        for q in range(j + 1):
+            yy = y + wh - (q + 1) * chip_h - q * chip_g
+            c.rect(x - bw / 2, yy, bw, chip_h, fill=DEEP, rx=6)
+        c.text(x - colw / 2, y + wh + 10, colw, ZH_TIMES[j], "dl", DEEP, "center")
+    y += wh + 10 + 39.2 + 16
+    f = weights_formula(st)
+    c.text(X0, y, w, f, "dn", DEEP, "center")
+    y += fh + 16
+    res = f"{heads[2]} {_num(path_score(st))}"
+    rw = _tw(res, 34) + 60
+    c.rect(X0 + (w - rw) / 2, y, rw, 64, fill=GOLD, rx=14)
+    c.text(X0 + (w - rw) / 2, y + 10, rw, res, "dn", DEEP, "center", (X0 + (w - rw) / 2, y, rw, 64))
+    return y + 64
+
+
+def watch(c: Canvas, spec: dict, y0: float) -> float:
+    """哪幾步的信心被算進去（2026-11-15，CER 的對照組）：每列一種做法、一排步驟點，算進去的點實心、沒算的虛線空心；
+    列右邊一個結果框，best 的那列金色。nodes = 2～3 列 [{text, sub?, counted:[bool, …]（每一步算不算，3～6 步）, best?}]、
+    outcomes = 每列的結果 [{text}]、heads = [圖例：算進去, 圖例：沒算]。純示意。"""
+    rows, outs, heads = spec["nodes"], spec["outcomes"], spec["heads"]
+    if not 2 <= len(rows) <= 3 or len(outs) != len(rows) or len(heads) != 2 or sum(1 for r in rows if r.get("best")) != 1:
+        raise ValueError("watch 要 2～3 列、每列一個結果、heads 兩個圖例、剛好一列 best")
+    if any(not 3 <= len(r["counted"]) <= 6 for r in rows):
+        raise ValueError("watch 每列 3～6 步")
+    w = X1 - X0
+    ow = 250
+    lg = 39.2 + 30
+    ths = [_th(c, r, w) for r in rows]
+    band, gap = 96, 40
+    total = lg + sum(ths) + len(rows) * (10 + band) + gap * (len(rows) - 1)
+    _fit(total, BOTTOM - y0, "watch")
+    gap += min((BOTTOM - y0 - total) / max(len(rows) - 1, 1) * .6, 70)
+    y = y0
+    c.circle(X0 + 16, y + 20, 15, fill=DEEP)
+    c.text(X0 + 42, y, 330, heads[0], "ds", DEEP, "left")
+    x2 = X0 + 42 + _tw(heads[0], 28) + 60
+    c.circle(x2 + 16, y + 20, 14, fill=CREAM, stroke=TEAL, sw=4, dash="6 5")
+    c.text(x2 + 42, y, 330, heads[1], "ds", DEEP, "left")
+    y += lg
+    for r, t_, o in zip(rows, ths, outs):
+        c.text(X0, y, w, r["text"], "dn", DEEP, "left")
+        if r.get("sub"):
+            c.text(X0, y + c.lines(r["text"], w, 34) * 44.2 + 6, w, r["sub"], "ds", TEAL, "left")
+        y += t_ + 10
+        cy = y + band / 2
+        m = len(r["counted"])
+        x_end = X1 - ow - 50
+        xs = [X0 + 30 + i * (x_end - X0 - 30) / (m - 1) for i in range(m)]
+        c.line(xs[0], cy, xs[-1], cy, TEAL, 4)
+        for x, on in zip(xs, r["counted"]):
+            if on:
+                c.circle(x, cy, 26, fill=DEEP)
+            else:
+                c.circle(x, cy, 24, fill=CREAM, stroke=TEAL, sw=4, dash="6 5")
+        c.arrow(xs[-1] + 34, cy, X1 - ow - 12, cy, DEEP, 4, head=14)
+        win = r.get("best")
+        c.rect(X1 - ow, cy - 40, ow, 80, fill=GOLD if win else CREAM, stroke=None if win else TEAL, sw=4, rx=14)
+        c.text(X1 - ow + 10, cy - 22, ow - 20, o["text"], "dn", DEEP, "center", (X1 - ow, cy - 40, ow, 80))
+        y += band + gap
+    return y - gap
+
+
+def tok_avg(cells, key_only=False) -> float:
+    ps = [x["p"] for x in cells if (x.get("tone") == "key" or not key_only)]
+    return sum(ps) / len(ps)
+
+
+def tokprob(c: Canvas, spec: dict, y0: float) -> float:
+    """每個 Token 的機率（2026-11-15，CER 第 2 則）：一列一句話，每個 Token 一格，格子上方一根直條（高度＝機率，0～1，同一條底線）、條上寫機率；
+    虛線＝平均（程式算；只有一列且 mode=all 時畫，旁邊標「平均」）。mode = "all"：所有 Token 一起平均；"key"：只有 tone=key 的 Token 算（其他 Token 變淡、標「不算」）。
+    steps = 1～2 列 [{label?, cells:[{text, p, tone: key／fill}]}]（每列剛好一個 key，金色）、heads = [平均線的標籤前綴, key 的標籤]。純示意，機率是假設的。"""
+    rows, heads, mode = spec["steps"], spec["heads"], spec.get("mode", "all")
+    if not 1 <= len(rows) <= 2 or len(heads) != 2 or mode not in ("all", "key"):
+        raise ValueError("tokprob 要 1～2 列（steps）、heads 兩個、mode 是 all／key")
+    for r in rows:
+        if sum(1 for x in r["cells"] if x.get("tone") == "key") != 1 or not all(0 < x["p"] <= 1 for x in r["cells"]):
+            raise ValueError("tokprob 每列剛好一個 key Token，機率在 0～1")
+    w = X1 - X0
+    th_, gap = 56, 12
+    lab_h = [39.2 + 10 if r.get("label") else 0 for r in rows]
+    two = len(rows) == 2                      # 兩列時平均寫在列標籤那一行的右邊，省一行
+    bar_h = 170 if not two else 60
+    avg_h = 0 if two else 39.2 + 6
+    rgap = 40 if two else 50
+    total = sum(lab_h) + len(rows) * (47.2 + bar_h + 8 + th_ + (0 if two else 10 + avg_h)) + rgap * (len(rows) - 1)
+    _fit(total, BOTTOM - y0, "tokprob")
+    extra = BOTTOM - y0 - total
+    bar_h += min(extra / len(rows) * .7, 110)
+    y = y0
+    for r, lh in zip(rows, lab_h):
+        cells = r["cells"]
+        avg = tok_avg(cells, mode == "key")
+        lab = f"{heads[0]} {_num(avg)}" if mode == "all" else f"{heads[1]} {_num(avg)}"
+        if lh:
+            c.text(X0, y, w * (.68 if two else 1), r["label"], "dn", DEEP, "left")
+            if two:
+                c.text(X0 + w * .68, y, w * .32, lab, "dn", DEEP, "right")
+            y += lh
+        ws = _tok_widths([x["text"] for x in cells], w, gap, mn=86)
+        xs = [X0 + sum(ws[:k]) + gap * k for k in range(len(cells))]
+        base = y + 47.2 + bar_h
+        c.line(X0, base, X1, base, DEEP, 3)
+        for x, cw, t in zip(xs, ws, cells):
+            key = t.get("tone") == "key"
+            off = mode == "key" and not key
+            h = bar_h * t["p"]
+            bw = min(cw * .5, 70)
+            c.rect(x + (cw - bw) / 2, base - h, bw, h, fill=GOLD if key else (CREAM if off else MID), stroke=TEAL if off else None,
+                   sw=3, dash="8 6" if off else None, rx=6)
+            c.text(x, base - h - 48, cw, f"{t['p']:g}" if not off else "不算", "dl", DEEP if not off else TEAL, "center")
+            _tok(c, x, base + 8, cw, th_, t["text"], "gold" if key else ("ghost" if off else "solid"))
+        if mode == "all" and not two:         # 兩列或只算關鍵字時不畫平均線（會穿過數字；平均已寫在標籤）
+            ay = base - bar_h * avg
+            c.line(X0, ay, X1, ay, DEEP, 4, dash="14 10")
+            kx, kw = next((x, cw) for x, cw, t in zip(xs, ws, cells) if t.get("tone") == "key")
+            kh = bar_h * next(t["p"] for t in cells if t.get("tone") == "key")
+            if (base - kh - 48) - (ay + 10) >= 44:    # 平均線的名字寫在關鍵字那一欄、線的下方，碰到數字就不寫
+                c.text(kx - 80, ay + 10, kw + 80, f"平均 {_num(avg)}", "dl", DEEP, "right")
+        if two:
+            y = base + 8 + th_ + rgap
+        else:
+            c.text(X0, base + 8 + th_ + 10, w, lab, "dn", DEEP, "left")
+            y = base + 8 + th_ + 10 + avg_h + rgap
+    return y - rgap
+
+
+def extract(c: Canvas, spec: dict, y0: float) -> float:
+    """從推理文字裡抓出中間答案（2026-11-15，CER 第 2 則）：左邊一張推理卡，每一步幾條淡色長條（推理的文字，示意）加一個金框標籤（例「Answer: 125」）；
+    中間一支箭頭（標籤例「Regex」）；右邊一張小表，一步一列，只剩抓出來的答案。
+    nodes = 步驟 2～4 個 [{text（右表的步驟名）, tag（左卡的標籤，含格式字）, sub（右表的值）}]、heads = [左卡標題, 箭頭標籤, 右表標題]。純示意。"""
+    st, heads = spec["nodes"], spec["heads"]
+    if not 2 <= len(st) <= 4 or len(heads) != 3 or not all(n.get("tag") and n.get("sub") for n in st):
+        raise ValueError("extract 要 2～4 步（每步 text、tag、sub）、heads 三個")
+    w = X1 - X0
+    lw, aw = 520, 120
+    rx0 = X0 + lw + aw
+    rw = X1 - rx0
+    rh = 112
+    hh = 56
+    total = hh + len(st) * rh + 20
+    _fit(total, BOTTOM - y0, "extract")
+    rh += min((BOTTOM - y0 - total) / len(st) * .5, 40)
+    ch = hh + len(st) * rh + 20
+    y = y0 + min((BOTTOM - y0 - total) * .15, 30)
+    c.rect(X0, y, lw, ch, fill=CREAM, stroke=DEEP, sw=4, rx=18)
+    c.text(X0 + 24, y + 12, lw - 48, heads[0], "dl", DEEP, "left")
+    c.rect(rx0, y, rw, ch, fill=CREAM, stroke=DEEP, sw=4, rx=18)
+    c.rect(rx0, y, rw, hh, fill=DEEP, rx=18)
+    c.rect(rx0, y + hh - 18, rw, 18, fill=DEEP, rx=0)
+    c.text(rx0 + 18, y + (hh - 39.2) / 2, rw - 36, heads[2], "dl", CREAM, "left", (rx0, y, rw, hh))
+    for j, n in enumerate(st):
+        ry = y + hh + j * rh
+        c.rect(X0 + 24, ry + 10, lw - 48, 14, fill=LIGHT, rx=7, op=.6)
+        c.rect(X0 + 24, ry + 34, (lw - 48) * .7, 14, fill=LIGHT, rx=7, op=.6)
+        tw_ = _tw(n["tag"], 28) + 36
+        c.cell(X0 + 24, ry + 56, tw_, 46, n["tag"], fill=CREAM, stroke=GOLD, color=DEEP)
+        c.raw(f'<rect class="bg" x="{X0 + 24:.1f}" y="{ry + 56:.1f}" width="{tw_:.1f}" height="46" rx="16" fill="none" stroke="{GOLD}" stroke-width="6"/>')
+        cy = ry + 79
+        c.text(rx0 + 18, cy - 19.6, rw * .55, n["text"], "dl", TEAL, "left")
+        c.text(rx0 + rw * .5, cy - 22.1, rw * .5 - 18, n["sub"], "dn", DEEP, "right")
+        if j:
+            c.line(rx0 + 14, ry, rx0 + rw - 14, ry, LIGHT, 2)
+    ay = y + ch / 2
+    c.arrow(X0 + lw + 12, ay, rx0 - 12, ay, DEEP, 6, head=18)
+    c.text(X0 + lw, ay - 52, aw, heads[1], "dl", DEEP, "center")
+    return y + ch
+
+
+def sieve(c: Canvas, spec: dict, y0: float) -> float:
+    """把握當篩子（2026-11-15，CER 第 3 則）：兩列，每列左邊幾枚推理路徑（格子裡是那條路徑的答案；low＝沒把握，畫虛線並在下面標 heads[1]），
+    中間一道直的虛線篩子（上方標 heads[0]），右邊一個結果框（ok 那一列金色，另一列米色藍綠框）。
+    nodes = 2 列 [{text 列標題, sub?, paths:[{text, low?}] 3～6 個, ok?}]（剛好一列 ok）、outcomes = 每列結果 [{text}]、heads = [篩子標籤, 被濾掉的標籤]；純示意。"""
+    rows, outs, heads = spec["nodes"], spec["outcomes"], spec["heads"]
+    if len(rows) != 2 or len(outs) != 2 or len(heads) != 2 or sum(1 for r in rows if r.get("ok")) != 1:
+        raise ValueError("sieve 要 2 列（剛好一列 ok）、每列一個結果、heads 兩個")
+    if not all(3 <= len(r.get("paths", [])) <= 6 for r in rows):
+        raise ValueError("sieve 每列 3～6 條路徑")
+    w = X1 - X0
+    ow, ch, gap, rgap = 250, 64, 12, 44
+    fx = X1 - ow - 80
+    cw_all = fx - 40 - X0
+    lab_h = 39.2 + 16
+    ths = [c.lines(r["text"], w, 34) * 44.2 + (6 + c.lines(r["sub"], w, 28) * 39.2 if r.get("sub") else 0) for r in rows]
+    lows = [50 if any(p_.get("low") for p_ in r["paths"]) else 0 for r in rows]
+    total = lab_h + sum(t + 14 + ch + lo for t, lo in zip(ths, lows)) + rgap
+    _fit(total, BOTTOM - y0, "sieve")
+    y = y0 + (BOTTOM - y0 - total) * .25
+    c.text(fx - 200, y, 400, heads[0], "dl", TEAL, "center")
+    y += lab_h
+    top = None
+    for r, o, t_, lo in zip(rows, outs, ths, lows):
+        c.text(X0, y, w, r["text"], "dn", DEEP, "left")
+        if r.get("sub"):
+            c.text(X0, y + c.lines(r["text"], w, 34) * 44.2 + 6, w, r["sub"], "ds", TEAL, "left")
+        y += t_ + 14
+        top = y - 10 if top is None else top
+        ws = _tok_widths([p_["text"] for p_ in r["paths"]], cw_all, gap, mn=70)
+        x = X0
+        for p_, cw in zip(r["paths"], ws):
+            _tok(c, x, y, cw, ch, p_["text"], "ghost" if p_.get("low") else "solid")
+            if p_.get("low"):
+                c.text(x, y + ch + 10, cw, heads[1], "dl", TEAL, "center")
+            x += cw + gap
+        cy = y + ch / 2
+        c.arrow(fx + 16, cy, X1 - ow - 14, cy, DEEP, 4, head=14)
+        ok = r.get("ok")
+        c.rect(X1 - ow, cy - 44, ow, 88, fill=GOLD if ok else CREAM, stroke=None if ok else TEAL, sw=4, rx=14)
+        c.text(X1 - ow + 10, cy - 22, ow - 20, o["text"], "dn", DEEP, "center", (X1 - ow, cy - 44, ow, 88))
+        bot = y + ch + 10
+        y += ch + lo + rgap
+    c.line(fx, top, fx, bot, DEEP, 6, dash="12 10")
+    return y - rgap
+
+
+def lens(c: Canvas, spec: dict, y0: float) -> float:
+    """只看最後一步 vs 看每一步（2026-11-15，CER 第 3 則）：一條推理路徑每一步一根直條（高度＝那一步答案的自信度，假設的），下面是步驟格；
+    上方兩道括號：長的（實線）罩住全部步驟、標「heads[0]：outcomes[0]」；短的（虛線）只罩最後一步、標「heads[1]：outcomes[1]」。自信度最低的那一步金色（猶豫）。
+    nodes = 步驟 3～6 個 [{text, p}]、heads = [看全部的標籤, 只看最後一步的標籤]、outcomes = [{text}, {text}]；純示意。"""
+    st, heads, outs = spec["nodes"], spec["heads"], spec["outcomes"]
+    if not 3 <= len(st) <= 6 or len(heads) != 2 or len(outs) != 2 or not all(0 < n["p"] <= 1 for n in st):
+        raise ValueError("lens 要 3～6 步（p 在 0～1）、heads 兩個、outcomes 兩個")
+    w = X1 - X0
+    th_, gap = 56, 16
+    bar_h = 150
+    total = 44.2 + 40 + 44.2 + 40 + 47.2 + bar_h + 8 + th_
+    _fit(total, BOTTOM - y0, "lens")
+    bar_h += min((BOTTOM - y0 - total) * .7, 120)
+    ws = _tok_widths([n["text"] for n in st], w, gap, mn=120)
+    xs = [X0 + sum(ws[:k]) + gap * k for k in range(len(st))]
+    y = y0
+    c.text(X0, y, w, f"{heads[0]}：{outs[0]['text']}", "dn", DEEP, "left")
+    y += 44.2 + 12
+    c.line(X0, y, X1, y, DEEP, 5); c.line(X0, y, X0, y + 20, DEEP, 5); c.line(X1, y, X1, y + 20, DEEP, 5)
+    y += 28
+    c.text(X0, y, w, f"{heads[1]}：{outs[1]['text']}", "dn", TEAL, "right")
+    y += 44.2 + 12
+    lx0, lx1 = xs[-1], X1
+    c.line(lx0, y, lx1, y, TEAL, 5, dash="12 9"); c.line(lx0, y, lx0, y + 20, TEAL, 5); c.line(lx1, y, lx1, y + 20, TEAL, 5)
+    y += 28
+    base = y + 47.2 + bar_h
+    c.line(X0, base, X1, base, DEEP, 3)
+    lo = min(range(len(st)), key=lambda k: st[k]["p"])
+    for k, (n, x, cw) in enumerate(zip(st, xs, ws)):
+        h = bar_h * n["p"]
+        bw = min(cw * .5, 80)
+        c.rect(x + (cw - bw) / 2, base - h, bw, h, fill=GOLD if k == lo else MID, rx=6)
+        c.text(x, base - h - 48, cw, f"{n['p']:g}", "dl", DEEP, "center")
+        _tok(c, x, base + 8, cw, th_, n["text"], "solid")
+    return base + 8 + th_
+
+
 KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "paths": paths, "epochs": epochs,
          "dotgrid": dotgrid, "dumbbell": dumbbell, "range": range_chart, "funnel": funnel,
          "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation, "tokens": tokens,
@@ -4643,7 +5138,9 @@ KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "
          "grain": grain, "ballot": ballot, "thresh": thresh, "murky": murky,
          "ambig": ambig, "peek": peek, "blend": blend, "repeat": repeat, "catchup": catchup, "variants": variants,
          "grid2": grid2, "twostage": twostage, "timeline": timeline, "twin": twin,
-         "scan": scan, "tally": tally}
+         "scan": scan, "tally": tally,
+         "chips": chips, "midfail": midfail, "tagged": tagged, "weights": weights, "watch": watch,
+         "tokprob": tokprob, "extract": extract, "sieve": sieve, "lens": lens}
 
 
 def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:
@@ -4658,7 +5155,8 @@ def texts(sl: dict) -> list[str]:
     """示意圖上的所有文字與數字（逐欄位，給 check_a 的數字／名稱檢查與 build_package 的審查文字用）。"""
     out = []
     for st in sl.get("steps", []):
-        out.append(st["label"])
+        if st.get("label"):          # tokprob 的列可以沒有標籤
+            out.append(st["label"])
         for cell in st["cells"]:
             out.append(cell["text"]); out += [cell["sub"]] if cell.get("sub") else []
         if st.get("verdict"):
@@ -4691,6 +5189,34 @@ def texts(sl: dict) -> list[str]:
         out += [m["text"] for m in r.get("marks", [])] + ([r["tie"]] if r.get("tie") else [])
         if r.get("parts"):
             out.append("・".join(f"{h} {p}" for h, p in zip(sl.get("heads", []), r["parts"])))   # 和圖上那一行一字不差（讀者引用才對得上）
+    if sl.get("kind") == "chips":         # 籌碼的票數、自信度與合計（程式算），和圖上一字不差
+        ms = ["count", "weight"] if sl.get("mode", "both") == "both" else [sl.get("mode")]
+        for n in sl.get("nodes", []):
+            if "count" in ms:
+                out.append(f"{len(n['chips'])} 票")
+            if "weight" in ms and sl.get("show_values"):
+                out += [_num(v) for v in n["chips"]] + [f"合計 {_num(sum(n['chips']))}"]
+    if sl.get("kind") == "tokprob":       # 每個 Token 的機率（假設的）與平均（程式算）
+        for r in sl.get("steps", []):
+            out += [f"{x['p']:g}" for x in r["cells"]]
+            hs = list(sl.get("heads", [])) + ["", ""]
+            out.append(f"{hs[0]} {_num(tok_avg(r['cells']))}" if sl.get("mode", "all") == "all" else f"{hs[1]} {_num(tok_avg(r['cells'], True))}")
+        if sl.get("mode", "all") == "all" and len(sl.get("steps", [])) == 1:    # 一列時虛線旁的「平均 x」
+            out.append(f"平均 {_num(tok_avg(sl['steps'][0]['cells']))}")
+    if sl.get("kind") == "extract":
+        out += [n["tag"] for n in sl.get("nodes", [])]
+    if sl.get("kind") == "sieve":         # 每條路徑格子裡的答案
+        for n in sl.get("nodes", []):
+            out += [p_["text"] for p_ in n.get("paths", [])]
+    if sl.get("kind") == "lens":          # 每一步的自信度（假設的）與兩道括號的標籤（和圖上一字不差）
+        out += [f"{n['p']:g}" for n in sl.get("nodes", [])]
+        out += [f"{h}：{o['text']}" for h, o in zip(sl.get("heads", []), sl.get("outcomes", []))]
+    if sl.get("kind") == "tagged":
+        for n in sl.get("nodes", []):
+            out += list(n.get("answers", []))
+    if sl.get("kind") == "weights":
+        out += [_num(n["c"]) for n in sl.get("nodes", [])] + [ZH_TIMES[j] for j in range(len(sl.get("nodes", [])))]
+        out += [weights_formula(sl["nodes"]), f"{(list(sl.get('heads', [])) + ['', '', ''])[2]} {_num(path_score(sl['nodes']))}".strip()]
     if sl.get("kind") == "ring":
         out += [x for x in sl.get("labels") or [] if x]
     if sl.get("kind") == "equation" and sl.get("ops"):      # 運算符號是內容（+ 和 × 意思不同），審查者要看得到整條算式

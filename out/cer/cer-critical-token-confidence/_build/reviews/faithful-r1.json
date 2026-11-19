@@ -1,0 +1,90 @@
+{
+  "post": "cer-critical-token-confidence",
+  "blocks": [
+    {"block": "第 1 張", "atoms": [
+      {"text": "AI 整段說得很有把握，可能只是廢話說得順", "verdict": "完全支持", "card_quote": "這導致我們很難區分一條「邏輯正確的路徑」和一條「廢話連篇但文法通順的路徑」。", "note": "c4 部落格推論；「可能」保留了不確定語氣，封面可沒說完整。"},
+      {"text": "「Therefore, the answer is」這類詞，模型生成的機率通常非常高", "verdict": "完全支持", "card_quote": "這些詞彙對於文法通順很重要，模型生成它們的機率通常非常高 (自信度高) 。", "note": "c3，保留「通常」。"},
+      {"text": "算整段平均，會蓋過真正關鍵的那個數字", "verdict": "完全支持", "card_quote": "如果我們計算整段文字的平均機率，這些無關緊要的高分 Token 會**稀釋**掉真正關鍵的資訊 (例如某個關鍵的運算數字或實體名稱) 。", "note": "「蓋過」對應稀釋／掩蓋；只取數字一例，範圍未放大。"},
+      {"text": "所以 CER 只看答案標籤後面的字", "verdict": "完全支持", "card_quote": "所以它不算整句的機率，而是用 Regex 抓出 Prompt 定義好的標籤（如 Answer: 或 Response:）後面的內容當關鍵字", "note": "c1 設計參數，主詞為 CER。"}
+    ], "errors": []},
+    {"block": "第 2 張", "atoms": [
+      {"text": "整句平均 0.89，關鍵的 125 只有 0.41（假設例子）", "verdict": "完全支持", "card_quote": "例如在計算過程中出現的 \"100\", \"5\", \"125\"。", "note": "放行項 1：125 取自 c8 示範值，機率為假設，圖註已標明；重算平均 5.34/6＝0.89 正確。"},
+      {"text": "推理過程裡有大量功能性詞彙，像「Therefore, the answer is」，模型生成它們的機率通常非常高", "verdict": "完全支持", "card_quote": "一個典型的思維鏈 (Chain-of-Thought, CoT) 包含了大量的**功能性詞彙** (Functional Words)", "note": "c3。"},
+      {"text": "算整段的平均機率時，這些高分 Token 會稀釋掉真正關鍵的資訊，例如某個關鍵的運算數字", "verdict": "完全支持", "card_quote": "這些無關緊要的高分 Token 會**稀釋**掉真正關鍵的資訊 (例如某個關鍵的運算數字或實體名稱)", "note": "近逐字。"},
+      {"text": "圖註：機率是假設的例子；直條高度是模型輸出這個字的機率", "verdict": "完全支持", "card_quote": "", "note": "圖上單位與比較對象（整句平均 vs 只算關鍵字）有寫明；屬撰寫者例子說明。"}
+    ], "errors": []},
+    {"block": "第 3 張（回顧，第 2 則細節）", "atoms": [
+      {"text": "「首先」「所以答案是」這類詞機率很高", "verdict": "部分支持", "card_quote": "模型生成它們的機率通常非常高 (自信度高)", "note": "卡上是「通常非常高」，回顧拿掉了「通常」，把往往寫成一律。"},
+      {"text": "會蓋過關鍵數字", "verdict": "完全支持", "card_quote": "這些無關緊要的高分 Token 會**稀釋**掉真正關鍵的資訊 (例如某個關鍵的運算數字或實體名稱)", "note": "c3。"},
+      {"text": "CER 規定每步寫出中間答案", "verdict": "完全支持", "card_quote": "我們要求模型在每一個推理步驟結束時，必須依照特定的格式輸出中間答案。", "note": "c6。"},
+      {"text": "只算答案那幾個字的機率", "verdict": "完全支持", "card_quote": "所以它不算整句的機率，而是用 Regex 抓出 Prompt 定義好的標籤（如 Answer: 或 Response:）後面的內容當關鍵字", "note": "c1。"}
+    ], "errors": ["措辭與卡不同"]},
+    {"block": "第 4 張", "atoms": [
+      {"text": "CER 的自信度，只算關鍵的那幾個字", "verdict": "完全支持", "card_quote": "讓自信度分數純粹反映模型對「推理結果」的把握", "note": "c1。"},
+      {"text": "CER（Confidence Enhanced Reasoning）是不需要訓練的框架，不改模型、不需要外部獎勵模型，只用推理時輸出的 Logits 做後處理", "verdict": "完全支持", "card_quote": "CER（Confidence Enhanced Reasoning）是一個不需要訓練的框架，不修改模型權重、不需要外部的 Reward Model，純粹利用 LLM 推理時輸出的 Logits（機率分佈）做後處理", "note": "「不改模型」對應不修改權重，未加新範圍。"},
+      {"text": "Token／功能性詞彙／關鍵字的白話定義", "verdict": "完全支持", "card_quote": "**開放域問答 (Open-Domain QA)**: 關注 **專有名詞 (Proper Nouns)**。例如人名、地名或特定實體。", "note": "放行項 5；功能性詞彙、關鍵字的定義與 c3、c5、c8 一致，未加用途。"}
+    ], "errors": []},
+    {"block": "第 5 張", "atoms": [
+      {"text": "高分的填充詞，把關鍵的數字稀釋掉", "verdict": "完全支持", "card_quote": "這些無關緊要的高分 Token 會**稀釋**掉真正關鍵的資訊", "note": "c3。"},
+      {"text": "規定每步寫出「Answer:」，再用 Regex 抓", "verdict": "完全支持", "card_quote": "這樣做把非結構化的思維鏈轉成「半結構化」的資料，後續可以用正規表達式（Regex）輕鬆提取資訊", "note": "c6、c7。"},
+      {"text": "一個詞拆成好幾個 Token 時，把機率相乘", "verdict": "完全支持", "card_quote": "也就是將所有組成 Token 的機率相乘", "note": "c10。"}
+    ], "errors": []},
+    {"block": "第 6 張", "atoms": [
+      {"text": "兩條路徑答案不同，整句平均卻差不多（0.91 vs 0.86，關鍵字 0.62 vs 0.38；舉例）", "verdict": "部分支持", "card_quote": "這導致我們很難區分一條「邏輯正確的路徑」和一條「廢話連篇但文法通順的路徑」。", "note": "放行項 2，重算正確、圖註標明舉例；但圖上兩條路徑只差答案、填充詞相同，示範的是稀釋，並沒有畫出卡上對比的「廢話連篇但文法通順」路徑。"},
+      {"text": "結果是很難分出邏輯正確的路徑和廢話連篇、但文法通順的路徑", "verdict": "完全支持", "card_quote": "結果是很難區分一條「邏輯正確的路徑」和一條「廢話連篇但文法通順的路徑」", "note": "c4 部落格推論，語氣未加強。"},
+      {"text": "就像訊噪比：數值和專有名詞是訊號，連接詞和填充詞是雜訊；混在一起算平均，強大的雜訊會蓋過微弱但關鍵的訊號", "verdict": "完全支持", "card_quote": "在推理過程中，**數值**和**專有名詞**是真正的「訊號」，而連接詞和填充詞則是背景「雜訊」。如果我們把整段話混在一起算平均，強大的背景雜訊會掩蓋掉微弱但關鍵的訊號波動。", "note": "c5 部落格舉例，「就像」標明是比喻。"}
+    ], "errors": []},
+    {"block": "第 7 張", "atoms": [
+      {"text": "每一步寫出 Answer:，程式就能自動抓重點", "verdict": "完全支持", "card_quote": "為了後續能讓程式自動抓取重點，我們必須跟模型「約法三章」。", "note": "c6。"},
+      {"text": "CER 用 Prompt 要求模型每步結束照格式寫中間答案：數學題 Answer: [數值]、問答題 Response: [實體或短語]", "verdict": "完全支持", "card_quote": "為了讓程式能自動抓重點，CER 用 Prompt 要求模型在每一個推理步驟結束時依特定格式輸出中間答案：數學任務要求輸出「Answer: [數值]」，問答任務要求輸出「Response: [實體/短語]」", "note": "c6 主詞為 CER。"},
+      {"text": "思維鏈變成半結構化資料，用 Regex 就能輕鬆抓出來", "verdict": "完全支持", "card_quote": "後續可以用正規表達式（Regex）輕鬆提取資訊", "note": "c7。"},
+      {"text": "圖：Answer: 100／5／125 三步", "verdict": "完全支持", "card_quote": "例如在計算過程中出現的 \"100\", \"5\", \"125\"。", "note": "放行項 3，圖註標明假設。"}
+    ], "errors": []},
+    {"block": "第 8 張", "atoms": [
+      {"text": "Therefore、is 都不算，只剩 125 的機率", "verdict": "部分支持", "card_quote": "透過這個篩選機制，我們排除了 \"Therefore\", \"We calculate\", \"is equal to\" 這些高機率但無資訊量的詞彙", "note": "卡上是「is equal to」，主標簡化為「is」；另外例句「the answer is 125」沒有 Answer: 標籤，與 CER 依標籤抓取的機制略有落差，但不構成反向主張。"},
+      {"text": "關鍵字依任務而定：數學題看數值，問答題看人名、地名這類專有名詞", "verdict": "完全支持", "card_quote": "關鍵字依任務而定：數學任務關注數值（例如計算過程中出現的 \"100\"、\"5\"、\"125\"），開放域問答關注專有名詞（例如人名、地名或特定實體）", "note": "c8。"},
+      {"text": "排除「Therefore」「is equal to」這些高機率、無資訊量的詞，自信度只反映對推理結果的把握", "verdict": "完全支持", "card_quote": "確保我們的自信度分數純粹反映了模型對「推理結果」的把握。", "note": "c1、c9。"}
+    ], "errors": []},
+    {"block": "第 9 張", "atoms": [
+      {"text": "一個關鍵字可能由好幾個 Token 組成，CER 用聯合機率、把組成 Token 機率相乘", "verdict": "完全支持", "card_quote": "一個關鍵字可能由多個 Token 組成，CER 用聯合機率（Joint Probability）計算這個單詞的整體自信度，也就是把所有組成 Token 的機率相乘", "note": "c10。"},
+      {"text": "論文驗證後發現，這是最有效的算法", "verdict": "完全支持", "card_quote": "論文驗證後發現，最有效的方法是計算 **聯合機率 (Joint Probability)**", "note": "c10 原作者解讀，主詞為論文，符合。"},
+      {"text": "假設「125」拆成「12」「5」，0.9 × 0.8 ＝ 0.72", "verdict": "部分支持", "card_quote": "一個關鍵字 (例如 \"125\") 可能由多個 Token 組成 (例如 Token IDs `[1, 2, 5]`) 。", "note": "放行項 4，算式正確、已標假設；但同一個「125」在第 2、8 張是單一 Token、機率 0.41，第 9 張變成兩個 Token、自信度 0.72，跨張例子互相矛盾；拆法也與卡上舉的 [1, 2, 5] 不同（已標假設，不算違背）。"}
+    ], "errors": ["其他"]},
+    {"block": "第 10 張", "atoms": [
+      {"text": "不改模型，也能多擠出一點效能", "verdict": "完全支持", "card_quote": "是從現有模型中榨出更多效能的有效途徑", "note": "c12 部落格判斷，「多擠出一點」比卡弱。"},
+      {"text": "用 Prompt 規定寫出 Answer:/Response: 標籤，把自然語言變成半結構化資料，不改模型架構就提升可控性", "verdict": "完全支持", "card_quote": "透過 Prompt 強制模型輸出 Answer: 或 Response: 標籤，把非結構化的自然語言轉成半結構化的資料，這是在不改變模型架構下，提升系統可控性的關鍵技巧", "note": "c11。"},
+      {"text": "模型輸出的機率分佈比最後文字資訊多得多；只算關鍵 Token 機率是榨出更多效能的有效途徑", "verdict": "完全支持", "card_quote": "模型的原始輸出（Logits）包含比最終文字豐富得多的資訊，學會去雜存菁、只算關鍵 Token 的機率，是從現有模型中榨出更多效能的有效途徑", "note": "c12，未比卡強。"}
+    ], "errors": []},
+    {"block": "第 11 張", "atoms": [
+      {"text": "AI 整段說得很有把握，就代表它算對了嗎？", "verdict": "完全支持", "card_quote": "結果是很難區分一條「邏輯正確的路徑」和一條「廢話連篇但文法通順的路徑」", "note": "問句，對應 c4。"},
+      {"text": "CER 只算「Answer:」後的關鍵字", "verdict": "完全支持", "card_quote": "我們利用 Regex 抓取 Prompt 中定義好的標籤 (如 `Answer:` 或 `Response:`) ，並鎖定其後的內容作為「關鍵字」。", "note": "c1；Response: 在內文有出現。"},
+      {"text": "說得再順的廢話也不算分", "verdict": "完全支持", "card_quote": "透過這個篩選，排除了 \"Therefore\"、\"We calculate\"、\"is equal to\" 這些高機率但無資訊量的詞彙", "note": "c9；指無資訊量的詞不計入自信度。"}
+    ], "errors": []},
+    {"block": "第 12 張（系列地圖，第 2 則細節）", "atoms": [
+      {"text": "「首先」「所以答案是」這類詞機率很高，會蓋過關鍵數字；CER 規定每步寫出中間答案，只算答案那幾個字的機率", "verdict": "部分支持", "card_quote": "模型生成它們的機率通常非常高 (自信度高)", "note": "與第 3 張相同：拿掉了「通常」。"}
+    ], "errors": ["措辭與卡不同"]},
+    {"block": "Threads 正文", "atoms": [
+      {"text": "AI 整段說得很有把握，可能只是廢話說得順", "verdict": "完全支持", "card_quote": "這導致我們很難區分一條「邏輯正確的路徑」和一條「廢話連篇但文法通順的路徑」。", "note": "同封面。"},
+      {"text": "句子裡有大量 First, we need to calculate／Therefore, the answer is 這類詞，生成機率通常非常高；算整段平均會稀釋關鍵資訊，結果很難分出邏輯正確和廢話連篇但文法通順的推理", "verdict": "完全支持", "card_quote": "直接計算整條推理路徑的自信度會有很大的雜訊：思維鏈裡有大量功能性詞彙（如 \"First, we need to calculate...\"、\"Therefore, the answer is...\"），模型生成它們的機率通常非常高", "note": "c3、c4。"},
+      {"text": "CER（ACL 2025）", "verdict": "找不到", "card_quote": "", "note": "claims 裡沒有發表場合；只出現在卡 frontmatter 的 article_title，屬書目資訊，貼文未標明來源非 claims。"},
+      {"text": "用 Prompt 規定每一步結尾寫出「Answer: 數值」（問答題寫「Response: 人名或地名」）", "verdict": "部分支持", "card_quote": "**問答任務**: 要求輸出 `Response: [實體/短語]`。", "note": "卡上 Response 的格式是「實體/短語」，貼文寫成「人名或地名」，把 Prompt 格式窄化並改成 c8 關鍵字類別的例子（短語不一定是人名地名）。"},
+      {"text": "再用 Regex 把標籤後面的關鍵字抓出來，只算這幾個字的機率", "verdict": "完全支持", "card_quote": "用 Regex 抓出 Prompt 定義好的標籤（如 Answer: 或 Response:）後面的內容當關鍵字", "note": "c1。"},
+      {"text": "一個詞被拆成好幾個 Token 時，把機率相乘", "verdict": "完全支持", "card_quote": "也就是將所有組成 Token 的機率相乘", "note": "c10。"}
+    ], "errors": ["措辭與卡不同", "其他"]},
+    {"block": "Threads 最後一則", "atoms": [
+      {"text": "CER 只算每一步「Answer:」後面關鍵字的機率，說得再順的廢話也不算分", "verdict": "完全支持", "card_quote": "透過這個篩選機制，我們排除了 \"Therefore\", \"We calculate\", \"is equal to\" 這些高機率但無資訊量的詞彙", "note": "c1、c6、c9。"}
+    ], "errors": []},
+    {"block": "IG caption", "atoms": [
+      {"text": "算 AI 推理的自信度，為什麼不能整段平均？CER 只看關鍵字", "verdict": "部分支持", "card_quote": "直接計算整條推理路徑 (Whole-sequence) 的自信度會有很大的雜訊。", "note": "卡上是「會有很大的雜訊」（部落格推論），「不能」略強，但以問句呈現、內文有說明。"},
+      {"text": "・整句平均 0.89，關鍵的 125 只有 0.41", "verdict": "部分支持", "card_quote": "", "note": "這是撰寫者的假設例子，caption 摘要單獨列出、沒有標明是假設，讀者會讀成實測數字。"},
+      {"text": "其餘逐張摘要（兩條路徑整句平均差不多、每步寫 Answer:、只剩 125 機率、機率相乘、不改模型多擠效能）", "verdict": "完全支持", "card_quote": "結果是很難區分一條「邏輯正確的路徑」和一條「廢話連篇但文法通順的路徑」", "note": "對應各張主標，判定同各張。"}
+    ], "errors": ["其他"]}
+  ],
+  "recalculations": [
+    {"block": "第 2 張／第 8 張", "expression": "(0.98+0.99+0.99+0.98+0.99+0.41)/6", "result": "0.89"},
+    {"block": "第 6 張 路徑 1", "expression": "(0.97+0.99+0.98+0.99+0.62)/5", "result": "0.91"},
+    {"block": "第 6 張 路徑 2", "expression": "(0.97+0.99+0.98+0.99+0.38)/5", "result": "0.862 → 0.86"},
+    {"block": "第 9 張", "expression": "0.9*0.8", "result": "0.72"}
+  ],
+  "gaps": []
+}

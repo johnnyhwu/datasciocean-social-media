@@ -34,7 +34,7 @@ CONTENT = {"text", "table", "chart_bars", "chart_sounding", "diagram"}
 CONTENT_KEYS = {"title", "body", "label", "question", "rows", "bars", "note", "nav", "legend",
                 "nodes", "outcomes", "loop", "columns", "heads", "pairs", "count", "points", "ref", "ranges", "group", "start", "end",
                 "items", "steps", "cells", "on", "total", "labels", "ops", "branches", "fork"}   # on：點陣裡實心的點數；total：stack 的總次數；labels：ring 每條邊的標籤；ops：equation 的運算符號（都會經 diagrams.texts() 輸出）；branches：封面岔路的標籤（slide_lines 輸出）
-LAYOUT_KEYS = {"layout", "refs", "quals", "fig_refs", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols", "more", "edges", "hot", "fade", "chain", "hops", "pick"}   # pick：dist 只取最高或期望值； cols：點陣每列幾個點；hops：leak 第一條的跳數（版面參數，不含文字）
+LAYOUT_KEYS = {"layout", "refs", "quals", "fig_refs", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols", "more", "edges", "hot", "fade", "chain", "hops", "pick", "mode", "show_values"}   # mode／show_values：chips 畫哪幾欄、要不要寫數字（數字經 diagrams.texts() 輸出）；pick：dist 只取最高或期望值； cols：點陣每列幾個點；hops：leak 第一條的跳數（版面參數，不含文字）
 
 
 def check_fields(d: dict) -> None:

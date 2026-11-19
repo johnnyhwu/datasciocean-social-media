@@ -1,0 +1,92 @@
+{
+  "post": "cer-process-confidence-weighted-voting",
+  "blocks": [
+    {"block": "slide01", "atoms": [
+      {"text": "多數決（Self-Consistency）每一票一樣重", "verdict": "完全支持", "card_quote": "它假設每一條推理路徑的權重都是平等的", "note": "c1 原文"},
+      {"text": "CER 是 ACL 2025 的論文", "verdict": "完全支持", "card_quote": "這篇論文已被 **ACL 2025 Main Conference** 接收", "note": "c2"},
+      {"text": "CER 改成看每一票有多大信心", "verdict": "完全支持", "card_quote": "計算支持該答案的所有路徑的**自信度總和**", "note": "c1/c12"},
+      {"text": "檢查推理的每一步", "verdict": "完全支持", "card_quote": "必須檢查過程中的每一個轉折點", "note": "c7"},
+      {"text": "不用重新訓練", "verdict": "完全支持", "card_quote": "這是一個完全 **無需訓練 (Training-free)** 的框架", "note": "c1"},
+      {"text": "主標：猶豫的那幾票也算數？（問句 hook）", "verdict": "完全支持", "card_quote": "情境 B**: 模型在推導過程中充滿猶豫 (低機率) ，最後剛好湊出一個答案", "note": "問句未斷言事實；c1 限定條件在第 10 張出現"}],
+     "errors": []},
+    {"block": "slide02", "atoms": [
+      {"text": "對同一題推好幾遍、選出現最多次的答案，是提升推理最主流的做法", "verdict": "完全支持", "card_quote": "目前提升推理能力最主流的方法是 **Self-Consistency (SC)**", "note": "c3 背景說明"},
+      {"text": "它只數票，假設每一條推理都平等", "verdict": "完全支持", "card_quote": "隱含了一個危險的假設: **每一條生成的路徑都是「平等」的。**", "note": "c4"},
+      {"text": "CER 把每一票的信心加起來", "verdict": "完全支持", "card_quote": "計算支持該答案的所有路徑的**自信度總和**", "note": "c12"},
+      {"text": "A 3 票、B 2 票，B 勝出的例子", "verdict": "完全支持", "card_quote": "", "note": "放行的假設例，圖註標明舉例；與第 9 張 1.05 vs 1.7 一致"}],
+     "errors": []},
+    {"block": "slide03", "atoms": [
+      {"text": "CER 是被 ACL 2025 主會議接收的論文", "verdict": "完全支持", "card_quote": "這篇論文已被 **ACL 2025 Main Conference** 接收", "note": "c2"},
+      {"text": "不用另外訓練打分數的模型、不微調 LLM，只靠 Prompt 與 Logits", "verdict": "完全支持", "card_quote": "它不需要訓練額外的獎勵模型 (Reward Model) ，也不需要微調 LLM。它僅僅透過精心設計的 Prompt 配合模型輸出的 Logits (機率分佈)", "note": "c2"},
+      {"text": "多數決：生成 K 條推理路徑，選出現最多次的答案", "verdict": "完全支持", "card_quote": "讓模型對同一個問題生成 \\(K\\) 條不同的推理路徑 (Reasoning Paths) ，然後統計出現次數最多的答案作為最終結果", "note": "c3"},
+      {"text": "信心從模型輸出的機率算出來", "verdict": "完全支持", "card_quote": "配合模型輸出的 Logits (機率分佈)", "note": "名詞白話定義，未加新用途"}],
+     "errors": []},
+    {"block": "slide04", "atoms": [
+      {"text": "猶豫的一票和篤定的一票一樣重", "verdict": "完全支持", "card_quote": "在 SC 的機制下，情境 A 和情境 B 的這一票權重是一樣的。", "note": "c4"},
+      {"text": "錯誤又常出在中間", "verdict": "完全支持", "card_quote": "**錯誤往往發生在中間。**", "note": "c6，往往→常，等強"},
+      {"text": "每一步交出中間答案，加權成路徑分數，再加總投票", "verdict": "完全支持", "card_quote": "我們要求模型在每一個推理步驟結束時，必須依照特定的格式輸出中間答案。", "note": "c8/c9/c12"},
+      {"text": "和只看最後一步的版本比", "verdict": "完全支持", "card_quote": "作者設計了一個對照組 **CER-LAST**，即忽略中間過程，只計算「最後一個答案」的自信度。", "note": "c14"}],
+     "errors": []},
+    {"block": "slide05", "atoms": [
+      {"text": "現有不少方法傾向只看最後答案的信心，但錯誤往往發生在中間", "verdict": "完全支持", "card_quote": "現有的許多方法傾向於只評估**最終生成答案**的自信度。這忽略了一個核心事實: **錯誤往往發生在中間。**", "note": "c6"},
+      {"text": "五步數學題第二步算錯，後面再完美、再有自信，最終答案也是錯", "verdict": "完全支持", "card_quote": "一個數學題可能需要五個步驟，如果第二步算錯了，即便後面三步的推導邏輯再完美、模型再有自信，最終答案也是錯的。", "note": "c6"},
+      {"text": "論文認為中間某一步猶豫（機率低），路徑權重就該大幅降低", "verdict": "完全支持", "card_quote": "如果模型在中間某一步驟表現出猶豫 (高熵值、低機率) ，這就是一個強烈的警訊，暗示這條路徑的權重應該被大幅降低。", "note": "c7，主詞為論文"}],
+     "errors": []},
+    {"block": "slide07", "atoms": [
+      {"text": "CER 記下每個中間答案的信心", "verdict": "完全支持", "card_quote": "\\(c_{a_j}\\) 是第 \\(j\\) 步關鍵答案的自信度", "note": "c9"},
+      {"text": "第 j 步算 j 次，加總除以次數（線性加權平均）", "verdict": "完全支持", "card_quote": "$$ C_{path} = \\frac{\\sum_{j=1}^{n} j \\cdot c_{a_j}}{\\sum_{j=1}^{n} j} $$", "note": "白話說法等價"},
+      {"text": "越後面的步驟算越多次", "verdict": "完全支持", "card_quote": "**越靠近最終答案的步驟，權重越重。**", "note": "c9"},
+      {"text": "0.9、0.6、0.8 → 0.75", "verdict": "完全支持", "card_quote": "", "note": "放行假設例，標明舉例；重算 4.5/6=0.75"}],
+     "errors": []},
+    {"block": "slide08", "atoms": [
+      {"text": "0.9、0.8、0.6 → 0.72，從 0.75 掉到 0.72", "verdict": "完全支持", "card_quote": "", "note": "放行假設例；4.3/6=0.7167≈0.72"},
+      {"text": "推理會累積：第一步通常只是理解題目、比較簡單，最後一步往往依賴前面所有步驟的正確性", "verdict": "完全支持", "card_quote": "因為推理是累積的。Step 1 通常只是理解題目，較為簡單；而最後的 Step \\(N\\) 往往依賴於前面所有步驟的正確性。", "note": "c10 部落格推論，以作者口吻寫、未用驗證語氣"}],
+     "errors": []},
+    {"block": "slide09", "atoms": [
+      {"text": "多數決只數每個答案出現幾次", "verdict": "完全支持", "card_quote": "單純計算每個答案出現了幾次 (Count Voting) 。", "note": "c12"},
+      {"text": "CER 把支持同一答案的路徑分數加總，選總分最高", "verdict": "完全支持", "card_quote": "我們最終選取得分 \\(Score(Answer)\\) 最高的那個答案。", "note": "c12"},
+      {"text": "猶豫路徑對總分貢獻很小；每一步有信心的路徑影響很大", "verdict": "完全支持", "card_quote": "中間過程猶豫不決 (自信度低) ，它對總分的貢獻就會很小；反之，一條邏輯清晰、每一步都很有把握的路徑，將會對最終決策產生決定性的影響。", "note": "c13，影響很大比決定性弱"},
+      {"text": "A：0.4+0.3+0.35=1.05；B：0.9+0.8=1.7", "verdict": "完全支持", "card_quote": "", "note": "放行假設例，標明舉例，重算一致"}],
+     "errors": []},
+    {"block": "slide10", "atoms": [
+      {"text": "對照組 CER-LAST 忽略中間過程，只算最後一個答案的信心", "verdict": "完全支持", "card_quote": "作者設計了一個對照組 **CER-LAST**，即忽略中間過程，只計算「最後一個答案」的自信度。", "note": "c14"},
+      {"text": "在這組對照結果裡，CER 在所有情況下都顯著勝過它（主標：次次落後）", "verdict": "完全支持", "card_quote": "**CER (Blue Bar) 在所有情況下都顯著優於 CER-LAST (Red Bar)**", "note": "範圍限定在這組對照，比較對象明確"},
+      {"text": "論文的核心貢獻是證明過程信心比只看最後答案更有參考價值", "verdict": "完全支持", "card_quote": "其核心貢獻在於證明了 **「推理過程中的自信度 (Process Confidence) 」比單純看「最終答案的自信度」更具參考價值**。", "note": "c1"},
+      {"text": "CER 在純知識檢索題目上有侷限", "verdict": "完全支持", "card_quote": "實驗也顯示了它在純知識檢索任務上的局限性", "note": "c1 限定條件已帶出"}],
+     "errors": []},
+    {"block": "slide11", "atoms": [
+      {"text": "每一票依信心加權", "verdict": "完全支持", "card_quote": "計算支持該答案的所有路徑的**自信度總和**", "note": "c12"},
+      {"text": "信心看的是每一步", "verdict": "完全支持", "card_quote": "必須檢查過程中的每一個轉折點", "note": "c7"},
+      {"text": "不用重新訓練", "verdict": "完全支持", "card_quote": "這是一個完全 **無需訓練 (Training-free)** 的框架", "note": "c1"}],
+     "errors": []},
+    {"block": "slide12", "atoms": [
+      {"text": "系列地圖標題與細節", "verdict": "完全支持", "card_quote": "", "note": "結構元素，不需對證"}],
+     "errors": []},
+    {"block": "threads.body", "atoms": [
+      {"text": "Self-Consistency 是提升推理最主流的做法，選出現最多次的答案", "verdict": "完全支持", "card_quote": "目前提升推理能力最主流的方法是 **Self-Consistency (SC)**", "note": "c3"},
+      {"text": "它假設每一條推理都平等；假設的例子：嚴謹有信心與猶豫湊出的推理都只算一票", "verdict": "完全支持", "card_quote": "在 SC 的機制下，情境 A 和情境 B 的這一票權重是一樣的。", "note": "c4 部落格舉例，已標「假設的例子」"},
+      {"text": "要求 AI 每一步寫出中間答案", "verdict": "完全支持", "card_quote": "我們要求模型在每一個推理步驟結束時，必須依照特定的格式輸出中間答案。", "note": "c8"},
+      {"text": "各步信心加權成分數（越後面算越多次），再加總選最高", "verdict": "完全支持", "card_quote": "**越靠近最終答案的步驟，權重越重。**", "note": "c9/c12"},
+      {"text": "不用訓練，只靠 Prompt 和模型輸出的機率", "verdict": "完全支持", "card_quote": "它僅僅透過精心設計的 Prompt 配合模型輸出的 Logits (機率分佈)", "note": "c2/c1"},
+      {"text": "在這組對照結果裡，CER 在所有情況下都顯著勝過只看最後一步的對照組", "verdict": "完全支持", "card_quote": "**CER (Blue Bar) 在所有情況下都顯著優於 CER-LAST (Red Bar)**", "note": "c14"},
+      {"text": "CER 在純知識檢索的題目上有侷限", "verdict": "完全支持", "card_quote": "實驗也顯示了它在純知識檢索任務上的局限性", "note": "c1 限定條件"}],
+     "errors": []},
+    {"block": "threads.last", "atoms": [
+      {"text": "CER 不只數票，把每一條推理的信心加起來，看的是每一步", "verdict": "完全支持", "card_quote": "計算支持該答案的所有路徑的**自信度總和**", "note": "c1/c12；文章與同系列為結構"}],
+     "errors": []},
+    {"block": "hook", "atoms": [
+      {"text": "AI 多想幾次再多數決，猶豫的那幾票也算數？", "verdict": "完全支持", "card_quote": "它假設每一條推理路徑的權重都是平等的，忽略了模型在生成過程中的「猶豫」或「自信」。", "note": "問句，未比內文說得滿"}],
+     "errors": []},
+    {"block": "caption", "atoms": [
+      {"text": "Self-Consistency 多數決只數票", "verdict": "完全支持", "card_quote": "單純計算每個答案出現了幾次 (Count Voting) 。", "note": "c12"},
+      {"text": "各列為投影片主標重述（錯在第 2 步、每步交中間答案、越後面算越多次、0.72、3 票輸 2 票、對照裡次次落後）", "verdict": "完全支持", "card_quote": "**CER (Blue Bar) 在所有情況下都顯著優於 CER-LAST (Red Bar)**", "note": "與已審投影片一致；限定條件在內文"}],
+     "errors": []}
+  ],
+  "recalculations": [
+    {"block": "slide07", "expression": "(0.9+0.6*2+0.8*3)/6", "result": "0.75"},
+    {"block": "slide08", "expression": "(0.9+0.8*2+0.6*3)/6", "result": "0.7167 ≈ 0.72"},
+    {"block": "slide09", "expression": "0.4+0.3+0.35 ; 0.9+0.8", "result": "1.05 ; 1.7（B 勝，與第 2 張一致）"},
+    {"block": "slide06", "expression": "6*3=18, +2=20, -4=16；路徑2 18-4=14, +2=16；路徑3 6*4=24, +2=26, -4=22（故意算錯）", "result": "一致"}
+  ],
+  "gaps": []
+}

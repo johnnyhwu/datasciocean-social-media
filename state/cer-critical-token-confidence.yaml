@@ -1,0 +1,9 @@
+concept: cer-critical-token-confidence
+formats:
+  ig_carousel:
+    status: ready
+    pack: out/cer/cer-critical-token-confidence
+  threads_thread:
+    status: ready
+    pack: out/cer/cer-critical-token-confidence
+posts: []

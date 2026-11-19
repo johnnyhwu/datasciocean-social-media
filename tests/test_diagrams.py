@@ -610,6 +610,60 @@ expect("variants 的結論會進 texts()", "無效" in tx and "對照組" in tx,
 tx = _D.texts(D("scan", **PR["scan"]))
 expect("scan 的格數與金格序號會進 texts()", "50" in tx and "25" in tx, str(tx))
 
+# CER（2026-11-15）：chips、midfail、tagged、weights、watch、tokprob、extract、sieve、lens
+ROW = lambda ans, pk: [{"text": "Therefore", "p": 0.98, "tone": "fill"}, {"text": "the", "p": 0.99, "tone": "fill"}, {"text": "is", "p": 0.99, "tone": "fill"}, {"text": ans, "p": pk, "tone": "key"}]
+CER = {"chips": dict(nodes=[{"text": "答案 A", "chips": [0.4, 0.3, 0.35]}, {"text": "答案 B", "chips": [0.9, 0.8]}], mode="both", heads=["多數決", "CER"]),
+       "chips_values": dict(nodes=[{"text": "答案 A", "chips": [0.4, 0.3, 0.35]}, {"text": "答案 B", "chips": [0.9, 0.8]}], mode="weight", heads=["把握加總"], show_values=True),
+       "midfail": dict(nodes=[{"text": "第一步"}, {"text": "第二步", "bad": True}, {"text": "第三步"}], heads=["從這裡錯", "答案"], outcomes=[{"text": "錯的答案"}, {"text": "後面照錯的算"}]),
+       "tagged": dict(heads=["每一步交出中間答案", "Answer"], nodes=[{"text": "路徑 1", "answers": ["18", "20", "16"]}, {"text": "路徑 2", "answers": ["18", "22", "18"]}]),
+       "weights": dict(nodes=[{"text": "第一步", "c": 0.9}, {"text": "第二步", "c": 0.6}, {"text": "第三步", "c": 0.8}], heads=["自信度", "算幾次", "路徑分數"]),
+       "watch": dict(nodes=[{"text": "CER", "counted": [True, True, True], "best": True}, {"text": "CER-LAST", "counted": [False, False, True]}],
+                     outcomes=[{"text": "較好"}, {"text": "較差"}], heads=["算進去", "沒算"]),
+       "tokprob": dict(steps=[{"cells": ROW("125", 0.41)}], mode="all", heads=["整句平均", "只算關鍵字"]),
+       "tokprob_two": dict(steps=[{"label": "路徑 1", "cells": ROW("125", 0.41)}, {"label": "路徑 2", "cells": ROW("120", 0.15)}], mode="key", heads=["整句平均", "只算關鍵字"]),
+       "extract": dict(nodes=[{"text": "第一步", "tag": "Answer: 100", "sub": "100"}, {"text": "第二步", "tag": "Answer: 5", "sub": "5"}], heads=["一條推理路徑", "Regex", "抓出的答案"]),
+       "sieve": dict(nodes=[{"text": "數學題", "paths": [{"text": "16"}, {"text": "21", "low": True}, {"text": "16"}], "ok": True},
+                            {"text": "知識題", "sub": "每一條都錯", "paths": [{"text": "1907"}, {"text": "1912"}, {"text": "1898"}]}],
+                     outcomes=[{"text": "選出 16"}, {"text": "還是答錯"}], heads=["看把握", "沒把握"]),
+       "lens": dict(nodes=[{"text": "第一步", "p": 0.9}, {"text": "第二步", "p": 0.35}, {"text": "答案", "p": 0.95}], heads=["看每一步", "只看最後一步"],
+                    outcomes=[{"text": "看得到猶豫"}, {"text": "很有把握"}])}
+for k_, kw_ in CER.items():
+    kind = k_.split("_")[0]
+    code, out = render(D(kind, **kw_))
+    expect(f"正確的 {k_} 通過程式 B", code == 0, out)
+    code, out = render(D(kind, **{**kw_, "body": "很長的補充" * 40}))
+    expect(f"故意做壞：{k_} 的補充太長放不下 → 抓得到", code != 0, out)
+code, out = render(D("midfail", **{**CER["midfail"], "nodes": [{"text": "一"}, {"text": "二"}, {"text": "三"}]}))
+expect("故意做壞：midfail 沒有壞步驟 → 報錯", code != 0 and "midfail" in out, out)
+code, out = render(D("weights", **{**CER["weights"], "heads": ["每一步的把握程度", "算幾次", "路徑分數"]}))
+expect("故意做壞：weights 左欄標籤太長 → 報錯", code != 0 and "weights" in out, out)
+code, out = render(D("watch", **{**CER["watch"], "nodes": [{**n, "best": True} for n in CER["watch"]["nodes"]]}))
+expect("故意做壞：watch 兩列都是 best → 報錯", code != 0 and "watch" in out, out)
+code, out = render(D("tokprob", **{**CER["tokprob"], "steps": [{"cells": [{**c_, "tone": "fill"} for c_ in ROW("125", 0.41)]}]}))
+expect("故意做壞：tokprob 沒有關鍵字 → 報錯", code != 0 and "tokprob" in out, out)
+code, out = render(D("tokprob", **{**CER["tokprob"], "steps": [{"cells": ROW("125", 1.4)}]}))
+expect("故意做壞：tokprob 機率大於 1 → 報錯", code != 0 and "tokprob" in out, out)
+code, out = render(D("extract", **{**CER["extract"], "nodes": [{"text": "第一步", "tag": "Answer: 1"}]}))
+expect("故意做壞：extract 只有一步、沒有 sub → 報錯", code != 0 and "extract" in out, out)
+code, out = render(D("sieve", **{**CER["sieve"], "nodes": [{**n, "ok": True} for n in CER["sieve"]["nodes"]]}))
+expect("故意做壞：sieve 兩列都 ok → 報錯", code != 0 and "sieve" in out, out)
+code, out = render(D("sieve", **{**CER["sieve"], "nodes": [CER["sieve"]["nodes"][0], {"text": "知識題", "paths": [{"text": "1907"}]}]}))
+expect("故意做壞：sieve 一列只有一條路徑 → 報錯", code != 0 and "sieve" in out, out)
+code, out = render(D("lens", **{**CER["lens"], "nodes": [{"text": "一", "p": 0.9}, {"text": "二", "p": 0}]}))
+expect("故意做壞：lens 只有兩步、p 是 0 → 報錯", code != 0 and "lens" in out, out)
+tx = _D.texts(D("chips", **CER["chips_values"]))
+expect("chips 的自信度與合計會進 texts()", "合計 1.05" in tx and "合計 1.7" in tx, str(tx))
+tx = _D.texts(D("weights", **CER["weights"]))
+expect("weights 的算式與路徑分數會進 texts()（程式算 0.75）", any("÷ 6" in t for t in tx) and "路徑分數 0.75" in tx, str(tx))
+tx = _D.texts(D("tokprob", **CER["tokprob"]))
+expect("tokprob 一列：每個機率、整句平均與虛線旁的「平均」會進 texts()", "0.41" in tx and "整句平均 0.84" in tx and "平均 0.84" in tx, str(tx))
+tx = _D.texts(D("tokprob", **CER["tokprob_two"]))
+expect("tokprob 只算關鍵字：平均就是關鍵字機率", "只算關鍵字 0.41" in tx and "只算關鍵字 0.15" in tx, str(tx))
+tx = _D.texts(D("sieve", **CER["sieve"]))
+expect("sieve 每條路徑的答案會進 texts()", "21" in tx and "1898" in tx and "沒把握" in tx, str(tx))
+tx = _D.texts(D("lens", **CER["lens"]))
+expect("lens 的自信度與括號標籤（和圖上一字不差）會進 texts()", "0.35" in tx and "看每一步：看得到猶豫" in tx and "只看最後一步：很有把握" in tx, str(tx))
+
 # 矮格子共用的 cell()：一定用 28px 粗體（dl），字框才不會高過格子讓程式 B 的對比取樣取到邊線
 import html
 cv = DG.Canvas(DG.Ctx(lambda s, n: 1, lambda s: s, html.escape))

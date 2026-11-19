@@ -16,3 +16,4 @@ replace:
   精準率: Precision
   嵌入向量: embedding    # 同上：embedding 不翻譯
   向量嵌入: embedding
+  把握: 信心            # CER 系列（2026-11-17 人的回饋）：講模型對答案有多確定，一律寫「信心」，不寫「把握」；卡上的「自信度」在貼文也寫「信心」
