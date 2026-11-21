@@ -1,0 +1,19 @@
+{"post": "ragu-results-peeling-confounds",
+ "blocks": [{"block": "第 8 張",
+  "atoms": [
+   {"text": "主標：越難越強？主要是對手往下掉", "verdict": "完全支持", "card_quote": "所謂 cross-over，主要不是 RAGU 變強，而是 HippoRAG 2 從 72.4 掉到 56.9，跌了 15.5 pp。", "note": "「越難越強」是 c13 論文的敘事（論文說…是「越難越強」的證據），以問句提出再由 c14 拆解；第 8 張與第 4 張都沒寫明「越難越強」是論文的說法，見 errors（minor）。"},
+   {"text": "RAGU 沒有一路掉分", "verdict": "完全支持", "card_quote": "但看 RAGU 自己那一欄：54.2 → 53.7 → 64.1 → 59.0", "note": "由卡上數列直接讀出（非單調下降），弱於卡上「RAGU 的表現對任務難度不敏感」，未放大。"},
+   {"text": "HippoRAG 2 從 72.4% 掉到 56.9%", "verdict": "完全支持", "card_quote": "HippoRAG 2 從 72.4 掉到 56.9，跌了 15.5 pp", "note": ""},
+   {"text": "最難那級只差 2.1%，在 AI 裁判的雜訊範圍內", "verdict": "完全支持", "card_quote": "何況最後那格贏的是 59.0 對 56.9，2.1 pp，落在 LLM-judge 的雜訊範圍內。", "note": "c1#2 限定條件在此帶出；圖上 RAGU 59 > HippoRAG 2 56.9，方向清楚。"},
+   {"text": "圖表四級 AC：Fact Retrieval 72.4/54.2、Complex Reasoning 68.4/53.7、Contextual Summarize 65/64.1、Creative Generation 56.9/59（HippoRAG 2/RAGU）", "verdict": "完全支持", "card_quote": "Fact Retrieval | 26.2 | 72.4 | 54.2 … Complex Reasoning | 20.2 | 68.4 | 53.7 … Contextual Summarize | 22.6 | 65.0 | 64.1 … Creative Generation | 14.4 | 56.9 | 59.0", "note": "單位 %、軸從 0、比較對象 HippoRAG 2 皆在圖上。"},
+   {"text": "第 4 級為最難", "verdict": "完全支持", "card_quote": "在 GraphRAG-Bench Medical 最難的 Creative Generation 層級", "note": ""},
+   {"text": "圖註：答對率（AC）；都用 RAGU 附帶的抽取模型建圖", "verdict": "完全支持", "card_quote": "cross-over 是在 GraphRAG-Bench Medical 的四個難度層級上比的 AC，都用 Meno-Lite-0.1（RAGU 附帶的抽取模型）建圖", "note": "第 8 張未寫 GraphRAG-Bench Medical，但第 4 張已交代「分四級難度的醫療題庫 GraphRAG-Bench Medical」，限定條件在貼文中出現。"}
+  ],
+  "errors": [
+   {"type": "錨點寫法不符", "severity": "minor", "detail": "「越難越強」在卡上是原作者解讀（c13：論文說 gap 從 −18.2 單調收斂到 +2.1，是「越難越強」的證據），第 8 張以問句呈現、未標明是論文的說法；因為是問句且立即被拆解，沒有斷言錯誤事實，非 blocker。"}
+  ]}],
+ "recalculations": [
+  {"expr": "72.4 - 56.9", "result": 15.5, "matches_card": true},
+  {"expr": "59.0 - 56.9", "result": 2.1, "matches_post": "2.1%", "matches_card": true}
+ ],
+ "gaps": []}

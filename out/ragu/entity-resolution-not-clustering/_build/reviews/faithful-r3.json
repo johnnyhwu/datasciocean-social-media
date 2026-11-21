@@ -1,0 +1,72 @@
+{"post": "entity-resolution-not-clustering",
+ "blocks": [
+  {"block": "第 1 張", "atoms": [
+    {"text": "同一個東西的不同寫法，合起來其實不是分群", "verdict": "完全支持", "card_quote": "去重（entity resolution）跟分群（clustering）其實是兩種性質不同的任務", "note": "「同一個東西的不同寫法合起來」是去重的白話（放行項）"},
+    {"text": "去重有標準答案，分群沒有", "verdict": "完全支持", "card_quote": "分群沒有標準答案，分 3 群或 5 群都可能對，取決於用途，本質是無監督的結構發現；去重有標準答案", "note": ""},
+    {"text": "DBSCAN 的半徑一放寬，名字很像的父子就可能被併成同一個人", "verdict": "完全支持", "card_quote": "兩人的名字字串高度相似、描述也都跟貝爾實驗室有關，eps 稍微放寬，父子就被合併成同一個節點", "note": "封面可沒說完整；「描述都跟貝爾實驗室有關」與 c14 限定條件在第 9 張與 Threads 出現；「可能」比卡保守"}
+  ], "errors": []},
+  {"block": "第 2 張", "atoms": [
+    {"text": "去重的群多半只有 1 到 5 筆", "verdict": "完全支持", "card_quote": "去重是 k ≈ n（10 萬個 mention 可能有 7 萬個實體）、群極小，多半 1～5", "note": "部落格判斷，以作者口吻寫可"},
+    {"text": "提及／實體／去重的定義", "verdict": "完全支持", "card_quote": "同一個真實世界的實體，在不同 chunk 裡會各自產生獨立的 mention", "note": "放行項：c3 的白話定義"},
+    {"text": "分群是少數大群，去重的群又小又多", "verdict": "完全支持", "card_quote": "所有幾何式分群演算法的設計前提都是「少數幾個大群」…而去重的真實結構是「幾萬個大小 1 到 3 的微群」", "note": ""},
+    {"text": "圖：群少、每群很大｜例：1000 個客戶分 5 群", "verdict": "完全支持", "card_quote": "分群是 k << n（1000 個客戶分 5 群）、群大，幾十到幾千", "note": ""},
+    {"text": "圖：群多、每群多半 1 到 5 筆｜例：10 萬筆提及，7 萬個實體", "verdict": "完全支持", "card_quote": "去重是 k ≈ n（10 萬個 mention 可能有 7 萬個實體）、群極小，多半 1～5", "note": "卡上「可能有」在圖上略去，但已標「例」，屬示範數字，不算數字對不上"},
+    {"text": "圖：分群：少數幾個大群｜去重：滿滿的小群", "verdict": "完全支持", "card_quote": "設計前提都是「少數幾個大群」…去重的真實結構是「幾萬個大小 1 到 3 的微群」", "note": "點數為示意，圖註已標"}
+  ], "errors": []},
+  {"block": "第 4 張", "atoms": [
+    {"text": "RAGU 是一套 GraphRAG，先請 LLM 把文件裡的實體和關係抽出來建成知識圖", "verdict": "完全支持", "card_quote": "RAGU 是 ITMO University 團隊的 GraphRAG 引擎（先請 LLM 把文件裡的實體跟關係抽出來建成知識圖）", "note": ""},
+    {"text": "論文說它用 DBSCAN 去重", "verdict": "完全支持", "card_quote": "abstract 稱之為 DBSCAN-backed deduplication", "note": "c2 限定條件（論文前後不一、只能翻原始碼）在第 9 張圖註與 Threads 出現"},
+    {"text": "提及：例：9 段文字抽出 9 筆，直接建圖是 9 個點，其實只有 3 個實體", "verdict": "完全支持", "card_quote": "blog 的例子是 9 個 chunk 產生的 9 筆 mention，直接建圖會得到 9 個節點，正確答案是 3 個", "note": "部落格舉例，已標「例」"},
+    {"text": "去重：把指同一個實體的提及合成一個點，例如 Bell Labs 和 Bell Laboratories", "verdict": "完全支持", "card_quote": "去重有標準答案（Bell Labs 跟 Bell Laboratories 就是同一個）", "note": ""},
+    {"text": "DBSCAN：半徑 eps 內有夠多鄰居的點，就和鄰居連成一群", "verdict": "完全支持", "card_quote": "DBSCAN 的規則是：在半徑 eps 內至少有 min_samples 個鄰居的點算核心點，核心點跟鄰居連成一群", "note": "「夠多」是 min_samples 的白話；noise 省略不改意思"}
+  ], "errors": []},
+  {"block": "第 6 張", "atoms": [
+    {"text": "每一對只有是或否，去重有標準答案；去重是對每一對提及問「是同一個嗎？」", "verdict": "完全支持", "card_quote": "去重有標準答案（Bell Labs 跟 Bell Laboratories 就是同一個），本質是對每組 pair 做二元判斷：同一個？是／否", "note": ""},
+    {"text": "分群分 3 群或 5 群都可能對，看用途", "verdict": "完全支持", "card_quote": "分群沒有標準答案，分 3 群或 5 群都可能對，取決於用途", "note": ""},
+    {"text": "標準答案列（分群沒有／去重有，Bell Labs 與 Bell Laboratories）", "verdict": "完全支持", "card_quote": "有標準答案嗎 | 沒有。分 3 群或 5 群都可能對，取決於用途 | 有。\"Bell Labs\" 跟 \"Bell Laboratories\" 就是同一個", "note": ""},
+    {"text": "怎麼評列：分群只能間接看分得好不好；去重可以一對一對標註，直接算合對幾成、漏了幾成", "verdict": "完全支持", "card_quote": "分群只能用 silhouette 之類的代理指標評估…去重可標註 pair，直接算 precision / recall", "note": "放行項的白話"}
+  ], "errors": []},
+  {"block": "第 7 張", "atoms": [
+    {"text": "DBSCAN 用在去重，只剩門檻加連線", "verdict": "完全支持", "card_quote": "min_samples=2 的 DBSCAN，數學上等價於「相似度門檻加上 connected components（union-find）」", "note": "部落格推論，以作者口吻寫可"},
+    {"text": "一個實體可能只有 2 筆提及，所以鄰居數下限只能設成 2", "verdict": "完全支持", "card_quote": "一個實體可能只有 2 個 mention，所以 min_samples 必須設到 2", "note": ""},
+    {"text": "這樣它就等於「相似度超過門檻就連線，連成一串的算同一個」；只是多背了一個難調的 eps", "verdict": "完全支持", "card_quote": "在去重所需的參數設定下，DBSCAN 會自動塌陷成 union-find，只是多背了一個難調的 eps", "note": ""},
+    {"text": "圖：DBSCAN｜鄰居數下限只能設 2｜還要調半徑 eps｜連得到的點算同一群", "verdict": "完全支持", "card_quote": "核心點跟鄰居連成一群", "note": ""},
+    {"text": "圖：門檻＋連通塊｜相似度超過門檻就連線｜更好調、更好除錯｜連成一串的算同一個", "verdict": "完全支持", "card_quote": "「門檻加 union-find」能做到同樣的事，而且更好調、更好 debug", "note": ""}
+  ], "errors": []},
+  {"block": "第 9 張", "atoms": [
+    {"text": "合錯比漏合嚴重", "verdict": "完全支持", "card_quote": "誤合併遠比漏合併嚴重", "note": ""},
+    {"text": "父子可能被併成一個人；Dennis Ritchie 和父親 Alistair E. Ritchie 名字很像、描述都和貝爾實驗室有關；eps 稍微放寬，父子就被併成同一個點，後面沒有機制救得回來", "verdict": "完全支持", "card_quote": "Alistair E. Ritchie 是 Dennis Ritchie 的父親，兩人的名字字串高度相似、描述也都跟貝爾實驗室有關，eps 稍微放寬，父子就被合併成同一個節點，而且下游沒有任何機制救得回來", "note": ""},
+    {"text": "圖：漏合｜同一個人留成兩個點｜頂多資訊分散", "verdict": "完全支持", "card_quote": "漏了頂多資訊分散", "note": "「同一個人留成兩個點」是漏合的白話"},
+    {"text": "圖：合錯｜兩個人被併成一個點｜寫錯了事實｜很難察覺", "verdict": "完全支持", "card_quote": "合錯了是事實層面的錯誤而且很難察覺", "note": ""},
+    {"text": "圖註：DBSCAN 用在哪一層論文前後不一；若先依名字分組，連別名都合不了", "verdict": "完全支持", "card_quote": "abstract 說 DBSCAN 用於跨名字去重，方法段讀起來卻像是先用 (name, type) 分好組、再在同一組內部做 DBSCAN，後者根本無法合併別名", "note": "「依名字分組」省略了 type，屬簡化，不改意思；「只能翻原始碼」(c14#2, c2#2) 在 Threads 正文出現"}
+  ], "errors": []},
+  {"block": "第 11 張", "atoms": [
+    {"text": "DBSCAN 聽起來比較專業，但不是非它不可；選 DBSCAN 讓摘要好看，但技術上沒有非它不可的理由", "verdict": "完全支持", "card_quote": "blog 認為選 DBSCAN 讓 abstract 好看（DBSCAN-backed deduplication 聽起來就是比 threshold-based merging 學術），但技術上沒有非它不可的理由", "note": "「摘要」＝abstract；「專業」對應「學術」"},
+    {"text": "論文寫法：DBSCAN-backed deduplication 比 threshold-based merging 聽起來學術", "verdict": "完全支持", "card_quote": "DBSCAN-backed deduplication 聽起來就是比 threshold-based merging 學術", "note": ""},
+    {"text": "其實：門檻加連通塊就能做到同樣的事，更好調、更好除錯", "verdict": "完全支持", "card_quote": "「門檻加 union-find」能做到同樣的事，而且更好調、更好 debug", "note": ""},
+    {"text": "真想用 DBSCAN：先試它的改良版 HDBSCAN，把難調的 eps 拿掉了", "verdict": "完全支持", "card_quote": "想用 DBSCAN 的時候，先試 HDBSCAN；它是 DBSCAN 的階層式改良版，把 eps 這個參數拿掉…DBSCAN 最痛的兩點——eps 難調", "note": ""}
+  ], "errors": []},
+  {"block": "第 12 張", "atoms": [
+    {"text": "去重有標準答案", "verdict": "完全支持", "card_quote": "去重有標準答案", "note": ""},
+    {"text": "群又小又多", "verdict": "完全支持", "card_quote": "去重是 k ≈ n（10 萬個 mention 可能有 7 萬個實體）、群極小，多半 1～5", "note": ""},
+    {"text": "門檻加連線就做得到，而且更好調", "verdict": "完全支持", "card_quote": "「門檻加 union-find」能做到同樣的事，而且更好調、更好 debug", "note": ""}
+  ], "errors": []},
+  {"block": "Threads 正文", "atoms": [
+    {"text": "同一個東西的不同寫法合起來，其實不是分群", "verdict": "完全支持", "card_quote": "去重（entity resolution）跟分群（clustering）其實是兩種性質不同的任務", "note": ""},
+    {"text": "建知識圖時，同一個人會在不同段落各被抽出一次，每一次叫一筆「提及」", "verdict": "完全支持", "card_quote": "同一個真實世界的實體，在不同 chunk 裡會各自產生獨立的 mention", "note": "以「人」為例說實體，範圍沒有放大"},
+    {"text": "把指同一個東西的提及合成一個點叫去重，例如 Bell Labs 和 Bell Laboratories", "verdict": "完全支持", "card_quote": "去重有標準答案（Bell Labs 跟 Bell Laboratories 就是同一個）", "note": ""},
+    {"text": "RAGU 這套 GraphRAG 說它靠分群方法 DBSCAN 去重", "verdict": "完全支持", "card_quote": "abstract 稱之為 DBSCAN-backed deduplication", "note": ""},
+    {"text": "去重有標準答案，每一對只有「是同一個」或「不是」", "verdict": "完全支持", "card_quote": "本質是對每組 pair 做二元判斷：同一個？是／否", "note": ""},
+    {"text": "一個實體可能只有 2 筆提及，鄰居數下限只能設成 2，結果等於「夠像就連線、連成一串的算同一個」，只是多了一個難調的參數", "verdict": "完全支持", "card_quote": "一個實體可能只有 2 個 mention，所以 min_samples 必須設到 2；而 min_samples=2 的 DBSCAN，數學上等價於「相似度門檻加上 connected components（union-find）」…只是多背了一個難調的 eps", "note": ""},
+    {"text": "更要小心的是合錯：半徑稍微放寬，名字很像的 Dennis Ritchie 父子就可能被併成同一個人，而且後面救不回來", "verdict": "完全支持", "card_quote": "兩人的名字字串高度相似、描述也都跟貝爾實驗室有關，eps 稍微放寬，父子就被合併成同一個節點，而且下游沒有任何機制救得回來", "note": "「更要小心」對應 c10「誤合併遠比漏合併嚴重」"},
+    {"text": "DBSCAN 用在哪一層，論文前後說法不一，只能翻原始碼確認", "verdict": "完全支持", "card_quote": "論文敘述前後不一致：abstract 說 DBSCAN 用於跨名字去重，方法段讀起來卻像是先用 (name, type) 分好組、再在同一組內部做 DBSCAN…論文的文字本身無法判定，要確認只能翻原始碼", "note": "c14#1、c14#2 帶出"}
+  ], "errors": []},
+  {"block": "Threads 最後一則的第一句", "atoms": [
+    {"text": "去重有標準答案、群又小又多；門檻加連線就做得到，而且更好調", "verdict": "完全支持", "card_quote": "「門檻加 union-find」能做到同樣的事，而且更好調、更好 debug", "note": "「標準答案」見 c5「去重有標準答案」；「群又小又多」見 c6「群極小，多半 1～5」"}
+  ], "errors": []}
+ ],
+ "recalculations": [
+  {"block": "第 2 張", "expression": "70000/100000", "result": "0.7（實體數與提及數同量級，符合卡上 k ≈ n）"},
+  {"block": "第 4 張", "expression": "9 - 3", "result": "6（9 筆提及合成 3 個實體，與卡一致）"}
+ ],
+ "gaps": []}

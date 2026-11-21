@@ -1,0 +1,91 @@
+{
+  "post": "retrieval-recall-not-answer-quality",
+  "skim": {
+    "conclusion": "只看「該查的有沒有查到」這個分數，系統會越撈越多；RAGU 就是這樣，撈得多、綜合題涵蓋得多，但找事實題答對得少，因為多撈進來的段落會干擾 AI。調系統時要一起看撈進多少雜訊，最好直接看答案。",
+    "citations": [
+      {"quote": "AI 查到的資料更齊，答案卻可能更差"},
+      {"quote": "只看「該查的有沒有查到」，會把系統一路推向多撈；多撈進來的段落，可能讓 AI 挑錯答案"},
+      {"quote": "綜合題涵蓋得多，找事實題答對得少"},
+      {"quote": "從實體、關係到段落：RAGU 越撈越多"},
+      {"quote": "找事實時多撈是干擾，寫綜合答案時反而有用"},
+      {"quote": "只盯 Evidence Recall，系統會一路往多撈走；要一起看撈進多少雜訊，最好直接看答案。"}
+    ]
+  },
+  "core": {
+    "thesis": {
+      "answer": "Evidence Recall 只量「相關的撈到幾成」，不量撈進多少雜訊；只盯它會讓系統多撈，而多撈在找單一事實的題目上可能讓答案變差。",
+      "citations": [
+        {"quote": "Evidence Recall 只測該撈的撈到沒有，完全不測不該撈的有沒有撈進來。"},
+        {"quote": "只盯 Evidence Recall，系統會一路往多撈走；要一起看撈進多少雜訊，最好直接看答案。"}
+      ]
+    },
+    "mechanism": {
+      "answer": "RAGU 設計上從實體擴展到關係、再到原文段落，撈到的資訊更完整但濃度更低；多塞進意思相關但答案不同的材料（干擾項），或資料太長時中間被忽略，AI 就容易答錯。",
+      "citations": [
+        {"quote": "RAGU 撈到的不是更正確的資訊，是更完整、但濃度更低的資訊，而且這是設計造成的"},
+        {"quote": "多塞幾段意思相關、但答案不同的材料，AI 挑錯的機率就上升"},
+        {"quote": "資料很長時，AI 對開頭和結尾敏感，中間容易被忽略"}
+      ]
+    },
+    "evidence": {
+      "answer": "綜合題 RAGU 的 Coverage 57.4% 對 HippoRAG 2 的 34.7%；找事實題 RAGU 答對率 54.2% 對 72.4%。但雜訊比例（Precision / Context Relevancy）論文沒報數字，所以「多撈造成答錯」是推論、不是量出來的。",
+      "citations": [
+        {"quote": "Creative Generation 要廣泛的材料，RAGU 涵蓋的重點比 HippoRAG 2 多 22.7%；Fact Retrieval 要一個精確的事實，RAGU 的答對率卻是 54.2% 對 72.4%。"},
+        {"quote": "撈到的資料有幾成相關（Precision），這篇論文沒有量"},
+        {"quote": "方向是對的，但沒有任何數據支持"}
+      ]
+    }
+  },
+  "terms": [
+    {"term": "Evidence Recall", "blocks_core": false, "note": "第 2 張第一次出現就有「只算相關的撈到幾成」加甲乙算例，第 4 張再定義，懂。"},
+    {"term": "Precision", "blocks_core": false, "note": "第 2 張有「撈到的東西有幾成相關」，懂。"},
+    {"term": "GraphRAG", "blocks_core": false, "note": "每張頁首「GraphRAG 的天花板有多高」都有，第 4 張才說 RAGU 是一套 GraphRAG 並描述建知識圖、沿圖走；勉強算有說明，但 GraphRAG 這個類別本身（以及 RAG）在輪播裡從沒白話說是什麼，只在 Threads 有「替 AI 查資料的系統（RAG）」。不擋核心。"},
+    {"term": "知識圖", "blocks_core": false, "note": "第 4 張「把實體和關係抽出來建成知識圖」，大致能懂。"},
+    {"term": "Coverage", "blocks_core": false, "note": "出現在第 6 張圖上數字旁，第 4 張有定義「答案有沒有涵蓋所有該講的重點」，懂。"},
+    {"term": "答對率（AC）", "blocks_core": false, "note": "第 4 張有定義，懂。"},
+    {"term": "HippoRAG 2", "blocks_core": false, "note": "第 4 張「論文拿來和 RAGU 比的另一套系統」，夠用。"},
+    {"term": "Creative Generation / Fact Retrieval", "blocks_core": false, "note": "第 6 張圖上附（綜合題）（找事實），夠用。"},
+    {"term": "consolidation / LocalSearch", "blocks_core": false, "note": "第 7 張圖上有中文主句，英文是括號，不影響理解。"},
+    {"term": "Context Relevancy", "blocks_core": false, "note": "第 10 張圖上附「撈到的資料有多相關」，懂。"},
+    {"term": "誤差內", "blocks_core": false, "note": "第 9 張圖註「在誤差內」，輪播沒說誤差是什麼、多大，一般人不知道 2 個百分點為什麼算平手。"},
+    {"term": "抽取模型", "blocks_core": false, "note": "第 6 張圖註「RAGU 附帶的抽取模型建圖」，沒解釋，但只是圖註。"},
+    {"term": "剝掉混淆、答案格式", "blocks_core": false, "note": "第 3、12 張系列第 1 則摘要，看不懂指什麼，但不是這則核心。"},
+    {"term": "Leiden、模組度、7B、去重、連通塊", "blocks_core": false, "note": "第 12 張系列地圖其他則的摘要，沒定義，不影響這則。"}
+  ],
+  "post_only_questions": [
+    {"q": "貼文說的「實體」是什麼？", "answer": "文件裡提到的人、事、物。", "citations": [{"quote": "先請 LLM 把文件裡的實體（提到的人、事、物）和關係抽出來建成知識圖"}]},
+    {"q": "RAGU 查資料時，是怎麼一步步擴大撈的範圍？", "answer": "先把同一個實體的所有提及合起來（去重與摘要），查資料時從實體擴展到關係，再從關係擴展到原文段落。", "citations": [{"quote": "先把同一個實體的所有提及合起來"}, {"quote": "查資料時，從實體擴展到關係"}, {"quote": "再從關係擴展到原文段落"}]},
+    {"q": "第 9 張圖註裡，59.0% 和 56.9% 各是哪一套系統的分數？", "answer": "59.0% 是 RAGU，56.9% 是 HippoRAG 2（最難一級題目的答對率）。", "citations": [{"quote": "最難一級答對率 RAGU 59.0% 對 HippoRAG 2 56.9%，在誤差內"}]},
+    {"q": "Evidence Recall 只測什麼、不測什麼？", "answer": "只測該撈的相關材料撈到沒有（撈回幾成）；不測不該撈的有沒有撈進來，也不評答案。", "citations": [{"quote": "Evidence Recall 只測該撈的撈到沒有，完全不測不該撈的有沒有撈進來。"}, {"quote": "撈回了多少比例的相關材料；只評查資料，不評答案"}]},
+    {"q": "RAGU 的論文用了多少張 GPU？", "answer": "貼文沒寫", "citations": []}
+  ],
+  "feel": {
+    "felt_misled": "沒有。封面說「更齊、答案卻可能更差」，內文第 6 張就給了找事實題 54.2% 對 72.4%，而且有講綜合題反而比較好、也坦白雜訊論文沒量，「可能」兩字有兌現。",
+    "unclear_slides": [
+      "第 3 張：系列第 1 則摘要「剝掉混淆後」「扣掉答案格式」看不懂",
+      "第 6 張：「多 22.7%」我會以為是多兩成多，但 57.4 和 34.7 看起來是差 22.7 個百分點，有點搞混",
+      "第 9 張：圖註「在誤差內」不知道誤差是什麼",
+      "第 12 張：其他則摘要（Leiden、模組度、7B、連通塊）看不懂，但不影響這則"
+    ]
+  },
+  "takeaways": [
+    {"slide": 2, "takeaway": "全撈到不代表撈得準：乙 Recall 滿分，但一半是雜訊。", "quote": "乙：全撈到，也撈進雜訊", "no_takeaway": false},
+    {"slide": 6, "takeaway": "RAGU 綜合題涵蓋得比 HippoRAG 2 多，但找事實題答對率明顯輸。", "quote": "綜合題涵蓋得多，找事實題答對得少", "no_takeaway": false},
+    {"slide": 8, "takeaway": "答案在資料裡不等於 AI 會用到；多撈的段落可能變干擾或被忽略。", "quote": "「答案在資料裡」和「AI 會用到它」是兩回事", "no_takeaway": false},
+    {"slide": 9, "takeaway": "多撈對找事實是負擔、對綜合題是優勢；難題上 RAGU 小贏其實在誤差內。", "quote": "找事實時多撈是干擾，寫綜合答案時反而有用", "no_takeaway": false},
+    {"slide": 10, "takeaway": "能證明「多撈帶進雜訊」的那個數字論文沒給，所以這是推論。", "quote": "最需要的那個數字論文列了卻沒報", "no_takeaway": false}
+  ],
+  "hard_to_understand": [
+    {"slide": 3, "quote": "剝掉混淆後，用圖只多答對 1.2 到 4.3%｜細節：扣掉答案格式，RAGU 對 HippoRAG 2 平手或落後", "why": "沒看過第 1 則，不知道「混淆」「答案格式」指什麼；不過這頁是前情提要，不影響本則。"},
+    {"slide": 6, "quote": "RAGU 涵蓋的重點比 HippoRAG 2 多 22.7%", "why": "圖上是 57.4% 對 34.7%，差的是 22.7 個百分點；寫「多 22.7%」容易讓人以為是相對多兩成多。"},
+    {"slide": 6, "quote": "答對率：醫療題庫、RAGU 附帶的抽取模型建圖、AI 裁判評一次", "why": "「抽取模型建圖」沒解釋，不知道這條件代表什麼。"},
+    {"slide": 9, "quote": "最難一級答對率 RAGU 59.0% 對 HippoRAG 2 56.9%，在誤差內", "why": "不知道「誤差」是什麼、多大，也不知道「最難一級」是怎麼分級。"},
+    {"slide": 12, "quote": "Leiden 用模組度判斷切得好不好", "why": "系列其他則的專有名詞，沒定義；不影響本則。"}
+  ],
+  "charts": [
+    {"slide": 2, "can_state_claim": true, "issue": "實心點／空心點／叉叉一看就懂，甲乙對比清楚，支撐主標。"},
+    {"slide": 6, "can_state_claim": true, "issue": "兩組橫條顏色一致、數字大，一眼看出綜合題 RAGU 長、找事實題 RAGU 短。小問題：兩組量的是不同分數（Coverage 與答對率），只看圖會以為是同一把尺，但標籤有寫。"},
+    {"slide": 9, "can_state_claim": true, "issue": "左右對照卡片清楚；圖註 59.0% 對 56.9% 是唯一數字，「在誤差內」沒解釋，但不擋主標。"},
+    {"slide": 10, "can_state_claim": true, "issue": "報了的三個框 vs. 藏起來打問號的 Context Relevancy，意思清楚。"}
+  ]
+}

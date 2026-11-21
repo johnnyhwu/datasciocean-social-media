@@ -1,0 +1,494 @@
+{
+  "series": "ragu",
+  "concept": "graph-vs-vector-clustering-modularity",
+  "also_concepts": [],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "反差",
+    "title": "同一張知識圖，\n[[兩種分法兩種結果]]",
+    "subtitle": "照意思分：人一群、地名一群；\n照連線分：Dennis Ritchie 的作品、\n過世日期、年齡同一群",
+    "refs": [
+      "c11",
+      "c12"
+    ],
+    "candidate": "A"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "同一張知識圖，\n[[兩種分法兩種結果]]",
+      "body": "照意思分：人一群、地名一群；\n照連線分：Dennis Ritchie 的作品、\n過世日期、年齡同一群",
+      "refs": [
+        "c11",
+        "c12"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "同一張圖\n[[分出 4 群還是 2 群]]",
+      "label": "兩種「像」",
+      "columns": [
+        {
+          "head": "照語意分：4 群同類",
+          "items": [
+            {
+              "text": "都是人",
+              "sub": "Dennis 和父親 Alistair"
+            },
+            {
+              "text": "都是軟體",
+              "sub": "C 語言、Unix"
+            },
+            {
+              "text": "都是地名",
+              "sub": "Murray Hill、NJ"
+            },
+            {
+              "text": "都是數值",
+              "sub": "過世日期、享年 70"
+            }
+          ]
+        },
+        {
+          "head": "照連線分：2 個主題",
+          "items": [
+            {
+              "text": "Ritchie 這個主題",
+              "sub": "Dennis、C 語言、Unix、過世日期、70"
+            },
+            {
+              "text": "貝爾實驗室這個地點",
+              "sub": "Alistair、Bell Labs、Murray Hill、NJ",
+              "emph": true
+            }
+          ]
+        }
+      ],
+      "refs": [
+        "c11",
+        "c1",
+        "c12",
+        "c6"
+      ],
+      "body": "要回答「Ritchie 是誰」，要的是右邊那群。"
+    },
+    {
+      "layout": "recap",
+      "title": "[[前情提要]]與這一則重點",
+      "current": "graph-vs-vector-clustering-modularity",
+      "refs": [
+        "結構"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "先認識社群偵測",
+      "body": "RAGU 是一套 GraphRAG：先請 LLM 把文件裡的人、作品、地點這些東西（實體）和關係抽出來，建成知識圖。建好圖之後，再用 Hierarchical Leiden 把圖分群，這一步叫社群偵測。",
+      "rows": [
+        [
+          "語意分群",
+          "把每個詞換成一串數字（向量），意思相近就靠近，靠近的分一起；例如 k-means"
+        ],
+        [
+          "圖分群",
+          "連得多的分一起；例如 Leiden"
+        ],
+        [
+          "RAG",
+          "先找資料、再讓 LLM 回答"
+        ]
+      ],
+      "key_w": 200,
+      "refs": [
+        "c2",
+        "c1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "route",
+      "title": "圖分群\n[[分三段看]]",
+      "label": "路線圖",
+      "body": "接下來看：圖分群切在哪、怎麼判斷切得好、RAG 為什麼要這樣切。",
+      "nodes": [
+        {
+          "text": "切在哪",
+          "sub": "Ritchie 的圖剪斷一條線"
+        },
+        {
+          "text": "怎麼判斷切得好",
+          "sub": "模組度：群內的線比亂連多多少"
+        },
+        {
+          "text": "RAG 為什麼要這樣切",
+          "sub": "問「Ritchie 是誰」時要撈到什麼"
+        }
+      ],
+      "heads": [
+        "三段",
+        "最後：同一條流程裡的兩種「像」"
+      ],
+      "refs": [
+        "c3",
+        "c6",
+        "c12"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "netgraph",
+      "title": "Ritchie 的圖\n[[從唯一的橋切成兩群]]",
+      "label": "切成兩群",
+      "body": "論文自己的例子：Dennis Ritchie 和父親 Alistair 之間只有一條線。剪斷這條橋，換來兩邊各自連得很緊。",
+      "nodes": [
+        {
+          "text": "Dennis Ritchie",
+          "x": 0.32,
+          "y": 0.62,
+          "g": 0,
+          "lab": "right"
+        },
+        {
+          "text": "C 語言",
+          "x": 0.46,
+          "y": 1.0,
+          "g": 0,
+          "lab": "below"
+        },
+        {
+          "text": "Unix",
+          "x": 0.1,
+          "y": 0.92,
+          "g": 0,
+          "lab": "below"
+        },
+        {
+          "text": "Oct 12, 2011",
+          "x": 0.66,
+          "y": 0.8,
+          "g": 0,
+          "lab": "below"
+        },
+        {
+          "text": "70",
+          "x": 0.06,
+          "y": 0.46,
+          "g": 0,
+          "lab": "below"
+        },
+        {
+          "text": "Alistair E. Ritchie",
+          "x": 0.42,
+          "y": 0.22,
+          "g": 1,
+          "lab": "left"
+        },
+        {
+          "text": "Bell Labs",
+          "x": 0.44,
+          "y": 0.0,
+          "g": 1,
+          "lab": "right"
+        },
+        {
+          "text": "Murray Hill",
+          "x": 0.7,
+          "y": 0.18,
+          "g": 1,
+          "lab": "right"
+        },
+        {
+          "text": "New Jersey",
+          "x": 0.86,
+          "y": 0.42,
+          "g": 1,
+          "lab": "below"
+        }
+      ],
+      "edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          8
+        ]
+      ],
+      "cut": [
+        4
+      ],
+      "heads": [
+        "Ritchie 這個主題",
+        "貝爾實驗室這個地點",
+        "被剪斷的橋"
+      ],
+      "note": "節點位置照論文的圖擺，只是示意",
+      "fig_refs": [
+        "ragu/figure4.png"
+      ],
+      "refs": [
+        "c6",
+        "c8",
+        "c11"
+      ]
+    },
+    {
+      "layout": "chart_bars",
+      "title": "模組度：群內的線\n[[比亂連多出多少]]",
+      "label": "模組度",
+      "body": "Leiden 用模組度判斷切得好不好。人脈很廣的點，分到哪一群都會帶進很多線，所以要扣掉亂連也會有的部分。以 Ritchie 那群為例：",
+      "unit": "",
+      "bars": [
+        {
+          "name": "實際",
+          "subs": [
+            "群內的線佔全圖"
+          ],
+          "value": 0.5
+        },
+        {
+          "name": "亂連也會有的",
+          "subs": [
+            "照每個點的連線數估"
+          ],
+          "value": 0.316
+        }
+      ],
+      "note": "兩者差 0.184，就是 Ritchie 這群的分數",
+      "refs": [
+        "c3",
+        "c4",
+        "c5",
+        "c7"
+      ]
+    },
+    {
+      "layout": "table",
+      "title": "切成兩群約 0.367，\n[[全部一群只有 0]]",
+      "label": "算算看",
+      "body": "9 是 Ritchie 群所有點的連線數加總，16 是全圖 8 條線的兩倍（每條線兩端各算一次）。",
+      "rows": [
+        [
+          "Ritchie 群",
+          "4/8 − (9/16)² = 0.500 − 0.316 = 0.184"
+        ],
+        [
+          "貝爾實驗室",
+          "3/8 − (7/16)² = 0.375 − 0.191 = 0.184"
+        ],
+        [
+          "兩群加總",
+          "Q ≈ 0.367（沒四捨五入的數相加）"
+        ],
+        [
+          "不切",
+          "全部一群：8/8 − (16/16)² = 0，切開比較好"
+        ]
+      ],
+      "key_w": 200,
+      "note": "Q 理論上限是 1；實務上 0.3 到 0.7 表示有明顯的群",
+      "refs": [
+        "c7",
+        "c8",
+        "c9",
+        "c6"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "flow",
+      "title": "Leiden 怎麼找到這個切法",
+      "label": "演算法",
+      "body": "Leiden 是 Louvain 的修正版。Louvain 每一步挑眼前分數漲最多的走法，反覆做兩件事：",
+      "nodes": [
+        {
+          "text": "把點移到讓 Q 增加最多的鄰居群",
+          "sub": "每次挑分數漲最多的"
+        },
+        {
+          "text": "把每群壓成一個大點，再跑一次",
+          "sub": "在更小的圖上重來，所以叫「階層式」"
+        },
+        {
+          "text": "Leiden 補上一步整理",
+          "sub": "保證群裡不會斷成兩塊，也更快停下來"
+        }
+      ],
+      "refs": [
+        "c10"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "bubble",
+      "title": "問「Ritchie 是誰」\n[[要一次撈到這一整包]]",
+      "label": "為什麼要主題",
+      "body": "對 RAG 來說，要的是圖分群給的主題：他的作品、過世日期、年齡，語意上八竿子打不著，放在一起卻剛好能摘要成「他是誰」。",
+      "heads": [
+        "照意思分",
+        "照連線分"
+      ],
+      "nodes": [
+        {
+          "text": "Dennis 和父親同一群",
+          "sub": "都是人"
+        },
+        {
+          "text": "一群就是一個主題",
+          "sub": "作品、日期、年齡都在"
+        }
+      ],
+      "outcomes": [
+        {
+          "text": "Dennis Ritchie"
+        },
+        {
+          "text": "C 語言"
+        },
+        {
+          "text": "Unix"
+        },
+        {
+          "text": "Oct 12, 2011"
+        },
+        {
+          "text": "70"
+        }
+      ],
+      "note": "不過在 RAGU 的對照裡，整套 GraphRAG 比純向量檢索只多幾個百分點",
+      "refs": [
+        "c12",
+        "c11",
+        "c13"
+      ],
+      "quals": [
+        "c13#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "compare",
+      "title": "RAGU 一條流程\n[[用了兩種「像」]]",
+      "label": "合併 vs 分群",
+      "body": "要合併同一個東西就看語意，要找出彼此有關的東西就看連線，用途完全不同。不過合併那一步，若是先依名字分組再做，連別名也合不了。",
+      "columns": [
+        {
+          "head": "合併那一步",
+          "items": [
+            {
+              "text": "語意相似"
+            },
+            {
+              "text": "同一個東西的不同寫法"
+            }
+          ]
+        },
+        {
+          "head": "社群偵測那一步",
+          "items": [
+            {
+              "text": "結構相關"
+            },
+            {
+              "text": "不同東西之間的關聯",
+              "emph": true
+            }
+          ]
+        }
+      ],
+      "note": "合併那一步怎麼用 DBSCAN，論文前後寫法不一",
+      "refs": [
+        "c14"
+      ],
+      "quals": [
+        "c14#1",
+        "c14#2"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "同一張知識圖，為什麼兩種分法給兩種結果？",
+      "title": "照意思分，得到同類；\n照連線分，得到主題。\n要回答「他是誰」，\n要的是主題。",
+      "refs": [
+        "c1",
+        "c12"
+      ]
+    },
+    {
+      "layout": "series_map",
+      "title": "這個系列共六則",
+      "current": "graph-vs-vector-clustering-modularity",
+      "nav": "完整文章在 datasciocean.com，搜「RAGU」",
+      "refs": [
+        "結構"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "同一張知識圖，分兩次群，結果很不一樣。\n\n照意思分，Dennis Ritchie 和他父親都是人，就分一起；照連線分，Ritchie 的作品、過世日期、年齡都連在他身上，就分一起。一邊是一類一類，一邊是一個一個主題。\n\n為什麼 RAG 要後者？因為使用者問「Ritchie 是誰」，你希望一次撈到他的作品、死亡日期、年齡，這些東西語意上八竿子打不著，卻共同構成一個能被摘要的主題。不過 RAGU 自己的對照裡，整套 GraphRAG 比純向量檢索，淨貢獻只有幾個百分點。\n\n還有一個沒說清楚的地方：RAGU 合併那一步怎麼用 DBSCAN，論文前後寫法不一，只能翻原始碼確認。\n\n這是 RAGU 系列的第五則；抽取用的小模型為什麼夠用，在這個系列的下一則。",
+      "refs": [
+        "c1",
+        "c11",
+        "c12",
+        "c13",
+        "c14"
+      ],
+      "quals": [
+        "c13#1",
+        "c14#1",
+        "c14#2"
+      ]
+    },
+    "last": {
+      "text": "照意思分，得到同類；照連線分，得到主題。要回答「他是誰」，要的是主題。\n文章：datasciocean.com/paper-intro/ragu\n同系列：剝掉混淆後，用圖只多答對 1.2 到 4.3%（尚未發布）\n同系列：證據撈得更完整，答案不一定更好（尚未發布）\n同系列：先定好名單再讓 AI 選，圖就少了斷線（尚未發布）\n同系列：合併同一個東西的寫法，不是分群問題（尚未發布）\n同系列：小模型夠用，是因為任務簡單（尚未發布）",
+      "refs": [
+        "c1",
+        "c12"
+      ],
+      "quals": [],
+      "link": "https://datasciocean.com/paper-intro/ragu/"
+    }
+  },
+  "caption": {
+    "first": "GraphRAG 的知識圖分群（Leiden、模組度）：照連線分得到主題，照語意分得到同類",
+    "first_refs": [
+      "c1"
+    ],
+    "nav": "完整文章在 datasciocean.com，搜「RAGU」",
+    "hashtags": [
+      "RAGU",
+      "GraphRAG",
+      "知識圖",
+      "LLM"
+    ]
+  }
+}

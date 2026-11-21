@@ -34,7 +34,7 @@ CONTENT = {"text", "table", "chart_bars", "chart_sounding", "diagram"}
 CONTENT_KEYS = {"title", "body", "label", "question", "rows", "bars", "note", "nav", "legend",
                 "nodes", "outcomes", "loop", "columns", "heads", "pairs", "count", "points", "ref", "ranges", "group", "start", "end",
                 "items", "steps", "cells", "on", "total", "labels", "ops", "branches", "fork"}   # on：點陣裡實心的點數；total：stack 的總次數；labels：ring 每條邊的標籤；ops：equation 的運算符號（都會經 diagrams.texts() 輸出）；branches：封面岔路的標籤（slide_lines 輸出）
-LAYOUT_KEYS = {"layout", "refs", "quals", "fig_refs", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols", "more", "edges", "hot", "fade", "chain", "hops", "pick", "mode", "show_values"}   # mode／show_values：chips 畫哪幾欄、要不要寫數字（數字經 diagrams.texts() 輸出）；pick：dist 只取最高或期望值； cols：點陣每列幾個點；hops：leak 第一條的跳數（版面參數，不含文字）
+LAYOUT_KEYS = {"layout", "refs", "quals", "fig_refs", "unit", "key_w", "subs_inline", "current", "axis_max", "kind", "cols", "more", "edges", "hot", "fade", "chain", "hops", "pick", "mode", "show_values", "ev_w", "cut", "h"}   # mode／show_values：chips 畫哪幾欄、要不要寫數字（數字經 diagrams.texts() 輸出）；pick：dist 只取最高或期望值； cols：點陣每列幾個點；hops：leak 第一條的跳數；ev_w：mismatch 的事件框寬；cut、h：netgraph 被切斷的邊序號與圖高（版面參數，不含文字）
 
 
 def check_fields(d: dict) -> None:
@@ -131,7 +131,12 @@ def slide_lines(sl: dict, with_refs: bool) -> list[str]:
         out.append(f"示意圖（{sl['kind']}）上的文字與數字：" + "｜".join(D.texts(sl)))
         if sl["kind"] in D.DESC:
             out.append(f"示意圖的畫面（{sl['kind']}）：{D.DESC[sl['kind']]}" + ("；" + "；".join(f"第 {i + 1} 列「{n['text']}」的金色箭頭接到下一列" for i, n in enumerate(sl["nodes"]) if n.get("feeds")) if sl["kind"] == "transcript" else ""))
-    if sl.get("edges"):      # links 圖的連線是內容（誰跟誰相連），審查者要看得到
+    if sl.get("kind") == "netgraph":   # 圖的連線與分群是內容，審查者要看得到
+        cut = set(sl.get("cut", []))
+        out.append("示意圖的連線：" + "｜".join(f"{sl['nodes'][i]['text']}—{sl['nodes'][j]['text']}" + ("（金色虛線：被切斷）" if k in cut else "") for k, (i, j) in enumerate(sl["edges"])))
+        for g in (0, 1):
+            out.append(f"示意圖的第 {g + 1} 群（{sl['heads'][g]}）：" + "、".join(n["text"] for n in sl["nodes"] if n.get("g", 0) == g))
+    elif sl.get("edges"):      # links 圖的連線是內容（誰跟誰相連），審查者要看得到
         hot = {tuple(e) for e in sl.get("hot", [])}
         out.append("示意圖的連線（左—右）：" + "｜".join(f"{sl['nodes'][l]['text']}—{sl['outcomes'][r]['text']}" + ("（金色）" if (l, r) in hot else "") for l, r in sl["edges"]))
     if sl["layout"] == "diagram" and sl.get("kind") == "hops":

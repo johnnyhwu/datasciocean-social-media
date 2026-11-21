@@ -33,7 +33,7 @@ RP = PARAMS["render"]
 WD, HT, SAFE_X, PAD_X = RP["width"], RP["height"], RP["safe_x"], RP["pad_x"]
 CREAM, TEAL, DEEP, GOLD = "#F2E0C0", "#076876", "#01353F", "#DDA642"
 MID, LIGHT, ABYSS = "#1F8A8D", "#69B4AA", "#032027"
-SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD, "seesaw": GOLD, "spotlight": GOLD, "window": GOLD, "hourglass": GOLD, "band": GOLD, "junction": GOLD, "echo": GOLD, "chips": GOLD}
+SERIES_COLORS = {"teal-mid": MID, "abyss-contour": LIGHT, "paper-cards": DEEP, "horizon": GOLD, "seesaw": GOLD, "spotlight": GOLD, "window": GOLD, "hourglass": GOLD, "band": GOLD, "junction": GOLD, "echo": GOLD, "chips": GOLD, "ceiling": GOLD}
 ALLOWED_FONT_PX = {28, 34, 38, 40, 56, 72, 76}
 ZERO_Y = 706          # 測深圖水面（0）
 
@@ -915,6 +915,75 @@ def ch_takeaway(mi):
     return ch_row(CH_SETS[mi % len(CH_SETS)], (250, 540, 830), 1190, 180, 14, 44, 7, dark=True, x0=80, x1=1000, sw=5)[0]
 
 
+# ---------------------------------------------------------------- 低天花板系列（style: ceiling）的 SVG 元件
+# 哲學 series/ragu/philosophy.md：一張知識圖擠在一道厚重的天花板下面，點與線往上長、長到天花板就停；
+# 只有一個點頂到天花板，那一點是金色。都用 class "bg"，純裝飾、不帶數據。
+# 圖的骨架（u, v 在 0～1；v=0 是天花板下緣）：節點 (u, v, 半徑比例)，邊是節點序號的配對。
+CL_NODES = ((.06, .55, .7), (.17, .25, .9), (.25, .70, .6), (.36, .42, 1.0), (.47, .80, .7), (.55, .12, 1.0),
+            (.63, .55, .8), (.74, .30, .9), (.80, .78, .6), (.90, .45, .8), (.97, .15, .6))
+CL_EDGES = ((0, 1), (0, 2), (1, 3), (2, 3), (3, 4), (3, 5), (4, 6), (5, 6), (5, 7), (6, 7), (6, 8), (7, 9), (8, 9), (9, 10), (1, 5), (7, 10))
+CL_TOPS = (5, 1, 10)          # 每一則頂到天花板（金色）的節點：第 1 則中間、第 2 則左邊、第 3 則右邊，之後輪替
+
+
+def cl_graph(x0, x1, ceil_y, depth, r, top_i, dark=False, ceil_sw=14, bleed=False, nodes=CL_NODES, edges=CL_EDGES):
+    """天花板（y=ceil_y 的粗線）＋下面一張圖：top_i 那個節點頂到天花板（金色），其他節點往下錯落。回傳 svg。"""
+    pts = []
+    for k, (u, v, s) in enumerate(nodes):
+        rr = r * (1.25 if k == top_i else s)
+        cy = ceil_y + ceil_sw / 2 + rr if k == top_i else ceil_y + ceil_sw / 2 + r * 1.6 + v * depth
+        pts.append((x0 + u * (x1 - x0), cy, rr))
+    line_c = MID if not dark else LIGHT
+    node_c = TEAL if not dark else LIGHT
+    s = ""
+    for a, b in edges:
+        s += (f'<line class="bg" x1="{pts[a][0]:.1f}" y1="{pts[a][1]:.1f}" x2="{pts[b][0]:.1f}" y2="{pts[b][1]:.1f}" '
+              f'stroke="{line_c}" stroke-width="{max(2, r / 6):.1f}" stroke-opacity=".75"/>')
+    for k, (x, y, rr) in enumerate(pts):
+        s += f'<circle class="bg" cx="{x:.1f}" cy="{y:.1f}" r="{rr:.1f}" fill="{GOLD if k == top_i else node_c}"/>'
+    a, b = (0, WD) if bleed else (x0 - r * 2, x1 + r * 2)
+    s += f'<line class="bg" x1="{a}" y1="{ceil_y}" x2="{b}" y2="{ceil_y}" stroke="{CREAM if dark else DEEP}" stroke-width="{ceil_sw}" stroke-linecap="{"butt" if bleed else "round"}"/>'
+    return s
+
+
+def cl_bottom(x0, x1, ceil_y, depth, r):
+    """圖的最低點（給排版檢查用）。"""
+    return ceil_y + 14 + r * 1.6 + max(v for _, v, _ in CL_NODES) * depth + r
+
+
+CL_COVER = (80, 1000, 200, 340, 30)       # 封面：天花板 y=200（貼齊兩側出血、粗 28），圖往下長到約 y=580
+
+
+def cl_cover(mi, text_h=0):
+    """封面：上方一道貼齊兩側的天花板，知識圖擠在它下面；標題與副標在下半。
+    text_h＝標題＋副標的高度：圖往下長，把多出的空白吃掉（文字底緣落在 y≈1170），避免下半大片留白。
+    節點（含金色那顆）都留在左右 80px 邊界內。回傳 (svg, 圖的最低點 y)。"""
+    x0, x1, cy, dp, r = CL_COVER
+    x0, x1 = x0 + r * 1.25, x1 - r * 1.25
+    spare = 1170 - (cl_bottom(x0, x1, cy, dp, r) + 60 + text_h)
+    dp = min(560, dp + max(0, spare))
+    return cl_graph(x0, x1, cy, dp, r, CL_TOPS[mi % len(CL_TOPS)], ceil_sw=28, bleed=True), cl_bottom(x0, x1, cy, dp, r)
+
+
+def cl_corner(idx, n):
+    """內頁右上角：一小段天花板下面四個點；頂到天花板的那一點隨讀到第幾張換位置。"""
+    nodes = ((0, .5, .8), (.33, .1, 1), (.66, .6, .8), (1, .2, .9))
+    edges = ((0, 1), (1, 2), (2, 3), (1, 3))
+    k = min(3, 4 * (idx - 1) // max(n - 1, 1))
+    return cl_graph(906, 994, 86, 22, 7, k, ceil_sw=6, nodes=nodes, edges=edges)
+
+
+def cl_deco(idx, n):
+    """文字張與沒有名詞表的脈絡張：下半一道天花板（y=860）與一張圖；頂到天花板的那一點隨張數往右移。"""
+    order = (0, 1, 3, 5, 7, 9, 10)
+    k = order[min(len(order) - 1, len(order) * (idx - 1) // max(n - 1, 1))]
+    return cl_graph(110, 970, 860, 200, 18, k, ceil_sw=10)
+
+
+def cl_takeaway(mi):
+    """帶走張（深色底）：底部一道米色天花板與淺色的圖，金色那點與封面同一個。"""
+    return cl_graph(110, 970, 960, 150, 16, CL_TOPS[mi % len(CL_TOPS)], dark=True, ceil_sw=8)
+
+
 # ---------------------------------------------------------------- 濃淡帶系列（style: band）的 SVG 元件
 # 哲學 series/llm-as-a-verifier/philosophy.md：一條橫貫全寬的帶子，越可能的分數越濃；金針停在濃淡分佈的期望值。
 # 都用 class "bg"（背景層），排版時自己確保不壓到文字。分佈純示意（不是實驗數據），每一則一種。
@@ -1002,6 +1071,12 @@ def series_journey(members, cur, jy):
             svg += f'<circle class="bg" cx="{x_:.1f}" cy="{jy}" r="40" fill="{GOLD}" fill-opacity=".30"/><circle class="bg" cx="{x_:.1f}" cy="{jy}" r="22" fill="{GOLD}"/>'
         else:
             svg += f'<circle class="bg" cx="{x_:.1f}" cy="{jy}" r="14" fill="{CREAM}" stroke="{TEAL}" stroke-width="5"/>'
+        if n_ >= 5:      # 5 則以上點距太窄（6 則只有 140px），「（這一則）」改放第二行，標籤框寬跟著點距（2026-11-19 RAGU 6 則）
+            w_ = 700 / (n_ - 1) - 10
+            out += f'<div class="t abs ilab{" cur2" if k_ == cur else ""}" style="left:{x_ - w_ / 2:.1f}px;top:{jy + 50}px;width:{w_:.0f}px;text-align:center">{esc(f"第 {k_ + 1} 則")}</div>'
+            if k_ == cur:
+                out += f'<div class="t abs ilab cur2" style="left:{x_ - w_ / 2:.1f}px;top:{jy + 89}px;width:{w_:.0f}px;text-align:center">這一則</div>'
+            continue
         lab_ = f"第 {k_ + 1} 則" + ("" if k_ != cur else "（這一則）")
         out += f'<div class="t abs ilab{" cur2" if k_ == cur else ""}" style="left:{x_ - 150:.1f}px;top:{jy + 50}px;width:300px;text-align:center">{esc(lab_)}</div>'
     return svg, out
@@ -1052,6 +1127,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     jc = series.get("style") == "junction"
     ec = series.get("style") == "echo"
     ch = series.get("style") == "chips"
+    cl = series.get("style") == "ceiling"
     idx, n_sl = spec.get("_idx", 1), spec.get("_n", 1)          # 第幾張／共幾張（render_all 填入）
     mi, mn = spec.get("_mi", 0), spec.get("_mn", 1)            # 這則是系列的第幾則／共幾則
     kw = {"SERIES_TAG": esc(tag), "TITLE": title_html(spec.get("title", "")), "BODY": esc(bind_nums(spec.get("body", ""))), "FAM": "", "BODY_STYLE": "", "FOOT_CLS": ""}
@@ -1130,6 +1206,17 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         if 170 + tl_ + 36 + sl_ > stack_top - 30:      # 籌碼是背景圖形（程式 B 的重疊檢查量不到），這裡先擋
             raise ValueError(f"封面放不下：標題＋副標到 y={170 + tl_ + 36 + sl_:.0f}，會壓到下方籌碼（上限 {stack_top - 30:.0f}）；縮短主標或副標")
         kw["BODY"] = kw["BODY"].replace("\n", "<br>")
+    elif lay == "cover" and cl:        # 米色底，上方一道天花板、知識圖擠在它下面；標題接在圖下面、副標接著標題
+        tl_ = sum(est_lines(seg, 920 / 76 - 0.4) for seg in re.sub(r"\[\[|\]\]", "", spec.get("title", "")).split("\n")) * 95
+        sl_ = sum(est_lines(seg, 920 / 40 - 0.4) for seg in spec.get("body", "").split("\n")) * 64
+        svg_, g_bot = cl_cover(mi, tl_ + 36 + sl_)
+        kw["SVG"] = svg_wrap(svg_)
+        top_ = int(g_bot + 60)
+        kw["TITLE_TOP"] = top_
+        kw["SUB_TOP"] = top_ + tl_ + 36
+        if top_ + tl_ + 36 + sl_ > 1230:      # 頁腳在 y=1262
+            raise ValueError(f"封面放不下：標題＋副標到 y={top_ + tl_ + 36 + sl_:.0f}，會壓到頁腳（上限 1230）；縮短主標或副標")
+        kw["BODY"] = kw["BODY"].replace("\n", "<br>")
     elif lay == "cover" and seesaw:    # 米色底，標題在上，下半一座蹺蹺板；副標固定在 y=400
         kw["SVG"] = svg_wrap(ss_cover())
         kw["SUB_TOP"] = 400
@@ -1149,7 +1236,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             parts, cells, _ = table_block(spec["rows"], y0_ + shift, spec.get("key_w", 300))
             kw["SVG"], kw["CELLS"] = svg_wrap(parts), cells
         else:
-            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else (svg_wrap(ss_mid(idx, n_sl)) if seesaw else (svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False)) if spot else (svg_wrap(wn_deco(idx)) if win else (svg_wrap(hg_deco(idx, n_sl)) if hg else (svg_wrap(bd_deco(idx, n_sl, mi)) if bd else (svg_wrap(jc_deco(idx, n_sl)) if jc else (svg_wrap(ec_deco(idx, n_sl)) if ec else (svg_wrap(ch_deco(idx, n_sl)) if ch else "")))))))))), ""
+            kw["SVG"], kw["CELLS"] = (svg_wrap(stagger((idx - 1) % 4)) if cards else (svg_wrap(h_band(idx, n_sl)) if horizon else (svg_wrap(ss_mid(idx, n_sl)) if seesaw else (svg_wrap(sp_field((90, 760, 990, 1190), 26, 11, idx, 190, thr=200, dark=False)) if spot else (svg_wrap(wn_deco(idx)) if win else (svg_wrap(hg_deco(idx, n_sl)) if hg else (svg_wrap(bd_deco(idx, n_sl, mi)) if bd else (svg_wrap(jc_deco(idx, n_sl)) if jc else (svg_wrap(ec_deco(idx, n_sl)) if ec else (svg_wrap(ch_deco(idx, n_sl)) if ch else (svg_wrap(cl_deco(idx, n_sl)) if cl else ""))))))))))), ""
             if horizon:
                 kw["FOOT_CLS"] = "light"
     elif lay == "text" and contour:
@@ -1176,6 +1263,8 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         kw["SVG"] = svg_wrap(ec_deco(idx, n_sl))
     elif lay == "text" and ch:         # 下半一排五疊籌碼，最高那疊頂端金色、隨張數往右移
         kw["SVG"] = svg_wrap(ch_deco(idx, n_sl))
+    elif lay == "text" and cl:         # 下半一道天花板與一張圖，頂到天花板的金點隨張數往右移
+        kw["SVG"] = svg_wrap(cl_deco(idx, n_sl))
     elif lay == "text" and seesaw:     # 中段一座蹺蹺板，傾斜角隨張數轉向
         kw["SVG"] = svg_wrap(ss_mid(idx, n_sl))
     elif lay == "text":
@@ -1208,6 +1297,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         labels = (f'<div class="t abs legend" style="left:120px;top:{y0}px">{esc(l1)}</div>'
                   f'<div class="t abs legend" style="left:{x2 + 40}px;top:{y0}px">{esc(l2)}</div>')
         dec = any(isinstance(b[k_], float) and b[k_] != int(b[k_]) for b in bars for k_ in ("value", "value2"))    # 有小數的圖：全部數字都顯示一位小數（80.0，不是 80）
+        nd2 = max([1] + [len(f"{b[k_]:g}".split(".")[1]) for b in bars for k_ in ("value", "value2") if "." in f"{b[k_]:g}"])
         gy = y0 + 62
         few = len(bars) <= 2                    # 只有 1～2 組時（2026-10-26）：條放粗、組距拉開，圖面用滿
         bh_, bgap = (66, 86) if few else (44, 60)
@@ -1223,8 +1313,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
                 by = gy + j * bgap
                 ln = v * s
                 svg += (f'<rect class="g bar" data-v="{v}" data-e="0" x="{x0}" y="{by}" width="{ln:.2f}" height="{bh_}" fill="{col}"/>')
+                # 2026-11-19 修：原本的條件運算式在整數圖只輸出數字、少了開頭的 <div>（數字跑到左上角）；小數照卡上的位數印，不四捨五入成一位
                 labels += (f'<div class="t abs num2" style="left:{x0 + ln + 18:.1f}px;top:{by + (bh_ - 44) / 2 - 2:.1f}px;color:{DEEP}">'
-                           f'{v:.1f}{esc(spec.get("unit", ""))}</div>' if dec else f'{v:g}{esc(spec.get("unit", ""))}</div>')
+                           f'{(f"{v:.{nd2}f}" if dec else f"{v:g}")}{esc(spec.get("unit", ""))}</div>')
                 last_bottom = by + bh_
             gy += step
         svg += f'<line class="g axis" x1="{x0}" y1="{top}" x2="{x0}" y2="{last_bottom + 10}" stroke="{DEEP}" stroke-width="3"/>'
@@ -1340,14 +1431,14 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         lab = spec.get("label")
         kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
         kw["SVG"] = svg_wrap(hg_takeaway())
-    elif lay == "takeaway" and (bd or jc or ec or ch):
+    elif lay == "takeaway" and (bd or jc or ec or ch or cl):
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
         q = spec.get("question")
         kw["QUESTION"] = f'<div class="t abs take-q" style="top:320px">{esc(q)}</div>' if q else ""
         kw["TAKE_STYLE"] = f"top:{320 + math.ceil(len(q) / 15.0) * 73 + 36}px" if q else ""
         lab = spec.get("label")
         kw["LABEL"] = f'<div class="t abs take-label" style="top:370px">{esc(lab)}</div>' if lab else ""
-        kw["SVG"] = svg_wrap(jc_takeaway(mi) if jc else (ec_takeaway(mi) if ec else (ch_takeaway(mi) if ch else bd_takeaway(mi))))
+        kw["SVG"] = svg_wrap(jc_takeaway(mi) if jc else (ec_takeaway(mi) if ec else (ch_takeaway(mi) if ch else (cl_takeaway(mi) if cl else bd_takeaway(mi)))))
     elif lay == "takeaway" and seesaw:
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
         q = spec.get("question")
@@ -1391,6 +1482,8 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     elif lay == "recap":      # 第 2 頁：前面介紹過什麼、這一則要講什麼（內容由系列檔填，不是主張）
         cur = [m["concept"] for m in series["members"]].index(spec["current"])
         svg, out, yend = series_rows(series["members"], cur, 330, labels=True, upto=cur + 1)
+        if yend > 1170:      # 列多（系列第 6 則以後）放不下時，拿掉每列上方的「第 N 則」小標籤再排一次
+            svg, out, yend = series_rows(series["members"], cur, 330, labels=False, upto=cur + 1)
         if yend > 1170:
             raise ValueError(f"回顧頁放不下：列到 y={yend}，上限 1170；縮短 summary 或減少列數")
         if yend + 130 <= 1190:       # 列多（第 4 則）時下面放不下路線，就不放；最後一頁的系列地圖有
@@ -1411,11 +1504,11 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         cur = [m["concept"] for m in series["members"]].index(spec["current"])
         y, svg, out = 330, "", ""
         for i, t in enumerate(items):
-            if (contour or cards or spot or win or hg or bd or ec or ch) and i == cur:
+            if (contour or cards or spot or win or hg or bd or ec or ch or cl) and i == cur:
                 svg += f'<rect class="bg" x="72" y="{y - 10}" width="936" height="84" rx="6" fill="{DEEP}"/>'
                 svg += f'<circle class="g mark" data-e="1" cx="100" cy="{y + 32}" r="12" fill="{GOLD}"/>'
                 out += f'<div class="t abs item cur" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
-            elif contour or cards or spot or win or hg or bd or ec or ch:
+            elif contour or cards or spot or win or hg or bd or ec or ch or cl:
                 svg += f'<circle class="g mark" cx="100" cy="{y + 32}" r="8" fill="{TEAL}"/>'
                 out += f'<div class="t abs item" style="left:132px;top:{y + 8}px">{esc(t)}</div>'
             elif i == cur:
@@ -1488,6 +1581,9 @@ def build(spec: dict, series: dict, tag: str) -> dict:
     if ch and lay not in ("cover", "takeaway", "text") and not (lay == "context" and not spec.get("rows")):
         corner = ch_corner(idx, n_sl)      # 右上角三疊小籌碼（文字張與沒有名詞表的脈絡張下半已經有大的）
         kw["SVG"] = kw["SVG"].replace("</svg>", corner + "</svg>", 1) if kw.get("SVG") else svg_wrap(corner)
+    if cl and lay not in ("cover", "takeaway", "text") and not (lay == "context" and not spec.get("rows")):
+        corner = cl_corner(idx, n_sl)      # 右上角一小段天花板與四個點（文字張與沒有名詞表的脈絡張下半已經有大的）
+        kw["SVG"] = kw["SVG"].replace("</svg>", corner + "</svg>", 1) if kw.get("SVG") else svg_wrap(corner)
     if bd and lay not in ("cover", "takeaway", "text") and not (lay == "context" and not spec.get("rows")):
         strip = bd_strip(idx, n_sl, mi)      # 頂端一條細濃淡帶（文字張與沒有名詞表的脈絡張下半已經有一條）
         kw["SVG"] = kw["SVG"].replace("</svg>", strip + "</svg>", 1) if kw.get("SVG") else svg_wrap(strip)
@@ -1500,7 +1596,7 @@ def build(spec: dict, series: dict, tag: str) -> dict:
             dots += rail(mi % 4 if lay == "series_map" else (idx - 1) % 4)
         kw["SVG"] = kw["SVG"].replace("</svg>", dots + "</svg>") if kw.get("SVG") else svg_wrap(dots)
 
-    if (jc or ec or ch) and lay != "takeaway":      # 分岔軌道系列：主標照 spec 的 \n 換行（2026-11-10：不換的話 \n 變成空格，中文標題中間多一格空白，例如「先把資料 按形式…」）
+    if (jc or ec or ch or cl) and lay != "takeaway":      # 分岔軌道系列：主標照 spec 的 \n 換行（2026-11-10：不換的話 \n 變成空格，中文標題中間多一格空白，例如「先把資料 按形式…」）
         kw["TITLE"] = kw["TITLE"].replace("\n", "<br>")
 
     # 模板填入

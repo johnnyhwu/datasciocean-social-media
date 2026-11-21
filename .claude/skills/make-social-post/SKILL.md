@@ -39,7 +39,8 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | 7 | **先照 `references/self-check.md` 自檢**，再派忠實者、讀者（一般讀者，附圖）、編輯（附圖）；**有 `fig_refs` 再派重製圖審查者**（`references/figure-prompt.md`，看原圖＋主張＋重製圖）；`verify_faithful.py`、`verify_reader.py`、`verify_figure.py`。**審查全過就 `spec_diff.py --mark`**；之後再新增文字或改數字，用 `spec_diff.py` 列出範圍重審 | `references/review-loop.md`、`references/self-check.md` |
 | 8 | `batch_check.py <spec>...`（參數順序 = 預計發文順序） | `references/batch-and-publish.md` §4 |
 | 9–10 | 給人看貼文 `README.md`（含縮圖）、`ig/post.md`、`threads/post.md`；交成品時列出 hook 候選與選擇理由、新增的圖型、沒採用的審查建議與理由；人 review 說沒問題後 `state.py ready <觀念> <格式> <發布包> --hook-accepted`（兩個格式各一次） | `references/batch-and-publish.md` §5–6 |
-| 11 | **發布**：`series_links.py --write`（系列已有發布的前幾則時；要在 IG `--confirm` 之前）＋ `prepare` → push `ig/jpg/` → IG `preflight` → IG dry-run → 人說「發」→ `--confirm` → Threads dry-run → `--confirm`；成功後自動寫回 state | **`references/publish-flow.md`**（照做）、`references/instagram-publish.md`、`references/threads-publish.md` |
+| 3b | **（開始做新的一則時）從 `growth/plan.md` 挑 1～2 個 action 做實驗**，寫進 `_build/progress.md`，並在 `growth/experiments.md` 記一行 | `references/growth-loop.md` §3–4 |
+| 11 | **發布**：`series_links.py --write`（系列已有發布的前幾則時；要在 IG `--confirm` 之前）＋ `prepare` → push `ig/jpg/` → IG `preflight` → IG dry-run → 人說「發」→ `--confirm` → Threads dry-run → `--confirm`；成功後自動寫回 state；**發完跑 `insights.py pull` 做流量追蹤與判讀**（`growth-loop.md` §1–2） | **`references/publish-flow.md`**（照做）、`references/instagram-publish.md`、`references/threads-publish.md` |
 
 新系列的視覺（哲學、風格、模板）用 `design-series-visuals` 做，不先出草圖與樣張給人（`CLAUDE.md` 規則 12，人只 review 成品）；系列已有模板就直接用，同一系列的所有貼文用同一版模板。
 
@@ -64,6 +65,7 @@ description: 把 concept-wiki 的觀念卡做成 IG 輪播與 Threads 串文的�
 | `series_links.py` | Threads 最後一則的「同系列」：把已發布的貼文從「（尚未發布）」補成標題＋網址（dry-run／`--write`）；發布 dry-run 會擋沒補的 |
 | `series_deps.py` | 系列規劃：列出該合併成一則的候選（輔助，不是偵測器；最後由 Claude 判斷） |
 | `state.py` | 各觀念各格式的狀態（`not_tried`／`ready`／`published`／`unsuitable`）、發布紀錄、回補清單（`state/`） |
+| `insights.py` | 流量追蹤（唯讀）：抓每則已發布貼文的 IG／Threads 指標與帳號追蹤數，寫 `growth/snapshots/`；輸出前拿掉 token |
 | `cardlib.py` | 共用：唯讀解析觀念卡（含主張附的 `figures`：圖路徑、缺檔報錯、sha256 核對）、系列與發布包路徑、文字正規化與逐字比對 |
 
 **腳本參數**：`check_a`、`render`、`build_package`、`spec_diff`、`series_links` 吃 `_build/spec.json`；`contact_sheet`、`ig_publish`、`threads_publish`、`state.py ready` 吃發布包資料夾。跑超過 2 分鐘的指令（`ig_publish.py preflight`、全部回歸測試）用 Bash 的 `run_in_background`（不要自己串 `&`）。`state.py ready` 的格式名是 `ig_carousel`／`threads_thread`（打錯會報錯）。改 spec 的中文文字用 Python 取代，不用 `sed -i`（macOS 的 BSD sed 要 `-i ''`，中文與引號容易出錯）。**全篇換詞**（例：人要「把握」改「信心」，2026-11-17）：不動引用的原文標題（`series.md` 的「文章標題」、caption 導流行）；換完搜尋疊字（「信心（信心）」），用 `diff` 逐行看過；被換掉的詞加進 `config/terms.yaml`，程式 A 才擋得住下次。

@@ -65,7 +65,11 @@ def run_pairs():
         p.write_text(json.dumps(PAIRS_SPEC, ensure_ascii=False), encoding="utf-8")
         subprocess.run(["uv", "run", "python", str(RENDER), str(p)], capture_output=True, text=True, cwd=ROOT)
         rep = json.loads((Path(d) / "checks-b.json").read_text(encoding="utf-8"))
-        return {c["name"]: c["ok"] for c in rep["slides"][0]["checks"]}
+        res = {c["name"]: c["ok"] for c in rep["slides"][0]["checks"]}
+        html = (Path(d) / "html" / "01.html").read_text(encoding="utf-8")
+        # 2026-11-19 RAGU：整數的成對橫條圖曾只輸出數字、少了 <div>（數字跑到左上角，程式 B 沒抓到）；8 條橫條要有 8 個數字標籤
+        res["每條橫條都有自己的數字標籤（整數）"] = html.count('class="t abs num2"') == 8
+        return res
 
 
 def est_lines_closing_quote():

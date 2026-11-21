@@ -4,7 +4,6 @@
 
 ## 待發布
 
-- 拆解 CER：不只數票，還要看 AI 有多大信心 第 1 則：[不只數票，把每一票的信心加起來](cer/cer-process-confidence-weighted-voting/README.md)
 - 拆解 CER：不只數票，還要看 AI 有多大信心 第 2 則：[整句平均會被廢話稀釋，只看關鍵字](cer/cer-critical-token-confidence/README.md)
 - 拆解 CER：不只數票，還要看 AI 有多大信心 第 3 則：[數學比問答穩，因為信心補不了沒學過的知識](cer/cer-results-how-to-read/README.md)
 
@@ -12,7 +11,7 @@
 
 | 發文順序 | 觀念 | 標題（planned_title） | IG | Threads | 打開 |
 |---|---|---|---|---|---|
-| 1 | `cer-process-confidence-weighted-voting` | 不只數票，把每一票的信心加起來 | 待發布 | 待發布 | [README](cer-process-confidence-weighted-voting/README.md) |
+| 1 | `cer-process-confidence-weighted-voting` | 不只數票，把每一票的信心加起來 | 已發布 | 已發布 | [README](cer-process-confidence-weighted-voting/README.md) |
 | 2 | `cer-critical-token-confidence` | 整句平均會被廢話稀釋，只看關鍵字 | 待發布 | 待發布 | [README](cer-critical-token-confidence/README.md) |
 | 3 | `cer-results-how-to-read` | 數學比問答穩，因為信心補不了沒學過的知識 | 待發布 | 待發布 | [README](cer-results-how-to-read/README.md) |
 
@@ -62,6 +61,15 @@
 | 1 | `prompt-repetition-causal-bottleneck-and-fix` | 把提示詞貼兩次，第二遍就看得到全文 | 已發布 | 已發布 | [README](prompt-repetition-causal-bottleneck-and-fix/README.md) |
 | 2 | `prompt-repetition-free-lunch-latency` | 輸入變兩倍長，為什麼幾乎沒變慢？ | 已發布 | 已發布 | [README](prompt-repetition-free-lunch-latency/README.md) |
 | 3 | `prompt-repetition-results-and-boundary` | 70 組裡 47 勝 0 敗，叫 AI 先推理就變中性 | 已發布 | 已發布 | [README](prompt-repetition-results-and-boundary/README.md) |
+
+## 拆解 RAGU：GraphRAG 的天花板有多高（`ragu`）
+
+| 發文順序 | 觀念 | 標題（planned_title） | IG | Threads | 打開 |
+|---|---|---|---|---|---|
+| 1 | `ragu-pipeline-two-stage-extraction-consolidation` | 先定好名單再讓 AI 選，圖就少了斷線 | 未做 | 未做 | [README](ragu-pipeline-two-stage-extraction-consolidation/README.md) |
+| 2 | `ragu-results-peeling-confounds` | 剝掉混淆後，用圖只多答對 1.2 到 4.3% | 未做 | 未做 | [README](ragu-results-peeling-confounds/README.md) |
+| 3 | `retrieval-recall-not-answer-quality` | 證據撈得更完整，答案不一定更好 | 未做 | 未做 | [README](retrieval-recall-not-answer-quality/README.md) |
+| 4 | `small-extractor-saturation-not-scale` | 小模型夠用，是因為任務簡單 | 未做 | 未做 | [README](small-extractor-saturation-not-scale/README.md) |
 
 ## SAG：不先建圖，查詢時才連（`sag`）
 

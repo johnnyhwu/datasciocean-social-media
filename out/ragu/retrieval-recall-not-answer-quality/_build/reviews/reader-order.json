@@ -1,0 +1,194 @@
+{
+ "post": "retrieval-recall-not-answer-quality",
+ "skim": {
+  "conclusion": "AI 撈資料撈得齊，不代表答案好：撈全的同時會塞進雜訊。RAGU 撈得多，綜合題涵蓋得多，但找事實題答得少；找事實時多撈是干擾、寫綜合答案時反而有用。論文還缺了最關鍵的「撈到的有多相關」數字。所以不能只盯 Evidence Recall，要一起看雜訊、最好直接看答案。",
+  "citations": [
+   {
+    "quote": "AI 查到的資料更齊， 答案卻可能更差"
+   },
+   {
+    "quote": "4 段相關資料全撈到， 也塞進 4 段雜訊"
+   },
+   {
+    "quote": "綜合題涵蓋得多， 找事實題答對得少"
+   },
+   {
+    "quote": "找事實時多撈是干擾， 寫綜合答案時反而有用"
+   },
+   {
+    "quote": "最需要的那個數字 論文列了卻沒報"
+   },
+   {
+    "quote": "只盯 Evidence Recall， 系統會一路往多撈走； 要一起看撈進多少雜訊， 最好直接看答案。"
+   }
+  ]
+ },
+ "core": {
+  "thesis": {
+   "answer": "只看「該查的有沒有查到」會把系統推向多撈，多撈可能讓 AI 挑錯答案。",
+   "citations": [
+    {
+     "quote": "只看「該查的有沒有查到」， 會把系統一路推向多撈； 多撈進來的段落，可能讓 AI 挑錯答案"
+    }
+   ]
+  },
+  "mechanism": {
+   "answer": "多撈進來的相關但答案不同的材料會變成干擾項，資料太長時中間也容易被忽略。",
+   "citations": [
+    {
+     "quote": "多塞幾段意思相關、但答案不同的材料，AI 挑錯的機率就上升"
+    },
+    {
+     "quote": "資料很長時，AI 對開頭和結尾敏感，中間容易被忽略"
+    }
+   ]
+  },
+  "evidence": {
+   "answer": "RAGU 綜合題涵蓋率 57.4% 對 34.7% 較高，但找事實題答對率 54.2% 對 72.4% 較低；雜訊多寡論文沒量。",
+   "citations": [
+    {
+     "quote": "RAGU 涵蓋的重點比 HippoRAG 2 多 22.7%；Fact Retrieval 要一個精確的事實，RAGU 的答對率卻是 54.2% 對 72.4%。"
+    },
+    {
+     "quote": "撈進多少雜訊，論文沒有量過"
+    }
+   ]
+  }
+ },
+ "terms": [
+  {
+   "term": "Evidence Recall",
+   "blocks_core": false,
+   "note": "第 2 張就有白話與算式說明（相關的撈到幾成），清楚。"
+  },
+  {
+   "term": "Precision",
+   "blocks_core": false,
+   "note": "第 2 張有說明「撈到的東西有幾成相關」。"
+  },
+  {
+   "term": "RAGU",
+   "blocks_core": false,
+   "note": "第 4 張才介紹，第 1、2 張沒出現，OK。"
+  },
+  {
+   "term": "GraphRAG / 知識圖",
+   "blocks_core": false,
+   "note": "第 4 張有說明，但這則重點不在圖，讀者可略過。"
+  },
+  {
+   "term": "Coverage",
+   "blocks_core": false,
+   "note": "第 4 張有說明。"
+  },
+  {
+   "term": "Fact Retrieval / Creative Generation",
+   "blocks_core": false,
+   "note": "第 6 張圖上附中文（找事實）（綜合題），可懂。"
+  },
+  {
+   "term": "HippoRAG 2",
+   "blocks_core": false,
+   "note": "第 4 張說是論文拿來比的另一套系統。"
+  },
+  {
+   "term": "LocalSearch / consolidation",
+   "blocks_core": false,
+   "note": "第 7 張圖上英文，但旁邊有中文說明，不擋。"
+  },
+  {
+   "term": "Context Relevancy",
+   "blocks_core": false,
+   "note": "第 10 張圖上附「撈到的資料有多相關」，可懂。"
+  },
+  {
+   "term": "實體",
+   "blocks_core": false,
+   "note": "第 4 張括號說明「提到的人、事、物」；第 7 張圖上用到，可懂。"
+  }
+ ],
+ "post_only_questions": [
+  {
+   "q": "貼文說 RAGU「撈得多」，但沒有給 RAGU 和 HippoRAG 2 的 Evidence Recall 數字，只在第 10 張說 HippoRAG 2 的較低；RAGU 到底撈得多多少？",
+   "answer": "",
+   "citations": []
+  },
+  {
+   "q": "第 9 張「論文說題目越難 RAGU 越強」：這一則沒說過題目有分難度、Fact Retrieval 和 Creative Generation 是難度的兩端，要自己猜。",
+   "answer": "",
+   "citations": []
+  }
+ ],
+ "feel": {
+  "felt_misled": "大致沒有。封面說「可能更差」，用的是「可能」，內文也承認雜訊沒量過。只是第 6 張把 Coverage 和答對率兩個不同分數放在同一張圖，第一眼會以為是同一種比較。",
+  "unclear_slides": [
+   6,
+   9
+  ]
+ },
+ "takeaways": [
+  {
+   "note": "撈得全（Recall）和撈得準（Precision）是兩回事，只看前者會越撈越多。"
+  },
+  {
+   "note": "找單一事實時多撈是干擾，寫綜合答案時多撈反而有用。"
+  },
+  {
+   "note": "調查資料系統要一起看雜訊，最好直接看答案對不對。"
+  }
+ ],
+ "hard_to_understand": [
+  {
+   "slide": 6,
+   "quote": "綜合題涵蓋得多， 找事實題答對得少",
+   "why": "上下兩組是不同分數（Coverage 和答對率），放同一張圖、同一個 % 軸，容易誤讀成同一種比較；看懂要靠左邊小字。"
+  },
+  {
+   "slide": 7,
+   "quote": "RAGU 撈到的不是更正確的資訊，是更完整、但濃度更低的資訊，而且這是設計造成的：",
+   "why": "「濃度更低」是比喻，下面流程圖只說越擴越多，沒有直接顯示「濃度」怎麼變低（且圖註說 Precision 論文沒量）。"
+  },
+  {
+   "slide": 9,
+   "quote": "論文說題目越難 RAGU 越強；這可能才是真正的原因",
+   "why": "這則沒交代題目有難度分級，突然出現「題目越難」；也沒說 Creative Generation 是最難的。"
+  },
+  {
+   "slide": 10,
+   "quote": "能回答這件事的指標，全篇沒有一個數值，也沒說明原因。",
+   "why": "「這件事」指什麼要回頭看上一句；可讀但要繞一下。"
+  }
+ ],
+ "charts": [
+  {
+   "slide": 2,
+   "can_state_claim": true,
+   "issue": "甲 3 顆實心 1 顆空心、乙 4 顆實心 4 個叉，一眼看懂「全撈到但也撈進雜訊」。很好。"
+  },
+  {
+   "slide": 5,
+   "can_state_claim": true,
+   "issue": "路線圖，非數據圖。"
+  },
+  {
+   "slide": 6,
+   "can_state_claim": true,
+   "issue": "看得出 RAGU 綜合題高、找事實題低；但兩組是不同指標，需要讀小字才不誤會。"
+  },
+  {
+   "slide": 7,
+   "can_state_claim": true,
+   "issue": "三層流程看得出越擴越多；但「越撈越多」的量沒有視覺化（三個框一樣大）。"
+  },
+  {
+   "slide": 9,
+   "can_state_claim": true,
+   "issue": "左右對照清楚：找事實要撈得準、綜合題要撈得全。"
+  },
+  {
+   "slide": 10,
+   "can_state_claim": true,
+   "issue": "報了的三個指標 vs 沉在水下的 Context Relevancy 問號，看得懂「列了沒報」。"
+  }
+ ]
+}

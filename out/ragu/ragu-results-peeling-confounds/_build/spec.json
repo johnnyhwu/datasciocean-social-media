@@ -1,0 +1,404 @@
+{
+  "series": "ragu",
+  "concept": "ragu-results-peeling-confounds",
+  "also_concepts": [],
+  "lang": "zh-TW",
+  "status": "draft",
+  "hook": {
+    "style": "讀者疑問",
+    "title": "AI 先畫知識圖再回答，\n[[真的比較準嗎？]]",
+    "subtitle": "RAGU 論文的實驗：\n同一套程式拿掉圖，\n答對率只差 1.2 到 4.3%",
+    "refs": [
+      "c1",
+      "c10",
+      "c11"
+    ],
+    "candidate": "A"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "title": "AI 先畫知識圖再回答，\n[[真的比較準嗎？]]",
+      "body": "RAGU 論文的實驗：\n同一套程式拿掉圖，\n答對率只差 1.2 到 4.3%",
+      "refs": [
+        "c1",
+        "c10",
+        "c11"
+      ],
+      "quals": [
+        "c1#4"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "lift",
+      "title": "答案改短多 16.9%，\n[[用圖只多 1.2%]]",
+      "body": "同一組醫療題目，只把 AI 的答案從長改短，答對率就多 16.9%；花工夫建一整張知識圖，和同一套程式但不用圖的版本比，只多 1.2%。",
+      "heads": [
+        "改之前",
+        "改之後"
+      ],
+      "unit": "%",
+      "nodes": [
+        {
+          "text": "只把答案從長改短",
+          "sub": "同一套檢索",
+          "base": 56.0,
+          "top": 72.9,
+          "pair": [
+            "長答案",
+            "短答案"
+          ]
+        },
+        {
+          "text": "不用圖改成用圖",
+          "sub": "同一套程式、同一個提示詞、都用短答案",
+          "base": 71.7,
+          "top": 72.9,
+          "emph": true,
+          "pair": [
+            "不用圖",
+            "用圖"
+          ]
+        }
+      ],
+      "note": "答對率是另一個 AI 當裁判的單次評分，個位數差距不宜當結論",
+      "refs": [
+        "c6",
+        "c11",
+        "c10",
+        "c5"
+      ],
+      "quals": [
+        "c6#1",
+        "c11#1",
+        "c1#3"
+      ],
+      "label": "BioASQ"
+    },
+    {
+      "layout": "recap",
+      "title": "[[前情提要]]與這一則重點",
+      "current": "ragu-results-peeling-confounds",
+      "refs": [
+        "結構"
+      ]
+    },
+    {
+      "layout": "context",
+      "title": "先認識三個名字",
+      "body": "一般的 RAG 撈出最像的幾段文件，每段各自獨立，看不到跨文件的關聯。",
+      "rows": [
+        [
+          "GraphRAG",
+          "請 LLM 抽出文件裡的實體（人、組織、產品）和關係，建成知識圖，查資料時沿著圖上的線走"
+        ],
+        [
+          "RAGU",
+          "ITMO University 團隊 2026 年 7 月放上 arXiv；主張建圖時把「抽取」和「整併」拆開，圖會更乾淨"
+        ],
+        [
+          "HippoRAG 2",
+          "另一套 GraphRAG 代表系統，這一則的主要對手"
+        ]
+      ],
+      "key_w": 230,
+      "refs": [
+        "c3",
+        "c2"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "route",
+      "title": "1.2 到 4.3% 怎麼來？\n[[一層一層剝]]",
+      "label": "路線圖",
+      "body": "論文比了四組題庫（三組一般問答、一組分四級難度的醫療題）。每個系統都用同一個 AI 寫答案，只換建圖的方式；再請另一個 AI 當裁判判斷對不對，算出答對率。",
+      "nodes": [
+        {
+          "text": "答案寫長寫短",
+          "sub": "都用短答案時，RAGU 和 HippoRAG 2 誰強？"
+        },
+        {
+          "text": "用圖還是不用圖",
+          "sub": "同一套程式，只差在用不用圖"
+        },
+        {
+          "text": "「越難越強」",
+          "sub": "最難那一級追過對手，是誰在動？"
+        }
+      ],
+      "heads": [
+        "剝三層",
+        "最後：讀這類論文先做的三個檢查"
+      ],
+      "refs": [
+        "c4",
+        "c1",
+        "c6",
+        "c10",
+        "c13"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "lift",
+      "title": "標準答案很短，\n[[RAGU 卻預設寫長的]]",
+      "label": "答案格式",
+      "body": "需要串好幾份資料才答得出的題目（Multi-Hop），標準答案很短（例如「Bell Laboratories」），RAGU 卻預設寫長的。系統不變、只要 AI 答短：",
+      "heads": [
+        "長答案",
+        "短答案"
+      ],
+      "unit": "%",
+      "nodes": [
+        {
+          "text": "BioASQ",
+          "base": 56.0,
+          "top": 72.9,
+          "emph": true
+        },
+        {
+          "text": "2Wiki",
+          "base": 46.6,
+          "top": 58.0
+        },
+        {
+          "text": "MuSiQue",
+          "base": 43.5,
+          "top": 40.1
+        }
+      ],
+      "refs": [
+        "c6"
+      ],
+      "quals": [
+        "c6#1"
+      ],
+      "note": "光改短，兩組題庫各多 16.9% 和 11.4%"
+    },
+    {
+      "layout": "table",
+      "title": "都用短答案比，\n[[RAGU 平手或落後]]",
+      "label": "答案格式",
+      "body": "光換一句提示詞就多出的 16.9%，比論文任何一項方法的貢獻都大。所以要先扣掉答案長短：兩邊都用短答案，再比答對率。",
+      "rows": [
+        [
+          "BioASQ",
+          "RAGU 72.9%、HippoRAG 2 72.4%：差 0.5%，打平"
+        ],
+        [
+          "2Wiki",
+          "RAGU 58.0%、HippoRAG 2 63.5%：落後 5.5%"
+        ],
+        [
+          "MuSiQue",
+          "RAGU 40.1%、HippoRAG 2 54.4%：落後 14.3%"
+        ]
+      ],
+      "key_w": 230,
+      "note": "論文說兩邊各有擅長、不是誰全面贏；但都用短答案比，RAGU 一項都沒有贏",
+      "refs": [
+        "c7",
+        "c8",
+        "c9",
+        "c1"
+      ],
+      "quals": [
+        "c8#1",
+        "c9#1",
+        "c1#1"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "lift",
+      "title": "拿掉圖，\n[[答對率差不到 5%]]",
+      "label": "NaiveRAG 對照",
+      "body": "NaiveRAG 是 RAGU 自己的程式、同一個提示詞，只是完全不用圖。用圖多答對的，比只改答案長短的 16.9% 小。",
+      "heads": [
+        "不用圖",
+        "用圖"
+      ],
+      "unit": "%",
+      "nodes": [
+        {
+          "text": "BioASQ",
+          "base": 71.7,
+          "top": 72.9
+        },
+        {
+          "text": "2Wiki",
+          "base": 53.7,
+          "top": 58.0,
+          "emph": true
+        },
+        {
+          "text": "MuSiQue",
+          "base": 36.6,
+          "top": 40.1
+        }
+      ],
+      "note": "兩邊都用短答案",
+      "refs": [
+        "c10",
+        "c11",
+        "c1"
+      ],
+      "quals": [
+        "c11#1",
+        "c1#4"
+      ]
+    },
+    {
+      "layout": "chart_bars",
+      "title": "論文說越難越強？\n[[主要是對手往下掉]]",
+      "label": "難度分級",
+      "body": "拆開看：RAGU 沒有一路掉分，HippoRAG 2 從 72.4% 掉到 56.9%；最難那級只差 2.1%，在 AI 裁判的雜訊範圍內。",
+      "unit": "%",
+      "axis_max": 100,
+      "legend": [
+        "HippoRAG 2",
+        "RAGU"
+      ],
+      "bars": [
+        {
+          "name": "第 1 級",
+          "value": 72.4,
+          "value2": 54.2,
+          "subs": [
+            "Fact Retrieval"
+          ]
+        },
+        {
+          "name": "第 2 級",
+          "value": 68.4,
+          "value2": 53.7,
+          "subs": [
+            "Complex Reasoning"
+          ]
+        },
+        {
+          "name": "第 3 級",
+          "value": 65.0,
+          "value2": 64.1,
+          "subs": [
+            "Contextual Summarize"
+          ]
+        },
+        {
+          "name": "第 4 級（最難）",
+          "value": 56.9,
+          "value2": 59.0,
+          "subs": [
+            "Creative Generation"
+          ]
+        }
+      ],
+      "note": "答對率（AC）；都用 RAGU 附帶的抽取模型建圖",
+      "fig_refs": [
+        "ragu/figure3.png"
+      ],
+      "refs": [
+        "c1",
+        "c13",
+        "c14",
+        "c15",
+        "c9"
+      ],
+      "quals": [
+        "c1#2",
+        "c1#5",
+        "c13#1",
+        "c14#1",
+        "c9#2"
+      ]
+    },
+    {
+      "layout": "diagram",
+      "kind": "stops",
+      "title": "讀這類論文，\n[[先做三個檢查]]",
+      "label": "帶走",
+      "body": "看到漂亮的差距，先問：有沒有更平凡的原因（提示詞、答案格式、切段大小、對照組設定）在解釋它？RAGU 這篇三個檢查都踩到：",
+      "nodes": [
+        {
+          "text": "找乾淨的對照：誰跟誰只差一個變因",
+          "sub": "這篇的乾淨對照是 NaiveRAG"
+        },
+        {
+          "text": "查論文說要量、卻沒給數字的項目",
+          "sub": "論文列了 Context Relevancy，卻沒有任何一個數值"
+        },
+        {
+          "text": "查核心賣點有沒有對照實驗",
+          "sub": "唯一新的一步「整併」（去重與摘要），沒比過有它和沒它"
+        }
+      ],
+      "refs": [
+        "c16",
+        "c17"
+      ]
+    },
+    {
+      "layout": "takeaway",
+      "question": "AI 先畫知識圖再回答，真的比較準嗎？",
+      "title": "RAGU 用自己的程式比：\n圖只多答對 1.2 到 4.3%。\n看到差距，\n先找更平凡的原因。",
+      "refs": [
+        "c18",
+        "c11",
+        "c17"
+      ],
+      "quals": [
+        "c18#1"
+      ]
+    }
+  ],
+  "threads": {
+    "mode": "carousel",
+    "body": {
+      "text": "AI 先畫知識圖再回答，真的比較準嗎？\n\nGraphRAG 的做法是先請 AI 把文件裡的人、組織、產品和它們的關係抽出來，建成一張知識圖，查資料時沿著圖走。RAGU（ITMO University 團隊，2026 年 7 月放上 arXiv）主張把建圖拆成抽取和整併兩個階段，圖會更乾淨。\n\n但它的實驗裡，光把答案改短，BioASQ 的答對率就多 16.9%；都用短答案比，RAGU 對 HippoRAG 2 是平手或落後。RAGU 反而意外量出了 GraphRAG 的天花板：用它自己的程式、自己的提示詞，和不用圖的版本比，圖只多答對 1.2 到 4.3%。這種「不要做什麼」的結果很少有人願意發表；正在評估要不要導入 GraphRAG 的人，這比論文想證明的東西更有用。\n\n答對率是另一個 AI 當裁判、只打一次的分數，論文沒有誤差範圍，也沒有人工檢查裁判準不準，所以差幾個百分點不宜當結論。細節在圖裡。\n\n這是 RAGU 系列的第二則；證據撈得多、答案為什麼沒變好，在這個系列的下一則。",
+      "refs": [
+        "c3",
+        "c2",
+        "c6",
+        "c8",
+        "c1",
+        "c10",
+        "c11",
+        "c18",
+        "c5"
+      ],
+      "quals": [
+        "c1#1",
+        "c1#3",
+        "c1#4",
+        "c6#1",
+        "c8#1",
+        "c11#1",
+        "c18#1"
+      ]
+    },
+    "last": {
+      "text": "看到漂亮的差距，先問有沒有更平凡的原因：提示詞、答案格式、切段大小、對照組設定。\n文章：datasciocean.com/paper-intro/ragu\n同系列：先定好名單再讓 AI 選，圖就少了斷線（尚未發布）\n同系列：證據撈得更完整，答案不一定更好（尚未發布）\n同系列：小模型夠用，是因為任務簡單（尚未發布）",
+      "refs": [
+        "c17"
+      ],
+      "quals": [],
+      "link": "https://datasciocean.com/paper-intro/ragu/"
+    }
+  },
+  "caption": {
+    "first": "GraphRAG 先把文件畫成知識圖再回答，真的比較準嗎？RAGU 論文的實驗拆開來看",
+    "first_refs": [
+      "c1",
+      "c3"
+    ],
+    "nav": "完整文章在 datasciocean.com，搜「RAGU」",
+    "hashtags": [
+      "RAGU",
+      "GraphRAG",
+      "RAG",
+      "LLM"
+    ]
+  }
+}

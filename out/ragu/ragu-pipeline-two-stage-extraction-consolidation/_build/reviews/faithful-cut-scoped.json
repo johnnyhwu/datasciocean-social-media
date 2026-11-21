@@ -1,0 +1,28 @@
+{"post": "ragu-pipeline-two-stage-extraction-consolidation",
+ "blocks": [
+  {"block": "第 6 張",
+   "atoms": [
+    {"text": "RAGU 的型別表沒有「創造」這類關係", "verdict": "完全支持", "card_quote": "NEREL 裡沒有 `CREATOR_OF` 這類關係", "note": "型別表＝論文用的 NEREL schema（c10「論文用的 NEREL schema」）。"},
+    {"text": "AI 只好把 Ritchie 和 C 語言連成「擔任」，線畫錯了", "verdict": "完全支持", "card_quote": "Dennis Ritchie | C Programming Language | WORKS_AS … 前兩條是錯的。原文說 Ritchie 創造了 C 語言，`WORKS_AS` 的語意是「擔任某職位」，完全不對。", "note": "「只好」的因果來自 c12「LLM 被迫在 49 個型別裡挑一個最接近的，就挑錯了」（部落格推論），以作者口吻寫，未比卡強。"},
+    {"text": "後面的問答還是答對了，因為查回來的是原始段落", "verdict": "完全支持", "card_quote": "後面的多跳問答還是答對了「Ritchie 創造了 C 語言」，因為檢索回來的是原始 chunk 文字，不是只有那條錯誤的邊", "note": ""},
+    {"text": "圖在這裡主要是幫忙找段落", "verdict": "完全支持", "card_quote": "這反過來說明圖在這裡的作用主要是「找到相關段落」", "note": "保留「在這裡」，範圍未放大。"},
+    {"text": "圖：Ritchie → C 語言｜關係：WORKS_AS｜錯的", "verdict": "完全支持", "card_quote": "Dennis Ritchie | C Programming Language | WORKS_AS", "note": ""},
+    {"text": "圖：查回來的原文段落「Ritchie 創造了 C 語言」｜LLM 從原文讀出答案｜答對", "verdict": "完全支持", "card_quote": "原文說 Ritchie 創造了 C 語言 … 最終答案還是 LLM 從原文讀出來的", "note": "引號內是原文內容的中文轉述（卡上也是「原文說…」），不是逐字原文，不改變意思。"}
+   ],
+   "errors": []},
+  {"block": "Threads 正文",
+   "atoms": [
+    {"text": "AI 畫知識圖，常畫出接不上的線。", "verdict": "完全支持", "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字", "note": "首句沒說完整（未寫「單次抽取時」），下一句即補上，字面為真。"},
+    {"text": "讓 AI 一次把…抽出來，它常在關係裡寫出清單上沒有的名字，線就指向一個不存在的點", "verdict": "完全支持", "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字——實體抽到「Bell Laboratories」，關係卻寫「Bell Labs」，邊就指向一個不存在的節點。", "note": ""},
+    {"text": "RAGU 拆兩趟：先抽出實體（人、組織、產品這類）、定好名單，再抽關係，兩頭只能是名單上的名字", "verdict": "完全支持", "card_quote": "抽取被拆成兩趟 LLM 呼叫： … 約束：每個關係的 source_entity 與 target_entity … 必須是 E 裡面已驗證過的名字", "note": "「人、組織、產品」取自 c3「實體（人、組織、產品）」。"},
+    {"text": "這招不是 RAGU 發明的", "verdict": "完全支持", "card_quote": "跟 Microsoft GraphRAG、LightRAG 相比，差別只有 Step 3 這一格，其他每一格都是既有做法。", "note": "兩階段抽取屬 Step 2，卡上 Step 3 才是「唯一的原創處」。"},
+    {"text": "但很值得借用", "verdict": "完全支持", "card_quote": "它的兩階段 typed extraction 是個可以單獨拿走用的好 pattern", "note": ""},
+    {"text": "也不限於知識圖：只要 AI 要從一組既有的東西裡挑，就先把合法選項定死再讓它選", "verdict": "完全支持", "card_quote": "這個 pattern 可以脫離 GraphRAG 單獨用：任何時候要 LLM 產生「指向既有事物」的輸出，先把合法選項定死，再讓它選。", "note": ""},
+    {"text": "型別表來自俄語新聞的標註，論文自己也承認換語言或領域可能要重新設計", "verdict": "完全支持", "card_quote": "來自一套俄語新聞語料的標註體系。論文自己在 Bias 段承認換語言或換領域可能要重新設計 schema", "note": "c1#1、c9#1 帶出。"},
+    {"text": "表裡沒有的類別，AI 只能挑最接近的，就會挑錯", "verdict": "完全支持", "card_quote": "blog 指出 schema 覆蓋不足時，LLM 被迫在既有型別裡挑一個最接近的，就會挑錯", "note": "c1#2、c9#2 帶出。"},
+    {"text": "RAGU 自己的例子裡圖畫錯了，答案卻是對的，因為查回來的是原文段落", "verdict": "完全支持", "card_quote": "圖錯了，答案卻對了：後面的多跳問答還是答對了「Ritchie 創造了 C 語言」，因為檢索回來的是原始 chunk 文字", "note": "「RAGU 自己的例子」對應 c11「論文挑出來的 demo」，範圍限於該例。"}
+   ],
+   "errors": []}
+ ],
+ "recalculations": [],
+ "gaps": []}

@@ -1,0 +1,204 @@
+{
+ "post": "ragu-results-peeling-confounds",
+ "skim": {
+  "conclusion": "先畫知識圖再回答沒有明顯比較準：只把答案改短就多 16.9%，用圖只多 1.2 到 4.3%；兩邊都用短答案時 RAGU 對 HippoRAG 2 平手或落後；「越難越強」主要是對手往下掉。看到差距要先找更平凡的原因。",
+  "citations": [
+   {
+    "quote": "AI 先畫知識圖再回答， 真的比較準嗎？"
+   },
+   {
+    "quote": "答案改短多 16.9%， 用圖只多 1.2%"
+   },
+   {
+    "quote": "都用短答案比， RAGU 平手或落後"
+   },
+   {
+    "quote": "拿掉圖， 答對率差不到 5%"
+   },
+   {
+    "quote": "論文說越難越強？ 主要是對手往下掉"
+   },
+   {
+    "quote": "RAGU 用自己的程式比： 圖只多答對 1.2 到 4.3%。 看到差距， 先找更平凡的原因。"
+   }
+  ]
+ },
+ "core": {
+  "thesis": {
+   "answer": "用圖帶來的好處很小，比答案長短這種平凡因素的影響還小。",
+   "citations": [
+    {
+     "quote": "用圖多答對的，比只改答案長短的 16.9% 小。"
+    }
+   ]
+  },
+  "mechanism": {
+   "answer": "標準答案很短，RAGU 預設寫長的，所以光改短就大幅加分；扣掉這個因素再比，圖的貢獻才看得清。",
+   "citations": [
+    {
+     "quote": "標準答案很短（例如「Bell Laboratories」），RAGU 卻預設寫長的。"
+    },
+    {
+     "quote": "所以要先扣掉答案長短：兩邊都用短答案，再比答對率。"
+    }
+   ]
+  },
+  "evidence": {
+   "answer": "同一套程式不用圖對用圖：71.7% 對 72.9%、53.7% 對 58.0%、36.6% 對 40.1%；都用短答案時 RAGU 對 HippoRAG 2 打平或落後 5.5%、14.3%。",
+   "citations": [
+    {
+     "quote": "不用圖 71.7%・用圖 72.9%｜+1.2%"
+    },
+    {
+     "quote": "MuSiQue｜RAGU 40.1%、HippoRAG 2 54.4%：落後 14.3%"
+    }
+   ]
+  }
+ },
+ "terms": [
+  {
+   "term": "知識圖",
+   "blocks_core": false,
+   "note": "封面與第 2 張就出現，第 4 張才說明「抽出實體和關係建成知識圖」；字面可猜，不擋。"
+  },
+  {
+   "term": "RAG",
+   "blocks_core": false,
+   "note": "第 4 張「一般的 RAG 撈出最像的幾段文件」算有白話說明，但沒說撈文件是為了讓 AI 回答。"
+  },
+  {
+   "term": "BioASQ",
+   "blocks_core": false,
+   "note": "第 2 張小標籤與圖上出現，補充說「同一組醫療題目」，可懂是題庫名。"
+  },
+  {
+   "term": "2Wiki、MuSiQue",
+   "blocks_core": false,
+   "note": "第 6、7、8 張圖上的題庫名，沒有個別說明；只能從第 5 張「四組題庫」推知是題庫，夠用。"
+  },
+  {
+   "term": "Multi-Hop",
+   "blocks_core": false,
+   "note": "第 6 張有白話「需要串好幾份資料才答得出的題目」。"
+  },
+  {
+   "term": "NaiveRAG",
+   "blocks_core": false,
+   "note": "第 8 張小標籤，補充有說明「RAGU 自己的程式…只是完全不用圖」。"
+  },
+  {
+   "term": "HippoRAG 2",
+   "blocks_core": false,
+   "note": "第 4 張說是「另一套 GraphRAG 代表系統」，夠用。"
+  },
+  {
+   "term": "Fact Retrieval / Complex Reasoning / Contextual Summarize / Creative Generation",
+   "blocks_core": false,
+   "note": "第 9 張圖上的英文級別名，沒翻譯；但有「第 1 級…第 4 級（最難）」可懂難度順序。"
+  },
+  {
+   "term": "AC",
+   "blocks_core": false,
+   "note": "第 9 張圖註「答對率（AC）」，括號英文縮寫，不擋。"
+  },
+  {
+   "term": "Context Relevancy",
+   "blocks_core": false,
+   "note": "第 10 張圖上，沒說明是什麼指標；只知道論文列了沒數字，不擋核心。"
+  },
+  {
+   "term": "整併",
+   "blocks_core": false,
+   "note": "第 10 張括號「去重與摘要」，「去重」對一般人略生硬。"
+  }
+ ],
+ "post_only_questions": [
+  {
+   "q": "第 7 張說「光換一句提示詞就多出的 16.9%」，前面都說是「把答案改短」，改短和換提示詞的關係要自己串。",
+   "answer": "",
+   "citations": []
+  },
+  {
+   "q": "第 9 張「難度分級」用的是哪一組題庫？第 5 張提到醫療題分四級，猜是那組，但圖上沒寫。",
+   "answer": "",
+   "citations": []
+  }
+ ],
+ "feel": {
+  "felt_misled": "沒有。封面副標「答對率只差 1.2 到 4.3%」內文有完整拆解，還提醒 AI 裁判評分有雜訊。",
+  "unclear_slides": [
+   9,
+   10
+  ]
+ },
+ "takeaways": [
+  {
+   "note": "用知識圖只多答對 1.2 到 4.3%，比只改答案長短的 16.9% 小很多。"
+  },
+  {
+   "note": "看到論文漂亮的差距，先問有沒有提示詞、答案格式等平凡原因。"
+  },
+  {
+   "note": "找「只差一個變因」的乾淨對照組來比。"
+  }
+ ],
+ "hard_to_understand": [
+  {
+   "slide": 7,
+   "quote": "光換一句提示詞就多出的 16.9%，比論文任何一項方法的貢獻都大。",
+   "why": "前面一直說「改短答案」，這裡換成「換一句提示詞」，一般人要自己推出「叫 AI 答短 = 改提示詞」。"
+  },
+  {
+   "slide": 9,
+   "quote": "最難那級只差 2.1%，在 AI 裁判的雜訊範圍內。",
+   "why": "「雜訊範圍」沒說多大、怎麼知道；另外圖上 RAGU 其實一路往上（54.2→59.0），主標只說對手往下掉，可以多一句點出 RAGU 也有上升。"
+  },
+  {
+   "slide": 10,
+   "quote": "論文列了 Context Relevancy，卻沒有任何一個數值",
+   "why": "不知道 Context Relevancy 是什麼、為什麼缺它很重要。"
+  },
+  {
+   "slide": 5,
+   "quote": "最難那一級追過對手，是誰在動？",
+   "why": "路線圖在還沒講「分難度」之前就出現「最難那一級」，當下有點跳，到第 9 張才懂。"
+  }
+ ],
+ "charts": [
+  {
+   "slide": 2,
+   "can_state_claim": true,
+   "issue": "兩條橫條：+16.9% 的深色段明顯比 +1.2% 長，一眼看懂改短的效果比用圖大。"
+  },
+  {
+   "slide": 5,
+   "can_state_claim": true,
+   "issue": "路線圖，列出三層要剝的東西；非數據圖。"
+  },
+  {
+   "slide": 6,
+   "can_state_claim": true,
+   "issue": "三組題庫改短的增減清楚；MuSiQue −3.4% 用虛線表示，圖例有說明「短答案少掉的」。"
+  },
+  {
+   "slide": 7,
+   "can_state_claim": true,
+   "issue": "表格，三列數字清楚；主標「平手或落後」與內容一致。"
+  },
+  {
+   "slide": 8,
+   "can_state_claim": true,
+   "issue": "增加的橘色小段都很短，看得出用圖幫助不大。"
+  },
+  {
+   "slide": 9,
+   "can_state_claim": true,
+   "issue": "看得出 HippoRAG 2 一路下降、最後一級 RAGU 略高；但沒寫是哪組題庫，且圖例 HippoRAG 2 在上、RAGU 在下，需對照色塊。"
+  },
+  {
+   "slide": 10,
+   "can_state_claim": true,
+   "issue": "三個檢查清單，非數據圖；Context Relevancy 未解釋。"
+  }
+ ]
+}

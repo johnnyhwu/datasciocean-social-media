@@ -1,0 +1,40 @@
+{"post": "retrieval-recall-not-answer-quality",
+ "blocks": [
+  {"block": "第 5 張",
+   "atoms": [
+    {"text": "主標：撈得多，答對率卻輸", "verdict": "完全支持",
+     "card_quote": "如果 RAGU 檢索到更完整的證據，為什麼最終答案正確率反而輸？",
+     "note": "c7（normal）。『撈得多』另有 c9「整條路線的傾向就是多撈」與 c13「HippoRAG 2 在 Evidence Recall 較低的情況下仍然贏得 factoid AC」支撐，未依賴 pending 的 c6。卡上 c7 的寫法同樣未限定層級；限定到 Fact Retrieval 的數字與條件在第 6 張（Fact Retrieval、醫療題庫、Meno-Lite、AI 裁判評一次），最難一級 RAGU 贏但在誤差內在第 9 張圖註。路線圖主標不另列 blocker。"},
+    {"text": "主標：分三段拆／圖上『三段』", "verdict": "完全支持",
+     "card_quote": "（結構元素，不需對證）",
+     "note": "指本則後面的三段敘事結構，非宣稱機制只有三個。"},
+    {"text": "補充：Evidence Recall 只測該撈的撈到沒有，完全不測不該撈的有沒有撈進來。", "verdict": "完全支持",
+     "card_quote": "Evidence Recall 只測「該撈的撈到沒有」，完全不測「不該撈的有沒有撈進來」",
+     "note": "c1 逐字（僅去掉引號）。"},
+    {"text": "圖：撈得多，答對率卻輸｜論文裡最值得想清楚的矛盾", "verdict": "完全支持",
+     "card_quote": "但這就引出整篇論文最值得想清楚的張力：**如果 RAGU 檢索到更完整的證據，為什麼最終答案正確率反而輸？**",
+     "note": "c7。卡寫『張力』，貼文寫『矛盾』，意思一致，不比卡強。"},
+    {"text": "圖：多撈怎麼傷到答案｜干擾項，和中間被忽略", "verdict": "完全支持",
+     "card_quote": "多撈為什麼實際上會傷害答案，有三個機制。第一是干擾項…第二是 lost in the middle，長 context 裡模型對開頭結尾敏感、中間容易被忽略",
+     "note": "c10。其限定條件（Precision 沒有人測）在第 7 張圖註與第 8 張圖註出現。"},
+    {"text": "圖：什麼題目反而吃香｜題目性質決定誰吃虧", "verdict": "完全支持",
+     "card_quote": "第三是任務性質決定誰吃虧：",
+     "note": "c11。『什麼題目反而吃香』對應 c11「有利於 | 高 precision | 高 recall」。"},
+    {"text": "圖：最後：調系統時該盯哪個分數", "verdict": "完全支持",
+     "card_quote": "這條會改變你調系統時盯哪個儀表板，而且跟 GraphRAG 完全無關。",
+     "note": "c16（normal）；本張『引用』未列 c16，但內容在卡上有據，且第 11 張引用了 c16。"}
+   ],
+   "errors": []},
+  {"block": "IG caption（第一句）",
+   "atoms": [
+    {"text": "Evidence Recall 越高答案越好？", "verdict": "完全支持",
+     "card_quote": "檢索指標好不等於答案好",
+     "note": "c1 的問句化；問句本身不構成新主張。"},
+    {"text": "RAGU 找事實題的答對率反而輸 HippoRAG 2", "verdict": "完全支持",
+     "card_quote": "Fact Retrieval | 26.2 | **72.4** | 54.2",
+     "note": "c7：Fact Retrieval 的 AC，HippoRAG 2 72.4、RAGU 54.2。『反而』暗示 RAGU 的 Evidence Recall 較高，由 c13（normal）「HippoRAG 2 在 Evidence Recall 較低的情況下仍然贏得 factoid AC」支撐，不依賴 pending 的 c6。c7 的限定條件（醫療題庫、Meno-Lite-0.1 建圖、單一 judge 單次評分、無 error bar 與人工驗證）在第 6 張圖註與 Threads 正文出現，caption 第一句省略可接受。"}
+   ],
+   "errors": []}
+ ],
+ "recalculations": [],
+ "gaps": []}

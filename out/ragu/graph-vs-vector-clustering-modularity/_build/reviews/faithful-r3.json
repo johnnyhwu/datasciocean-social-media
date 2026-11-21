@@ -1,0 +1,50 @@
+{"post": "graph-vs-vector-clustering-modularity",
+ "blocks": [
+  {"block": "第 2 張", "atoms": [
+    {"text": "同一張圖分出 4 群還是 2 群", "verdict": "完全支持", "card_quote": "向量分群的結果（按語意）:…群 D = {Oct 12 2011, 70}…圖分群的結果（按結構）:…群 2 = {Alistair, Bell Labs, Murray Hill, NJ}", "note": "c11 向量 4 群（A–D）、圖 2 群（1–2）。"},
+    {"text": "要回答「Ritchie 是誰」，要的是右邊那群（照連線分）", "verdict": "完全支持", "card_quote": "對 RAG 來說要的是後者：使用者問「Dennis Ritchie 是誰」，你希望一次撈到他的作品、死亡日期、年齡", "note": "c12；右邊＝圖分群。右邊有兩群，「那群」單數略含糊，但字面指圖分群一側，不改卡意。"},
+    {"text": "照語意分：4 群同類", "verdict": "完全支持", "card_quote": "會分到一起的 | 同類的東西 | 有關係的東西", "note": "c1"},
+    {"text": "都是人：Dennis 和父親 Alistair", "verdict": "完全支持", "card_quote": "群 A = {Dennis Ritchie, Alistair E. Ritchie}   ← 都是人", "note": "c11；「父親」見 c6「這個機制最脆弱的地方是 Alistair E. Ritchie，Dennis 的父親。」"},
+    {"text": "都是軟體：C 語言、Unix", "verdict": "完全支持", "card_quote": "群 B = {C語言, Unix}                            ← 都是軟體", "note": "c11"},
+    {"text": "都是地名：Murray Hill、NJ", "verdict": "完全支持", "card_quote": "群 C = {Murray Hill, New Jersey}                ← 都是地名", "note": "c11；NJ 為縮寫（放行項）"},
+    {"text": "都是數值：過世日期、享年 70", "verdict": "完全支持", "card_quote": "群 D = {Oct 12 2011, 70}                        ← 都是數值", "note": "c11＋c6「圖裡的 `70` 是 Ritchie 過世時的年齡」「Dennis Ritchie | October 12, 2011 | DATE_OF_DEATH」；白話為放行項"},
+    {"text": "照連線分：2 個主題", "verdict": "完全支持", "card_quote": "向量分群給你「分類」，圖分群給你「主題」。", "note": "c1＋c11 兩群"},
+    {"text": "Ritchie 這個主題：Dennis、C 語言、Unix、過世日期、70", "verdict": "完全支持", "card_quote": "群 1 = {Dennis, C語言, Unix, Oct12, 70}         ← 都跟 Ritchie 這個主題有關", "note": "c11"},
+    {"text": "貝爾實驗室這個地點：Alistair、Bell Labs、Murray Hill、NJ", "verdict": "完全支持", "card_quote": "群 2 = {Alistair, Bell Labs, Murray Hill, NJ}   ← 都跟貝爾實驗室這個地點有關", "note": "c11"}
+  ], "errors": []},
+  {"block": "第 8 張", "atoms": [
+    {"text": "切成兩群約 0.367，全部一群只有 0", "verdict": "完全支持", "card_quote": "Q = 0.367…對照組：全部塞成一群…8/8 − (16/16)^2 = 0", "note": "c7；比較對象為全部一群（Q=0）"},
+    {"text": "9 是 Ritchie 群所有點的連線數加總，16 是全圖 8 條線的兩倍", "verdict": "完全支持", "card_quote": "d_c = 社群 c 裡所有節點的度數總和…總邊數 `m = 8`，度數是 Dennis 5、Alistair 2、Bell Labs 2、Murray Hill 2、其餘各 1。", "note": "c5、c6 的白話（放行項）；重算 5+1+1+1+1=9、2×8=16"},
+    {"text": "Ritchie 群：4/8 − (9/16)² = 0.500 − 0.316 = 0.184", "verdict": "完全支持", "card_quote": "4/8 − (9/16)^2 = 0.500 − 0.316 = 0.184", "note": "c7"},
+    {"text": "貝爾實驗室：3/8 − (7/16)² = 0.375 − 0.191 = 0.184", "verdict": "完全支持", "card_quote": "3/8 − (7/16)^2 = 0.375 − 0.191 = 0.184", "note": "c7"},
+    {"text": "兩群加總 Q ≈ 0.367（沒四捨五入的數相加）", "verdict": "完全支持", "card_quote": "Q = 0.367", "note": "c7；重算 0.18359375×2=0.3671875（放行項）"},
+    {"text": "不切：全部一群 8/8 − (16/16)² = 0，切開比較好", "verdict": "完全支持", "card_quote": "0.367 大於 0，所以切成兩群比不切好。", "note": "c7、c8"},
+    {"text": "Q 理論上限是 1；實務上 0.3 到 0.7 表示有明顯的群", "verdict": "完全支持", "card_quote": "（Q 的理論上限是 1，實務上 0.3 到 0.7 表示有明顯的社群結構。）", "note": "c9；群＝社群（放行項）"}
+  ], "errors": []},
+  {"block": "第 10 張", "atoms": [
+    {"text": "問「Ritchie 是誰」要一次撈到這一整包", "verdict": "完全支持", "card_quote": "使用者問「Dennis Ritchie 是誰」，你希望一次撈到他的作品、死亡日期、年齡", "note": "c12"},
+    {"text": "對 RAG 來說，要的是圖分群給的主題", "verdict": "完全支持", "card_quote": "對 RAG 來說要的是後者", "note": "c12（部落格判斷，作者口吻可）"},
+    {"text": "他的作品、過世日期、年齡，語意上八竿子打不著，放在一起卻剛好能摘要成「他是誰」", "verdict": "完全支持", "card_quote": "這些東西語意上八竿子打不著，但共同構成一個可以被摘要的主題。", "note": "c12；「摘要成『他是誰』」把卡上「可以被摘要的主題」與同句的問題接起來，未加新事實"},
+    {"text": "（bubble）Dennis 和父親同一群／都是人（照意思分）", "verdict": "完全支持", "card_quote": "群 A = {Dennis Ritchie, Alistair E. Ritchie}   ← 都是人", "note": "c11（放行項）"},
+    {"text": "（bubble）一群就是一個主題，作品、日期、年齡都在：Dennis Ritchie、C 語言、Unix、Oct 12, 2011、70（照連線分）", "verdict": "完全支持", "card_quote": "群 1 = {Dennis, C語言, Unix, Oct12, 70}         ← 都跟 Ritchie 這個主題有關", "note": "c11、c1「圖分群給你「主題」」"},
+    {"text": "不過在 RAGU 的對照裡，整套 GraphRAG 比純向量檢索只多幾個百分點", "verdict": "完全支持", "card_quote": "整套 GraphRAG——兩階段抽取、DBSCAN consolidation、Leiden 分群、社群摘要——相對於純向量檢索的淨貢獻，就是這 1.2 到 4.3 pp。", "note": "c13#1 限定條件的概括（放行項）"}
+  ], "errors": []},
+  {"block": "Threads 正文", "atoms": [
+    {"text": "同一張知識圖，分兩次群，結果很不一樣。", "verdict": "完全支持", "card_quote": "同一張 Ritchie 圖用兩種分法", "note": "c11 text；開頭句字面為真"},
+    {"text": "照意思分，Dennis Ritchie 和他父親都是人，就分一起", "verdict": "完全支持", "card_quote": "群 A = {Dennis Ritchie, Alistair E. Ritchie}   ← 都是人", "note": "c11＋c6「Dennis 的父親」"},
+    {"text": "照連線分，Ritchie 的作品、過世日期、年齡都連在他身上，就分一起", "verdict": "完全支持", "card_quote": "群 1 = {Dennis, C語言, Unix, Oct12, 70}         ← 都跟 Ritchie 這個主題有關", "note": "c11；「連在他身上」見 c6：Dennis Ritchie 連向 C 語言、Unix、Oct 12, 2011 與 70"},
+    {"text": "一邊是一類一類，一邊是一個一個主題", "verdict": "完全支持", "card_quote": "向量分群給你「分類」，圖分群給你「主題」。", "note": "c1"},
+    {"text": "為什麼 RAG 要後者？使用者問「Ritchie 是誰」，你希望一次撈到他的作品、死亡日期、年齡，這些東西語意上八竿子打不著，卻共同構成一個能被摘要的主題", "verdict": "完全支持", "card_quote": "對 RAG 來說要的是後者：使用者問「Dennis Ritchie 是誰」，你希望一次撈到他的作品、死亡日期、年齡，這些東西語意上八竿子打不著，但共同構成一個可以被摘要的主題。", "note": "c12 近逐字"},
+    {"text": "不過 RAGU 自己的對照裡，整套 GraphRAG 比純向量檢索，淨貢獻只有幾個百分點", "verdict": "完全支持", "card_quote": "同一篇 blog 在 RAGU 自己的對照裡量到，整套 GraphRAG（含 Leiden 分群、社群摘要）相對於純向量檢索的淨貢獻只有 1.2 到 4.3 pp", "note": "c13#1 概括（放行項）"},
+    {"text": "RAGU 合併那一步怎麼用 DBSCAN，論文前後寫法不一，只能翻原始碼確認", "verdict": "完全支持", "card_quote": "abstract 說 DBSCAN 用於跨名字去重，方法段讀起來卻像是先用 (name, type) 分好組、再在同一組內部做 DBSCAN。…論文的文字本身無法判定，要確認只能翻原始碼。", "note": "c14#1、c14#2；「後者根本無法合併別名」的細節在第 11 張出現"}
+  ], "errors": []}
+ ],
+ "recalculations": [
+  {"block": "第 8 張", "expression": "4/8-(9/16)**2", "result": "0.18359375（≈0.184；(9/16)^2=0.31640625≈0.316）"},
+  {"block": "第 8 張", "expression": "3/8-(7/16)**2", "result": "0.18359375（≈0.184；(7/16)^2=0.19140625≈0.191）"},
+  {"block": "第 8 張", "expression": "0.18359375+0.18359375", "result": "0.3671875（≈0.367）"},
+  {"block": "第 8 張", "expression": "8/8-(16/16)**2", "result": "0.0"},
+  {"block": "第 8 張", "expression": "d_1 = 5+1+1+1+1；2m = 2*8", "result": "9；16"},
+  {"block": "第 8 張", "expression": "d_2 = 2+2+2+1", "result": "7"}
+ ],
+ "gaps": []}

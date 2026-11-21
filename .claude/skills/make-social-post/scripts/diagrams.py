@@ -118,6 +118,9 @@
   extract   從推理文字抓出中間答案（2026-11-15）：nodes = 步驟 [{text, tag, sub}]、heads = [左卡標題, 箭頭標籤, 右表標題]；純示意
   watch     哪幾步被算進去（2026-11-15）：nodes = 列 [{text, sub?, counted:[bool…], best?}]、outcomes = 每列結果、heads = 兩個圖例；純示意
   sieve     把握當篩子（2026-11-15，CER 第 3 則）：nodes = 2 列 [{text, sub?, paths:[{text, low?}], ok?}]（剛好一列 ok）、outcomes = 每列結果、heads = [篩子標籤, 被濾掉的標籤]；純示意
+  lift      基準＋增量（2026-11-19，RAGU）：heads = [基準的名字, 改後的名字]、nodes = 列 [{text, sub?, base, top, emph?, pair?}]（2～4 列；pair＝這列自己的改前改後名字）、unit、選用 axis_max（預設 100）；藍綠＝基準、深海＝多出來的（emph 那列金色）、虛線空框＝少掉的；差距由程式算，軸從 0 起
+  kgroups   少數大群 vs 滿滿的微群（2026-11-19，RAGU 第 4 則）：heads = [左面板標題, 右面板標題]、nodes = [{text, sub?}（左說明）, {text, sub?}（右說明）]；左 5 個大群、右 30 個 1～3 顆點的微群，純示意，圖註標「示意」
+  netgraph  一張小知識圖被切成兩群（2026-11-19，RAGU 第 5 則）：nodes = [{text, x, y, g}]（相對座標 0～1、g＝第幾群）、edges = [[i, j]]、cut = 被切斷的邊序號、heads = [第 0 群, 第 1 群, 被切斷的邊]；節點越多邊畫越大，位置只是示意
   lens      看每一步 vs 只看最後一步（2026-11-15）：nodes = 步驟 [{text, p}]（最低的金色）、heads = [長括號標籤, 短括號標籤]、outcomes = 兩個結論（接在標籤後）；自信度是假設的
 
 規則：圖形全部用 class "bg"（不進程式 B 的文字與圖形重疊檢查），所以排版由這裡負責避開文字；框內的文字由程式 B 的「框內文字不超出框」檢查；
@@ -2155,8 +2158,19 @@ def mismatch(c: Canvas, spec: dict, y0: float) -> float:
     same, other = spec["nodes"]
     ea, eb = spec["outcomes"]
     w = X1 - X0
-    evw, evh = 190, 112
-    chw, chh = 190, 64
+    evw, evh = int(spec.get("ev_w", 190)), 112          # 選用 ev_w：事件框寬（事件名短、寫法長時設窄；RAGU 第 3 則）
+    chh = 64
+    cf, cfs = "dn", 34                                   # 寫法框的字；放不下時改小一號
+    cw1 = max(190, _tw(same["text"], 34) + 44)          # 寫法框寬跟著字長（預設 190）
+    cw2 = max(190, _tw(other["text"], 34) + 44)
+    if 2 * evw + cw1 + cw2 + 4 * 24 + 40 > w:
+        cf, cfs = "ds", 28
+        cw1 = max(190, _tw(same["text"], 28) + 44)
+        cw2 = max(190, _tw(other["text"], 28) + 44)
+    chw = cw1
+    gp = 40 if 2 * evw + cw1 + cw2 + 4 * 40 + 60 <= w else 24   # 下段框與框的間距；寫法長時收窄
+    if 2 * evw + cw1 + cw2 + 4 * gp + 40 > w:
+        raise ValueError("mismatch 的寫法太長，下段放不下（縮短寫法或設窄 ev_w）")
     ph = max(_th(c, {"text": same["sub"]}, w), 0) if same.get("sub") else 0
     qh = _th(c, {"text": other["sub"]}, w) if other.get("sub") else 0
     gh = c.lines(hgap, 300, 28) * 39.2
@@ -2172,9 +2186,9 @@ def mismatch(c: Canvas, spec: dict, y0: float) -> float:
         if e.get("sub"):
             c.text(x + 15, yy + (evh - t) / 2 + c.lines(e["text"], evw - 30, 34) * 44.2 + 4, evw - 30, e["sub"], "ds", LIGHT, "center", (x, yy, evw, evh))
 
-    def chip(cx, cy, label):
-        c.rect(cx - chw / 2, cy - chh / 2, chw, chh, fill=GOLD, rx=32)
-        c.text(cx - chw / 2 + 10, cy - 22, chw - 20, label, "dn", DEEP, "center", (cx - chw / 2, cy - chh / 2, chw, chh))
+    def chip(cx, cy, label, cw):
+        c.rect(cx - cw / 2, cy - chh / 2, cw, chh, fill=GOLD, rx=32)
+        c.text(cx - cw / 2 + 10, (cy - 22 if cf == "dn" else cy - 18), cw - 20, label, cf, DEEP, "center", (cx - cw / 2, cy - chh / 2, cw, chh))
 
     c.text(X0, y, w, h1, "dl", TEAL, "left")
     cy = y + 44 + evh / 2
@@ -2182,7 +2196,7 @@ def mismatch(c: Canvas, spec: dict, y0: float) -> float:
     mid = X0 + w / 2
     c.line(X0 + evw, cy, mid - chw / 2, cy, GOLD, 10)
     c.line(mid + chw / 2, cy, X1 - evw, cy, GOLD, 10)
-    chip(mid, cy, same["text"])
+    chip(mid, cy, same["text"], cw1)
     ty = y + 44 + evh + 14
     if same.get("sub"):
         c.text(X0, ty, w, same["sub"], "ds", TEAL, "center")
@@ -2191,11 +2205,11 @@ def mismatch(c: Canvas, spec: dict, y0: float) -> float:
     c.text(X0, y, w, h2, "dl", TEAL, "left")
     cy2 = y + 44 + evh / 2
     ev(X0, y + 44, ea); ev(X1 - evw, y + 44, eb)
-    lx, rx_ = X0 + evw + 40 + chw / 2, X1 - evw - 40 - chw / 2
-    c.line(X0 + evw, cy2, lx - chw / 2, cy2, GOLD, 10)
-    c.line(rx_ + chw / 2, cy2, X1 - evw, cy2, GOLD, 10)
-    chip(lx, cy2, same["text"]); chip(rx_, cy2, other["text"])
-    c.line(lx + chw / 2 + 8, cy2, rx_ - chw / 2 - 8, cy2, TEAL, 4, dash="8 8")
+    lx, rx_ = X0 + evw + gp + cw1 / 2, X1 - evw - gp - cw2 / 2
+    c.line(X0 + evw, cy2, lx - cw1 / 2, cy2, GOLD, 10)
+    c.line(rx_ + cw2 / 2, cy2, X1 - evw, cy2, GOLD, 10)
+    chip(lx, cy2, same["text"], cw1); chip(rx_, cy2, other["text"], cw2)
+    c.line(lx + cw1 / 2 + 8, cy2, rx_ - cw2 / 2 - 8, cy2, TEAL, 4, dash="8 8")
     _cross(c, (lx + rx_) / 2, cy2, 13, DEEP, 5)
     ty2 = y + 44 + evh + 14
     c.text((lx + rx_) / 2 - 150, ty2, 300, hgap, "ds", DEEP, "center")
@@ -4590,9 +4604,11 @@ def scan(c: Canvas, spec: dict, y0: float) -> float:
 
 def tally(c: Canvas, spec: dict, y0: float) -> float:
     """勝、平、敗一顆點一場（2026-11-11）：每列一組實驗，點數＝場數（寫 70 就畫 70 顆），勝是深海實心、平是空心、敗是打叉。
-    heads = [勝的圖例, 平的圖例, 敗的圖例]、nodes = 列 [{text, sub?, parts:[勝, 平, 敗]}]；選用 hot = 要墊金色淡底的列序號。"""
+    heads = [勝的圖例, 平的圖例, 敗的圖例]、nodes = 列 [{text, sub?, parts:[勝, 平, 敗]}]；選用 hot = 要墊金色淡底的列序號；選用 cols = 一列幾顆（預設 30，6～30）。"""
     rows, heads, hot = spec["nodes"], spec["heads"], spec.get("hot")
-    w, cols = X1 - X0, 30
+    w, cols = X1 - X0, int(spec.get("cols", 30))   # 選用 cols：一列幾顆（點很少時設小一點，點就畫大；RAGU 第 2 則 8 顆點）
+    if not 6 <= cols <= 30:
+        raise ValueError("tally 的 cols 要在 6～30 之間")
     d_ = w / cols
     r_ = d_ * .34
     lg = 39.2 + 22
@@ -5123,6 +5139,176 @@ def lens(c: Canvas, spec: dict, y0: float) -> float:
     return base + 8 + th_
 
 
+# ------------------------------------------------------------------ RAGU 系列（2026-11-19）：基準＋增量
+def lift_delta(r: dict) -> str:
+    """lift 每列的差距字串（程式算，和圖上一字不差）：正數加「+」，負數用「−」（U+2212）。"""
+    d = round(r["top"] - r["base"], 1)
+    return ("+" if d >= 0 else "−") + f"{abs(d):.1f}"
+
+
+def lift(c: Canvas, spec: dict, y0: float) -> float:
+    """基準＋增量（2026-11-19，RAGU 第 1 則）：一列一組對照，橫條先畫「基準」那段（藍綠），改了一個條件之後多出來的那段接在後面（深海；emph 那列金色），
+    少掉的那段畫成虛線空框。軸從 0 起，長度與數值成正比（class rbar 由程式 B 檢查）；差距由程式算。
+    heads = [基準的名字, 改後的名字]（例：長答案、短答案）；nodes = 列 [{text, sub?, base, top, emph?}]（2～4 列）；unit；選用 axis_max（預設 100）。"""
+    hb, ht = spec["heads"][:2]
+    rows = spec["nodes"]
+    unit = spec.get("unit", "")
+    amax = spec.get("axis_max", 100)
+    if not 2 <= len(rows) <= 4:
+        raise ValueError(f"lift 的 nodes 要 2～4 列，現在是 {len(rows)}")
+    if sum(1 for r in rows if r.get("emph")) > 1:
+        raise ValueError("lift 的 emph 最多一列（金色只給一處）")
+    for r in rows:
+        if not (0 <= r["base"] <= amax and 0 <= r["top"] <= amax):
+            raise ValueError(f"lift 的數值要在 0～{amax}：{r['text']}")
+    w = X1 - X0
+    xa, bw_max = X0, w - 190                 # 右邊留 190px 給差距數字
+    sc = bw_max / amax
+    bh = 50
+    neg = any(r["top"] < r["base"] for r in rows)
+    leg = 60
+    hs = [c.lines(r["text"], w, 34) * 44.2 + (c.lines(r["sub"], w, 28) * 39.2 + 2 if r.get("sub") else 0) + 10 + bh + 6 + 40 for r in rows]
+    gap = 26
+    total = leg + sum(hs) + gap * (len(rows) - 1)
+    _fit(total, BOTTOM - y0, "lift")
+    gap += min((BOTTOM - y0 - total) / max(len(rows) - 1, 1), 50)
+    lx = X0                                                  # 圖例
+    items = [(dict(fill=MID), hb), (dict(fill=DEEP), f"{ht}多出來的")] + ([(dict(fill=GOLD), "重點那一列")] if any(r.get("emph") for r in rows) else []) + ([(dict(fill=CREAM, stroke=DEEP, dash="8 6"), f"{ht}少掉的")] if neg else [])   # 金色要在圖例裡說明（RAGU 第 1 則讀者：圖上有金色、圖例沒有）
+    for f, h in items:
+        c.rect(lx, y0 + 6, 36, 36, fill=f["fill"], stroke=f.get("stroke"), dash=f.get("dash"), rx=6)
+        tw = _tw(h, 28) + 10
+        c.text(lx + 48, y0 + 4, tw, h, "ds", DEEP, "left")
+        lx += 48 + tw + 34
+    y = y0 + leg
+    for r, rh in zip(rows, hs):
+        c.text(X0, y, w, r["text"], "dn", DEEP, "left")
+        by = y + c.lines(r["text"], w, 34) * 44.2
+        if r.get("sub"):
+            c.text(X0, by + 2, w, r["sub"], "ds", TEAL, "left")
+            by += c.lines(r["sub"], w, 28) * 39.2 + 2
+        by += 10
+        b, t = r["base"], r["top"]
+        lo = min(b, t)
+        segs = [(0, lo, f'fill="{MID}"')]
+        if t > b:
+            segs.append((b, t, f'fill="{GOLD if r.get("emph") else DEEP}"'))
+        elif t < b:
+            segs.append((t, b, f'fill="{CREAM}" stroke="{DEEP}" stroke-width="3" stroke-dasharray="8 6"'))
+        for a_, z_, st in segs:
+            c.svg.append(f'<rect class="bg rbar" x="{xa + a_ * sc:.1f}" y="{by:.1f}" width="{(z_ - a_) * sc:.1f}" height="{bh}" rx="0" {st} '
+                         f'data-lo="{a_}" data-hi="{z_}" data-s="{sc}" data-x0="{xa}"/>')
+        c.text(xa + max(b, t) * sc + 18, by + (bh - 44.2) / 2, 172, f"{lift_delta(r)}{unit}", "dn", DEEP, "left")
+        pb, pt = r.get("pair") or (hb, ht)        # 選用 pair：這一列自己的「改之前、改之後」名字（各列改的條件不同時）
+        c.text(X0, by + bh + 6, w, f"{pb} {b:.1f}{unit}・{pt} {t:.1f}{unit}", "ds", DEEP, "left")
+        y += rh + gap
+    return y - gap
+
+
+# --------------------------------- RAGU 系列（2026-11-19）：少數大群 vs 微群
+def kgroups(c: Canvas, spec: dict, y0: float) -> float:
+    """少數大群 vs 滿滿的微群（2026-11-19，RAGU 第 4 則「去重不是分群」）：左右兩個面板，純示意。
+    左：5 個大群（每群一圈、16 顆點）；右：30 個微群（每群 1～3 顆點，各自一個小圈）。點數只是示意，不是數據；圖註要標「示意」。
+    heads = [左面板標題, 右面板標題]；nodes = [{text, sub?}（左面板下的說明）, {text, sub?}（右面板下的說明）]；選用 panel_h（預設 360）。"""
+    heads, nodes = spec["heads"], spec["nodes"]
+    if len(heads) != 2 or len(nodes) != 2:
+        raise ValueError("kgroups 的 heads 與 nodes 都要剛好 2 個（左、右面板）")
+    w = X1 - X0
+    gap = 40
+    pw = (w - gap) / 2
+    ph = float(spec.get("panel_h", 360))
+    th = max(c.lines(h, pw, 34) for h in heads) * 44.2
+    ch = max(_th(c, n, pw) for n in nodes)
+    total = th + 12 + ph + 16 + ch
+    _fit(total, BOTTOM - y0, "kgroups")
+    y = y0
+    for i, (h, n) in enumerate(zip(heads, nodes)):
+        x = X0 + i * (pw + gap)
+        c.text(x, y, pw, h, "dl", TEAL, "left")
+        py = y + th + 12
+        c.rect(x, py, pw, ph, fill="none", stroke=TEAL, sw=2, rx=18)
+        sx, sy = pw / 440, ph / 380                       # 位置以 440×380 的面板設計，再等比縮放
+        if i == 0:
+            rr = 66 * min(sx, sy)
+            for gx, gy in [(110, 100), (320, 92), (92, 280), (240, 255), (362, 290)]:
+                cx, cy = x + gx * sx, py + gy * sy
+                c.circle(cx, cy, rr, fill="none", stroke=MID, sw=3)
+                for k in range(16):
+                    r_ = (rr - 12) * math.sqrt((k + .5) / 16)
+                    a = k * 2.39996
+                    c.circle(cx + r_ * math.cos(a), cy + r_ * math.sin(a), 6.5, fill=DEEP)
+        else:
+            sizes = [1, 2, 1, 3, 1, 2, 2, 1, 1, 3, 1, 2, 1, 1, 2, 3, 1, 2, 2, 1, 3, 1, 1, 2, 1, 2, 1, 3, 2, 1]
+            offs = {1: [(0, 0)], 2: [(-8, 0), (8, 0)], 3: [(-8, 6), (8, 6), (0, -8)]}
+            cw_, chh_ = pw / 6, ph / 5
+            for k, n_ in enumerate(sizes):
+                cx = x + (k % 6 + .5) * cw_ + (6 if (k // 6) % 2 else -6)
+                cy = py + (k // 6 + .5) * chh_
+                c.circle(cx, cy, 22, fill="none", stroke=MID, sw=2)
+                for ox, oy in offs[n_]:
+                    c.circle(cx + ox, cy + oy, 6.5, fill=DEEP)
+        ty = py + ph + 16
+        c.text(x, ty, pw, n["text"], "dn", DEEP, "left")
+        if n.get("sub"):
+            c.text(x, ty + c.lines(n["text"], pw, 34) * 44.2 + 6, pw, n["sub"], "ds", TEAL, "left")
+    return y0 + total
+
+
+# --------------------------------- RAGU 系列（2026-11-19）：一張小圖被切成兩群
+def netgraph(c: Canvas, spec: dict, y0: float) -> float:
+    """一張小知識圖被切成兩群（2026-11-19，RAGU 第 5 則「模組度」）：節點照相對座標擺，顏色＝所屬的群，被切斷的邊畫金色虛線。
+    nodes = [{text, x, y, g, lab?}]（x、y 是 0～1 的相對位置；g = 0 或 1，是第幾群；lab = 名字放 below／above／left／right，預設 below）；edges = [[i, j], …]（0 起）；
+    cut = 被切斷的邊在 edges 裡的序號（選用，可多條）；heads = [第 0 群的圖例, 第 1 群的圖例, 被切斷的邊的圖例]；選用 h（圖高，預設 520）。
+    位置只是示意（照原圖的相對位置擺），不是數據。"""
+    nodes, edges, heads = spec["nodes"], spec["edges"], spec["heads"]
+    cut = set(spec.get("cut", []))
+    if len(heads) != 3:
+        raise ValueError("netgraph 的 heads 要 3 個：第 0 群、第 1 群、被切斷的邊")
+    if not 4 <= len(nodes) <= 12:
+        raise ValueError("netgraph 的 nodes 要 4～12 個")
+    for i, j in edges:
+        if not (0 <= i < len(nodes) and 0 <= j < len(nodes)) or i == j:
+            raise ValueError(f"netgraph 的邊 {i}-{j} 指向不存在的節點")
+    if any(k >= len(edges) for k in cut):
+        raise ValueError("netgraph 的 cut 序號超出 edges")
+    w = X1 - X0
+    lg = 39.2 + 22
+    h = min(float(spec.get("h", 520)), BOTTOM - y0 - lg - 50)   # 空間不夠就壓扁，但不低於 380
+    if h < 380:
+        raise ValueError(f"netgraph 放不下：圖高只剩 {h:.0f}px（至少 380）；請縮短補充")
+    total = lg + h + 50
+    _fit(total, BOTTOM - y0, "netgraph")
+    lx = X0                                                   # 圖例
+    for f, t in [(dict(fill=DEEP), heads[0]), (dict(fill=MID), heads[1])]:
+        c.circle(lx + 16, y0 + 22, 14, fill=f["fill"])
+        tw = _tw(t, 28) + 10
+        c.text(lx + 40, y0 + 4, tw, t, "ds", DEEP, "left")
+        lx += 40 + tw + 30
+    c.line(lx, y0 + 22, lx + 44, y0 + 22, GOLD, 6, dash="10 8")
+    c.text(lx + 56, y0 + 4, _tw(heads[2], 28) + 10, heads[2], "ds", DEEP, "left")
+    top = y0 + lg + 10
+    P = [(X0 + 40 + n["x"] * (w - 80), top + 24 + n["y"] * (h - 70)) for n in nodes]
+    for k, (i, j) in enumerate(edges):
+        (x1, y1), (x2, y2) = P[i], P[j]
+        if k in cut:
+            c.line(x1, y1, x2, y2, GOLD, 7, dash="12 9")
+        else:
+            c.line(x1, y1, x2, y2, LIGHT, 5)
+    deg = [sum(1 for e in edges if k in e) for k in range(len(nodes))]
+    R = [16 + 3 * min(d, 5) for d in deg]                    # 連得越多畫越大（只是示意）
+    for n, (x, y), r in zip(nodes, P, R):                     # 名字底下墊一塊底色，線不會穿過字
+        tw = _tw(n["text"], 28) + 16
+        side = n.get("lab", "below")                          # 名字放哪：below（預設）、above、left、right
+        if side not in ("below", "above", "left", "right"):
+            raise ValueError(f"netgraph 的 lab 只能是 below／above／left／right：{side}")
+        lx, ly = {"below": (x - tw / 2, y + r + 6), "above": (x - tw / 2, y - r - 46),
+                  "left": (x - r - 10 - tw, y - 20), "right": (x + r + 10, y - 20)}[side]
+        c.rect(lx, ly, tw, 40, fill=CREAM, rx=8)
+        c.text(lx + 4, ly - 2, tw - 8, n["text"], "ds", DEEP, {"left": "right", "right": "left"}.get(side, "center"))   # 放左邊時靠右對齊，字貼著點
+    for n, (x, y), r in zip(nodes, P, R):
+        c.circle(x, y, r, fill=DEEP if n.get("g", 0) == 0 else MID, stroke=CREAM, sw=4)
+    return y0 + total
+
+
 KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "paths": paths, "epochs": epochs,
          "dotgrid": dotgrid, "dumbbell": dumbbell, "range": range_chart, "funnel": funnel,
          "batches": batches, "decay": decay, "stops": stops, "fan": fan, "peaks": peaks, "quad": quad, "locked": locked, "equation": equation, "tokens": tokens,
@@ -5140,7 +5326,8 @@ KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "
          "grid2": grid2, "twostage": twostage, "timeline": timeline, "twin": twin,
          "scan": scan, "tally": tally,
          "chips": chips, "midfail": midfail, "tagged": tagged, "weights": weights, "watch": watch,
-         "tokprob": tokprob, "extract": extract, "sieve": sieve, "lens": lens}
+         "tokprob": tokprob, "extract": extract, "sieve": sieve, "lens": lens,
+         "lift": lift, "kgroups": kgroups, "netgraph": netgraph}
 
 
 def build(spec: dict, y0: float, ctx: Ctx) -> tuple[str, str, float]:
@@ -5217,6 +5404,12 @@ def texts(sl: dict) -> list[str]:
     if sl.get("kind") == "weights":
         out += [_num(n["c"]) for n in sl.get("nodes", [])] + [ZH_TIMES[j] for j in range(len(sl.get("nodes", [])))]
         out += [weights_formula(sl["nodes"]), f"{(list(sl.get('heads', [])) + ['', '', ''])[2]} {_num(path_score(sl['nodes']))}".strip()]
+    if sl.get("kind") == "lift":          # 每列的兩個數值與差距（程式算），和圖上一字不差
+        hs = list(sl.get("heads", [])) + ["", ""]
+        u_ = sl.get("unit", "")
+        for n in sl.get("nodes", []):
+            pb, pt = n.get("pair") or hs[:2]
+            out += [f"{pb} {n['base']:.1f}{u_}・{pt} {n['top']:.1f}{u_}", f"{lift_delta(n)}{u_}"]
     if sl.get("kind") == "ring":
         out += [x for x in sl.get("labels") or [] if x]
     if sl.get("kind") == "equation" and sl.get("ops"):      # 運算符號是內容（+ 和 × 意思不同），審查者要看得到整條算式

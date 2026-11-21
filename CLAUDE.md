@@ -20,6 +20,7 @@ datasciocean-concept-wiki（Stage 1，submodule：concept-wiki/）
 | 開新系列、設計模板、新增版型或圖表類型、調整品牌常數 | `.claude/skills/design-series-visuals/SKILL.md` |
 | **帶數字的圖：這張該用什麼圖、圖有沒有直接支撐主標、怎麼評圖** | `.claude/skills/chart-thinking/SKILL.md`（含從 OpenAI data-visualization plugin 挑來的上游資料，`upstream/`） |
 | 卡長什麼樣、`status` 的語意（pending 不用、author_confirmed 取保守） | `concept-wiki/docs/card-format.md` |
+| **流量追蹤與改進**（發布後量成效、寫 insight、下一則挑 action 做實驗；目標是讀者與追蹤人數變多） | `make-social-post/references/growth-loop.md`；狀態在 `growth/`（先讀 `growth/README.md`） |
 | 調整參數（張數、字數、詞表、輪數、存量）與用語對照 | `config/params.yaml`、`config/terms.yaml` |
 
 環境全在 repo 內（`.venv/`、`.uv-cache/`、`.playwright-browsers/`），**不要裝任何東西到全域**。腳本一律 `uv run python <script>`。
@@ -46,7 +47,6 @@ datasciocean-concept-wiki（Stage 1，submodule：concept-wiki/）
 
 ## 範圍外（不要做）
 
-- 成效分析（觸及、按讚、導流）：另做獨立系統。本專案只負責記錄識別碼（觀念 id、系列 id、格式、網址、時間、hook 樣態；在 `state/`）。
 - 帳號設定、頭像、簡介、發文時段：不在本專案範圍（不做、不提醒）。
 - 英文版：目前只做繁體中文，語言是參數（`lang: zh-TW`）。
 - Reels、Shorts、長影片：目前只保留插件介面。
@@ -65,6 +65,7 @@ config/                                 人會改的設定：params.yaml（參�
 assets/                                 fonts/（內嵌字型）、brand/（品牌來源圖）
 series/<系列 id>/                       一個系列的一切都在這裡：series.md（成員、planned_title、hashtag、色）、philosophy.md（視覺哲學）、templates/
 standalone/<觀念 id>/                  獨立貼文（沒有系列）自己的一套視覺：standalone.md（風格、色）、philosophy.md、templates/、sketches/；每則各有各的，不共用（spec 寫 series: null）
+growth/                                 流量追蹤與改進：plan.md（行動清單）、experiments.md（每則套用的 action 與判讀）、reports/、snapshots/（insights.py 抓的數字）
 state/                                  <觀念 id>.yaml（各格式狀態、發布紀錄）、backfill.md（待回補清單）、ig-publish-log.jsonl、threads-publish-log.jsonl（API 發文紀錄，含曾經的測試發文，不要刪）
 out/                                    發布包（程式產生）
     README.md                             總入口：待發布清單、各系列狀態（build_package.py 產生，不手改）
@@ -97,6 +98,7 @@ tests/                                  回歸測試 `test_*.py`（`test_*_style
 - **圖**（要大膽、有創意、直接支撐主標、比文字多給資訊；畫面句要有具體物件；沒有合適的就發明新圖型）：`ig-carousel.md` §0、`design-series-visuals/references/brand-and-layouts.md` §4.2、`principles.md`；帶數字的圖用 `chart-thinking`。
 - **系列規劃**（Claude 決定哪些卡合併、整個系列做完才鎖定並發第 1 則、第 2 則以後有 `recap`）：`references/batch-and-publish.md` §1–2、`spec-json.md`。
 - **送審前自檢**：`references/self-check.md`（最上面四類是忠實者最常退回的）。審查：`review-loop.md`。
+- **流量追蹤與改進**（人 2026-11-21）：Claude 自己維護，不等人提醒；每次發布完跑 `insights.py pull` 判讀、更新 `growth/plan.md`，每做新的一則就從裡面挑 1～2 個 action 做實驗並記錄（`growth-loop.md`）。
 - **進度寫進檔案**：每則 `_build/progress.md`，最上面是 10 行內的「現況＋下一步」；hook 候選、合併方案也寫進檔案，對話壓縮或用量上限中斷後才接得上。
 - **要問人時用白話說清楚**（這是什麼、選了會怎樣、代價、我的建議）。人不做手動事項：需要手動的，Claude 做或不做，不丟給人。
 - skill 與 `references/` 是依實測整理出來的，有疑問以它們為準；沒寫到的照最接近的前例判斷，交成品時說明。

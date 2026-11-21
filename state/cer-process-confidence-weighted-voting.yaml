@@ -1,9 +1,23 @@
 concept: cer-process-confidence-weighted-voting
 formats:
   ig_carousel:
-    status: ready
-    pack: out/cer/cer-process-confidence-weighted-voting
+    status: published
   threads_thread:
-    status: ready
-    pack: out/cer/cer-process-confidence-weighted-voting
-posts: []
+    status: published
+posts:
+- post_id: cer-process-confidence-weighted-voting:ig_carousel
+  format: ig_carousel
+  series_id: cer
+  url: https://www.instagram.com/p/Df5yc_3H6XQ/
+  published_at: 2026-11-19T00:26:52+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []
+- post_id: cer-process-confidence-weighted-voting:threads_thread
+  format: threads_thread
+  series_id: cer
+  url: https://www.threads.com/@datasciocean/post/Df5yzotH4IY
+  published_at: 2026-11-19T00:29:12+0000
+  hook_type: 讀者疑問
+  mentions: []
+  backfilled: []

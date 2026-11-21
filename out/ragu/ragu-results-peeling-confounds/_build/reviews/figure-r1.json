@@ -1,0 +1,27 @@
+{
+  "slides": [
+    {"slide": 8,
+     "items": [
+       {"what": "第 1 級 Fact Retrieval HippoRAG 2 數值", "reproduced": "72.4%", "original_position": "左圖 (a) 第一組（Fact Retrieval）第二條（橘色斜線）上方", "original": "72.4", "in_claim": "HippoRAG 2 則從 72.4 掉到 56.9", "verdict": "一致"},
+       {"what": "第 1 級 Fact Retrieval RAGU 數值", "reproduced": "54.2%", "original_position": "左圖 (a) 第一組第三條（藍色 our system）上方", "original": "54.2", "in_claim": "RAGU 自己那一欄是 54.2 → 53.7 → 64.1 → 59.0", "verdict": "一致"},
+       {"what": "第 2 級 Complex Reasoning HippoRAG 2 數值", "reproduced": "68.4%", "original_position": "左圖 (a) 第二組（Complex Reasoning）第二條上方", "original": "68.4", "in_claim": "", "verdict": "主張沒寫"},
+       {"what": "第 2 級 Complex Reasoning RAGU 數值", "reproduced": "53.7%", "original_position": "左圖 (a) 第二組第三條上方", "original": "53.7", "in_claim": "RAGU 自己那一欄是 54.2 → 53.7 → 64.1 → 59.0", "verdict": "一致"},
+       {"what": "第 3 級 Contextual Summarize HippoRAG 2 數值", "reproduced": "65.0%", "original_position": "左圖 (a) 第三組（Contextual Summarize）第二條上方", "original": "65.0", "in_claim": "", "verdict": "主張沒寫"},
+       {"what": "第 3 級 Contextual Summarize RAGU 數值", "reproduced": "64.1%", "original_position": "左圖 (a) 第三組第三條上方", "original": "64.1", "in_claim": "RAGU 自己那一欄是 54.2 → 53.7 → 64.1 → 59.0", "verdict": "一致"},
+       {"what": "第 4 級 Creative Generation HippoRAG 2 數值", "reproduced": "56.9%", "original_position": "左圖 (a) 第四組（Creative Generation）第二條上方", "original": "56.9", "in_claim": "HippoRAG 2 則從 72.4 掉到 56.9", "verdict": "一致"},
+       {"what": "第 4 級 Creative Generation RAGU 數值", "reproduced": "59.0%", "original_position": "左圖 (a) 第四組第三條上方", "original": "59.0", "in_claim": "RAGU 以 59.0 對 56.9 贏 HippoRAG 2", "verdict": "一致"},
+       {"what": "四個層級名稱與順序", "reproduced": "Fact Retrieval、Complex Reasoning、Contextual Summarize、Creative Generation（第 1–4 級）", "original_position": "左圖 (a) x 軸標籤", "original": "Fact Retrieval, Complex Reasoning, Contextual Summarize, Creative Generation", "in_claim": "四個難度層級（Fact Retrieval、Complex Reasoning、Contextual Summarize、Creative Generation）", "verdict": "一致"},
+       {"what": "難度遞增關係（第 1 級到第 4 級（最難））", "reproduced": "第 1 級…第 4 級（最難）", "original_position": "圖下方箭頭文字", "original": "→ increasing task complexity →", "in_claim": "四個難度層級", "verdict": "一致"},
+       {"what": "圖例 HippoRAG 2", "reproduced": "HippoRAG 2（青色）", "original_position": "上方圖例第二項", "original": "HippoRAG 2（橘色斜線）", "in_claim": "RAGU 對 HippoRAG 2 的 AC 差距", "verdict": "一致"},
+       {"what": "圖例 RAGU", "reproduced": "RAGU（深色）", "original_position": "上方圖例第三項", "original": "our system", "in_claim": "RAGU 自己那一欄是 54.2 → 53.7 → 64.1 → 59.0", "verdict": "一致"},
+       {"what": "指標名稱（Answer Correctness / AC）", "reproduced": "沒有；重製圖只標單位 %，圖、圖例、圖註都沒寫這是哪個指標", "original_position": "左圖標題與 y 軸", "original": "(a) Answer Correctness；y 軸 Answer Correctness (%)；同一張原圖右側 (b) Evidence Recall 是另一個指標、趨勢不同", "in_claim": "RAGU 對 HippoRAG 2 的 AC 差距從 −18.2 單調收斂到 +2.1", "verdict": "不一致"},
+       {"what": "差距 −18.2% 收斂到 +2.1%", "reproduced": "論文說差距從 −18.2% 收斂到 +2.1%、越難越強", "original_position": "", "original": "沒有（原圖未印差距）", "in_claim": "RAGU 對 HippoRAG 2 的 AC 差距從 −18.2 單調收斂到 +2.1，論文說這是「越難越強」的證據", "verdict": "僅來自主張"},
+       {"what": "「醫療題庫」", "reproduced": "醫療題庫的四級難度", "original_position": "", "original": "沒有", "in_claim": "在 GraphRAG-Bench Medical 的四個難度層級", "verdict": "僅來自主張"},
+       {"what": "HippoRAG 2 從 72.4% 一路掉到 56.9%、對手往下掉", "reproduced": "其實是對手往下掉；HippoRAG 2 從 72.4% 一路掉到 56.9%", "original_position": "左圖 (a) 各組第二條", "original": "72.4、68.4、65.0、56.9（逐級下降）", "in_claim": "所謂 cross-over 主要不是 RAGU 變強，而是 HippoRAG 2 往下掉", "verdict": "一致"},
+       {"what": "圖註 Meno-Lite-0.1 建圖", "reproduced": "都用 RAGU 附帶的抽取模型 Meno-Lite-0.1 建圖", "original_position": "", "original": "沒有", "in_claim": "這四個難度層級的 AC 都用 Meno-Lite-0.1（RAGU 附帶的 7B 抽取模型）建圖", "verdict": "僅來自主張"},
+       {"what": "LightRAG 與 (b) Evidence Recall 被省略", "reproduced": "未畫", "original_position": "上方圖例第一項、右圖 (b)", "original": "LightRAG 各組第一條；(b) Evidence Recall 整張", "in_claim": "", "verdict": "一致"},
+       {"what": "橫條長度比例與軸起點", "reproduced": "軸從 0 起，橫條長度看起來與數值成正比", "original_position": "左圖 (a) y 軸 0–80", "original": "y 軸從 0 起", "in_claim": "", "verdict": "一致"}
+     ],
+     "errors": ["圖例或範圍被省略", "圖上超出主張"]}
+  ]
+}

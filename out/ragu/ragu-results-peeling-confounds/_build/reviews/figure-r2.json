@@ -1,0 +1,29 @@
+{
+  "slides": [
+    {"slide": 8,
+     "items": [
+       {"what": "圖表類型與指標", "reproduced": "成對橫條圖，單位 %，軸從 0 起；圖註「答對率（AC）」", "original_position": "原圖左半 (a) 面板標題與 y 軸標籤", "original": "(a) Answer Correctness；y 軸「Answer Correctness (%)」，0 起", "in_claim": "RAGU 對 HippoRAG 2 的 AC 差距從 −18.2 單調收斂到 +2.1", "verdict": "一致"},
+       {"what": "圖例：對照組名稱", "reproduced": "HippoRAG 2", "original_position": "原圖頂部圖例中間項（橘色斜線）", "original": "HippoRAG 2", "in_claim": "RAGU 對 HippoRAG 2 的 AC 差距", "verdict": "一致"},
+       {"what": "圖例：主角名稱", "reproduced": "RAGU", "original_position": "原圖頂部圖例右項（藍色）", "original": "our system（論文自稱；主張稱 RAGU）", "in_claim": "RAGU 自己那一欄是 54.2 → 53.7 → 64.1 → 59.0", "verdict": "一致"},
+       {"what": "第 1 級類別名", "reproduced": "第 1 級 / Fact Retrieval", "original_position": "(a) 面板 x 軸第 1 組", "original": "Fact Retrieval", "in_claim": "四個難度層級（Fact Retrieval、Complex Reasoning、Contextual Summarize、Creative Generation）", "verdict": "一致"},
+       {"what": "第 1 級 HippoRAG 2 數值", "reproduced": "72.4%", "original_position": "(a) Fact Retrieval 組橘色柱頂標註", "original": "72.4", "in_claim": "Fact Retrieval | 26.2 | 72.4 | 54.2", "verdict": "一致"},
+       {"what": "第 1 級 RAGU 數值", "reproduced": "54.2%", "original_position": "(a) Fact Retrieval 組藍色柱頂標註", "original": "54.2", "in_claim": "RAGU 自己那一欄是 54.2 → 53.7 → 64.1 → 59.0", "verdict": "一致"},
+       {"what": "第 2 級類別名", "reproduced": "第 2 級 / Complex Reasoning", "original_position": "(a) 面板 x 軸第 2 組", "original": "Complex Reasoning", "in_claim": "四個難度層級（Fact Retrieval、Complex Reasoning、Contextual Summarize、Creative Generation）", "verdict": "一致"},
+       {"what": "第 2 級 HippoRAG 2 數值", "reproduced": "68.4%", "original_position": "(a) Complex Reasoning 組橘色柱頂標註", "original": "68.4", "in_claim": "Complex Reasoning | 20.2 | 68.4 | 53.7", "verdict": "一致"},
+       {"what": "第 2 級 RAGU 數值", "reproduced": "53.7%", "original_position": "(a) Complex Reasoning 組藍色柱頂標註", "original": "53.7", "in_claim": "RAGU 自己那一欄是 54.2 → 53.7 → 64.1 → 59.0", "verdict": "一致"},
+       {"what": "第 3 級類別名", "reproduced": "第 3 級 / Contextual Summarize", "original_position": "(a) 面板 x 軸第 3 組", "original": "Contextual Summarize", "in_claim": "四個難度層級（Fact Retrieval、Complex Reasoning、Contextual Summarize、Creative Generation）", "verdict": "一致"},
+       {"what": "第 3 級 HippoRAG 2 數值", "reproduced": "65.0%", "original_position": "(a) Contextual Summarize 組橘色柱頂標註", "original": "65.0", "in_claim": "Contextual Summarize | 22.6 | 65.0 | 64.1", "verdict": "一致"},
+       {"what": "第 3 級 RAGU 數值", "reproduced": "64.1%", "original_position": "(a) Contextual Summarize 組藍色柱頂標註", "original": "64.1", "in_claim": "RAGU 自己那一欄是 54.2 → 53.7 → 64.1 → 59.0", "verdict": "一致"},
+       {"what": "第 4 級類別名與「最難」", "reproduced": "第 4 級（最難）/ Creative Generation", "original_position": "(a) 面板 x 軸第 4 組；圖底箭頭文字", "original": "Creative Generation；「→ increasing task complexity →」", "in_claim": "在 GraphRAG-Bench Medical 最難的 Creative Generation 層級", "verdict": "一致"},
+       {"what": "第 4 級 HippoRAG 2 數值", "reproduced": "56.9%", "original_position": "(a) Creative Generation 組橘色柱頂標註", "original": "56.9", "in_claim": "HippoRAG 2 則從 72.4 掉到 56.9", "verdict": "一致"},
+       {"what": "第 4 級 RAGU 數值", "reproduced": "59.0%", "original_position": "(a) Creative Generation 組藍色柱頂標註", "original": "59.0", "in_claim": "RAGU 以 59.0 對 56.9 贏 HippoRAG 2", "verdict": "一致"},
+       {"what": "難度順序（第 1 到第 4 級）", "reproduced": "由上到下第 1 級→第 4 級（最難）", "original_position": "(a) x 軸由左到右與圖底箭頭", "original": "Fact Retrieval → Complex Reasoning → Contextual Summarize → Creative Generation，箭頭 increasing task complexity", "in_claim": "四個難度層級（Fact Retrieval、Complex Reasoning、Contextual Summarize、Creative Generation）", "verdict": "一致"},
+       {"what": "圖註：建圖條件", "reproduced": "都用 RAGU 附帶的抽取模型建圖", "original_position": "原圖無此文字", "original": "原圖沒畫建圖模型", "in_claim": "這四個難度層級的 AC 都用 Meno-Lite-0.1（RAGU 附帶的 7B 抽取模型）建圖", "verdict": "僅來自主張"},
+       {"what": "補充：差距 −18.2% 收斂到 +2.1%、論文說越難越強", "reproduced": "論文說差距從 −18.2% 收斂到 +2.1%、越難越強", "original_position": "原圖未印差距值；由柱頂 54.2−72.4、59.0−56.9 可對應", "original": "原圖沒有差距標註，但與柱頂數值不矛盾", "in_claim": "RAGU 對 HippoRAG 2 的 AC 差距從 −18.2 單調收斂到 +2.1，論文說這是「越難越強」的證據", "verdict": "僅來自主張"},
+       {"what": "補充：醫療題庫的四級難度", "reproduced": "醫療題庫的四級難度", "original_position": "原圖無資料集名稱", "original": "原圖沒標資料集", "in_claim": "在 GraphRAG-Bench Medical 的四個難度層級", "verdict": "僅來自主張"},
+       {"what": "主標與補充：主要是 HippoRAG 2 從 72.4% 掉到 56.9%", "reproduced": "越難越強？主要是對手往下掉；主要是 HippoRAG 2 從 72.4% 掉到 56.9%", "original_position": "(a) 橘色柱 Fact Retrieval 72.4、Creative Generation 56.9", "original": "72.4、56.9（解讀原圖沒有）", "in_claim": "所謂 cross-over 主要不是 RAGU 變強，而是 HippoRAG 2 往下掉", "verdict": "僅來自主張"},
+       {"what": "省略 LightRAG 與 (b) Evidence Recall 面板", "reproduced": "只畫 HippoRAG 2 與 RAGU 的 AC", "original_position": "原圖圖例左項 LightRAG、右半 (b) 面板", "original": "LightRAG 柱與 Evidence Recall 面板", "in_claim": "", "verdict": "一致"}
+     ],
+     "errors": []}
+  ]
+}
