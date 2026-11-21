@@ -418,7 +418,7 @@
       ]
     },
     "last": {
-      "text": "CER：只算每一步「Answer:」後面關鍵字的機率，說得再順的廢話也不算分。\n文章：datasciocean.com/paper-intro/cer\n同系列：不只數票，把每一票的信心加起來（尚未發布）\n同系列：數學比問答穩，因為信心補不了沒學過的知識（尚未發布）",
+      "text": "CER：只算每一步「Answer:」後面關鍵字的機率，說得再順的廢話也不算分。\n文章：datasciocean.com/paper-intro/cer\n同系列：不只數票，把每一票的信心加起來\nhttps://www.threads.com/@datasciocean/post/Df5yzotH4IY\n同系列：數學比問答穩，因為信心補不了沒學過的知識（尚未發布）",
       "refs": [
         "c1",
         "c9"

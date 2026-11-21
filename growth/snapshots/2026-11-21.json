@@ -1,7 +1,7 @@
 {
- "taken_at": "2026-11-21T07:42:34+0000",
+ "taken_at": "2026-11-21T16:19:28+0000",
  "account": {
-  "ig_followers": 1688,
+  "ig_followers": 1687,
   "th_followers": 583
  },
  "posts": [
@@ -17,8 +17,8 @@
    "cover": "AI 學人類偏好的底層，是 1952 年的球隊排名模型",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 29.2,
-   "th_age_days": 29.2,
+   "ig_age_days": 29.6,
+   "th_age_days": 29.6,
    "ig": {
     "views": 125,
     "reach": 51,
@@ -51,8 +51,8 @@
    "cover": "想用便宜的 Judge 幫 GPT-6 省錢？得先闖兩關！",
    "threads_mode": null,
    "experiments": [],
-   "ig_age_days": 42.0,
-   "th_age_days": 42.0,
+   "ig_age_days": 42.3,
+   "th_age_days": 42.3,
    "ig": {
     "views": 349,
     "reach": 105,
@@ -74,6 +74,42 @@
    }
   },
   {
+   "concept": "cer-critical-token-confidence",
+   "series": "cer",
+   "hook_type": "反直覺斷言",
+   "ig_url": "https://www.instagram.com/p/DgAo1VZj1GU/",
+   "ig_published_at": "2026-11-21T16:16:33+0000",
+   "th_url": "https://www.threads.com/@datasciocean/post/DgApDevj2aT",
+   "th_published_at": "2026-11-21T16:18:38+0000",
+   "slides": 12,
+   "cover": "AI 整段說得很有信心，可能只是廢話說得順",
+   "threads_mode": "carousel",
+   "experiments": [
+    "A3"
+   ],
+   "ig_age_days": 0.0,
+   "th_age_days": 0.0,
+   "ig": {
+    "views": 2,
+    "reach": 0,
+    "likes": 0,
+    "comments": 0,
+    "saved": 0,
+    "shares": 0,
+    "follows": 0,
+    "profile_visits": 0,
+    "total_interactions": 0
+   },
+   "th": {
+    "views": 0,
+    "likes": 0,
+    "replies": 1,
+    "reposts": 0,
+    "quotes": 0,
+    "shares": 0
+   }
+  },
+  {
    "concept": "cer-process-confidence-weighted-voting",
    "series": "cer",
    "hook_type": "讀者疑問",
@@ -85,10 +121,10 @@
    "cover": "AI 多想幾次再多數決，猶豫的那幾票也算數？",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 2.3,
-   "th_age_days": 2.3,
+   "ig_age_days": 2.7,
+   "th_age_days": 2.7,
    "ig": {
-    "views": 92,
+    "views": 96,
     "reach": 34,
     "likes": 2,
     "comments": 0,
@@ -119,8 +155,8 @@
    "cover": "讓 Claude Code 自己改檔案、下指令，不會出事嗎？",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 23.3,
-   "th_age_days": 23.3,
+   "ig_age_days": 23.7,
+   "th_age_days": 23.7,
    "ig": {
     "views": 393,
     "reach": 141,
@@ -153,8 +189,8 @@
    "cover": "Claude Code 靠六個機制，擴充能力又管住 context",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 21.3,
-   "th_age_days": 21.3,
+   "ig_age_days": 21.7,
+   "th_age_days": 21.7,
    "ig": {
     "views": 245,
     "reach": 97,
@@ -167,7 +203,7 @@
     "total_interactions": 8
    },
    "th": {
-    "views": 192,
+    "views": 193,
     "likes": 2,
     "replies": 1,
     "reposts": 0,
@@ -187,8 +223,8 @@
    "cover": "AI 學做決策，能不能先許願要幾分？",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 31.3,
-   "th_age_days": 31.3,
+   "ig_age_days": 31.7,
+   "th_age_days": 31.7,
    "ig": {
     "views": 287,
     "reach": 99,
@@ -221,8 +257,8 @@
    "cover": "便宜的 Judge JEV 先判，成績居然贏過 GPT-6 單打",
    "threads_mode": null,
    "experiments": [],
-   "ig_age_days": 45.0,
-   "th_age_days": 44.9,
+   "ig_age_days": 45.4,
+   "th_age_days": 45.3,
    "ig": {
     "views": 357,
     "reach": 116,
@@ -255,8 +291,8 @@
    "cover": "便宜的 Judge JEV，判得出程式有 bug 嗎？",
    "threads_mode": null,
    "experiments": [],
-   "ig_age_days": 44.2,
-   "th_age_days": 44.2,
+   "ig_age_days": 44.6,
+   "th_age_days": 44.6,
    "ig": {
     "views": 364,
     "reach": 118,
@@ -289,8 +325,8 @@
    "cover": "同一份文件，怎麼長出四種簡報？",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 37.3,
-   "th_age_days": 37.3,
+   "ig_age_days": 37.7,
+   "th_age_days": 37.7,
    "ig": {
     "views": 281,
     "reach": 100,
@@ -323,8 +359,8 @@
    "cover": "三個疑點：資料少、沒驗證、難擴展",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 35.7,
-   "th_age_days": 35.7,
+   "ig_age_days": 36.1,
+   "th_age_days": 36.1,
    "ig": {
     "views": 156,
     "reach": 50,
@@ -357,8 +393,8 @@
    "cover": "兩招不用訓練的技巧 代價各是什麼？",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 35.2,
-   "th_age_days": 35.2,
+   "ig_age_days": 35.6,
+   "th_age_days": 35.6,
    "ig": {
     "views": 170,
     "reach": 57,
@@ -391,8 +427,8 @@
    "cover": "從 20 個答案挑最好的，AI 評審不必兩兩都比",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 14.2,
-   "th_age_days": 14.2,
+   "ig_age_days": 14.6,
+   "th_age_days": 14.6,
    "ig": {
     "views": 172,
     "reach": 59,
@@ -425,11 +461,11 @@
    "cover": "提示詞貼兩次，不是囉嗦，是在補 AI 的盲點",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 6.2,
-   "th_age_days": 6.2,
+   "ig_age_days": 6.5,
+   "th_age_days": 6.5,
    "ig": {
-    "views": 124,
-    "reach": 47,
+    "views": 126,
+    "reach": 48,
     "likes": 0,
     "comments": 1,
     "saved": 1,
@@ -459,11 +495,11 @@
    "cover": "提示詞貼兩次、輸入變兩倍，為什麼幾乎沒變慢？",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 4.8,
-   "th_age_days": 4.8,
+   "ig_age_days": 5.2,
+   "th_age_days": 5.2,
    "ig": {
-    "views": 105,
-    "reach": 43,
+    "views": 113,
+    "reach": 44,
     "likes": 0,
     "comments": 0,
     "saved": 0,
@@ -473,7 +509,7 @@
     "total_interactions": 0
    },
    "th": {
-    "views": 227,
+    "views": 228,
     "likes": 3,
     "replies": 2,
     "reposts": 0,
@@ -493,11 +529,11 @@
    "cover": "找第 25 個名字，答對率 21.33% 變 97.33%",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 4.3,
-   "th_age_days": 4.3,
+   "ig_age_days": 4.7,
+   "th_age_days": 4.7,
    "ig": {
-    "views": 109,
-    "reach": 34,
+    "views": 113,
+    "reach": 35,
     "likes": 2,
     "comments": 1,
     "saved": 0,
@@ -507,7 +543,7 @@
     "total_interactions": 3
    },
    "th": {
-    "views": 149,
+    "views": 150,
     "likes": 1,
     "replies": 1,
     "reposts": 0,
@@ -527,8 +563,8 @@
    "cover": "Slack、Wiki、程式碼、Jira，怎麼塞進同一張表？",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 19.7,
-   "th_age_days": 19.7,
+   "ig_age_days": 20.1,
+   "th_age_days": 20.1,
    "ig": {
     "views": 223,
     "reach": 70,
@@ -561,8 +597,8 @@
    "cover": "搜尋每次都把所有工具叫一遍？又慢又貴",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 16.7,
-   "th_age_days": 16.7,
+   "ig_age_days": 17.1,
+   "th_age_days": 17.1,
    "ig": {
     "views": 180,
     "reach": 70,
@@ -595,8 +631,8 @@
    "cover": "Multi-Hop 推理，一定要先建知識圖譜嗎？",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 27.2,
-   "th_age_days": 27.2,
+   "ig_age_days": 27.5,
+   "th_age_days": 27.5,
    "ig": {
     "views": 273,
     "reach": 97,
@@ -629,8 +665,8 @@
    "cover": "SAG 贏在超邊，還是贏在 SQL？",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 25.3,
-   "th_age_days": 25.3,
+   "ig_age_days": 25.7,
+   "th_age_days": 25.7,
    "ig": {
     "views": 229,
     "reach": 76,
@@ -643,7 +679,7 @@
     "total_interactions": 6
    },
    "th": {
-    "views": 2401,
+    "views": 2403,
     "likes": 42,
     "replies": 2,
     "reposts": 3,
@@ -663,8 +699,8 @@
    "cover": "SAG 不靠更強的模型，靠分工",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 26.2,
-   "th_age_days": 26.2,
+   "ig_age_days": 26.6,
+   "th_age_days": 26.6,
    "ig": {
     "views": 305,
     "reach": 99,
@@ -677,7 +713,7 @@
     "total_interactions": 5
    },
    "th": {
-    "views": 7791,
+    "views": 7793,
     "likes": 103,
     "replies": 8,
     "reposts": 13,
@@ -697,8 +733,8 @@
    "cover": "SAG 相較 GraphRAG 不先建圖，很省事沒錯，但要付三筆帳",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 23.8,
-   "th_age_days": 23.8,
+   "ig_age_days": 24.2,
+   "th_age_days": 24.2,
    "ig": {
     "views": 122,
     "reach": 46,
@@ -731,8 +767,8 @@
    "cover": "讓 AI 改 Skill 不亂改，靠這兩招！",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 39.2,
-   "th_age_days": 39.2,
+   "ig_age_days": 39.5,
+   "th_age_days": 39.5,
    "ig": {
     "views": 246,
     "reach": 100,
@@ -765,8 +801,8 @@
    "cover": "AI 改完 Skill，怎麼知道有沒有變好？",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 38.2,
-   "th_age_days": 38.2,
+   "ig_age_days": 38.5,
+   "th_age_days": 38.5,
    "ig": {
     "views": 184,
     "reach": 58,
@@ -799,8 +835,8 @@
    "cover": "Skill 怎麼調才有效？讓 AI 照紀律自己調！",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 40.0,
-   "th_age_days": 40.0,
+   "ig_age_days": 40.4,
+   "th_age_days": 40.4,
    "ig": {
     "views": 164,
     "reach": 61,
@@ -833,8 +869,8 @@
    "cover": "搜尋出三種毛病，Cerebras 不是多加幾招，是一種毛病配一帖藥",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 18.3,
-   "th_age_days": 18.3,
+   "ig_age_days": 18.6,
+   "th_age_days": 18.6,
    "ig": {
     "views": 154,
     "reach": 55,
@@ -867,11 +903,11 @@
    "cover": "AI 怎麼決定這題去哪裡查？",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 10.3,
-   "th_age_days": 10.3,
+   "ig_age_days": 10.7,
+   "th_age_days": 10.7,
    "ig": {
-    "views": 189,
-    "reach": 75,
+    "views": 190,
+    "reach": 76,
     "likes": 3,
     "comments": 0,
     "saved": 1,
@@ -901,8 +937,8 @@
    "cover": "答案明明在圖片裡，AI 搜尋卻先去翻文字",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 11.3,
-   "th_age_days": 11.3,
+   "ig_age_days": 11.7,
+   "th_age_days": 11.7,
    "ig": {
     "views": 140,
     "reach": 52,
@@ -935,8 +971,8 @@
    "cover": "叫 AI 打 1 到 5 分，為什麼一堆平手？",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 15.3,
-   "th_age_days": 15.3,
+   "ig_age_days": 15.7,
+   "th_age_days": 15.7,
    "ig": {
     "views": 238,
     "reach": 83,
@@ -969,11 +1005,11 @@
    "cover": "論文說 LLM-as-a-Verifier 表現最好，功勞真的是它的嗎？",
    "threads_mode": "carousel",
    "experiments": [],
-   "ig_age_days": 13.2,
-   "th_age_days": 13.2,
+   "ig_age_days": 13.5,
+   "th_age_days": 13.5,
    "ig": {
-    "views": 261,
-    "reach": 97,
+    "views": 262,
+    "reach": 98,
     "likes": 2,
     "comments": 0,
     "saved": 2,

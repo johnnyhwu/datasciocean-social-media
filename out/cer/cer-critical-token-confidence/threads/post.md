@@ -35,6 +35,7 @@ CER 的做法：用指示規定 AI 每一步結尾寫出「Answer: 數值」（�
 ```text
 CER：只算每一步「Answer:」後面關鍵字的機率，說得再順的廢話也不算分。
 文章：datasciocean.com/paper-intro/cer
-同系列：不只數票，把每一票的信心加起來（尚未發布）
+同系列：不只數票，把每一票的信心加起來
+https://www.threads.com/@datasciocean/post/Df5yzotH4IY
 同系列：數學比問答穩，因為信心補不了沒學過的知識（尚未發布）
 ```
