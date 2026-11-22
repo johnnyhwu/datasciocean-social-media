@@ -35,4 +35,8 @@ CER 讓 AI 把同一題想好幾遍，再依每一遍推理過程的信心加權
 ```text
 多想幾遍、看信心，幫的是推理，不是知識。
 文章：datasciocean.com/paper-intro/cer
+同系列：不只數票，把每一票的信心加起來
+https://www.threads.com/@datasciocean/post/Df5yzotH4IY
+同系列：整句平均會被廢話稀釋，只看關鍵字
+https://www.threads.com/@datasciocean/post/DgApDevj2aT
 ```

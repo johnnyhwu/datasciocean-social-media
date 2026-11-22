@@ -89,7 +89,7 @@ CLAUDE.md 只留「進行中的系列」；已發布完的系列與歷史細節�
 
 ## CER 系列（2026-11-15 起；籌碼風格 `chips`）
 
-3 卡 3 則不合併；系列名「拆解 CER：不只數票，還要看 AI 有多大信心」（Claude 依規則 12 決定，2026-11-17 人接受）。新風格 `chips`（`tests/test_chips_style.py`）；新圖型 9 種：`chips`、`midfail`、`tagged`、`weights`、`watch`、`tokprob`、`extract`、`sieve`、`lens`（`tests/test_diagrams.py`）。三則在 `out/cer/`（12／12／10 張），審查全過。2026-11-17 人 review 回饋：「把握」一律改「信心」（三則全改，記進 `config/terms.yaml`）；第 1 則第 7 張拆成兩張（信心怎麼變路徑分數、猶豫挪到最後一步）、第 9 張籌碼標籤改寫；第 1 則忠實者 r4、r5、讀者 r3 通過。三則 ready（hook accepted）、系列 `members_locked: true`。存量 3；每則發布前先跑 `series_links.py`。
+3 卡 3 則不合併；系列名「拆解 CER：不只數票，還要看 AI 有多大信心」（Claude 依規則 12 決定，2026-11-17 人接受）。新風格 `chips`（`tests/test_chips_style.py`）；新圖型 9 種：`chips`、`midfail`、`tagged`、`weights`、`watch`、`tokprob`、`extract`、`sieve`、`lens`（`tests/test_diagrams.py`）。三則在 `out/cer/`（12／12／10 張），審查全過。2026-11-17 人 review 回饋：「把握」一律改「信心」（三則全改，記進 `config/terms.yaml`）；第 1 則第 7 張拆成兩張（信心怎麼變路徑分數、猶豫挪到最後一步）、第 9 張籌碼標籤改寫；第 1 則忠實者 r4、r5、讀者 r3 通過。三則 ready（hook accepted）、系列 `members_locked: true`。**系列完結**：第 1 則 2026-11-19（IG https://www.instagram.com/p/Df5yc_3H6XQ/、Threads https://www.threads.com/@datasciocean/post/Df5yzotH4IY）、第 2 則 2026-11-21（IG https://www.instagram.com/p/DgAo1VZj1GU/、Threads https://www.threads.com/@datasciocean/post/DgApDevj2aT）、第 3 則 2026-11-22（IG https://www.instagram.com/p/DgC0UGTiZtg/、Threads https://www.threads.com/@datasciocean/post/DgC0nqdCSWz）。第 2、3 則帶走張頁腳加了追蹤邀請（growth A3，人 review 後才加）；第 3 則 Threads 最後一則原本漏了同系列連結，發布前經人同意補上。
 
 ## 跨系列的人的決定與待決事項
 

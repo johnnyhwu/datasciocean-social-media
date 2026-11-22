@@ -38,7 +38,7 @@ P=out/<系列>/<觀念>                              # 要發的發布包資料�
 | 6 | **Threads dry-run**：列出每一則的完整文字、字數、附圖、連結預覽、額度（輪播模式只有 2 則：輪播貼文＋連結回覆）。把完整文字給人（同樣加 `--summary`） | `threads_publish.py publish $P --summary` | Claude → 人看 |
 | 7 | 人說「發」→ **Threads 發佈**：依序發，每一則回覆前一則，每一則發完立刻記錄 id（輪播：先建每張圖的子項 container，再建輪播本體；整串約 1 到 2 分鐘）；成功後自動寫回 state 與 `state/threads-publish-log.jsonl` | `threads_publish.py publish $P --confirm` | 人確認，Claude 執行 |
 | 8 | 驗證：`state.py status` 該觀念兩格式都是 `published`；`state/<觀念>.yaml` 有兩個網址；把網址給人。**貼文 `README.md` 與 `out/` 索引會在 `--confirm` 成功後自動更新**（`build_package.py --refresh`，兩個格式都發完才會顯示「已發布」與網址）；不用再手動 `build_package.py --force` | | Claude |
-| 9 | **Threads 回補**：`state/backfill.md` 有項目時，跑 dry-run，把每則回覆的完整文字給人看，人說「發」才 `--confirm`；成功後自動標記已回補。IG 與其他事項不做（見下） | `threads_publish.py backfill`（dry-run）→ `threads_publish.py backfill --confirm` | Claude；人確認 |
+| 9 | **Threads 回補**（**不用問人**，人 2026-11-22）：`state/backfill.md` 有項目時，跑 dry-run 自己看；沒有 problems、warnings，內容只是同系列標題＋網址，就直接 `--confirm`，回報時列出回補了哪幾則。dry-run 有問題才停下來問。成功後自動標記已回補。IG 與其他事項不做（見下） | `threads_publish.py backfill`（dry-run）→ `threads_publish.py backfill --confirm` | Claude（不用問人） |
 | 9.5 | **流量追蹤與改進**：兩個平台都發完後跑 `insights.py pull`，和上一份快照比、判讀 `trying` 的 action、更新 `growth/plan.md` 與 `growth/experiments.md`；回報發布結果時附 2～4 行流量追蹤。抓不到數據就說一聲、跳過，不擋發布 | `insights.py pull`，流程見 `growth-loop.md` | Claude（不用問人） |
 | 10 | 把這次的 state 與發佈紀錄 commit（人已說「完成後 commit and push」就直接做：先只 push `ig/jpg/`，發完再把其餘一起 commit 並 push；否則先問。不是這次改的變更，如 submodule 指標，先說明再問） | | Claude，**先問人**（人已授權時除外） |
 
@@ -48,7 +48,7 @@ IG 與 Threads **可以各自獨立發**，順序由人決定（目前慣例是�
 
 | 事項 | 做法 |
 |---|---|
-| **Threads 回補**（在原串文最後一則下接一則回覆，列出之後發布的同系列貼文與連結） | **Claude 做**：`threads_publish.py backfill`，dry-run 給人看、人說「發」才 `--confirm`（和發文一樣是公開動作）。成功後自動標記 `backfilled`、寫發佈紀錄 |
+| **Threads 回補**（在原串文最後一則下接一則回覆，列出之後發布的同系列貼文與連結） | **Claude 做，不用問人**（人 2026-11-22）：`threads_publish.py backfill`，dry-run 乾淨就直接 `--confirm`（見上表第 9 步）。成功後自動標記 `backfilled`、寫發佈紀錄 |
 | IG 回補（改 caption 補連結） | **不做**：API 不能改 caption，人也不手動做。已發布貼文的 IG 系列地圖維持原樣 |
 | 限時動態、精選集、置頂 | **不做**，也不提醒（限時動態的連結貼紙 API 不支援） |
 | 帳號設定、頭像、簡介、發文時段 | 不在本專案範圍 |

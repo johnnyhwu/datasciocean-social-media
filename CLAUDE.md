@@ -35,7 +35,7 @@ datasciocean-concept-wiki（Stage 1，submodule：concept-wiki/）
 6. **每個數字都要有比較對象；錨點類型決定寫法。** 設計參數主詞要是方法名、官方宣稱主詞要是宣稱方；部落格判斷可直接以作者口吻寫、不必標「我的判斷」（人決定，2026-10-08），但不得寫成卡上沒有的事實或比卡更強。
 7. **限定條件綁在主張上。** 用了某條主張，它的限定條件必須一起出現。
 8. **圖片由程式產生。** LLM 只產出內容規格 JSON；外觀由模板決定；數據圖與文字圖不用 AI 生圖。同一系列用同一份視覺哲學與同一套模板。**圖要直接支撐主標**；同一批對象的兩個同單位的量用成對橫條圖，不用雙軸（`chart-thinking`）。已發布的貼文不重渲（本機的圖要和網路上一致）。
-9. **發布一定要經人確認；經確認後 IG 與 Threads 都用官方 API 發布。** `ig_publish.py`、`threads_publish.py` 預設是 dry-run，**只有人明確說「發」之後才加 `--confirm`**，不可在同一輪自己決定；每個 dry-run 都要看，出現 problems 或 warnings 就停下來問；已發布過的不重複發；不用真實貼文做測試。整串授權、Threads 回補、哪些事不做：`publish-flow.md`。
+9. **發布一定要經人確認；經確認後 IG 與 Threads 都用官方 API 發布。** `ig_publish.py`、`threads_publish.py` 預設是 dry-run，**只有人明確說「發」之後才加 `--confirm`**，不可在同一輪自己決定；每個 dry-run 都要看，出現 problems 或 warnings 就停下來問；已發布過的不重複發；不用真實貼文做測試。**例外：Threads 回補不用問人**（人 2026-11-22），dry-run 乾淨就直接 `--confirm`。整串授權、Threads 回補、哪些事不做：`publish-flow.md`。
 10. **貼文不提 podcast，不加 AI 揭露。** podcast 連結只放個人檔案。
 11. **寧可暫停，也不降低標準。** 存量不足時暫停發文，不為了維持每天一則而放行未通過審查的內容。
 12. **預設由 Claude 從頭做到尾，人只 review 成品**（人 2026-11-10，UniversalRAG 兩則實測滿意）：選卡與合併、系列名與標題、hook、版型、審查迴圈都由 Claude 照 skill 自己決定，不中途問人；審查全部通過才交成品，交付時列出 hook 候選與選擇理由。人 review 成品說沒問題，就視為接受 hook、系列名與標題（`state.py ready --hook-accepted`，系列加 `members_locked`）。**仍要停下來問人**：審查者爭議、輪數用完仍有 blocker、要違反本檔規則才做得出來的取捨、發布。**新圖型不必先出樣張**（2026-10-12）：可直接在貼文裡做，但要附程式 B 檢查與回歸測試，交貼文時明講新增了哪些圖型。**問人時要說明選項的下游後果**，並附發出去的樣子。
@@ -85,8 +85,8 @@ tests/                                  回歸測試 `test_*.py`（`test_*_style
 
 ## 目前狀態（各系列進度、網址、待決事項：`docs/status.md`）
 
-- 已發布：系列 `skillopt`、`persona-aware-d2s`、`jev-cascade`、`sag`、`claude-code`、`cerebras-rag`、`llm-as-a-verifier`、`universal-rag`、`prompt-repetition`，獨立貼文 `decision-transformer-reward-conditioning`、`bradley-terry-pairwise-preference`。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。
-- 進行中：系列 `cer`（3 則 ready，見 `docs/status.md`）。
+- 已發布：系列 `skillopt`、`persona-aware-d2s`、`jev-cascade`、`sag`、`claude-code`、`cerebras-rag`、`llm-as-a-verifier`、`universal-rag`、`prompt-repetition`、`cer`，獨立貼文 `decision-transformer-reward-conditioning`、`bradley-terry-pairwise-preference`。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。
+- 進行中：系列 `ragu`（4 則審查全過，等人 review，見 `docs/status.md`）。
 - 獨立貼文（沒有系列）：spec 寫 `series: null`，視覺在 `standalone/<觀念 id>/`，發布包在 `out/standalone/`。
 
 ## 工作方式

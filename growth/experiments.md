@@ -7,7 +7,7 @@
 | 觀念 | 發布日 | actions | 做了什麼 |
 |---|---|---|---|
 | `cer-critical-token-confidence` | 2026-11-21 | A3 | 帶走張頁腳加追蹤邀請（人已 review 成品後才加，只改頁腳） |
-| `cer-results-how-to-read` | （未發布） | A3 | 同上 |
+| `cer-results-how-to-read` | 2026-11-22 | A3 | 同上 |
 | `ragu-pipeline-two-stage-extraction-consolidation` | （未發布） | A1, A3, A4 | GraphRAG 系統主題；帶走張頁腳加追蹤邀請；7 張 |
 | `ragu-results-peeling-confounds` | （未發布） | A1, A3 | 帶走張頁腳加追蹤邀請；11 張（A4 未套用） |
 | `retrieval-recall-not-answer-quality` | （未發布） | A1, A3 | 同上 |
@@ -19,5 +19,6 @@
 
 | 日期 | 快照 | action | 則數 | 結果 | 狀態變化 |
 |---|---|---|---|---|---|
+| 2026-11-22 | 2026-11-22 | A3 | 2（1 則 0.8 天、1 則剛發） | 追蹤數 IG 1,687、Threads 583，和前一份相同。A3 第 1 則（CER 2）0.8 天：IG 看 104、觸及 36、因這則追蹤 0、點進個人檔案 0；Threads 187（第 1 則 3.5 天才 123）。方向：IG 還沒有效果，Threads 略高；未滿 3 則、樣本太小，不判讀 | — |
 | 2026-11-22 | 2026-11-21（UTC，覆寫基準那份；基準版本在 git afdfa40） | A3 | 1（剛發） | 追蹤數 IG 1,688→1,687、Threads 583→583（距基準約 1 天，無變化）；A3 第 1 則剛發，下次快照才有數字 | — |
 | 2026-11-21 | 2026-11-21 | — | — | 建立基準（`reports/2026-11-21-baseline.md`），還沒有套用任何 action | — |

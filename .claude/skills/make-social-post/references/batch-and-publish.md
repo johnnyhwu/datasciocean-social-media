@@ -83,7 +83,7 @@ uv run python .claude/skills/make-social-post/scripts/state.py record <concept> 
 
 寫入 `state/<concept>.yaml` 的 `posts[]`（必須記錄：觀念 id、系列 id、格式、網址、發布時間、hook 樣態、提及的觀念；成效分析另做獨立系統，這些識別碼事後很難補），格式狀態改 `published`，並重算 `state/backfill.md`（已發布、但缺少「之後才發布的同系列或提及觀念」連結的貼文）。
 
-**回補只做 Threads，由 Claude 做**（人 2026-10-10 決定）：`threads_publish.py backfill`（dry-run）→ 人說「發」→ `--confirm`，會在原串文最後一則下面接一則回覆，列出之後才發布的同系列貼文（標題＋Threads 連結），成功後自動在 `state/<觀念>.yaml` 的 `backfilled` 加上觀念 id、清單就會消失。**IG 不回補**（API 不能改 caption，人也不手動做；已發布貼文的系列地圖維持原樣）。一則串文缺幾則就合成一則回覆。
+**回補只做 Threads，由 Claude 做**（人 2026-10-10 決定）：`threads_publish.py backfill`（dry-run）→ 乾淨就直接 `--confirm`（不用問人，人 2026-11-22；`publish-flow.md` 第 9 步），會在原串文最後一則下面接一則回覆，列出之後才發布的同系列貼文（標題＋Threads 連結），成功後自動在 `state/<觀念>.yaml` 的 `backfilled` 加上觀念 id、清單就會消失。**IG 不回補**（API 不能改 caption，人也不手動做；已發布貼文的系列地圖維持原樣）。一則串文缺幾則就合成一則回覆。
 
 ## 8. 未驗證事項（結果影響參數，不影響產出內容；人不做手動驗證，所以只在有機會順便看到時記錄）
 
