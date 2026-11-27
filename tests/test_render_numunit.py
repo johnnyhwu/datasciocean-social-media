@@ -12,7 +12,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-RENDER = ROOT / ".claude/skills/make-social-post/scripts/render.py"
+RENDER = ROOT / ".agents/skills/make-social-post/scripts/render.py"
 CHECK = "標題的數字與單位不拆成兩行"
 SPEC = {
     "series": "jev-cascade", "concept": "render-test", "lang": "zh-TW",

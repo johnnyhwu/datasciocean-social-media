@@ -16,7 +16,7 @@ import os
 FX = Path(__file__).resolve().parent / "fixtures"
 os.environ["DSO_CONCEPT_WIKI"] = str(FX / "concept-wiki")
 os.environ["DSO_SERIES_DIR"] = str(FX / "series")
-SCRIPT = ROOT / ".claude/skills/make-social-post/scripts/check_a.py"
+SCRIPT = ROOT / ".agents/skills/make-social-post/scripts/check_a.py"
 import yaml
 SLIDES_MAX = yaml.safe_load((ROOT / "config" / "params.yaml").read_text(encoding="utf-8"))["slides_max"]
 GOOD_A = json.loads((FX / "out/jev-teardown/jev-overview/spec.json").read_text(encoding="utf-8"))
@@ -145,7 +145,7 @@ def main():
         fails += not ok
         print(("PASS " if ok else "FAIL ") + name + ("" if ok else f"  [預期含 {expect!r}]\n{out}"))
     # 審查驗證程式的參數打反時，直接提示正確順序（2026-11-01：verify_reader 參數打反，程式崩潰多一次來回）
-    sd_scripts = ROOT / ".claude/skills/make-social-post/scripts"
+    sd_scripts = ROOT / ".agents/skills/make-social-post/scripts"
     for script, args, want in (("verify_reader.py", ["r.json", "post-reader.md"], "貼文在前"),
                                ("verify_faithful.py", ["f.json", "card.md"], "卡在前")):
         r = subprocess.run(["uv", "run", "python", str(sd_scripts / script), *args], capture_output=True, text=True, cwd=ROOT)

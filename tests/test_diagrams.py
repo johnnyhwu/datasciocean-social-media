@@ -8,7 +8,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-RENDER = ROOT / ".claude/skills/make-social-post/scripts/render.py"
+RENDER = ROOT / ".agents/skills/make-social-post/scripts/render.py"
 fails = []
 
 
@@ -436,7 +436,7 @@ code, out = render(D("route", **{**RT, "nodes": [{"text": "站名", "sub": "很�
 expect("故意做壞：路線圖的說明太長放不下 → 抓得到", code != 0, out)
 
 import sys
-sys.path.insert(0, str(ROOT / ".claude/skills/make-social-post/scripts"))
+sys.path.insert(0, str(ROOT / ".agents/skills/make-social-post/scripts"))
 import diagrams as DG
 o = DG.drift_offsets(5, 200)
 expect("drift_offsets：起點 0、單調遞增、終點 = dmax", o[0] == 0 and all(b > a for a, b in zip(o, o[1:])) and abs(o[-1] - 200) < 1e-9, str(o))
@@ -447,7 +447,7 @@ code, out = render(D("dist", nodes=DN, pick="argmax", heads=["模型給每個分
 expect("正確的機率直條（argmax）通過程式 B（含直條高度檢查）", code == 0, out)
 code, out = render(D("dist", nodes=DN, pick="ev", heads=["同一組機率", "期望值"]))
 expect("正確的機率直條（期望值）通過程式 B（含針的位置檢查）", code == 0, out)
-import sys as _s; _s.path.insert(0, str(ROOT / ".claude/skills/make-social-post/scripts")); import diagrams as _D
+import sys as _s; _s.path.insert(0, str(ROOT / ".agents/skills/make-social-post/scripts")); import diagrams as _D
 expect("dist_ev：期望值算對（0.02…0.45 → 4.16）", abs(_D.dist_ev(DN) - 4.16) < 1e-9, str(_D.dist_ev(DN)))
 expect("dist 的期望值標籤會進 texts()（程式 A 看得到圖上的 4.16）", "期望值 4.16" in _D.texts(D("dist", nodes=DN, pick="ev", heads=["x", "期望值"])), "")
 code, out = render(D("dist", nodes=[{**n, "p": 0.3} for n in DN], pick="ev"))

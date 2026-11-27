@@ -11,7 +11,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-RENDER = ROOT / ".claude/skills/make-social-post/scripts/render.py"
+RENDER = ROOT / ".agents/skills/make-social-post/scripts/render.py"
 CONCEPT = "bradley-terry-pairwise-preference"
 fails = []
 
@@ -112,7 +112,7 @@ expect("子標籤含 \\n 換行的 stops 通過程式 B", code == 0 and "1/1 張
 
 # LaTeX（spec 頂層 "math": true，`$...$` 由 KaTeX 排版）
 import sys
-sys.path.insert(0, str(ROOT / ".claude/skills/make-social-post/scripts"))
+sys.path.insert(0, str(ROOT / ".agents/skills/make-social-post/scripts"))
 import cardlib as W
 expect("tex_plain：分數、上下標、希臘字母", W.tex_plain(r"贏的機率 ＝ $\dfrac{p_i}{p_i + p_j}$，$\sigma(r_i - r_j)$") == "贏的機率 ＝ p_i/(p_i + p_j)，σ(r_i - r_j)")
 expect("tex_plain：巢狀大括號", W.tex_plain(r"$\dfrac{e^{r_i}}{1 + e^{-(r_i - r_j)}}$") == "(e^(r_i))/(1 + e^(-(r_i - r_j)))")

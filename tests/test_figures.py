@@ -16,7 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FX = Path(__file__).resolve().parent / "fixtures"
-SCRIPTS = ROOT / ".claude/skills/make-social-post/scripts"
+SCRIPTS = ROOT / ".agents/skills/make-social-post/scripts"
 TMP = Path(tempfile.mkdtemp())
 WIKI = TMP / "concept-wiki"
 shutil.copytree(FX / "concept-wiki", WIKI)
