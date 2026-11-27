@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-RENDER = ROOT / ".claude/skills/make-social-post/scripts/render.py"
+RENDER = ROOT / ".agents/skills/make-social-post/scripts/render.py"
 MEMBERS = ["persona-d2s-task-and-pipeline", "persona-d2s-training-design-flaws", "persona-d2s-what-to-borrow"]
 fails = []
 

@@ -12,8 +12,8 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-RENDER = ROOT / ".claude/skills/make-social-post/scripts/render.py"
-sys.path.insert(0, str(ROOT / ".claude/skills/make-social-post/scripts"))
+RENDER = ROOT / ".agents/skills/make-social-post/scripts/render.py"
+sys.path.insert(0, str(ROOT / ".agents/skills/make-social-post/scripts"))
 import render as R
 
 CONCEPT = "sag-latent-hyperedge-one-hop"

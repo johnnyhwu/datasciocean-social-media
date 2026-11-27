@@ -20,7 +20,7 @@ import os
 FX = Path(__file__).resolve().parent / "fixtures"
 os.environ["DSO_CONCEPT_WIKI"] = str(FX / "concept-wiki")
 os.environ["DSO_SERIES_DIR"] = str(FX / "series")
-sys.path.insert(0, str(ROOT / ".claude/skills/make-social-post/scripts"))
+sys.path.insert(0, str(ROOT / ".agents/skills/make-social-post/scripts"))
 
 import batch_check as BC  # noqa: E402
 import state as S  # noqa: E402

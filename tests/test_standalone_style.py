@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-RENDER = ROOT / ".claude/skills/make-social-post/scripts/render.py"
+RENDER = ROOT / ".agents/skills/make-social-post/scripts/render.py"
 CONCEPT = "decision-transformer-reward-conditioning"
 fails = []
 
