@@ -86,7 +86,7 @@ tests/                                  回歸測試 `test_*.py`（`test_*_style
 ## 目前狀態（各系列進度、網址、待決事項：`docs/status.md`）
 
 - 已發布：系列 `skillopt`、`persona-aware-d2s`、`jev-cascade`、`sag`、`claude-code`、`cerebras-rag`、`llm-as-a-verifier`、`universal-rag`、`prompt-repetition`、`cer`，獨立貼文 `decision-transformer-reward-conditioning`、`bradley-terry-pairwise-preference`。模板 hash 與已發布貼文不一致是預期的（已發布的不重渲）。
-- 進行中：系列 `ragu`（4 則審查全過，等人 review，見 `docs/status.md`）。
+- 已定案、待發布：系列 `ragu`「GraphRAG 值不值得做」（2026-11-23 人 review 後整個重做；2026-11-27 人說四則定案：兩格式 `ready`、`members_locked`；見 `series/ragu/series.md`、`docs/status.md`）。
 - 獨立貼文（沒有系列）：spec 寫 `series: null`，視覺在 `standalone/<觀念 id>/`，發布包在 `out/standalone/`。
 
 ## 工作方式

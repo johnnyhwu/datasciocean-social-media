@@ -1,9 +1,11 @@
-# 進度：ragu-pipeline-two-stage-extraction-consolidation（RAGU 第 3 則）
+# 進度
 
-## 現況（2026-11-19）
-- 忠實者 r3（輪數上限）擋第 9 張一處範圍 → 已照卡上原句改；超出輪數後加跑的只審第 9 張檢查通過。
-- 等人決定的事：輪數用完後的修改，請人確認接受（接受後再 spec_diff --mark）。
+## 現況（2026-11-27：定案）
+- 審查全過：8 張；忠實者 r3、讀者 r2 通過；spec_diff --mark 完成；batch_check 4 則 PASS。
+- 套用 action 見 `growth/experiments.md`。
+- 2026-11-27 人說 RAGU 四則都可以定案：兩格式 `state.py ready --hook-accepted`，`series.md` 加 `members_locked: true`（封面配圖維持現版）。
+- 下一步：人說「發」才走 `publish-flow.md`（prepare → push `ig/jpg/` → IG → Threads）；依系列順序從第 1 則開始。
 
 ## 歷史
-- r1：讀者／編輯：斷線問題與解法被去重頁隔開、「名單」換了意思、第 2 張先用沒介紹的詞 → 重排（兩趟抽取緊接斷線；去重兩張移到後面接第 4 則）、分開「名單」與「型別表」、補白話。忠實者 r1 唯一錯誤即「名單」換義。
-- r2：忠實者：第 10 張掉「抽取模型太弱」、第 9 張「沒有數字」太滿、Threads 實體窄化、caption 範圍 → 改。
+- 2026-11-25 r1–r3：新圖型 dangle、「那條線錯了也沒關係」改掉、清單／名單統一、「部落格認為」改作者口吻
+- 2026-11-23 重做：每則只講一件事、砍題庫名與對手名、8～9 張（見 `series/ragu/series.md` 規劃備忘）。

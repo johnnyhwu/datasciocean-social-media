@@ -8,10 +8,10 @@
 |---|---|---|---|
 | `cer-critical-token-confidence` | 2026-11-21 | A3 | 帶走張頁腳加追蹤邀請（人已 review 成品後才加，只改頁腳） |
 | `cer-results-how-to-read` | 2026-11-22 | A3 | 同上 |
-| `ragu-pipeline-two-stage-extraction-consolidation` | （未發布） | A1, A3, A4 | GraphRAG 系統主題；帶走張頁腳加追蹤邀請；7 張 |
-| `ragu-results-peeling-confounds` | （未發布） | A1, A3 | 帶走張頁腳加追蹤邀請；11 張（A4 未套用） |
-| `retrieval-recall-not-answer-quality` | （未發布） | A1, A3 | 同上 |
-| `small-extractor-saturation-not-scale` | （未發布） | A3 | 帶走張頁腳加追蹤邀請 |
+| `ragu-results-peeling-confounds` | （未發布） | A1, A3, A4 | 2026-11-23 重做：GraphRAG 值不值得做（系統取捨）；帶走張頁腳加追蹤邀請；7 張 |
+| `retrieval-recall-not-answer-quality` | （未發布） | A1, A3, A4 | 調 RAG 時該看哪個分數；帶走張頁腳加追蹤邀請；9 張 |
+| `ragu-pipeline-two-stage-extraction-consolidation` | （未發布） | A1, A3, A4 | 建圖的兩趟抽取（能帶走的做法）；帶走張頁腳加追蹤邀請；8 張 |
+| `small-extractor-saturation-not-scale` | （未發布） | A3, A4 | 帶走張頁腳加追蹤邀請；8 張 |
 
 ## 判讀紀錄
 

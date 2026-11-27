@@ -718,6 +718,21 @@ expect("cell()：畫一個框、文字用 dl 並帶 data-box", len(cv.svg) == 1 
 import render as RD
 from PIL import Image
 img = Image.new("RGB", (1080, 1350), (240, 232, 214))
+# 2026-11-23 RAGU 重做：dangle（線接到不存在的點）、tokens 的 label_w／cell_pad／no_arrow
+DG = dict(heads=["名字一樣：接得上", "名字不一樣：接到不存在的點"], nodes=[{"text": "Bell Laboratories", "sub": "清單上的點"}, {"text": "Bell Labs", "sub": "清單上沒有"}], outcomes=[{"text": "另一個點"}])
+code, out = render(D("dangle", **DG))
+expect("正確的 dangle 通過程式 B", code == 0, out)
+code, out = render(D("dangle", **{**DG, "outcomes": []}))
+expect("故意做壞：dangle 少了 outcomes（線另一端的點）→ 報錯", code != 0 and "dangle" in out, out)
+code, out = render(D("dangle", **{**DG, "nodes": [{"text": "Bell Laboratories", "sub": "很長的說明" * 30}, DG["nodes"][1]]}))
+expect("故意做壞：dangle 的說明太長放不下 → 抓得到", code != 0, out)
+tx = _D.texts(D("dangle", **DG))
+expect("dangle 的名字與排標籤會進 texts()", "Bell Labs" in tx and "另一個點" in tx and "名字一樣：接得上" in tx, str(tx))
+TK8 = dict(steps=[{"label": "A", "cells": [{"text": "相關", "tone": "state"}] * 3}, {"label": "B", "cells": [{"text": "相關", "tone": "state"}] * 4 + [{"text": "雜訊", "tone": "mask"}] * 4}])
+code, out = render(D("tokens", **TK8))
+expect("故意做壞：tokens 一列 8 格、預設列首寬 → 字擠出格子被抓到", code != 0, out)
+code, out = render(D("tokens", **TK8, label_w=60, cell_pad=6, no_arrow=True))
+expect("tokens 收窄列首與格內留白（label_w／cell_pad）後 8 格通過程式 B", code == 0, out)
 w = RD.worst_contrast([{"n": "淺字", "r": {"l": 200, "t": 200, "r": 400, "b": 240}, "c": "rgb(240, 232, 214)"}], img)
 expect("故意做壞：米色底上的米色字 → 對比 1.0，並給出取樣點與文字、背景顏色",
        w[0] < 1.1 and w[1] == "淺字" and "取樣點 (197,197)" in w[2] and "背景 rgb(240, 232, 214)" in w[2], str(w))

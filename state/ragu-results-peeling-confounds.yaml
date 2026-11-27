@@ -1,0 +1,9 @@
+concept: ragu-results-peeling-confounds
+formats:
+  ig_carousel:
+    status: ready
+    pack: out/ragu/ragu-results-peeling-confounds
+  threads_thread:
+    status: ready
+    pack: out/ragu/ragu-results-peeling-confounds
+posts: []

@@ -1,0 +1,9 @@
+concept: small-extractor-saturation-not-scale
+formats:
+  ig_carousel:
+    status: ready
+    pack: out/ragu/small-extractor-saturation-not-scale
+  threads_thread:
+    status: ready
+    pack: out/ragu/small-extractor-saturation-not-scale
+posts: []

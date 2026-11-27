@@ -1,11 +1,11 @@
-# 進度：retrieval-recall-not-answer-quality（RAGU 第 2 則）
+# 進度
 
-## 現況（2026-11-19）
-- 審查全過：忠實者 r3（只審改過的區塊）、讀者 r3 通過；r1 編輯建議已處理；spec_diff --mark 已記。
-- mark 之後改了 slide05 主標與 caption 第一句（忠實者 r3 的「部分支持」備註）→ 系列層審查時要重審這兩塊。
-- 等人決定的事：無。
+## 現況（2026-11-27：定案）
+- 審查全過：9 張；忠實者 r4、讀者 r4 通過；spec_diff --mark 完成；batch_check 4 則 PASS。
+- 套用 action 見 `growth/experiments.md`。
+- 2026-11-27 人說 RAGU 四則都可以定案：兩格式 `state.py ready --hook-accepted`，`series.md` 加 `members_locked: true`（封面配圖維持現版）。
+- 下一步：人說「發」才走 `publish-flow.md`（prepare → push `ig/jpg/` → IG → Threads）；依系列順序從第 1 則開始。
 
 ## 歷史
-- r1：忠實者退回（AC 限定條件沒在 IG 出現、「最難的」卡上沒有、「常用」、措辭）；讀者退回（HippoRAG 2、Creative Generation 沒定義）。→ 第 2 張改甲乙、補 HippoRAG 2 說明、綜合題／找事實題、標題錯開。
-- r2：忠實者退回（第 7 張「所有」、第 9 張比較對象）→ 改。讀者退回（實體沒定義）→ 第 4 張補「實體（提到的人、事、物）」。
-- 不採用：差距改寫「百分點」（人定用語寫 %）。
+- 2026-11-25 r1–r4：找全率／純度統一、HippoRAG 2 不稱 GraphRAG、第 7 張改用最難綜合題 59.0 vs 56.9（評分誤差內）、拿掉多撈→Coverage 的歸因
+- 2026-11-23 重做：每則只講一件事、砍題庫名與對手名、8～9 張（見 `series/ragu/series.md` 規劃備忘）。

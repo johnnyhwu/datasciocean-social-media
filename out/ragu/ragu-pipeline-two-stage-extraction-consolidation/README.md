@@ -1,12 +1,12 @@
-# 先定好名單再讓 AI 選，圖就少了斷線
+# AI 會把同一個東西寫成兩個名字
 
 | 項目 | 內容 |
 |---|---|
-| 系列 | 拆解 RAGU：GraphRAG 的天花板有多高 |
+| 系列 | GraphRAG 值不值得做 |
 | 觀念 | `ragu-pipeline-two-stage-extraction-consolidation`（卡：`concept-wiki/wiki/concepts/ragu-pipeline-two-stage-extraction-consolidation.md`） |
-| hook 樣態 | 痛點 |
-| IG 輪播 | 未做（7 張） |
-| Threads 串文 | 未做（2 則） |
+| hook 樣態 | 情境痛點 |
+| IG 輪播 | 待發布（8 張） |
+| Threads 串文 | 待發布（2 則） |
 
 ## 要看／要發的檔案
 
@@ -20,7 +20,7 @@
 
 ## 檢查結果（程式產生）
 
-- 程式 B：7/7 張通過（模板版本 `40425633b8ed`）
+- 程式 B：8/8 張通過（模板版本 `40425633b8ed`）
 - 程式 A、批次檢查、忠實者與讀者審查的結果不存在發布包裡（審查產出放暫存，不進 repo）；最後確認時由 Claude 在報告中說明
 
 ## 發布前

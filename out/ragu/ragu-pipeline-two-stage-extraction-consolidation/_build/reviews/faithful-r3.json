@@ -1,130 +1,391 @@
-{"post": "ragu-pipeline-two-stage-extraction-consolidation",
- "blocks": [
-  {"block": "第 9 張",
-   "atoms": [
-    {"text": "主標：六個步驟裡只有去重是新的",
-     "verdict": "完全支持",
-     "card_quote": "Step 3  Deduplication & Summarization  ★ 這篇唯一的原創處",
-     "note": "c1/c4。主標省略「摘要」與比較對象（Microsoft GraphRAG、LightRAG），補充第二句已補上比較對象。"},
-    {"text": "抽取拆兩趟不是新發明",
-     "verdict": "完全支持",
-     "card_quote": "跟 Microsoft GraphRAG、LightRAG 相比，差別只有 Step 3 這一格，其他每一格都是既有做法。",
-     "note": "Step 2 屬於「其他每一格」。"},
-    {"text": "但值得借用",
-     "verdict": "完全支持",
-     "card_quote": "它的兩階段 typed extraction 是個可以單獨拿走用的好 pattern",
-     "note": "c1 部落格判斷，以作者口吻寫，未比卡強。"},
-    {"text": "和 Microsoft GraphRAG、LightRAG 比，其他每一步都是既有做法",
-     "verdict": "完全支持",
-     "card_quote": "跟 Microsoft GraphRAG、LightRAG 相比，差別只有 Step 3 這一格，其他每一格都是既有做法。",
-     "note": ""},
-    {"text": "論文也沒比過有去重和沒有去重",
-     "verdict": "完全支持",
-     "card_quote": "**論文從頭到尾沒有做「有 Step 3 vs 沒 Step 3」的 ablation**",
-     "note": "「去重」指 Step 3（去重與摘要），與主標一致。"},
-    {"text": "（論文）只和 LightRAG 做跨系統比較，而兩者差的遠不只這一步",
-     "verdict": "部分支持",
-     "card_quote": "所以 consolidation 究竟帶來多少 gain，論文只有跟 LightRAG 的跨系統比較，而兩者的差異遠不只 Step 3。",
-     "note": "卡上的「只有跟 LightRAG 的跨系統比較」限定在「consolidation 究竟帶來多少 gain」這個問題上。貼文句子主詞是「論文」，寫成「只和 LightRAG 做跨系統比較」，沒有寫出「關於去重帶來多少效果」這個範圍，字面可讀成論文整體只跟 LightRAG 比過（系列第 1 則就提到 RAGU 對 HippoRAG 2 的比較，讀者可能看出矛盾）。"},
-    {"text": "示意圖：六步依序為 切段 Chunking／抽實體與關係（兩趟、有型別限制）／去重與摘要（把重複、別名、雜訊洗乾淨）／建圖 Graph Construction／分群 Community Detection／替每群寫摘要 Community Summarization；RAGU 建圖的六步（依序）",
-     "verdict": "完全支持",
-     "card_quote": "流程依序是 Chunking、Entity & Relation Extraction（兩階段、有 schema 約束）、Deduplication & Summarization（把重複、別名、噪音的實體與關係洗成乾淨版）、Graph Construction、Community Detection（Leiden）、Community Summarization",
-     "note": "中文步驟名為放行的白話翻譯；「型別限制」為 schema 約束的白話；省略 Leiden 屬子集。"},
-    {"text": "示意圖：打勾＝新的（勾在去重與摘要）",
-     "verdict": "完全支持",
-     "card_quote": "Step 3  Deduplication & Summarization  ★ 這篇唯一的原創處",
-     "note": "圖例為放行項。"}
-   ],
-   "errors": ["範圍被放大"]},
-  {"block": "第 10 張",
-   "atoms": [
-    {"text": "主標：同一個人被拆成三個點，分群就可能分錯",
-     "verdict": "完全支持",
-     "card_quote": "如果同一個實體被拆成三個節點（「Dennis Ritchie」/「Ritchie」/「D. Ritchie」）…可能被分進錯的社群",
-     "note": "「人」對應卡上的 Dennis Ritchie 例子；保留了「可能」。"},
-    {"text": "分群是看圖上誰和誰連得多",
-     "verdict": "完全支持",
-     "card_quote": "社群偵測是看圖的連接結構在分群",
-     "note": "「連接結構」的白話，未加新事實。"},
-    {"text": "本來集中的 3 條線就散成 1+1+1",
-     "verdict": "完全支持",
-     "card_quote": "本來該集中的 3 條邊會被分散成 1+1+1",
-     "note": ""},
-    {"text": "這個點變得不重要，可能被分錯群、甚至變成孤立點",
-     "verdict": "完全支持",
-     "card_quote": "這個節點在結構上就變得不重要，可能被分進錯的社群，甚至變成孤立點",
-     "note": "省略「在結構上」，意思未變。"},
-    {"text": "後面的步驟修不回來",
-     "verdict": "完全支持",
-     "card_quote": "抽取階段的噪音會經過社群偵測放大成結構性錯誤，而且下游修不回來",
-     "note": "c5 部落格推論，以作者口吻寫，未寫成論文已驗證。"},
-    {"text": "示意圖：合成一個點／3 條線集中在它身上／各算各的三個點／每個點只剩 1 條線／Dennis Ritchie、Ritchie、D. Ritchie／先合併再建圖 vs 沒合併就建圖",
-     "verdict": "完全支持",
-     "card_quote": "「先洗再建圖」在原理上是說得通的。…如果同一個實體被拆成三個節點（「Dennis Ritchie」/「Ritchie」/「D. Ritchie」），本來該集中的 3 條邊會被分散成 1+1+1",
-     "note": ""},
-    {"text": "圖註：不過抽取模型太弱時引入的錯，論文也承認合併救不回來",
-     "verdict": "完全支持",
-     "card_quote": "抽取模型太弱時引入的結構噪音，consolidation 也救不回來。",
-     "note": "c5#2 限定條件；「錯」為「結構噪音」的白話。c5#1 已在第 8 張出現。"}
-   ],
-   "errors": []},
-  {"block": "Threads 正文",
-   "atoms": [
-    {"text": "AI 畫知識圖，常畫出接不上的線。",
-     "verdict": "完全支持",
-     "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字…邊就指向一個不存在的節點",
-     "note": "開頭句省略「單次抽取時」，下一句「一次把…都抽出來」即補上。"},
-    {"text": "讓 AI 一次把文件裡的人、組織和它們的關係都抽出來，它常在關係裡寫出清單上沒有的名字，線就指向一個不存在的點。",
-     "verdict": "完全支持",
-     "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字——實體抽到「Bell Laboratories」，關係卻寫「Bell Labs」，邊就指向一個不存在的節點。",
-     "note": "人、組織依 c3「實體（人、組織、產品）」。"},
-    {"text": "RAGU 這套 GraphRAG 用的招式是拆兩趟：先抽出實體（人、組織、產品這類）、定好名單，再抽關係，兩頭只能是名單上的名字。",
-     "verdict": "完全支持",
-     "card_quote": "抽取被拆成兩趟 LLM 呼叫：…產出已驗證的實體集合 E = {e1, e2, ...}…Stage 2: chunk + E → 抽關係…約束：每個關係的 source_entity 與 target_entity…必須是 E 裡面已驗證過的名字",
-     "note": "c7；省略 schema 驗證屬子集。「GraphRAG」依 c2「GraphRAG 引擎」。"},
-    {"text": "這招不是 RAGU 發明的",
-     "verdict": "完全支持",
-     "card_quote": "跟 Microsoft GraphRAG、LightRAG 相比，差別只有 Step 3 這一格，其他每一格都是既有做法。",
-     "note": "兩趟抽取屬 Step 2。"},
-    {"text": "但很值得借用，也不限於知識圖",
-     "verdict": "完全支持",
-     "card_quote": "這個 pattern 可以脫離 GraphRAG 單獨用",
-     "note": "c1「好 pattern」、c9；部落格判斷以作者口吻寫。"},
-    {"text": "只要 AI 要從一組既有的東西裡挑，就先把合法選項定死再讓它選。",
-     "verdict": "完全支持",
-     "card_quote": "任何時候要 LLM 產生「指向既有事物」的輸出，先把合法選項定死，再讓它選。",
-     "note": ""},
-    {"text": "限制是型別表本身：RAGU 用的來自俄語新聞的標註，論文自己也承認換語言或領域可能要重新設計",
-     "verdict": "完全支持",
-     "card_quote": "來自一套俄語新聞語料的標註體系。論文自己在 Bias 段承認換語言或換領域可能要重新設計 schema",
-     "note": "c9#1 / c10。"},
-    {"text": "表裡沒有的類別，AI 只能挑最接近的，就會挑錯。",
-     "verdict": "完全支持",
-     "card_quote": "blog 指出 schema 覆蓋不足時，LLM 被迫在既有型別裡挑一個最接近的，就會挑錯（NEREL 沒有 CREATOR_OF 這類關係）",
-     "note": "c9#2。"},
-    {"text": "有意思的是，RAGU 自己的例子裡圖畫錯了，答案卻是對的，因為查回來的是原文段落。",
-     "verdict": "完全支持",
-     "card_quote": "後面的多跳問答還是答對了「Ritchie 創造了 C 語言」，因為檢索回來的是原始 chunk 文字，不是只有那條錯誤的邊。",
-     "note": "c13；「RAGU 自己的例子」對應 c11「論文挑出來的 demo」。"}
-   ],
-   "errors": []},
-  {"block": "IG caption（第一句）",
-   "atoms": [
-    {"text": "知識圖一次抽完時，AI 常寫出接不上的線",
-     "verdict": "完全支持",
-     "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字",
-     "note": ""},
-    {"text": "RAGU 拆成兩趟，先定名單再讓 AI 選",
-     "verdict": "完全支持",
-     "card_quote": "兩階段先把「有哪些節點」定死，第二階段就從開放式生成變成封閉集合上的選擇題。",
-     "note": "c7/c8。"}
-   ],
-   "errors": []}
- ],
- "recalculations": [
-  {"block": "第 10 張", "expression": "1+1+1", "result": "3（與「本來集中的 3 條線」一致）"}
- ],
- "gaps": [
-  {"description": "第 9 張「只和 LightRAG 做跨系統比較」掉了卡上的範圍「consolidation 究竟帶來多少 gain」，字面可讀成論文整體只跟 LightRAG 比較。",
-   "card_quote": "所以 consolidation 究竟帶來多少 gain，論文只有跟 LightRAG 的跨系統比較"}
- ]}
+{
+  "post": "ragu-pipeline-two-stage-extraction-consolidation",
+  "blocks": [
+    {
+      "block": "第 1 張",
+      "atoms": [
+        {
+          "text": "AI 會把同一個東西寫成兩個名字（主標）",
+          "verdict": "部分支持",
+          "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字——實體抽到「Bell Laboratories」，關係卻寫「Bell Labs」，邊就指向一個不存在的節點。",
+          "note": "卡限定在單次抽取時、且是「常」；主標省略情境，但副標的 Bell Labs 例子與第 2 張「AI 一次抽出點和線時，常…」補回，屬封面可省略細節，不列 blocker"
+        },
+        {
+          "text": "名單上寫「Bell Laboratories」，關係裡卻寫「Bell Labs」，這條關係就接不上",
+          "verdict": "完全支持",
+          "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字——實體抽到「Bell Laboratories」，關係卻寫「Bell Labs」，邊就指向一個不存在的節點。",
+          "note": "與卡上例子一致"
+        },
+        {
+          "text": "解法：先給 AI 一份名單，讓它從裡面挑",
+          "verdict": "完全支持",
+          "card_quote": "兩階段先把「有哪些節點」定死，第二階段就從開放式生成變成封閉集合上的選擇題。",
+          "note": "白話「定死節點→選擇題」，亦對應 c9「先把合法選項定死，再讓它選」"
+        },
+        {
+          "text": "c9 限定條件（schema 覆蓋不足會挑錯、型別表來自俄語新聞）在內文出現",
+          "verdict": "完全支持",
+          "card_quote": "這是 schema 覆蓋不足的典型症狀：NEREL 裡沒有 `CREATOR_OF` 這類關係，LLM 被迫在 49 個型別裡挑一個最接近的，就挑錯了。",
+          "note": "第 6 張補述與圖註出現"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 2 張",
+      "atoms": [
+        {
+          "text": "知識圖由點（人、組織這些東西）和線（點之間的關係）組成",
+          "verdict": "完全支持",
+          "card_quote": "GraphRAG 的解法是先請 LLM 把文件裡的實體（人、組織、產品）跟關係抽出來建成知識圖，檢索時可以沿著圖上的邊走。",
+          "note": "名詞白話定義，與卡一致"
+        },
+        {
+          "text": "AI 一次抽出點和線時，常在線上寫出點的清單裡沒有的名字",
+          "verdict": "完全支持",
+          "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字——實體抽到「Bell Laboratories」，關係卻寫「Bell Labs」，邊就指向一個不存在的節點。",
+          "note": "「單次抽取」「常」都保留"
+        },
+        {
+          "text": "示意圖：Bell Laboratories 在清單上卻沒線連到它；線上寫 Bell Labs，清單上沒有這個點，接到不存在的點",
+          "verdict": "完全支持",
+          "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字——實體抽到「Bell Laboratories」，關係卻寫「Bell Labs」，邊就指向一個不存在的節點。",
+          "note": "圖是卡上例子的白話化；「接得上」的對照點是示意，未加新事實"
+        },
+        {
+          "text": "主標：名字寫得不一樣，線就接到空氣",
+          "verdict": "完全支持",
+          "card_quote": "邊就指向一個不存在的節點",
+          "note": "口語化「接到空氣」等同指向不存在的節點"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 3 張",
+      "atoms": [
+        {
+          "text": "回顧頁各則標題與細節",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "結構元素（系列地圖、summary），不需對證"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 4 張",
+      "atoms": [
+        {
+          "text": "RAGU 是 ITMO University 團隊 2026 年 7 月放上 arXiv 的 GraphRAG 系統",
+          "verdict": "完全支持",
+          "card_quote": "RAGU 是 ITMO University 團隊在 2026 年 7 月[放上 arXiv](https://arxiv.org/abs/2607.11683)的 GraphRAG 引擎",
+          "note": "主詞是 RAGU，符合設計參數寫法"
+        },
+        {
+          "text": "RAGU 開源",
+          "verdict": "完全支持",
+          "card_quote": "兩者都開源",
+          "note": "卡 c2 text 寫「開源」"
+        },
+        {
+          "text": "先請 AI 把文件畫成知識圖，找資料時沿著圖上的線走",
+          "verdict": "完全支持",
+          "card_quote": "GraphRAG 的解法是先請 LLM 把文件裡的實體（人、組織、產品）跟關係抽出來建成知識圖，檢索時可以沿著圖上的邊走。",
+          "note": "卡講 GraphRAG 的一般做法，RAGU 是 GraphRAG 引擎，套用合理"
+        },
+        {
+          "text": "把抽點和線拆成兩趟",
+          "verdict": "完全支持",
+          "card_quote": "抽取被拆成兩趟 LLM 呼叫：",
+          "note": ""
+        },
+        {
+          "text": "第一趟只抽點，再用事先列好的分類（型別表）檢查每個點，得到一份名單",
+          "verdict": "完全支持",
+          "card_quote": "Stage 1: chunk → 抽實體 → 用 NEREL schema 驗證型別",
+          "note": "對應 C7b「產出已驗證的實體集合 E」"
+        },
+        {
+          "text": "型別表的例子是「人、組織」",
+          "verdict": "部分支持",
+          "card_quote": "GraphRAG 的解法是先請 LLM 把文件裡的實體（人、組織、產品）跟關係抽出來建成知識圖，檢索時可以沿著圖上的邊走。",
+          "note": "卡沒列出 NEREL 有哪些型別，只在 c3 以人、組織、產品舉例實體；作為型別的白話舉例可接受，不列錯誤"
+        },
+        {
+          "text": "第二趟抽線，線的兩端只能寫名單上的名字",
+          "verdict": "完全支持",
+          "card_quote": "必須是 E 裡面已驗證過的名字",
+          "note": ""
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 5 張",
+      "atoms": [
+        {
+          "text": "第二趟從自己寫，變成從名單挑",
+          "verdict": "完全支持",
+          "card_quote": "兩階段先把「有哪些節點」定死，第二階段就從開放式生成變成封閉集合上的選擇題。",
+          "note": "白話「開放式生成→封閉集合上的選擇題」"
+        },
+        {
+          "text": "這招不只用在建圖：任何要 AI 指向已經存在的東西時，先定好允許的選項，再讓它選",
+          "verdict": "完全支持",
+          "card_quote": "這個 pattern 可以脫離 GraphRAG 單獨用：任何時候要 LLM 產生「指向既有事物」的輸出，先把合法選項定死，再讓它選。",
+          "note": "部落格判斷以作者口吻寫，未比卡強"
+        },
+        {
+          "text": "示意圖：自己寫可能寫成 Bell Labs；從名單挑只能選名單上的名字",
+          "verdict": "完全支持",
+          "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字——實體抽到「Bell Laboratories」，關係卻寫「Bell Labs」，邊就指向一個不存在的節點。",
+          "note": "用「可能」，未說成必然"
+        },
+        {
+          "text": "c9 限定條件在內文出現",
+          "verdict": "完全支持",
+          "card_quote": "論文用的 NEREL schema 有 29 種實體型別、49 種關係型別，來自一套俄語新聞語料的標註體系。論文自己在 Bias 段承認換語言或換領域可能要重新設計 schema",
+          "note": "第 6 張與圖註"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 6 張",
+      "atoms": [
+        {
+          "text": "關係也有一份事先列好的清單（49 種）",
+          "verdict": "完全支持",
+          "card_quote": "論文用的 NEREL schema 有 29 種實體型別、49 種關係型別，來自一套俄語新聞語料的標註體系。論文自己在 Bias 段承認換語言或換領域可能要重新設計 schema",
+          "note": ""
+        },
+        {
+          "text": "文件寫 Ritchie 創造了 C 語言",
+          "verdict": "完全支持",
+          "card_quote": "前兩條是錯的。原文說 Ritchie 創造了 C 語言，`WORKS_AS` 的語意是「擔任某職位」，完全不對。",
+          "note": ""
+        },
+        {
+          "text": "清單沒有 CREATOR_OF 這類關係，AI 只好挑最接近的",
+          "verdict": "完全支持",
+          "card_quote": "這是 schema 覆蓋不足的典型症狀：NEREL 裡沒有 `CREATOR_OF` 這類關係，LLM 被迫在 49 個型別裡挑一個最接近的，就挑錯了。",
+          "note": "部落格推論照卡的直述句寫，未加驗證語氣"
+        },
+        {
+          "text": "Ritchie → C 語言、Ritchie → Unix 都挑到 WORKS_AS（擔任某職位），是錯的",
+          "verdict": "完全支持",
+          "card_quote": "前兩條是錯的。原文說 Ritchie 創造了 C 語言，`WORKS_AS` 的語意是「擔任某職位」，完全不對。",
+          "note": "卡列出兩條 WORKS_AS 與語意說明"
+        },
+        {
+          "text": "這還是論文挑出來展示的最佳案例：展示 5 條，錯了 2 條",
+          "verdict": "完全支持",
+          "card_quote": "而這還是論文自己挑出來展示的最佳案例，5 條裡錯 2 條。",
+          "note": "數字一致；「最佳案例」是 blog 的解讀，以作者口吻呈現，與卡同強度"
+        },
+        {
+          "text": "圖註：型別表來自俄語新聞，論文承認換語言或領域可能要重新設計",
+          "verdict": "完全支持",
+          "card_quote": "論文用的 NEREL schema 有 29 種實體型別、49 種關係型別，來自一套俄語新聞語料的標註體系。論文自己在 Bias 段承認換語言或換領域可能要重新設計 schema",
+          "note": "c10／c9 限定條件"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 7 張",
+      "atoms": [
+        {
+          "text": "後面的問答還是答對了「Ritchie 創造了 C 語言」",
+          "verdict": "完全支持",
+          "card_quote": "後面的多跳問答還是答對了「Ritchie 創造了 C 語言」，因為檢索回來的是原始 chunk 文字，不是只有那條錯誤的邊。",
+          "note": ""
+        },
+        {
+          "text": "這是論文挑出的一個例子",
+          "verdict": "完全支持",
+          "card_quote": "在論文挑出來的 Dennis Ritchie demo 中，圖上的邊錯了，多跳問答仍答對",
+          "note": "範圍限在單一 demo"
+        },
+        {
+          "text": "看起來，圖在這裡主要是幫忙找到相關段落",
+          "verdict": "完全支持",
+          "card_quote": "這反過來說明圖在這裡的作用主要是「找到相關段落」，最終答案還是 LLM 從原文讀出來的。",
+          "note": "部落格推論加「看起來」，不比卡強"
+        },
+        {
+          "text": "示意圖：沿著圖找到相關段落，包括 WORKS_AS 那條錯的線",
+          "verdict": "部分支持",
+          "card_quote": "後面的多跳問答還是答對了「Ritchie 創造了 C 語言」，因為檢索回來的是原始 chunk 文字，不是只有那條錯誤的邊。",
+          "note": "卡說「不是只有那條錯誤的邊」，隱含錯的邊也在檢索結果中；可接受"
+        },
+        {
+          "text": "交給模型的是文件原本的段落，裡面寫著「創造了 C 語言」，模型從段落讀出正確答案",
+          "verdict": "完全支持",
+          "card_quote": "這反過來說明圖在這裡的作用主要是「找到相關段落」，最終答案還是 LLM 從原文讀出來的。",
+          "note": "對應「檢索回來的是原始 chunk 文字」與「最終答案還是 LLM 從原文讀出來的」"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 8 張",
+      "atoms": [
+        {
+          "text": "先給它一份名單，讓它從裡面挑",
+          "verdict": "完全支持",
+          "card_quote": "這個 pattern 可以脫離 GraphRAG 單獨用：任何時候要 LLM 產生「指向既有事物」的輸出，先把合法選項定死，再讓它選。",
+          "note": ""
+        },
+        {
+          "text": "名單少了選項，它就會硬挑",
+          "verdict": "完全支持",
+          "card_quote": "這是 schema 覆蓋不足的典型症狀：NEREL 裡沒有 `CREATOR_OF` 這類關係，LLM 被迫在 49 個型別裡挑一個最接近的，就挑錯了。",
+          "note": "在 pattern 抽象層次上對應 c9 限定條件「schema 覆蓋不足時…挑一個最接近的」；卡的例子是關係型別清單，貼文以「名單」泛稱合法選項"
+        },
+        {
+          "text": "先問的問題：AI 會把同一個東西寫成兩個名字？",
+          "verdict": "完全支持",
+          "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字——實體抽到「Bell Laboratories」，關係卻寫「Bell Labs」，邊就指向一個不存在的節點。",
+          "note": "同封面"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "Threads 正文",
+      "atoms": [
+        {
+          "text": "AI 會把同一個東西寫成兩個名字",
+          "verdict": "部分支持",
+          "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字——實體抽到「Bell Laboratories」，關係卻寫「Bell Labs」，邊就指向一個不存在的節點。",
+          "note": "同封面，下一句即補「一次抽出點和線時，常…」"
+        },
+        {
+          "text": "知識圖由點和線組成；AI 一次抽出時常在線上寫出清單裡沒有的名字，Bell Laboratories／Bell Labs，接到不存在的點",
+          "verdict": "完全支持",
+          "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字——實體抽到「Bell Laboratories」，關係卻寫「Bell Labs」，邊就指向一個不存在的節點。",
+          "note": ""
+        },
+        {
+          "text": "RAGU（ITMO University 團隊的開源 GraphRAG 系統）",
+          "verdict": "完全支持",
+          "card_quote": "RAGU 是 ITMO University 團隊在 2026 年 7 月[放上 arXiv](https://arxiv.org/abs/2607.11683)的 GraphRAG 引擎",
+          "note": ""
+        },
+        {
+          "text": "兩趟：第一趟只抽點、用型別表檢查得到名單；第二趟抽線，兩端只能寫名單上的名字",
+          "verdict": "完全支持",
+          "card_quote": "Stage 1: chunk → 抽實體 → 用 NEREL schema 驗證型別",
+          "note": "亦對應 C7c"
+        },
+        {
+          "text": "這招不只用在建圖：任何要 AI 指向已經存在的東西時，先定好允許的選項，再讓它選",
+          "verdict": "完全支持",
+          "card_quote": "這個 pattern 可以脫離 GraphRAG 單獨用：任何時候要 LLM 產生「指向既有事物」的輸出，先把合法選項定死，再讓它選。",
+          "note": ""
+        },
+        {
+          "text": "代價是清單少了選項，AI 只好硬挑；49 種關係裡沒有 CREATOR_OF，AI 挑了 WORKS_AS（擔任某職位）",
+          "verdict": "完全支持",
+          "card_quote": "這是 schema 覆蓋不足的典型症狀：NEREL 裡沒有 `CREATOR_OF` 這類關係，LLM 被迫在 49 個型別裡挑一個最接近的，就挑錯了。",
+          "note": ""
+        },
+        {
+          "text": "這還是論文挑出來展示的最佳案例：展示 5 條，錯了 2 條",
+          "verdict": "完全支持",
+          "card_quote": "而這還是論文自己挑出來展示的最佳案例，5 條裡錯 2 條。",
+          "note": ""
+        },
+        {
+          "text": "型別表來自俄語新聞，論文承認換語言或領域可能要重新設計",
+          "verdict": "完全支持",
+          "card_quote": "論文用的 NEREL schema 有 29 種實體型別、49 種關係型別，來自一套俄語新聞語料的標註體系。論文自己在 Bias 段承認換語言或換領域可能要重新設計 schema",
+          "note": ""
+        },
+        {
+          "text": "後面的問答還是答對了，因為交給 AI 的是文件原本的段落",
+          "verdict": "完全支持",
+          "card_quote": "後面的多跳問答還是答對了「Ritchie 創造了 C 語言」，因為檢索回來的是原始 chunk 文字，不是只有那條錯誤的邊。",
+          "note": "卡本身就用「因為」"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "Threads 最後一則",
+      "atoms": [
+        {
+          "text": "任何要 AI 指向既有東西的時候：先把允許的選項定死，再讓它選",
+          "verdict": "完全支持",
+          "card_quote": "這個 pattern 可以脫離 GraphRAG 單獨用：任何時候要 LLM 產生「指向既有事物」的輸出，先把合法選項定死，再讓它選。",
+          "note": ""
+        },
+        {
+          "text": "也要確認名單涵蓋真正需要的選項",
+          "verdict": "部分支持",
+          "card_quote": "這是 schema 覆蓋不足的典型症狀：NEREL 裡沒有 `CREATOR_OF` 這類關係，LLM 被迫在 49 個型別裡挑一個最接近的，就挑錯了。",
+          "note": "卡只寫覆蓋不足會挑錯，沒有寫成建議；此句是同一限定條件的直接反面，未加新事實，不列錯誤"
+        },
+        {
+          "text": "文章網址、同系列標題",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "結構元素"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "IG caption",
+      "atoms": [
+        {
+          "text": "AI 會把同一個東西寫成兩個名字：Bell Laboratories、Bell Labs，線就接不上",
+          "verdict": "完全支持",
+          "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字——實體抽到「Bell Laboratories」，關係卻寫「Bell Labs」，邊就指向一個不存在的節點。",
+          "note": ""
+        },
+        {
+          "text": "名字寫得不一樣，線就接到空氣",
+          "verdict": "完全支持",
+          "card_quote": "單次抽取時，LLM 常在關係裡寫出實體清單裡不存在的名字——實體抽到「Bell Laboratories」，關係卻寫「Bell Labs」，邊就指向一個不存在的節點。",
+          "note": ""
+        },
+        {
+          "text": "不讓它寫，只讓它挑（第二趟從自己寫，變成從名單挑）",
+          "verdict": "完全支持",
+          "card_quote": "兩階段先把「有哪些節點」定死，第二階段就從開放式生成變成封閉集合上的選擇題。",
+          "note": ""
+        },
+        {
+          "text": "清單裡沒有「創造了」，AI 只好硬挑（關係也有一份事先列好的清單（49 種））",
+          "verdict": "完全支持",
+          "card_quote": "這是 schema 覆蓋不足的典型症狀：NEREL 裡沒有 `CREATOR_OF` 這類關係，LLM 被迫在 49 個型別裡挑一個最接近的，就挑錯了。",
+          "note": ""
+        },
+        {
+          "text": "圖畫錯了，答案卻是對的",
+          "verdict": "完全支持",
+          "card_quote": "後面的多跳問答還是答對了「Ritchie 創造了 C 語言」，因為檢索回來的是原始 chunk 文字，不是只有那條錯誤的邊。",
+          "note": ""
+        },
+        {
+          "text": "導流行、hashtag",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "結構元素"
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "recalculations": [
+    {
+      "block": "第 6 張",
+      "expression": "展示 5 條、錯 2 條 → 對的 5-2；錯誤比例 2/5",
+      "result": "3 條對；40%（貼文只寫 5 條錯 2 條，與卡一致）"
+    }
+  ],
+  "gaps": []
+}

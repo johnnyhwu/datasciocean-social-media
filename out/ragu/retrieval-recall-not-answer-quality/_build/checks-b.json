@@ -18,7 +18,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=779"
+          "detail": "最小左=80, 最大右=694"
         },
         {
           "name": "文字框無橫向溢出",
@@ -53,7 +53,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 RAGU：GraphRAG）"
+          "detail": "最低 5.0（GraphRAG 值不值得做）"
         },
         {
           "name": "標題最多 3 行",
@@ -63,7 +63,7 @@
         {
           "name": "標題末行 >= 2 字、換行不拆詞",
           "ok": true,
-          "detail": "{'lastChars': 7, 'bad': []}"
+          "detail": "{'lastChars': 8, 'bad': []}"
         },
         {
           "name": "標題的數字與單位不拆成兩行",
@@ -73,7 +73,7 @@
         {
           "name": "補充不拆詞、末行 >= 2 字",
           "ok": true,
-          "detail": "{'lines': 3, 'bad': [], 'lastChars': 19}"
+          "detail": "{'lines': 3, 'bad': [], 'lastChars': 8}"
         },
         {
           "name": "補充的數字與單位不拆成兩行",
@@ -83,7 +83,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 RAGU：GraphRAG 的天花板有多高']"
+          "detail": "['GraphRAG 值不值得做']"
         }
       ]
     },
@@ -104,7 +104,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=967"
+          "detail": "最小左=80, 最大右=992"
         },
         {
           "name": "文字框無橫向溢出",
@@ -139,7 +139,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 RAGU：GraphRAG）"
+          "detail": "最低 5.0（GraphRAG 值不值得做）"
         },
         {
           "name": "標題最多 2 行",
@@ -149,7 +149,7 @@
         {
           "name": "標題末行 >= 2 字、換行不拆詞",
           "ok": true,
-          "detail": "{'lastChars': 9, 'bad': []}"
+          "detail": "{'lastChars': 6, 'bad': []}"
         },
         {
           "name": "標題的數字與單位不拆成兩行",
@@ -159,10 +159,15 @@
         {
           "name": "圖表版型補充最多五行、不拆詞",
           "ok": true,
-          "detail": "{'lines': 4, 'bad': []}"
+          "detail": "{'lines': 2, 'bad': []}"
         },
         {
           "name": "補充的數字與單位不拆成兩行",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "框內文字不超出框（示意圖）",
           "ok": true,
           "detail": "[]"
         },
@@ -174,7 +179,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 RAGU：GraphRAG 的天花板有多高']"
+          "detail": "['GraphRAG 值不值得做']"
         }
       ]
     },
@@ -230,7 +235,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 RAGU：GraphRAG）"
+          "detail": "最低 5.0（GraphRAG 值不值得做）"
         },
         {
           "name": "標題最多 2 行",
@@ -255,7 +260,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 RAGU：GraphRAG 的天花板有多高']"
+          "detail": "['GraphRAG 值不值得做']"
         }
       ]
     },
@@ -276,7 +281,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=943"
+          "detail": "最小左=80, 最大右=1000"
         },
         {
           "name": "文字框無橫向溢出",
@@ -311,93 +316,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 RAGU：GraphRAG）"
-        },
-        {
-          "name": "標題最多 2 行",
-          "ok": true,
-          "detail": "1 行"
-        },
-        {
-          "name": "標題末行 >= 2 字、換行不拆詞",
-          "ok": true,
-          "detail": "{'lastChars': 10, 'bad': []}"
-        },
-        {
-          "name": "標題的數字與單位不拆成兩行",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "補充不拆詞、末行 >= 2 字",
-          "ok": true,
-          "detail": "{'lines': 4, 'bad': [], 'lastChars': 10}"
-        },
-        {
-          "name": "補充的數字與單位不拆成兩行",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "系列標籤與系列檔的名稱完全相同",
-          "ok": true,
-          "detail": "['拆解 RAGU：GraphRAG 的天花板有多高']"
-        }
-      ]
-    },
-    {
-      "slide": 5,
-      "layout": "diagram",
-      "checks": [
-        {
-          "name": "尺寸 1080x1350、無捲動溢出",
-          "ok": true,
-          "detail": "scroll=1080x1350"
-        },
-        {
-          "name": "字型已內嵌載入（Noto Sans CJK TC）",
-          "ok": true,
-          "detail": ""
-        },
-        {
-          "name": "文字左右邊界 >= 40px",
-          "ok": true,
-          "detail": "最小左=80, 最大右=980"
-        },
-        {
-          "name": "文字框無橫向溢出",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "文字與圖形不超出版面下緣（至少留 20px）",
-          "ok": true,
-          "detail": "最低 1302px，版面 1350px"
-        },
-        {
-          "name": "文字與文字不重疊",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "最小字級 >= 28px",
-          "ok": true,
-          "detail": "最小 28px"
-        },
-        {
-          "name": "字級都在規定集合內",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
-          "ok": true,
-          "detail": "最低 5.0（拆解 RAGU：GraphRAG）"
+          "detail": "最低 5.0（GraphRAG 值不值得做）"
         },
         {
           "name": "標題最多 2 行",
@@ -407,7 +326,7 @@
         {
           "name": "標題末行 >= 2 字、換行不拆詞",
           "ok": true,
-          "detail": "{'lastChars': 4, 'bad': []}"
+          "detail": "{'lastChars': 5, 'bad': []}"
         },
         {
           "name": "標題的數字與單位不拆成兩行",
@@ -415,9 +334,9 @@
           "detail": "[]"
         },
         {
-          "name": "圖表版型補充最多五行、不拆詞",
+          "name": "補充不拆詞、末行 >= 2 字",
           "ok": true,
-          "detail": "{'lines': 2, 'bad': []}"
+          "detail": "{'lines': 3, 'bad': [], 'lastChars': 7}"
         },
         {
           "name": "補充的數字與單位不拆成兩行",
@@ -425,24 +344,14 @@
           "detail": "[]"
         },
         {
-          "name": "框內文字不超出框（示意圖）",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "只有一組強調元素",
-          "ok": true,
-          "detail": "0"
-        },
-        {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 RAGU：GraphRAG 的天花板有多高']"
+          "detail": "['GraphRAG 值不值得做']"
         }
       ]
     },
     {
-      "slide": 6,
+      "slide": 5,
       "layout": "chart_bars",
       "checks": [
         {
@@ -458,7 +367,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=980"
+          "detail": "最小左=80, 最大右=932"
         },
         {
           "name": "文字框無橫向溢出",
@@ -493,7 +402,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 RAGU：GraphRAG）"
+          "detail": "最低 5.0（GraphRAG 值不值得做）"
         },
         {
           "name": "標題最多 2 行",
@@ -503,7 +412,7 @@
         {
           "name": "標題末行 >= 2 字、換行不拆詞",
           "ok": true,
-          "detail": "{'lastChars': 8, 'bad': []}"
+          "detail": "{'lastChars': 10, 'bad': []}"
         },
         {
           "name": "標題的數字與單位不拆成兩行",
@@ -513,7 +422,7 @@
         {
           "name": "圖表版型補充最多五行、不拆詞",
           "ok": true,
-          "detail": "{'lines': 4, 'bad': []}"
+          "detail": "{'lines': 3, 'bad': []}"
         },
         {
           "name": "補充的數字與單位不拆成兩行",
@@ -523,7 +432,7 @@
         {
           "name": "橫條長度與數值成正比、軸從 0 起",
           "ok": true,
-          "detail": "每單位 4.000~4.000px"
+          "detail": "每單位 400.000~400.000px"
         },
         {
           "name": "只有一組強調元素",
@@ -533,12 +442,12 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 RAGU：GraphRAG 的天花板有多高']"
+          "detail": "['GraphRAG 值不值得做']"
         }
       ]
     },
     {
-      "slide": 7,
+      "slide": 6,
       "layout": "diagram",
       "checks": [
         {
@@ -554,7 +463,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=980"
+          "detail": "最小左=80, 最大右=930"
         },
         {
           "name": "文字框無橫向溢出",
@@ -589,7 +498,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 RAGU：GraphRAG）"
+          "detail": "最低 5.0（GraphRAG 值不值得做）"
         },
         {
           "name": "標題最多 2 行",
@@ -629,12 +538,12 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 RAGU：GraphRAG 的天花板有多高']"
+          "detail": "['GraphRAG 值不值得做']"
         }
       ]
     },
     {
-      "slide": 8,
+      "slide": 7,
       "layout": "table",
       "checks": [
         {
@@ -685,7 +594,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 RAGU：GraphRAG）"
+          "detail": "最低 5.0（GraphRAG 值不值得做）"
         },
         {
           "name": "標題最多 2 行",
@@ -695,98 +604,7 @@
         {
           "name": "標題末行 >= 2 字、換行不拆詞",
           "ok": true,
-          "detail": "{'lastChars': 10, 'bad': []}"
-        },
-        {
-          "name": "標題的數字與單位不拆成兩行",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "圖表版型補充最多五行、不拆詞",
-          "ok": true,
-          "detail": "{'lines': 2, 'bad': []}"
-        },
-        {
-          "name": "補充的數字與單位不拆成兩行",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "只有一組強調元素",
-          "ok": true,
-          "detail": "0"
-        },
-        {
-          "name": "系列標籤與系列檔的名稱完全相同",
-          "ok": true,
-          "detail": "['拆解 RAGU：GraphRAG 的天花板有多高']"
-        }
-      ]
-    },
-    {
-      "slide": 9,
-      "layout": "diagram",
-      "checks": [
-        {
-          "name": "尺寸 1080x1350、無捲動溢出",
-          "ok": true,
-          "detail": "scroll=1080x1350"
-        },
-        {
-          "name": "字型已內嵌載入（Noto Sans CJK TC）",
-          "ok": true,
-          "detail": ""
-        },
-        {
-          "name": "文字左右邊界 >= 40px",
-          "ok": true,
-          "detail": "最小左=80, 最大右=995"
-        },
-        {
-          "name": "文字框無橫向溢出",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "文字與圖形不超出版面下緣（至少留 20px）",
-          "ok": true,
-          "detail": "最低 1302px，版面 1350px"
-        },
-        {
-          "name": "文字與文字不重疊",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "文字與圖形不重疊（圖形邊界框含線寬）",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "最小字級 >= 28px",
-          "ok": true,
-          "detail": "最小 28px"
-        },
-        {
-          "name": "字級都在規定集合內",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
-          "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
-          "ok": true,
-          "detail": "最低 5.0（拆解 RAGU：GraphRAG）"
-        },
-        {
-          "name": "標題最多 2 行",
-          "ok": true,
-          "detail": "2 行"
-        },
-        {
-          "name": "標題末行 >= 2 字、換行不拆詞",
-          "ok": true,
-          "detail": "{'lastChars': 10, 'bad': []}"
+          "detail": "{'lastChars': 6, 'bad': []}"
         },
         {
           "name": "標題的數字與單位不拆成兩行",
@@ -804,11 +622,6 @@
           "detail": "[]"
         },
         {
-          "name": "框內文字不超出框（示意圖）",
-          "ok": true,
-          "detail": "[]"
-        },
-        {
           "name": "只有一組強調元素",
           "ok": true,
           "detail": "0"
@@ -816,12 +629,12 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 RAGU：GraphRAG 的天花板有多高']"
+          "detail": "['GraphRAG 值不值得做']"
         }
       ]
     },
     {
-      "slide": 10,
+      "slide": 8,
       "layout": "diagram",
       "checks": [
         {
@@ -837,7 +650,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=980"
+          "detail": "最小左=80, 最大右=992"
         },
         {
           "name": "文字框無橫向溢出",
@@ -872,7 +685,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 5.0（拆解 RAGU：GraphRAG）"
+          "detail": "最低 5.0（GraphRAG 值不值得做）"
         },
         {
           "name": "標題最多 2 行",
@@ -892,7 +705,7 @@
         {
           "name": "圖表版型補充最多五行、不拆詞",
           "ok": true,
-          "detail": "{'lines': 5, 'bad': []}"
+          "detail": "{'lines': 3, 'bad': []}"
         },
         {
           "name": "補充的數字與單位不拆成兩行",
@@ -912,12 +725,12 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 RAGU：GraphRAG 的天花板有多高']"
+          "detail": "['GraphRAG 值不值得做']"
         }
       ]
     },
     {
-      "slide": 11,
+      "slide": 9,
       "layout": "takeaway",
       "checks": [
         {
@@ -933,7 +746,7 @@
         {
           "name": "文字左右邊界 >= 40px",
           "ok": true,
-          "detail": "最小左=80, 最大右=916"
+          "detail": "最小左=80, 最大右=819"
         },
         {
           "name": "文字框無橫向溢出",
@@ -968,7 +781,7 @@
         {
           "name": "文字對比度 >= 4.5（取文字框外緣四角的實際背景色）",
           "ok": true,
-          "detail": "最低 6.1（只盯 Evidence Reca）"
+          "detail": "最低 6.1（資料不是越多越好。雜訊可能讓 A）"
         },
         {
           "name": "標題最多 4 行",
@@ -978,7 +791,7 @@
         {
           "name": "標題末行 >= 2 字、換行不拆詞",
           "ok": true,
-          "detail": "{'lastChars': 8, 'bad': []}"
+          "detail": "{'lastChars': 9, 'bad': []}"
         },
         {
           "name": "標題的數字與單位不拆成兩行",
@@ -988,7 +801,7 @@
         {
           "name": "系列標籤與系列檔的名稱完全相同",
           "ok": true,
-          "detail": "['拆解 RAGU：GraphRAG 的天花板有多高']"
+          "detail": "['GraphRAG 值不值得做']"
         }
       ]
     }

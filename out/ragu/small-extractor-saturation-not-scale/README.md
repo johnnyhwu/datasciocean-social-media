@@ -1,12 +1,12 @@
-# 小模型夠用，是因為任務簡單
+# 小模型夠用，是因為題目太簡單
 
 | 項目 | 內容 |
 |---|---|
-| 系列 | 拆解 RAGU：GraphRAG 的天花板有多高 |
+| 系列 | GraphRAG 值不值得做 |
 | 觀念 | `small-extractor-saturation-not-scale`（卡：`concept-wiki/wiki/concepts/small-extractor-saturation-not-scale.md`） |
 | hook 樣態 | 反直覺斷言 |
-| IG 輪播 | 未做（12 張） |
-| Threads 串文 | 未做（2 則） |
+| IG 輪播 | 待發布（8 張） |
+| Threads 串文 | 待發布（2 則） |
 
 ## 要看／要發的檔案
 
@@ -20,7 +20,7 @@
 
 ## 檢查結果（程式產生）
 
-- 程式 B：12/12 張通過（模板版本 `40425633b8ed`）
+- 程式 B：8/8 張通過（模板版本 `40425633b8ed`）
 - 程式 A、批次檢查、忠實者與讀者審查的結果不存在發布包裡（審查產出放暫存，不進 repo）；最後確認時由 Claude 在報告中說明
 
 ## 發布前

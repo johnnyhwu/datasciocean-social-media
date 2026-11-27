@@ -1,5 +1,5 @@
 """系列 series/ragu（style: ceiling，低天花板）的回歸測試。
-每個版型都要通過程式 B；封面的天花板貼齊兩側、金色只給頂到天花板的一點（圓的上緣貼著天花板下緣）、每一則金點位置不同、標題在圖的下面；故意做壞的版本必須被抓到。
+每個版型都要通過程式 B；封面的天花板貼齊兩側、金色只給頂到天花板的一點（圓的上緣貼著天花板下緣）、每一則金點位置不同、標題在圖的上面（2026-11-23 改）；故意做壞的版本必須被抓到。
 用法（repo 根目錄）：uv run python tests/test_ceiling_style.py
 """
 import json
@@ -54,17 +54,17 @@ expect(f"每一張都有系列標籤（{TAG}）", html.count(TAG) >= 10, str(htm
 GOLD = f'fill="{R.GOLD}"'
 tops = []
 for mi in (0, 1, 2):
-    s, bot = R.cl_cover(mi)
+    s, ceil_y, bot = R.cl_cover(mi, 600)
     expect(f"第 {mi + 1} 則封面：金色只給一點", s.count(GOLD) == 1, str(s.count(GOLD)))
     m = re.search(r'cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)" fill="' + R.GOLD, s)
     cx, cy, r = map(float, m.groups())
     tops.append(cx)
-    ceil_y, sw = R.CL_COVER[2], 28
+    sw = 28
     expect(f"第 {mi + 1} 則封面：金點的上緣剛好貼著天花板下緣", abs((cy - r) - (ceil_y + sw / 2)) < 0.6, f"{cy - r} vs {ceil_y + sw / 2}")
     others = [float(a) - float(b) for a, b in re.findall(r'cy="([\d.]+)" r="([\d.]+)" fill="' + R.TEAL, s)]
     expect(f"第 {mi + 1} 則封面：其他點都沒頂到天花板", min(others) > ceil_y + sw / 2 + 5, str(min(others)))
     expect(f"第 {mi + 1} 則封面：天花板貼齊兩側出血", f'x1="0" y1="{ceil_y}" x2="{R.WD}"' in s)
-    expect(f"第 {mi + 1} 則封面：圖不超過畫面中段（最低點 y <= 820；2026-11-21 起圖會往下長、吃掉標題下方的空白）", bot <= 820, str(bot))
+    expect(f"第 {mi + 1} 則封面：天花板在文字下方、圖不壓到頁腳（最低點 y <= 1205）", ceil_y >= 660 and bot <= 1205, f"{ceil_y} {bot}")
 expect("三則封面金點位置都不同", len(set(tops)) == 3, str(tops))
 expect("內頁右上角：金點隨張數換位置", R.cl_corner(1, 10) != R.cl_corner(10, 10))
 d1, d2 = R.cl_deco(2, 10), R.cl_deco(9, 10)
@@ -74,7 +74,8 @@ code, out, html = render([{"layout": "diagram", "kind": "flow", "title": "第一
 expect("主標的 \\n 變成 <br>，程式 B 通過", code == 0 and "第一行<br>" in html, out)
 code, out, h1 = render([{"layout": "cover", "title": "短的標題", "body": "短副標"}])
 m = re.search(r'id="title" style="top:(\d+)px', h1)
-expect("封面：標題在圖的下面", code == 0 and m and int(m.group(1)) > R.cl_cover(0)[1] + 30, out[-300:])
+ys = [float(y) for y in re.findall(r'<line class="bg" x1="0" y1="([\d.]+)"', h1)]
+expect("封面：標題在圖的上面（天花板在標題下方）", code == 0 and m and ys and int(m.group(1)) + 95 < ys[0], out[-300:])
 code, out, _ = render([{**DECK[0], "branches": ["甲", "乙"], "hot": [0]}])
 expect("故意做壞：低天花板風格的封面寫 branches → 報錯（不默默丟掉）", code != 0 and "branches" in out, out)
 code, out, _ = render([{"layout": "cover", "title": "很長的封面主標第一行\n很長的封面主標第二行\n很長的封面主標第三行", "body": "\n".join(["很長很長的副標一行"] * 6)}])
