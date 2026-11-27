@@ -1,41 +1,85 @@
-{"post": "small-extractor-saturation-not-scale",
- "blocks": [
-  {"block": "第 4 張", "atoms": [
-    {"text": "RAGU 是一套 GraphRAG：先請 LLM 把文件裡的實體和關係抽出來建成知識圖", "verdict": "完全支持", "card_quote": "GraphRAG 的解法是先請 LLM 把文件裡的實體（人、組織、產品）跟關係抽出來建成知識圖", "note": "實體舉例改成「人、地點、作品」、「再拿來找資料回答」屬撰寫者已確認的白話放行項"},
-    {"text": "它附了一個 7B 的抽取模型 Meno-Lite-0.1，兩者都開源", "verdict": "完全支持", "card_quote": "附帶一個 7B 的抽取模型 Meno-Lite-0.1，兩者都開源", "note": ""},
-    {"text": "RAGU 認為現有系統預設用 GPT-4 等級的模型做抽取，成本太高", "verdict": "完全支持", "card_quote": "RAGU 認為現有系統預設要用 GPT-4 等級的模型做抽取，成本太高", "note": "主詞是 RAGU（宣稱方），錨點寫法相符"},
-    {"text": "7B、72B：B 是十億個參數，數字越大模型越大", "verdict": "完全支持", "card_quote": "附帶一個 7B 的抽取模型 Meno-Lite-0.1", "note": "名詞白話說明，放行項；不加新事實"}
-  ], "errors": []},
-  {"block": "第 12 張", "atoms": [
-    {"text": "只看抽取，7B 贏 32B", "verdict": "完全支持", "card_quote": "單獨測資訊抽取，7B 的 Meno-Lite-0.1 確實贏過 32B：", "note": ""},
-    {"text": "主要靠關係抽取", "verdict": "完全支持", "card_quote": "整體 HM 相對高出 12.5%，主要靠關係抽取那一欄（0.347 對 0.239）。", "note": ""},
-    {"text": "Meno-Lite-0.1 是微調過的 7B", "verdict": "完全支持", "card_quote": "Meno-Lite-0.1 的微調用了 NEREL 的 train/validation split", "note": "放行項"},
-    {"text": "資訊抽取評測有四項，總分 HM（四項的調和平均）", "verdict": "完全支持", "card_quote": "NER 是實體辨識（F1）、RE 是關係抽取（F1）、Def 與 RDef 分別是實體與關係的描述生成品質（chrF++）、HM 是前四項的調和平均。", "note": "「總分」作為 HM 的標籤，仍附「四項的調和平均」說明"},
-    {"text": "HM 0.468 對 0.416，相對高 12.5%", "verdict": "完全支持", "card_quote": "HM（NER、Def、RE、RDef 四項的調和平均）是 0.468 對 Qwen2.5-32B 的 0.416，相對高出 12.5%", "note": "重算 0.468/0.416-1 = 0.125"},
-    {"text": "另外三項 32B 都比較高", "verdict": "完全支持", "card_quote": "表上 Qwen2.5-32B 的 NER、Def、RDef 分別是 0.536、0.528、0.599，三欄都高於 Meno-Lite-0.1 的 0.504、0.527、0.558；Meno-Lite-0.1 只在 RE 與 HM 領先", "note": "c14#1 帶出"},
-    {"text": "圖：關係抽取 RE Meno-Lite-0.1（7B）0.347 對 Qwen2.5-32B 0.239", "verdict": "完全支持", "card_quote": "Meno-Lite-0.1 | 7B | 0.504 | 0.527 | **0.347** | 0.558 | **0.468**", "note": "Qwen2.5-32B 0.239 對應 \"Qwen2.5-32B | 32B | 0.536 | 0.528 | 0.239 | 0.599 | 0.416\""},
-    {"text": "圖：總分 HM Meno-Lite-0.1（7B）0.468 對 Qwen2.5-32B 0.416", "verdict": "完全支持", "card_quote": "Qwen2.5-32B | 32B | 0.536 | 0.528 | 0.239 | 0.599 | 0.416", "note": "圖只畫兩組為放行項；比較對象 Qwen2.5-32B 標在圖上"},
-    {"text": "圖註：微調資料和測試題同一來源，殘留優勢無法完全排除", "verdict": "完全支持", "card_quote": "Meno-Lite-0.1 的微調用了 NEREL 的 train/validation split，而 IE benchmark 用的是 held-out test split。論文說重疊僅限於標註 schema 跟文本領域，但殘留優勢無法完全排除", "note": "「同一來源」為撰寫者已確認的 c14#2 白話；卡上「論文說重疊僅限於標註 schema 跟文本領域」這段未出現，因它是論文的辯護而非限制，不改變限定條件方向，不列錯"}
-  ], "errors": []},
-  {"block": "Threads 正文", "atoms": [
-    {"text": "小模型夠用，是因為任務簡單，不是規模沒用。", "verdict": "完全支持", "card_quote": "pipeline 內部負責「讀懂並搬運資訊」的元件，小模型通常夠用。但理由是「任務簡單」，不是「規模無效」。", "note": "第一句可沒說完整；「通常」與「讀懂並搬運資訊的元件」範圍在第 14 張與置頂回覆有交代"},
-    {"text": "如果你以為「規模沒用」，就會把小模型錯套到真正需要推理的地方", "verdict": "完全支持", "card_quote": "搞錯理由，你會把它錯誤地套用到真正需要推理的環節上。", "note": "「這點很重要」為語氣，不加事實"},
-    {"text": "RAGU 論文的證據是從 0.5B 到 72B，背知識的題庫成長 21.1 倍、讀文件的只有 4 倍", "verdict": "完全支持", "card_quote": "論文報的數字是 0.5B 到 72B 之間，CheGeKa 成長 21.1 倍，MultiQ 只有 4 倍。", "note": "背知識／讀文件對應 CheGeKa「純粹考背下來的知識」與 MultiQ「所有事實都在 context 裡」"},
-    {"text": "背知識那題在 0.5B 幾乎是 0 分，倍數有灌水", "verdict": "完全支持", "card_quote": "這個比法有灌水成分。CheGeKa 在 0.5B 時 F1 幾乎貼地（約 0.015），分母趨近於零", "note": "部落格判斷以作者口吻寫，允許；「有灌水」對「有灌水成分」語氣接近，不判比卡強"},
-    {"text": "比較站得住的斜率是 0.65 對 0.26", "verdict": "完全支持", "card_quote": "真正站得住腳的是同一張圖裡的 log-linear 斜率 0.65 對 0.26，至少是同一個尺度上的比較。", "note": "c4#2 帶出"},
-    {"text": "題庫都是俄語", "verdict": "完全支持", "card_quote": "兩個 benchmark 都是俄語，CheGeKa 更是俄國文化常識題", "note": "c4#4 帶出"},
-    {"text": "模型是 2024 年的非推理模型", "verdict": "完全支持", "card_quote": "論文的證據來自 Qwen2.5-Instruct，2024 年的非 reasoning 模型。", "note": "c4#3 帶出"},
-    {"text": "論文自己的抽取實驗裡，純 Qwen2.5 家族是越大分數越高", "verdict": "完全支持", "card_quote": "論文自己的資訊抽取實驗顯示，純 Qwen2.5 家族在抽取上是單調隨規模上升的（7B 0.356 → 14B 0.396 → 32B 0.416）", "note": "限定在「論文自己的抽取實驗裡」，範圍未外推；7B 到 32B 的區間在第 10 張有寫"},
-    {"text": "它附的 7B 抽取模型單獨測確實贏 32B", "verdict": "完全支持", "card_quote": "單獨測資訊抽取，7B 的 Meno-Lite-0.1 確實贏過 32B：", "note": "c14#1（只在 RE 與 HM 領先）在第 12 張出現，Threads 附同一套圖"},
-    {"text": "論文自己在限制段承認，微調資料和測試題同源，殘留優勢無法完全排除", "verdict": "完全支持", "card_quote": "還有一個 caveat 是論文自己在 Limitations 承認的：Meno-Lite-0.1 的微調用了 NEREL 的 train/validation split，而 IE benchmark 用的是 held-out test split。論文說重疊僅限於標註 schema 跟文本領域，但殘留優勢無法完全排除。", "note": "放行項；c14#2 帶出"},
-    {"text": "接到問答後，差距縮到 1% 以內", "verdict": "完全支持", "card_quote": "Meno-Lite-0.1 巨大的單獨抽取優勢，到了 GraphRAG-Bench 的端到端問答上壓縮到 1 pp 以內", "note": "pp 寫 % 為人定用語"},
-    {"text": "附錄裡換不同大小的抽取模型，答對率也只差 1.5% 以內", "verdict": "完全支持", "card_quote": "附錄的組態表更直接——3B 到 14B 的抽取模型換來換去，最終 AC 只差 1.5 pp 以內。", "note": "放行項；3B 到 14B 的區間在 Threads 未寫、在第 13 張有寫"},
-    {"text": "答對率是單一 AI 評審打一次分，沒有誤差範圍、也沒人工驗證，個位數差距不宜當結論", "verdict": "完全支持", "card_quote": "AC 是單一 judge 模型的單次評分，論文沒有 error bar、也沒有人工驗證 judge 準確度，個位數 pp 的差距不宜當結論。", "note": "c15#1 帶出"}
-  ], "errors": []}
- ],
- "recalculations": [
-  {"block": "第 12 張", "expression": "0.468/0.416 - 1", "result": "0.125（12.5%，與卡相符）"},
-  {"block": "第 12 張", "expression": "0.347/0.239", "result": "1.452（貼文未寫此衍生數字）"},
-  {"block": "第 12 張", "expression": "0.468 - 0.416", "result": "0.052（貼文未寫此衍生數字）"}
- ],
- "gaps": []}
+{
+  "post": "small-extractor-saturation-not-scale",
+  "blocks": [
+    {"block": "第 1 張", "atoms": [
+      {"text": "小模型就夠用，是因為題目太簡單（主標）", "verdict": "完全支持", "card_quote": "pipeline 內部負責「讀懂並搬運資訊」的元件，小模型通常夠用；但理由是「任務簡單」（任務難度低到落在 scaling 的飽和區），不是「規模無效」", "note": "主標省略「通常」與範圍，但副標以「整理資料這種簡單的事，通常小模型就夠」限定，合看字面為真，符合封面可沒說完整的規則。"},
+      {"text": "整理資料這種簡單的事，通常小模型就夠", "verdict": "完全支持", "card_quote": "pipeline 內部負責「讀懂並搬運資訊」的元件，小模型通常夠用", "note": "「整理資料」是「讀懂並搬運資訊」的白話，保留「通常」。"},
+      {"text": "大模型也加不了幾分", "verdict": "完全支持", "card_quote": "7B 可能已經 85 分、72B 也只有 90 分，本來就沒有空間讓規模發揮", "note": "白話轉述卡上的天花板例子。"},
+      {"text": "要推好幾步的題目，大小才看得出差別", "verdict": "完全支持", "card_quote": "那種多步推導才有難尾巴，7B 拿 5 分、大模型拿 80 分，規模的效果才看得出來", "note": "與卡一致。"}
+    ], "errors": []},
+    {"block": "第 2 張", "atoms": [
+      {"text": "簡單題沒有進步空間，難題才看得出大小（主標）", "verdict": "完全支持", "card_quote": "本來就沒有空間讓規模發揮；AIME（數學競賽題）、GPQA（研究生等級的科學問答）那種多步推導才有難尾巴", "note": "白話轉述天花板效應。"},
+      {"text": "RAGU 論文主張：抽資料用 7B 小模型就夠", "verdict": "完全支持", "card_quote": "所以抽取端用 7B 就夠", "note": "主詞是論文，出自 c3（撰寫者引用標 c2，c3 才是出處）。"},
+      {"text": "我們認為理由不是大小沒用，而是題目簡單", "verdict": "完全支持", "card_quote": "但理由是「任務簡單」，不是「規模無效」", "note": "部落格判斷，以作者口吻寫，可接受。"},
+      {"text": "圖：把句子裡的人名抽出來，7B 小模型 85 分、大模型 90 分", "verdict": "完全支持", "card_quote": "「把這句話裡的人名抽出來」這種任務的難度分佈集中在容易區，7B 可能已經 85 分、72B 也只有 90 分", "note": "卡上是 72B，圖寫「大模型」；圖註標明是部落格示意數字，部落格舉例錨點寫法符合。"},
+      {"text": "圖：AIME 數學競賽題，要推好幾步，7B 小模型 5 分、大模型 80 分", "verdict": "完全支持", "card_quote": "AIME（數學競賽題）、GPQA（研究生等級的科學問答）那種多步推導才有難尾巴，7B 拿 5 分、大模型拿 80 分", "note": "數字、單位（分）、比較對象（7B 對大模型）齊全。"},
+      {"text": "圖註：部落格舉的示意數字，不是實驗結果", "verdict": "完全支持", "card_quote": "同一類任務上 7B 對 72B（或大模型）的分數（blog 舉的示意數字）", "note": "符合部落格舉例的錨點寫法。"}
+    ], "errors": []},
+    {"block": "第 3 張", "atoms": [
+      {"text": "回顧頁：系列各則標題與細節", "verdict": "完全支持", "card_quote": "", "note": "結構元素（planned_title 與系列檔 summary），不需對證卡。"}
+    ], "errors": []},
+    {"block": "第 4 張", "atoms": [
+      {"text": "RAGU 用 7B 小模型抽資料（主標）", "verdict": "完全支持", "card_quote": "RAGU 是 ITMO University 團隊的 GraphRAG 引擎（先請 LLM 把文件裡的實體跟關係抽出來建成知識圖），附帶一個 7B 的抽取模型 Meno-Lite-0.1", "note": "設計參數，主詞是 RAGU。"},
+      {"text": "GraphRAG 要先請 AI 把文件裡的人、組織和它們的關係抽出來、建成知識圖", "verdict": "完全支持", "card_quote": "GraphRAG 的解法是先請 LLM 把文件裡的實體（人、組織、產品）跟關係抽出來建成知識圖", "note": "一致。"},
+      {"text": "RAGU 認為現有系統預設用 GPT-4 等級的模型抽取，成本太高", "verdict": "完全支持", "card_quote": "RAGU 認為現有系統預設要用 GPT-4 等級的模型做抽取，成本太高", "note": "主詞是 RAGU。"},
+      {"text": "RAGU：ITMO University 團隊的 GraphRAG 系統，開源；Meno-Lite-0.1：附帶的 7B 抽取模型，也開源", "verdict": "完全支持", "card_quote": "附帶一個 7B 的抽取模型 Meno-Lite-0.1，兩者都開源", "note": "一致。"},
+      {"text": "7B、72B：B 是十億個參數，數字越大模型越大", "verdict": "完全支持", "card_quote": "", "note": "名詞的白話定義，未改變卡意、未加用途或範圍，不算夾帶。"}
+    ], "errors": []},
+    {"block": "第 5 張", "atoms": [
+      {"text": "論文的理由：讀資料題，模型變大長得慢（主標）", "verdict": "完全支持", "card_quote": "語言能力隨模型規模成長很慢，世界知識成長很快，所以抽取端用 7B 就夠", "note": "原作者解讀，主詞標為「論文的理由」，寫法符合。"},
+      {"text": "論文的證據來自 Qwen2.5-Instruct，2024 年的非推理模型", "verdict": "完全支持", "card_quote": "論文的證據來自 Qwen2.5-Instruct，2024 年的非 reasoning 模型", "note": "c4 限定條件 #3 帶出。"},
+      {"text": "背知識題只能靠記憶，讀資料題的事實都在資料裡", "verdict": "完全支持", "card_quote": "CheGeKa 是俄語常識問答，沒有 context，純粹考背下來的知識；MultiQ 是多跳問答，所有事實都在 context 裡", "note": "白話轉述。"},
+      {"text": "論文主打「21.1 倍對 4 倍」，我們認為有灌水（起點幾乎是 0）", "verdict": "完全支持", "card_quote": "論文卻把「21.1 倍 vs 4 倍」放進 abstract 當主打", "note": "灌水理由對應「CheGeKa 在 0.5B 時 F1 幾乎貼地（約 0.015），分母趨近於零」；c4 限定條件 #1 帶出。"},
+      {"text": "比較站得住的是斜率：背知識題 CheGeKa 0.65、讀資料題 MultiQ 0.26", "verdict": "完全支持", "card_quote": "真正站得住腳的是同一張圖裡的 log-linear 斜率 0.65 對 0.26，至少是同一個尺度上的比較", "note": "數字對得上；圖單位寫「無單位」，量的名稱「斜率」只在補充文字出現、圖上未寫，比較對象（兩題互比）清楚，不列 blocker。"},
+      {"text": "圖註：兩份考題都是俄語；套到英語醫療資料，跨度不算小", "verdict": "完全支持", "card_quote": "兩個 benchmark 都是俄語，CheGeKa 更是俄國文化常識題，拿來代表「world knowledge」再推論到英語醫療語料，跨度不算小", "note": "c4 限定條件 #4 帶出。"}
+    ], "errors": []},
+    {"block": "第 6 張", "atoms": [
+      {"text": "單獨比抽取 7B 贏，接到問答就差不到 1%（主標）", "verdict": "完全支持", "card_quote": "Meno-Lite-0.1 巨大的單獨抽取優勢，到了 GraphRAG-Bench 的端到端問答上壓縮到 1 pp 以內", "note": "pp 寫成 % 為人定用語規則；「7B 贏」由 c14 支持。"},
+      {"text": "單獨測抽取，7B 優勢很大", "verdict": "完全支持", "card_quote": "Meno-Lite-0.1 巨大的單獨抽取優勢", "note": "一致。"},
+      {"text": "答對率是另一個 AI 只評一次、沒人工檢查，個位數差距不宜當結論", "verdict": "完全支持", "card_quote": "AC 是單一 judge 模型的單次評分，論文沒有 error bar、也沒有人工驗證 judge 準確度，個位數 pp 的差距不宜當結論", "note": "c15 限定條件帶出；未提 error bar，屬次要省略。"},
+      {"text": "7B 的 Meno-Lite-0.1 綜合分數 0.468，贏 32B 的 Qwen2.5（0.416），靠的是抽關係那一項", "verdict": "完全支持", "card_quote": "HM（NER、Def、RE、RDef 四項的調和平均）是 0.468 對 Qwen2.5-32B 的 0.416，相對高出 12.5%，主要靠關係抽取（RE，F1）那一欄的 0.347 對 0.239", "note": "數字對得上；卡寫「主要靠」，貼文寫「靠的是」，因其他三項 32B 皆較高，意思不變。"},
+      {"text": "其他三項 32B 較高", "verdict": "完全支持", "card_quote": "表上 Qwen2.5-32B 的 NER、Def、RDef 分別是 0.536、0.528、0.599，三欄都高於 Meno-Lite-0.1 的 0.504、0.527、0.558", "note": "c14 限定條件 #1 帶出。"},
+      {"text": "接到整套問答，和其他抽取模型比，差距壓到 1% 以內", "verdict": "完全支持", "card_quote": "到了 GraphRAG-Bench 的端到端問答上壓縮到 1 pp 以內", "note": "比較對象（其他抽取模型）寫明。"},
+      {"text": "抽取模型從 3B 換到 14B，答對率也只差 1.5% 以內", "verdict": "完全支持", "card_quote": "3B 到 14B 的抽取模型換來換去，最終 AC（LLM-judge 判斷的答案正確度）只差 1.5 pp 以內", "note": "一致。"},
+      {"text": "圖註：7B 的訓練資料和考題同一套標註，論文承認殘留優勢無法完全排除", "verdict": "部分支持", "card_quote": "Meno-Lite-0.1 的微調用了 NEREL 的 train/validation split，而 IE benchmark 用的是 held-out test split；論文說重疊僅限於標註 schema 跟文本領域，但殘留優勢無法完全排除", "note": "卡上的重疊僅限標註 schema 與文本領域、考題是 held-out split；「同一套標註」可被讀成同一批標註資料，且 IG 版未交代考題另外留出（Threads 版有寫）。"}
+    ], "errors": ["措辭與卡不同"]},
+    {"block": "第 7 張", "atoms": [
+      {"text": "小模型夠用的理由，別套到要推理的地方（主標）", "verdict": "完全支持", "card_quote": "搞錯理由，會把它錯誤地套用到真正需要推理的環節上", "note": "部落格判斷，作者口吻可。"},
+      {"text": "讀懂並搬運資訊的步驟，小模型通常夠用；理由是題目簡單，不是大小沒差；搞錯理由會套到真正需要推理的步驟上", "verdict": "完全支持", "card_quote": "pipeline 內部負責「讀懂並搬運資訊」的元件，小模型通常夠用；但理由是「任務簡單」（任務難度低到落在 scaling 的飽和區），不是「規模無效」；搞錯理由，會把它錯誤地套用到真正需要推理的環節上", "note": "一致。"},
+      {"text": "示意圖：小模型通常夠（讀懂資料、抽出句子裡的人名、搬運資訊）對 要看模型大小（推好幾步、研究生等級的科學問答、數學競賽題）", "verdict": "完全支持", "card_quote": "「把這句話裡的人名抽出來」這種任務的難度分佈集中在容易區…AIME（數學競賽題）、GPQA（研究生等級的科學問答）那種多步推導才有難尾巴", "note": "圖上分類與卡一致，保留「通常」。"},
+      {"text": "圖註：論文的證據來自 2024 年的非推理模型", "verdict": "完全支持", "card_quote": "論文的證據來自 Qwen2.5-Instruct，2024 年的非 reasoning 模型", "note": "c11。"}
+    ], "errors": []},
+    {"block": "第 8 張", "atoms": [
+      {"text": "搬資料，小模型通常夠；理由是題目簡單，不是模型大小沒差", "verdict": "完全支持", "card_quote": "小模型通常夠用。但理由是「任務簡單」，不是「規模無效」。", "note": "一致。"}
+    ], "errors": []},
+    {"block": "Threads 正文", "atoms": [
+      {"text": "小模型就夠用，是因為題目太簡單（hook）", "verdict": "完全支持", "card_quote": "小模型通常夠用；但理由是「任務簡單」", "note": "hook 省略「通常」與範圍，後文與最後一則有限定，符合封面規則。"},
+      {"text": "GraphRAG 要先請 AI 從文件抽出人、組織和關係；RAGU（ITMO University 團隊的開源 GraphRAG 系統）嫌 GPT-4 等級的模型抽取太貴，附了一個 7B 的抽取模型 Meno-Lite-0.1", "verdict": "完全支持", "card_quote": "RAGU 是 ITMO University 團隊的 GraphRAG 引擎（先請 LLM 把文件裡的實體跟關係抽出來建成知識圖），附帶一個 7B 的抽取模型 Meno-Lite-0.1，兩者都開源；RAGU 認為現有系統預設要用 GPT-4 等級的模型做抽取，成本太高", "note": "一致。"},
+      {"text": "論文的理由（Qwen2.5-Instruct，2024 年非推理模型；兩份考題都是俄語）：0.5B 換到 72B，背知識題分數變 21.1 倍，讀資料題只變 4 倍，所以抽取用 7B 就夠", "verdict": "完全支持", "card_quote": "論文報的是 0.5B 到 72B 之間，CheGeKa 成長 21.1 倍，MultiQ 只有 4 倍", "note": "數字對得上，主詞是論文；c4 限定條件 #3、#4 帶出。"},
+      {"text": "部落格認為有灌水：背知識題起點幾乎是 0；比較站得住的是斜率 0.65 對 0.26", "verdict": "完全支持", "card_quote": "CheGeKa 在 0.5B 時 F1 幾乎貼地（約 0.015），分母趨近於零，任何成長換算成倍數都會很誇張", "note": "斜率對應「真正站得住腳的是同一張圖裡的 log-linear 斜率 0.65 對 0.26」。"},
+      {"text": "真正的原因是天花板：抽人名 7B 可能 85 分、大模型 90 分；AIME 這類 7B 5 分、大模型 80 分（比方）", "verdict": "完全支持", "card_quote": "差別在天花板效應：「把這句話裡的人名抽出來」這種任務的難度分佈集中在容易區，7B 可能已經 85 分、72B 也只有 90 分", "note": "標「比方」，保留「可能」，符合部落格舉例寫法。"},
+      {"text": "單獨測抽取，7B 綜合分數 0.468 贏 32B 的 0.416；接到整套問答，和其他抽取模型只差 1% 以內", "verdict": "完全支持", "card_quote": "HM（NER、Def、RE、RDef 四項的調和平均）是 0.468 對 Qwen2.5-32B 的 0.416", "note": "端到端部分對應 c15「壓縮到 1 pp 以內」；c14 限定條件 #1 在附圖第 6 張出現。"},
+      {"text": "限制：7B 的微調資料和考題同一套標註體系（考題另外留出），殘留優勢無法完全排除", "verdict": "完全支持", "card_quote": "Meno-Lite-0.1 的微調用了 NEREL 的 train/validation split，而 IE benchmark 用的是 held-out test split；論文說重疊僅限於標註 schema 跟文本領域，但殘留優勢無法完全排除", "note": "「標註體系」「考題另外留出」貼近卡；未提文本領域，次要。"},
+      {"text": "答對率是另一個 AI 只評一次、沒人工檢查，個位數差距不宜當結論", "verdict": "完全支持", "card_quote": "AC 是單一 judge 模型的單次評分，論文沒有 error bar、也沒有人工驗證 judge 準確度，個位數 pp 的差距不宜當結論", "note": "一致。"}
+    ], "errors": []},
+    {"block": "Threads 最後一則", "atoms": [
+      {"text": "讀懂並搬運資訊的元件，小模型通常夠用；但理由是題目簡單，別把它套到需要推理的環節上", "verdict": "完全支持", "card_quote": "pipeline 內部負責「讀懂並搬運資訊」的元件，小模型通常夠用；但理由是「任務簡單」（任務難度低到落在 scaling 的飽和區），不是「規模無效」；搞錯理由，會把它錯誤地套用到真正需要推理的環節上", "note": "一致；文章網址與同系列為結構。"}
+    ], "errors": []},
+    {"block": "IG caption", "atoms": [
+      {"text": "小模型就夠用，是因為題目太簡單：整理資料這種事，大模型也加不了幾分", "verdict": "完全支持", "card_quote": "7B 可能已經 85 分、72B 也只有 90 分，本來就沒有空間讓規模發揮", "note": "與封面一致，範圍限於整理資料。"},
+      {"text": "各張主標重述（RAGU 論文主張抽資料用 7B 就夠；讀資料題長得慢；單獨比抽取 7B 贏、接到問答差不到 1%；別套到要推理的地方）", "verdict": "完全支持", "card_quote": "所以抽取端用 7B 就夠", "note": "與內文各張一致；導流行與 hashtag 為結構。"}
+    ], "errors": []}
+  ],
+  "recalculations": [
+    {"block": "第 6 張", "expression": "0.468 / 0.416 - 1", "result": "0.125（12.5%，與卡一致；貼文未寫此數）"},
+    {"block": "第 6 張", "expression": "0.347 - 0.239", "result": "0.108（RE 欄差距，貼文未寫此數）"},
+    {"block": "第 5 張", "expression": "0.65 / 0.26", "result": "2.5（貼文未寫倍數）"},
+    {"block": "Threads 正文", "expression": "0.57 / 0.12（MultiQ 約略終點/起點，卡上近似值）", "result": "4.75；與論文報的「4 倍」為近似，貼文照卡寫 4 倍，不判錯"},
+    {"block": "第 2 張", "expression": "90 - 85；80 - 5", "result": "5；75"}
+  ],
+  "gaps": [
+    {"description": "灌水的另一半理由（MultiQ 起點高、約 32B 就打到天花板，倍數小部分因為飽和）全篇未出現；貼文只交代背知識題起點幾乎為 0。", "card_quote": "MultiQ 起點高（約 0.12），而且大概在 32B 就打到天花板（約 0.57 之後持平），倍數小有一部分是因為它飽和了"},
+    {"description": "第 6 張 IG 圖註未交代考題是 held-out split、重疊僅限標註 schema 與文本領域（Threads 有「考題另外留出」）。", "card_quote": "論文說重疊僅限於標註 schema 跟文本領域，但殘留優勢無法完全排除"},
+    {"description": "答對率限定條件未提論文沒有 error bar。", "card_quote": "AC 是單一 judge 模型的單次評分，論文沒有 error bar、也沒有人工驗證 judge 準確度"}
+  ]
+}

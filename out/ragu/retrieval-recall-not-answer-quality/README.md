@@ -1,12 +1,12 @@
-# 證據撈得更完整，答案不一定更好
+# 資料撈得越多，AI 答得越好？
 
 | 項目 | 內容 |
 |---|---|
-| 系列 | 拆解 RAGU：GraphRAG 的天花板有多高 |
+| 系列 | GraphRAG 值不值得做 |
 | 觀念 | `retrieval-recall-not-answer-quality`（卡：`concept-wiki/wiki/concepts/retrieval-recall-not-answer-quality.md`） |
-| hook 樣態 | 代價與取捨 |
-| IG 輪播 | 未做（11 張） |
-| Threads 串文 | 未做（2 則） |
+| hook 樣態 | 讀者心中的疑問 |
+| IG 輪播 | 待發布（9 張） |
+| Threads 串文 | 待發布（2 則） |
 
 ## 要看／要發的檔案
 
@@ -20,7 +20,7 @@
 
 ## 檢查結果（程式產生）
 
-- 程式 B：11/11 張通過（模板版本 `40425633b8ed`）
+- 程式 B：9/9 張通過（模板版本 `40425633b8ed`）
 - 程式 A、批次檢查、忠實者與讀者審查的結果不存在發布包裡（審查產出放暫存，不進 repo）；最後確認時由 Claude 在報告中說明
 
 ## 發布前

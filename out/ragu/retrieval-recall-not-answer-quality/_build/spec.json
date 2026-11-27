@@ -1,379 +1,354 @@
 {
-  "series": "ragu",
-  "concept": "retrieval-recall-not-answer-quality",
-  "also_concepts": [],
-  "lang": "zh-TW",
-  "status": "draft",
-  "hook": {
-    "style": "代價與取捨",
-    "title": "AI 查到的資料更齊，\n[[答案卻可能更差]]",
-    "subtitle": "只看「該查的有沒有查到」，\n會把系統一路推向多撈；\n多撈進來的段落，可能讓 AI 挑錯答案",
-    "refs": [
-      "c1",
-      "c10"
-    ],
-    "candidate": "A"
-  },
-  "slides": [
-    {
-      "layout": "cover",
-      "title": "AI 查到的資料更齊，\n[[答案卻可能更差]]",
-      "body": "只看「該查的有沒有查到」，\n會把系統一路推向多撈；\n多撈進來的段落，可能讓 AI 挑錯答案",
-      "refs": [
-        "c1",
-        "c10"
-      ]
-    },
-    {
-      "layout": "diagram",
-      "kind": "tally",
-      "title": "4 段相關資料全撈到，\n[[也塞進 4 段雜訊]]",
-      "body": "一題有 4 段相關資料。Evidence Recall 只算相關的撈到幾成：甲 3/4 = 0.75，乙 4/4 = 1.00。但撈到的東西有幾成相關（Precision），甲 3/3 = 1.00，乙只有 4/8 = 0.50。",
-      "heads": [
-        "撈到的相關段落",
-        "漏掉的相關段落",
-        "撈進來的雜訊"
-      ],
-      "nodes": [
-        {
-          "text": "甲：撈得少，但撈得準",
-          "sub": "Evidence Recall 0.75・Precision 1.00",
-          "parts": [
-            3,
-            1,
-            0
-          ]
-        },
-        {
-          "text": "乙：全撈到，也撈進雜訊",
-          "sub": "Evidence Recall 1.00・Precision 0.50",
-          "parts": [
-            4,
-            0,
-            4
-          ]
-        }
-      ],
-      "note": "假設的例子：一顆點是一段資料",
-      "refs": [
-        "c8",
-        "c4",
-        "c3"
-      ],
-      "cols": 10
-    },
-    {
-      "layout": "recap",
-      "title": "[[前情提要]]與這一則重點",
-      "current": "retrieval-recall-not-answer-quality",
-      "refs": [
-        "結構"
-      ]
-    },
-    {
-      "layout": "context",
-      "title": "論文怎麼替答案打分數",
-      "body": "RAGU 是一套 GraphRAG：先請 LLM 把文件裡的實體（提到的人、事、物）和關係抽出來建成知識圖，查資料時沿著圖走。和這一則有關的分數：",
-      "rows": [
-        [
-          "Evidence Recall",
-          "撈回了多少比例的相關材料；只評查資料，不評答案"
-        ],
-        [
-          "答對率（AC）",
-          "由 LLM 當裁判，判斷答案語意上對不對"
-        ],
-        [
-          "Coverage",
-          "答案有沒有涵蓋所有該講的重點"
-        ],
-        [
-          "HippoRAG 2",
-          "論文拿來和 RAGU 比的另一套系統"
-        ]
-      ],
-      "key_w": 270,
-      "refs": [
-        "c2",
-        "c3",
-        "c5"
-      ]
-    },
-    {
-      "layout": "diagram",
-      "kind": "route",
-      "title": "撈得多，答對率卻輸：\n[[分三段拆]]",
-      "label": "路線圖",
-      "body": "Evidence Recall 只測該撈的撈到沒有，完全不測不該撈的有沒有撈進來。",
-      "nodes": [
-        {
-          "text": "撈得多，答對率卻輸",
-          "sub": "論文裡最值得想清楚的矛盾"
-        },
-        {
-          "text": "多撈怎麼傷到答案",
-          "sub": "干擾項，和中間被忽略"
-        },
-        {
-          "text": "什麼題目反而吃香",
-          "sub": "題目性質決定誰吃虧"
-        }
-      ],
-      "heads": [
-        "三段",
-        "最後：調系統時該盯哪個分數"
-      ],
-      "refs": [
-        "c1",
-        "c7",
-        "c10",
-        "c11"
-      ]
-    },
-    {
-      "layout": "chart_bars",
-      "title": "綜合題涵蓋得多，\n[[找事實題答對得少]]",
-      "label": "矛盾",
-      "body": "Creative Generation 要廣泛的材料，RAGU 涵蓋的重點比 HippoRAG 2 多 22.7%；Fact Retrieval 要一個精確的事實，RAGU 的答對率卻是 54.2% 對 72.4%。",
-      "unit": "%",
-      "axis_max": 100,
-      "legend": [
-        "RAGU",
-        "HippoRAG 2"
-      ],
-      "bars": [
-        {
-          "name": "Coverage",
-          "subs": [
-            "Creative Generation",
-            "（綜合題）"
-          ],
-          "value": 57.4,
-          "value2": 34.7
-        },
-        {
-          "name": "答對率（AC）",
-          "subs": [
-            "Fact Retrieval",
-            "（找事實）"
-          ],
-          "value": 54.2,
-          "value2": 72.4
-        }
-      ],
-      "note": "答對率：醫療題庫、RAGU 附帶的抽取模型建圖、AI 裁判評一次",
-      "refs": [
-        "c5",
-        "c7",
-        "c3",
-        "c11"
-      ],
-      "quals": [
-        "c7#1",
-        "c7#2"
-      ]
-    },
-    {
-      "layout": "diagram",
-      "kind": "flow",
-      "title": "從實體、關係到段落：\n[[RAGU 越撈越多]]",
-      "label": "多撈",
-      "body": "RAGU 撈到的不是更正確的資訊，是更完整、但濃度更低的資訊，而且這是設計造成的：",
-      "nodes": [
-        {
-          "text": "先把同一個實體的所有提及合起來",
-          "sub": "去重與摘要（consolidation）"
-        },
-        {
-          "text": "查資料時，從實體擴展到關係",
-          "sub": "從實體擴展到關係（LocalSearch）"
-        },
-        {
-          "text": "再從關係擴展到原文段落",
-          "sub": "再擴展到原文段落"
-        }
-      ],
-      "note": "撈到的資料有幾成相關（Precision），這篇論文沒有量",
-      "refs": [
-        "c9",
-        "c2"
-      ],
-      "quals": [
-        "c9#1"
-      ]
-    },
-    {
-      "layout": "table",
-      "title": "多撈進來的段落\n[[怎麼讓 AI 答錯？]]",
-      "label": "多撈",
-      "body": "「答案在資料裡」和「AI 會用到它」是兩回事：Evidence Recall 測前者，答對率測後者。",
-      "rows": [
-        [
-          "干擾項",
-          "找單一事實的題目只有一個正確答案；多塞幾段意思相關、但答案不同的材料，AI 挑錯的機率就上升"
-        ],
-        [
-          "中間被忽略",
-          "資料很長時，AI 對開頭和結尾敏感，中間容易被忽略"
-        ]
-      ],
-      "key_w": 230,
-      "note": "撈進多少雜訊，論文沒有量過",
-      "refs": [
-        "c10",
-        "c1"
-      ],
-      "quals": [
-        "c10#1",
-        "c1#1"
-      ]
-    },
-    {
-      "layout": "diagram",
-      "kind": "compare",
-      "title": "找事實時多撈是干擾，\n[[寫綜合答案時反而有用]]",
-      "label": "題目性質",
-      "body": "論文說題目越難 RAGU 越強；這可能才是真正的原因：RAGU 不是在難題上變聰明，而是始終用同一種策略（多撈），在簡單題是負擔，到綜合類的題目才變成優勢。",
-      "columns": [
-        {
-          "head": "Fact Retrieval",
-          "items": [
-            {
-              "text": "需要一個精確的事實"
-            },
-            {
-              "text": "多餘的材料是干擾"
-            },
-            {
-              "text": "撈得準（Precision 高）吃香"
-            }
-          ]
-        },
-        {
-          "head": "Creative Generation",
-          "items": [
-            {
-              "text": "需要廣泛的相關材料"
-            },
-            {
-              "text": "多餘的材料反而有用"
-            },
-            {
-              "text": "撈得全（Recall 高）吃香",
-              "emph": true
-            }
-          ]
-        }
-      ],
-      "note": "最難一級答對率 RAGU 59.0% 對 HippoRAG 2 56.9%，在誤差內",
-      "refs": [
-        "c11",
-        "c12",
-        "c1"
-      ],
-      "quals": [
-        "c12#1",
-        "c12#2",
-        "c12#3",
-        "c1#2",
-        "c1#3"
-      ]
-    },
-    {
-      "layout": "diagram",
-      "kind": "hidden",
-      "title": "最需要的那個數字\n[[論文列了卻沒報]]",
-      "label": "缺口",
-      "body": "論文只用一句話帶過：HippoRAG 2 的 Evidence Recall 較低，卻在找單一事實的題目答對更多，反映它撈得準。方向是對的，但沒有任何數據支持；能回答這件事的指標，全篇沒有一個數值，也沒說明原因。",
-      "heads": [
-        "論文報了的",
-        "論文列了、卻沒有任何數值"
-      ],
-      "nodes": [
-        {
-          "text": "Evidence Recall"
-        },
-        {
-          "text": "答對率（AC）"
-        },
-        {
-          "text": "Coverage"
-        }
-      ],
-      "outcomes": [
-        {
-          "text": "Context Relevancy",
-          "sub": "撈到的資料有多相關"
-        }
-      ],
-      "refs": [
-        "c13",
-        "c14",
-        "c3",
-        "c1"
-      ],
-      "quals": [
-        "c1#4"
-      ]
-    },
-    {
-      "layout": "takeaway",
-      "question": "AI 查到的資料更齊，答案為什麼可能更差？",
-      "title": "只盯 Evidence Recall，\n系統會一路往多撈走；\n要一起看撈進多少雜訊，\n最好直接看答案。",
-      "refs": [
-        "c1",
-        "c16"
-      ],
-      "quals": [
-        "c1#1"
-      ]
-    }
+ "series": "ragu",
+ "concept": "retrieval-recall-not-answer-quality",
+ "also_concepts": [],
+ "lang": "zh-TW",
+ "status": "draft",
+ "hook": {
+  "style": "讀者心中的疑問",
+  "title": "資料撈得越多，\n[[AI 答得越好？]]",
+  "subtitle": "給 AI 的參考資料，不是越多越好：\n混進很像、答案卻不同的資料，\n它可能反而挑錯。",
+  "refs": [
+   "c1",
+   "c10"
   ],
-  "threads": {
-    "mode": "carousel",
-    "body": {
-      "text": "AI 查到的資料更齊，答案卻可能更差。\n\n替 AI 查資料的系統（RAG）有一種分數叫 Evidence Recall：該查到的相關資料，撈回了幾成。問題是它完全不測不該撈的有沒有撈進來。只盯著它，會把系統一路推向多撈。\n\n這件事和 GraphRAG 無關：在找單一事實的題目上，衝高 Evidence Recall 和衝高答對率是互相拉扯的。所以調任何查資料的系統，至少要一起看撈進多少雜訊，最好直接看答案對不對；需要廣泛材料的綜合題則相反，多撈反而有用。RAGU 這篇 GraphRAG 論文剛好是例子，可能的原因是多撈進來的段落變成干擾，或在很長的資料中間被忽略。\n\n答對率是另一個 AI 當裁判、只打一次的分數，論文沒有誤差範圍，也沒有人工檢查裁判準不準，個位數的差距不宜當結論；撈到的資料有幾成相關，這篇論文沒有量。細節在圖裡。\n\n這是 RAGU 系列的第三則；建圖的 AI 該用多大，在這個系列的下一則。",
-      "refs": [
-        "c1",
-        "c10",
-        "c11",
-        "c12",
-        "c16",
-        "c4",
-        "c7"
-      ],
-      "quals": [
-        "c1#1",
-        "c1#2",
-        "c1#3",
-        "c10#1",
-        "c12#3",
-        "c7#2"
-      ]
-    },
-    "last": {
-      "text": "只盯 Evidence Recall，系統會一路往多撈走；調 RAG 要一起看撈進多少雜訊，最好直接看答案對不對。\n文章：datasciocean.com/paper-intro/ragu\n同系列：先定好名單再讓 AI 選，圖就少了斷線（尚未發布）\n同系列：剝掉混淆後，用圖只多答對 1.2 到 4.3%（尚未發布）\n同系列：小模型夠用，是因為任務簡單（尚未發布）",
-      "refs": [
-        "c1"
-      ],
-      "quals": [
-        "c1#1"
-      ],
-      "link": "https://datasciocean.com/paper-intro/ragu/"
-    }
+  "candidate": "A"
+ },
+ "slides": [
+  {
+   "layout": "cover",
+   "title": "資料撈得越多，\n[[AI 答得越好？]]",
+   "body": "給 AI 的參考資料，不是越多越好：\n混進很像、答案卻不同的資料，\n它可能反而挑錯。",
+   "refs": [
+    "c1",
+    "c10"
+   ],
+   "quals": [
+    "c1#1",
+    "c10#1"
+   ]
   },
-  "caption": {
-    "first": "Evidence Recall 越高答案越好？RAGU 找事實題的答對率反而輸 HippoRAG 2",
-    "first_refs": [
-      "c1",
-      "c7"
+  {
+   "layout": "diagram",
+   "kind": "tokens",
+   "title": "B 一段沒漏，\n[[但一半是雜訊]]",
+   "body": "假設同一題共有 4 段有用的資料。兩個系統各撈一次，交給 AI 讀：",
+   "steps": [
+    {
+     "label": "系統 A",
+     "cells": [
+      {
+       "text": "相關",
+       "tone": "state"
+      },
+      {
+       "text": "相關",
+       "tone": "state"
+      },
+      {
+       "text": "相關",
+       "tone": "state"
+      }
+     ]
+    },
+    {
+     "label": "系統 B",
+     "cells": [
+      {
+       "text": "相關",
+       "tone": "state"
+      },
+      {
+       "text": "相關",
+       "tone": "state"
+      },
+      {
+       "text": "相關",
+       "tone": "state"
+      },
+      {
+       "text": "相關",
+       "tone": "state"
+      },
+      {
+       "text": "雜訊",
+       "tone": "mask"
+      },
+      {
+       "text": "雜訊",
+       "tone": "mask"
+      },
+      {
+       "text": "雜訊",
+       "tone": "mask"
+      },
+      {
+       "text": "雜訊",
+       "tone": "mask"
+      }
+     ]
+    }
+   ],
+   "outcomes": [
+    {
+     "text": "A 漏了 1 段；B 4 段到齊，卻多了 4 段雜訊"
+    }
+   ],
+   "note": "部落格舉的假設例子",
+   "refs": [
+    "c8"
+   ],
+   "label_w": 70,
+   "cell_pad": 6,
+   "no_arrow": true
+  },
+  {
+   "layout": "recap",
+   "title": "[[前情提要]]與這一則重點",
+   "current": "retrieval-recall-not-answer-quality",
+   "refs": [
+    "結構"
+   ]
+  },
+  {
+   "layout": "context",
+   "title": "要說 A、B 誰好，\n[[得先有分數]]",
+   "body": "RAGU（ITMO University 團隊的 GraphRAG 系統）的論文用找全率評找資料、用答對率評最後的答案，沒有人測純度：",
+   "rows": [
+    [
+     "找全率",
+     "Evidence Recall：該找的資料，找回了幾成"
     ],
-    "nav": "完整文章在 datasciocean.com，搜「RAGU」",
-    "hashtags": [
-      "RAGU",
-      "GraphRAG",
-      "RAG",
-      "LLM"
+    [
+     "純度",
+     "precision：撈回來的資料裡，有用的佔幾成"
+    ],
+    [
+     "答對率",
+     "另一個 AI 當裁判，判斷最後的答案對不對"
     ]
+   ],
+   "key_w": 200,
+   "refs": [
+    "c2",
+    "c3",
+    "c4"
+   ]
+  },
+  {
+   "layout": "chart_bars",
+   "title": "找全率說 B 好，\n[[純度說 B 只有一半]]",
+   "body": "找全率只看「該找的找到沒」，不看「不該找的有沒有混進來」。只用找全率打分，系統會被推向多撈：",
+   "unit": "",
+   "axis_max": 1,
+   "legend": [
+    "找全率",
+    "純度"
+   ],
+   "bars": [
+    {
+     "name": "A",
+     "value": 0.75,
+     "value2": 1.0,
+     "subs": [
+      "撈 3 段，3 段相關"
+     ]
+    },
+    {
+     "name": "B",
+     "value": 1.0,
+     "value2": 0.5,
+     "subs": [
+      "撈 8 段，4 段相關"
+     ]
+    }
+   ],
+   "note": "部落格舉的假設例子",
+   "refs": [
+    "c4",
+    "c8",
+    "c1"
+   ],
+   "quals": [
+    "c1#1"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "compare",
+   "title": "雜訊為什麼\n[[會讓 AI 答錯？]]",
+   "body": "部落格推論，多撈會害答案的原因有三個（這篇論文沒有人測純度）。前兩個：",
+   "columns": [
+    {
+     "head": "干擾",
+     "items": [
+      {
+       "text": "問題只有一個正確答案"
+      },
+      {
+       "text": "多塞幾段很像、答案卻不同的資料"
+      },
+      {
+       "text": "模型挑錯的機率上升",
+       "emph": true
+      }
+     ]
+    },
+    {
+     "head": "中間被忽略",
+     "items": [
+      {
+       "text": "資料一長，模型比較注意開頭結尾"
+      },
+      {
+       "text": "中間的段落容易被忽略"
+      },
+      {
+       "text": "答案在資料裡，不代表 模型會用到",
+       "emph": true
+      }
+     ]
+    }
+   ],
+   "refs": [
+    "c10"
+   ],
+   "quals": [
+    "c10#1"
+   ]
+  },
+  {
+   "layout": "table",
+   "title": "第三個原因：\n[[看題目要什麼]]",
+   "label": "RAGU 的例子",
+   "body": "部落格推論 RAGU 一路用同一種策略（多撈）：簡單題是負擔，綜合題才變優勢。和對手 HippoRAG 2 比（考題 GraphRAG-Bench Medical，都用 RAGU 附帶的抽取模型建圖）：",
+   "rows": [
+    [
+     "查一個事實",
+     "多的資料是干擾。答對率 RAGU 54.2%、HippoRAG 2 72.4%"
+    ],
+    [
+     "最難的綜合題",
+     "多的資料是資產。答對率 RAGU 59.0%、HippoRAG 2 56.9%；只差 2.1 個百分點，評分本身的誤差就可能這麼大"
+    ]
+   ],
+   "key_w": 230,
+   "note": "答對率是另一個 AI 只評一次，沒誤差範圍、沒人工檢查裁判",
+   "refs": [
+    "c11",
+    "c12",
+    "c9",
+    "c7"
+   ],
+   "quals": [
+    "c9#1",
+    "c7#1",
+    "c7#2",
+    "c12#1",
+    "c12#2",
+    "c12#3"
+   ]
+  },
+  {
+   "layout": "diagram",
+   "kind": "stops",
+   "title": "調系統時，\n[[別只盯著找全率]]",
+   "label": "帶走",
+   "body": "只盯找全率，系統會被一路推向多撈。查單一事實的題目上，找得全和答得對是互相拉扯的；寫綜合內容時，多的資料反而有用。",
+   "nodes": [
+    {
+     "text": "找全率（或 hit rate 這類分數）",
+     "sub": "只看該找的找到沒"
+    },
+    {
+     "text": "加看純度",
+     "sub": "混進多少雜訊"
+    },
+    {
+     "text": "最好直接看最後的答案",
+     "emph": true
+    }
+   ],
+   "note": "RAGU 論文列了 Context Relevancy，卻沒給任何一個數字",
+   "refs": [
+    "c1",
+    "c16"
+   ],
+   "quals": [
+    "c1#1",
+    "c1#2",
+    "c1#3",
+    "c1#4"
+   ]
+  },
+  {
+   "layout": "takeaway",
+   "question": "資料撈得越多，AI 答得越好？",
+   "title": "資料不是越多越好。\n雜訊可能讓 AI 挑錯；\n除了找全率，\n也要看最後的答案。",
+   "refs": [
+    "c1",
+    "c10"
+   ],
+   "quals": [
+    "c1#1",
+    "c10#1"
+   ]
   }
+ ],
+ "threads": {
+  "mode": "carousel",
+  "body": {
+   "text": "參考資料撈得越多，AI 答得越好？撈得多，不等於答得好。\n\n假設一題有 4 段有用的資料。A 撈 3 段、都有用；B 撈 8 段，一半是雜訊。論文用的 Evidence Recall（找全率）只看「該找的找到沒」：A 0.75、B 1.00，B 贏。但撈回來的資料裡有用的佔幾成（precision，純度）：A 1.00、B 0.50。\n\n部落格推論多撈會害答案的原因有三個：問題只有一個正確答案時，多塞幾段很像、答案卻不同的資料，AI 挑錯的機率上升；資料一長，中間的段落容易被忽略；第三，要看題目，查事實時多的資料是干擾，寫綜合內容時是資產。\n\n部落格推論 RAGU 一路用同一種策略（多撈），簡單題是負擔、綜合題才變優勢。和 HippoRAG 2 比（GraphRAG-Bench Medical，都用 RAGU 附帶的抽取模型建圖），查事實的答對率 54.2% 對 72.4%；最難的綜合題 59.0% 對 56.9%，只差 2.1 個百分點，評分誤差就可能這麼大。答對率是另一個 AI 只評一次，沒誤差範圍、沒人工檢查；論文沒測純度，列了 Context Relevancy 卻沒給數字。",
+   "refs": [
+    "c1",
+    "c8",
+    "c3",
+    "c4",
+    "c10",
+    "c11",
+    "c12",
+    "c9",
+    "c7"
+   ],
+   "quals": [
+    "c1#1",
+    "c1#2",
+    "c1#3",
+    "c1#4",
+    "c10#1",
+    "c12#1",
+    "c12#2",
+    "c12#3",
+    "c7#1",
+    "c7#2",
+    "c9#1"
+   ]
+  },
+  "last": {
+   "text": "調系統時別只盯找全率：至少同時看 precision，最好直接看最後的答案。\n文章：datasciocean.com/paper-intro/ragu\n同系列：換一句提示詞 +16.9%，加一整張知識圖 +1.2%（尚未發布）\n同系列：AI 會把同一個東西寫成兩個名字（尚未發布）\n同系列：小模型夠用，是因為題目太簡單（尚未發布）",
+   "refs": [
+    "c1"
+   ],
+   "quals": [
+    "c1#1",
+    "c1#2",
+    "c1#3",
+    "c1#4"
+   ],
+   "link": "https://datasciocean.com/paper-intro/ragu/"
+  }
+ },
+ "caption": {
+  "first": "給 AI 的參考資料，撈得越多答得越好？混進很像但答案不同的資料，它可能反而挑錯",
+  "first_refs": [
+   "c1"
+  ],
+  "nav": "完整文章在 datasciocean.com，搜「RAGU」",
+  "hashtags": [
+   "RAGU",
+   "GraphRAG",
+   "RAG",
+   "LLM"
+  ]
+ }
 }

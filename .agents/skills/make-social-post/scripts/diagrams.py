@@ -121,6 +121,7 @@
   lift      基準＋增量（2026-11-19，RAGU）：heads = [基準的名字, 改後的名字]、nodes = 列 [{text, sub?, base, top, emph?, pair?}]（2～4 列；pair＝這列自己的改前改後名字）、unit、選用 axis_max（預設 100）；藍綠＝基準、深海＝多出來的（emph 那列金色）、虛線空框＝少掉的；差距由程式算，軸從 0 起
   kgroups   少數大群 vs 滿滿的微群（2026-11-19，RAGU 第 4 則）：heads = [左面板標題, 右面板標題]、nodes = [{text, sub?}（左說明）, {text, sub?}（右說明）]；左 5 個大群、右 30 個 1～3 顆點的微群，純示意，圖註標「示意」
   netgraph  一張小知識圖被切成兩群（2026-11-19，RAGU 第 5 則）：nodes = [{text, x, y, g}]（相對座標 0～1、g＝第幾群）、edges = [[i, j]]、cut = 被切斷的邊序號、heads = [第 0 群, 第 1 群, 被切斷的邊]；節點越多邊畫越大，位置只是示意
+  dangle    一條線接到不存在的點（2026-11-23，RAGU 重做第 3 則）：heads = [上排標籤, 下排標籤]、nodes = [{text（清單上的名字）, sub?}, {text（線上寫的另一種名字）, sub?}]、outcomes[0] = {text}（線另一端的點）；上排接上實心點，下排接到打叉的虛線空點、真點孤零零在旁邊；純示意
   lens      看每一步 vs 只看最後一步（2026-11-15）：nodes = 步驟 [{text, p}]（最低的金色）、heads = [長括號標籤, 短括號標籤]、outcomes = 兩個結論（接在標籤後）；自信度是假設的
 
 規則：圖形全部用 class "bg"（不進程式 B 的文字與圖形重疊檢查），所以排版由這裡負責避開文字；框內的文字由程式 B 的「框內文字不超出框」檢查；
@@ -925,7 +926,7 @@ def tokens(c: Canvas, spec: dict, y0: float) -> float:
     outcomes[0]（選用）＝底下一條橫框 {text, sub?, tone?}（tone: good 金色，否則深海）。
     2026-10-18 新增（Decision Transformer）：「交錯排列的序列」「蓋住其中一格」是符號序列，流程圖與表格說不出這個畫面。"""
     steps, foot, more = spec["steps"], (spec.get("outcomes") or [None])[0], bool(spec.get("more"))
-    w, lw, gap, vgap, pad = X1 - X0, 120, 16, 30, 14
+    w, lw, gap, vgap, pad = X1 - X0, int(spec.get("label_w", 120)), 16, 30, int(spec.get("cell_pad", 14))   # 選用 label_w／cell_pad：一列格子很多時（RAGU 重做第 2 則 8 格）收窄列首、格內留白
     ncell = max(len(s["cells"]) for s in steps)
     cw = (w - lw - gap * (ncell - 1)) / ncell
     iw = cw - 2 * pad
@@ -952,7 +953,8 @@ def tokens(c: Canvas, spec: dict, y0: float) -> float:
                       stroke=stroke, dash=dash, align="center", pad=pad, h=h)
         y += h
         if i < len(steps) - 1 or more:
-            c.arrow(ax, y + 4, ax, y + vg - 4, TEAL, 4, 12)
+            if not spec.get("no_arrow"):                 # 選用 no_arrow：各列是並列的兩個例子、不是一步接一步（RAGU 重做第 2 則）
+                c.arrow(ax, y + 4, ax, y + vg - 4, TEAL, 4, 12)
             y += vg
     if more:
         for j in range(3):
@@ -5254,6 +5256,54 @@ def kgroups(c: Canvas, spec: dict, y0: float) -> float:
 
 
 # --------------------------------- RAGU 系列（2026-11-19）：一張小圖被切成兩群
+def dangle(c: Canvas, spec: dict, y0: float) -> float:
+    """一條線接到不存在的點（2026-11-23，RAGU 重做第 3 則「名字寫得不一樣，線就接到空氣」）。兩排小知識圖：
+    上排：線的另一端寫的名字和清單上的點一樣 → 線接上實心點；下排：線上寫的名字清單上沒有 → 線接到一個虛線的空點（打叉），
+    清單上那個真的點孤零零在旁邊。heads = [上排標籤, 下排標籤]；nodes = [{text（清單上的名字）, sub?（真的點底下的說明）},
+    {text（線上寫的另一種名字）, sub?（空點底下的說明）}]；outcomes[0] = {text}（線另一端那個點的名字）。純示意。"""
+    heads, nodes, outs = spec.get("heads", []), spec.get("nodes", []), spec.get("outcomes", [])
+    if len(heads) != 2 or len(nodes) != 2 or not outs:
+        raise ValueError("dangle 要 heads 2 個（上排、下排標籤）、nodes 2 個（清單上的名字、線上寫的名字）、outcomes[0]（線另一端的點）")
+    real, ghost, src = nodes[0], nodes[1], outs[0]
+    lw = 300                                                  # 每個點名字的寬度
+    def lab_h(n):
+        return c.lines(n["text"], lw, 28) * 39.2 + (c.lines(n["sub"], lw, 28) * 39.2 if n.get("sub") else 0)
+    r = 34
+    row = 50 + 2 * r + 14 + max(lab_h(real), lab_h(ghost), lab_h(src))
+    gap = 46
+    total = 2 * row + gap
+    _fit(total, BOTTOM - y0, "dangle")
+    ex = BOTTOM - y0 - total
+    gap += min(ex * .5, 70)
+    xs, xm, xr = X0 + 150, X0 + 520, X0 + 790          # 線另一端的點、線接到的點、（下排）孤零零的真點
+
+    def node_lab(x, y, n, color=DEEP, sub_color=TEAL):
+        c.text(x - lw / 2, y, lw, n["text"], "ds", color, "center")
+        if n.get("sub"):
+            c.text(x - lw / 2, y + c.lines(n["text"], lw, 28) * 39.2, lw, n["sub"], "ds", sub_color, "center")
+
+    for k in range(2):
+        y = y0 + k * (row + gap)
+        c.text(X0, y, X1 - X0, heads[k], "dl", TEAL)
+        cy = y + 50 + r
+        if k == 0:
+            c.line(xs + r, cy, xm - r, cy, MID, 7)
+            c.circle(xs, cy, r, fill=DEEP)
+            c.circle(xm, cy, r, fill=DEEP)
+            node_lab(xs, cy + r + 14, src)
+            node_lab(xm, cy + r + 14, {"text": real["text"]})
+        else:
+            c.line(xs + r, cy, xm - r - 6, cy, MID, 7)
+            c.circle(xs, cy, r, fill=DEEP)
+            c.circle(xm, cy, r, fill="none", stroke=GOLD, sw=6, dash="10 8")
+            _cross(c, xm, cy, 14, GOLD, 7)
+            c.circle(xr, cy, r, fill=DEEP)
+            node_lab(xs, cy + r + 14, src)
+            node_lab(xm, cy + r + 14, ghost, DEEP, GOLD if False else TEAL)
+            node_lab(xr, cy + r + 14, real)
+    return y0 + total + gap - 46
+
+
 def netgraph(c: Canvas, spec: dict, y0: float) -> float:
     """一張小知識圖被切成兩群（2026-11-19，RAGU 第 5 則「模組度」）：節點照相對座標擺，顏色＝所屬的群，被切斷的邊畫金色虛線。
     nodes = [{text, x, y, g, lab?}]（x、y 是 0～1 的相對位置；g = 0 或 1，是第幾群；lab = 名字放 below／above／left／right，預設 below）；edges = [[i, j], …]（0 起）；
@@ -5318,7 +5368,7 @@ KINDS = {"flow": flow, "compare": compare, "pairs": pairs, "samples": samples, "
          "transcript": transcript, "oneloop": oneloop, "intercept": intercept, "dial": dial, "lanes": lanes, "layers": layers, "turn": turn,
          "sockets": sockets, "lazy": lazy, "hub": hub, "pinned": pinned, "compact": compact, "sidecar": sidecar, "combo": combo,
          "waist": waist, "schema": schema, "branch": branch, "gates": gates, "route": route, "depend": depend,
-         "pick": pick, "pile": pile, "addlane": addlane,
+         "pick": pick, "pile": pile, "dangle": dangle, "addlane": addlane,
          "dist": dist, "snap": snap, "stack": stack, "target": target, "ring": ring,
          "magnet": magnet, "puzzle": puzzle, "merge": merge, "clusters": clusters, "shelves": shelves, "switch": switch, "duel": duel, "matrix": matrix, "race": race,
          "grain": grain, "ballot": ballot, "thresh": thresh, "murky": murky,

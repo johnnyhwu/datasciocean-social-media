@@ -1,0 +1,79 @@
+{
+  "post": "ragu-results-peeling-confounds",
+  "blocks": [
+    {"block": "第 1 張", "atoms": [
+      {"text": "換句提示詞（叫 AI 答短一點），答對率多 16.9 個百分點", "verdict": "完全支持", "card_quote": "BioASQ | 56.0 | 72.9 | +16.9 pp（百分點）", "note": "c6：同一套檢索只把 prompt 從 verbose 改 terse，BioASQ +16.9 pp；pp 寫 % 為人定用語"},
+      {"text": "叫 AI 答短一點 = 把 generation prompt 改成 terse", "verdict": "完全支持", "card_quote": "同一套檢索、只把 generation prompt 從 verbose 改成 terse", "note": "白話說法，不改變意思"},
+      {"text": "加知識圖只多 1.2 個百分點（同一份考題）", "verdict": "完全支持", "card_quote": "BioASQ | 71.7 | 72.9 | +1.2 pp", "note": "c11 同為 BioASQ，故「同一份考題」字面為真"},
+      {"text": "建知識圖要花大工夫", "verdict": "完全支持", "card_quote": "建圖要跑一遍 LLM 抽取（論文估約 8k tokens/doc）、embedding、分群、社群摘要；NaiveRAG 只要切 chunk 加 embedding", "note": "c12 成本對照支持；8k 為論文估計的限定在第 3 張與串文出現"},
+      {"text": "封面只挑 BioASQ 一格並列對照", "verdict": "完全支持", "card_quote": "+16.9 pp 是「換個 prompt」買來的，比論文任何一項方法貢獻都大。", "note": "c7 支持此對比；MuSiQue −3.4 與 1.2～4.3 範圍在內文出現，讀完不會覺得被騙，封面『同一份考題』限定範圍"}],
+     "errors": []},
+    {"block": "第 2 張", "atoms": [
+      {"text": "RAG 是先幫 AI 找資料，再讓它讀著回答", "verdict": "完全支持", "card_quote": "使用者提問時撈出最相似的幾塊塞進 prompt", "note": "名詞白話定義，不加用途或範圍"},
+      {"text": "一般 RAG：文件切段、提問時撈出最像的幾段；每段各自獨立，看不到跨文件的關聯", "verdict": "完全支持", "card_quote": "標準的 RAG 做法是把文件切成 chunk、轉成向量存起來，使用者提問時撈出最相似的幾塊塞進 prompt。這種檢索是扁平的：每個 chunk 各自獨立，系統看不到跨文件的關聯。", "note": "c3 背景說明"},
+      {"text": "GraphRAG：先請 AI 抽出人、組織、產品和關係建成知識圖，找資料時沿著圖上的線走", "verdict": "完全支持", "card_quote": "GraphRAG 的解法是先請 LLM 把文件裡的實體（人、組織、產品）跟關係抽出來建成知識圖，檢索時可以沿著圖上的邊走。", "note": "c3"},
+      {"text": "RAGU 是 ITMO University 團隊 2026 年 7 月放上 arXiv 的 GraphRAG 系統", "verdict": "完全支持", "card_quote": "RAGU 是 ITMO University 團隊在 2026 年 7 月[放上 arXiv](https://arxiv.org/abs/2607.11683)的 GraphRAG 引擎", "note": "c2，引擎寫成系統不改意思"}],
+     "errors": []},
+    {"block": "第 3 張", "atoms": [
+      {"text": "不用圖只要把文件切段、把每段變成可以比相似度的數字", "verdict": "完全支持", "card_quote": "NaiveRAG 只要切 chunk 加 embedding", "note": "c12；embedding 的白話解釋與 c3「轉成向量…撈出最相似」一致"},
+      {"text": "拿兩者成本來比是我們的對照", "verdict": "完全支持", "card_quote": "約 8k tokens/doc 是論文的估計，拿建圖跟 NaiveRAG 比成本是 blog 的對照", "note": "c12#1 限定條件已帶出（部落格考證有標明）"},
+      {"text": "建圖帳單：AI 逐份讀文件抽出點和線、每段變成數字、把圖分群、每一群寫摘要", "verdict": "完全支持", "card_quote": "建圖要跑一遍 LLM 抽取（論文估約 8k tokens/doc）、embedding、分群、社群摘要", "note": "四項對應卡上四項"},
+      {"text": "論文估計每份文件約 8k tokens", "verdict": "完全支持", "card_quote": "論文估約 8k tokens/doc", "note": "宣稱方為論文，寫明"},
+      {"text": "主標：建一張圖，要多跑一大圈 AI", "verdict": "完全支持", "card_quote": "建圖要跑一遍 LLM 抽取", "note": "「一大圈」為語氣，指整串抽取＋分群＋摘要，不加新事實"},
+      {"text": "收據底部「答對率多多少？／建知識圖換來的」", "verdict": "完全支持", "card_quote": "整套 GraphRAG 相對於純向量檢索（NaiveRAG）的淨貢獻只有 1.2 到 4.3 pp", "note": "為問句懸念，答案在第 4 張，不含主張"}],
+     "errors": []},
+    {"block": "第 4 張", "atoms": [
+      {"text": "加上知識圖，答對率只多 1.2～4.3%", "verdict": "完全支持", "card_quote": "整套 GraphRAG 相對於純向量檢索（NaiveRAG）的淨貢獻只有 1.2 到 4.3 pp", "note": "c1/c11；「只」為部落格判斷，卡上即有"},
+      {"text": "RAGU 有個不用圖的版本，程式和提示詞都一樣", "verdict": "完全支持", "card_quote": "NaiveRAG 就是 RAGU 自己的 NaiveSearchEngine——同一套程式、同一個 generation prompt，但完全不用圖", "note": "c10"},
+      {"text": "論文正文沒分析這個對照", "verdict": "完全支持", "card_quote": "這是同一張表裡最重要、但論文正文一個字都沒分析的對照。", "note": "c10 部落格判斷"},
+      {"text": "BioASQ 不用圖 71.7%・用圖 72.9%，+1.2%", "verdict": "完全支持", "card_quote": "BioASQ | 71.7 | 72.9 | +1.2 pp", "note": "數字一致"},
+      {"text": "2Wiki 不用圖 53.7%・用圖 58.0%，+4.3%", "verdict": "完全支持", "card_quote": "2Wiki | 53.7 | 58.0 | +4.3 pp", "note": "數字一致"},
+      {"text": "MuSiQue 不用圖 36.6%・用圖 40.1%，+3.5%", "verdict": "完全支持", "card_quote": "MuSiQue | 36.6 | 40.1 | +3.5 pp", "note": "數字一致"},
+      {"text": "圖註：AI 裁判只評一次，沒誤差範圍、沒人工檢查，差幾 % 不宜當結論", "verdict": "完全支持", "card_quote": "AC 是單一 judge 模型的單次評分，論文沒有 error bar、也沒有人工驗證 judge 準確度，個位數 pp 的差距不宜當結論。", "note": "c11#1 限定條件已帶出；「沒人工檢查」是「沒有人工驗證 judge 準確度」的簡寫，意思一致"}],
+     "errors": []},
+    {"block": "第 5 張", "atoms": [
+      {"text": "叫 AI 答短一點，BioASQ 跳了 16.9%", "verdict": "完全支持", "card_quote": "BioASQ | 56.0 | 72.9 | +16.9 pp（百分點）", "note": "c6"},
+      {"text": "Multi-Hop 問答的標準答案很短，RAGU 卻預設寫一大段", "verdict": "完全支持", "card_quote": "多跳 QA 的標準答案是短答案（「Bell Laboratories」），RAGU 預設吐長答案", "note": "多跳→Multi-Hop 為 terms.yaml 用語替換；「要串好幾份資料」為名詞白話定義"},
+      {"text": "答短那欄就是上一張的 RAGU", "verdict": "完全支持", "card_quote": "BioASQ | 72.9 | 72.4 | +0.5 pp（打平）", "note": "c6 terse 值 72.9/58.0/40.1 與 c11 RAGU（terse）值相同"},
+      {"text": "2Wiki 答長 46.6%・答短 58.0%，+11.4%", "verdict": "完全支持", "card_quote": "2Wiki | 46.6 | 58.0 | +11.4 pp", "note": "數字一致"},
+      {"text": "MuSiQue 答長 43.5%・答短 40.1%，−3.4%", "verdict": "完全支持", "card_quote": "MuSiQue | 43.5 | 40.1 | −3.4 pp", "note": "數字一致"},
+      {"text": "BioASQ 多的比加整張圖多", "verdict": "完全支持", "card_quote": "+16.9 pp 是「換個 prompt」買來的，比論文任何一項方法貢獻都大。", "note": "16.9 > 1.2，衍生比較正確"},
+      {"text": "這個混淆論文自己承認", "verdict": "完全支持", "card_quote": "這一層是論文自己承認的，值得肯定。", "note": "c6"}],
+     "errors": []},
+    {"block": "第 6 張", "atoms": [
+      {"text": "BioASQ 上換提示詞多的 16.9 個百分點，比論文裡任何一個新方法帶來的進步都大", "verdict": "完全支持", "card_quote": "+16.9 pp 是「換個 prompt」買來的，比論文任何一項方法貢獻都大。", "note": "c7 部落格判斷，以作者口吻寫、未比卡更強；「方法貢獻」寫成「新方法帶來的進步」意思相同"},
+      {"text": "評估找資料的新方法之前，先問是不是這些小地方（提示詞、答案格式、切段大小、對照組設定）造成的", "verdict": "完全支持", "card_quote": "在做任何檢索改動的評估之前，先問：有沒有一個更無聊的變因（prompt、答案格式、chunk 大小、baseline 設定）在解釋這個差異？", "note": "c17，四格對應卡上四項"},
+      {"text": "主標：看到分數變好，先查無聊的原因", "verdict": "完全支持", "card_quote": "有沒有一個更無聊的變因", "note": "c17 白話"},
+      {"text": "quad 提示詞格「這篇：叫模型答短」", "verdict": "完全支持", "card_quote": "同一套檢索、只改 generation prompt 的效果：", "note": "c6"}],
+     "errors": []},
+    {"block": "第 7 張", "atoms": [
+      {"text": "BioASQ：答短 +16.9%，知識圖只 +1.2%", "verdict": "完全支持", "card_quote": "BioASQ | 56.0 | 72.9 | +16.9 pp（百分點）", "note": "c6 與 c11（BioASQ | 71.7 | 72.9 | +1.2 pp）"},
+      {"text": "分數變好，先查無聊的原因", "verdict": "完全支持", "card_quote": "在做任何檢索改動的評估之前，先問：有沒有一個更無聊的變因", "note": "c17"},
+      {"text": "先問的問題：GraphRAG 值不值得做？", "verdict": "完全支持", "card_quote": "", "note": "系列名稱，結構元素"}],
+     "errors": []},
+    {"block": "Threads 正文", "atoms": [
+      {"text": "換一句提示詞多 16.9 個百分點；加整張知識圖只多 1.2 個；同一套系統、同一份考題（BioASQ）", "verdict": "完全支持", "card_quote": "BioASQ | 56.0 | 72.9 | +16.9 pp（百分點）", "note": "c6 與 c11 同為 RAGU、BioASQ"},
+      {"text": "GraphRAG 先請 AI 抽出人、組織、產品和關係建成知識圖，沿著圖走", "verdict": "完全支持", "card_quote": "先請 LLM 把文件裡的實體（人、組織、產品）跟關係抽出來建成知識圖，檢索時可以沿著圖上的邊走", "note": "c3"},
+      {"text": "建圖要每份文件多跑一遍 AI（論文估約 8k tokens）", "verdict": "完全支持", "card_quote": "建圖要跑一遍 LLM 抽取（論文估約 8k tokens/doc）", "note": "c12，宣稱方論文已寫明"},
+      {"text": "部落格拿來對照的不用圖版本只要切段、把每段變成可以比相似度的數字", "verdict": "完全支持", "card_quote": "拿建圖跟 NaiveRAG 比成本是 blog 的對照", "note": "c12#1 限定已帶出"},
+      {"text": "RAGU（ITMO University，2026 年 7 月放上 arXiv）程式裡有不用圖的版本：同一套程式、同一句提示詞，只差有沒有圖", "verdict": "完全支持", "card_quote": "NaiveRAG 就是 RAGU 自己的 NaiveSearchEngine——同一套程式、同一個 generation prompt，但完全不用圖", "note": "c10、c2"},
+      {"text": "兩邊同樣只答短答案時，三份考題上圖只多 1.2 到 4.3 個百分點", "verdict": "完全支持", "card_quote": "terse 設定下的 AC，NaiveRAG（不用圖）對 RAGU（用圖）在 BioASQ 是 71.7 對 72.9（圖的淨貢獻 +1.2 pp），2Wiki 是 53.7 對 58.0（+4.3 pp），MuSiQue 是 36.6 對 40.1（+3.5 pp）", "note": "c11，terse 限定寫出"},
+      {"text": "答長改答短，BioASQ 多 16.9（MuSiQue 反而少 3.4）", "verdict": "完全支持", "card_quote": "MuSiQue | 43.5 | 40.1 | −3.4 pp", "note": "c6"},
+      {"text": "答對率是另一個 AI 當裁判、只評一次的分數，沒有誤差範圍、沒有人工檢查裁判準不準，差幾個百分點不宜當結論", "verdict": "完全支持", "card_quote": "AC 是單一 judge 模型的單次評分，論文沒有 error bar、也沒有人工驗證 judge 準確度，個位數 pp 的差距不宜當結論。", "note": "c5／c6#1／c11#1"},
+      {"text": "正在評估要不要導入 GraphRAG 的人，這組數字比論文想證明的東西更有用", "verdict": "完全支持", "card_quote": "這對任何正在評估要不要導入 GraphRAG 的人來說，比論文想證明的東西有用得多。", "note": "c18 部落格判斷，「更有用」不比卡強；c18#1（自己的程式、自己的 prompt）已在前段帶出"}],
+     "errors": []},
+    {"block": "Threads 最後一則", "atoms": [
+      {"text": "看到分數變好，先問有沒有更無聊的原因：提示詞、答案格式、切段大小、拿什麼來比", "verdict": "完全支持", "card_quote": "先問：有沒有一個更無聊的變因（prompt、答案格式、chunk 大小、baseline 設定）在解釋這個差異？", "note": "c17；文章連結與同系列列為結構"}],
+     "errors": []},
+    {"block": "IG caption", "atoms": [
+      {"text": "同一份考題：加整張知識圖只多 1.2%，換句提示詞多 16.9%", "verdict": "完全支持", "card_quote": "BioASQ | 71.7 | 72.9 | +1.2 pp", "note": "c11 與 c6（BioASQ +16.9）"},
+      {"text": "條列四項為第 3～6 張主標", "verdict": "完全支持", "card_quote": "整套 GraphRAG 相對於純向量檢索（NaiveRAG）的淨貢獻只有 1.2 到 4.3 pp", "note": "與各張判定相同；導流行、hashtag、系列名為結構"}],
+     "errors": []}
+  ],
+  "recalculations": [
+    {"block": "第 5 張", "expression": "72.9-56.0; 58.0-46.6; 40.1-43.5", "result": "16.9; 11.4; -3.4"},
+    {"block": "第 4 張", "expression": "72.9-71.7; 58.0-53.7; 40.1-36.6", "result": "1.2; 4.3; 3.5（範圍 1.2～4.3）"},
+    {"block": "第 1 張／第 5 張", "expression": "16.9 > 1.2", "result": "True"}
+  ],
+  "gaps": []
+}

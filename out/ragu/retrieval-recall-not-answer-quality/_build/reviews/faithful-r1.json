@@ -1,156 +1,441 @@
 {
   "post": "retrieval-recall-not-answer-quality",
   "blocks": [
-    {"block": "第 1 張", "atoms": [
-      {"text": "AI 查到的資料更齊，答案卻可能更差", "verdict": "完全支持",
-       "card_quote": "只盯著 recall 類指標（撈回率、hit rate）會系統性地把系統推向「撈更多」，而最終答案品質可能不動甚至下降。", "note": "有「可能」，與卡同強度；封面留白可接受。"},
-      {"text": "只看「該查的有沒有查到」，會把系統一路推向多撈", "verdict": "完全支持",
-       "card_quote": "會系統性地把系統推向「撈更多」", "note": "「該查的有沒有查到」對應 Evidence Recall 只測「該撈的撈到沒有」。"},
-      {"text": "多撈進來的段落，可能讓 AI 挑錯答案", "verdict": "完全支持",
-       "card_quote": "context 裡多塞幾段語意相關但答案不同的材料，LLM 挑錯的機率就上升", "note": "factoid 限定在第 8 張出現（找單一事實的題目），符合封面可沒說完整的規則。"}],
-     "errors": []},
-    {"block": "第 2 張", "atoms": [
-      {"text": "甲（像 HippoRAG 2）撈到 3 段相關、漏 1 段、0 雜訊；Evidence Recall 3/4 = 0.75、Precision 3/3 = 1.00", "verdict": "完全支持",
-       "card_quote": "HippoRAG 2 的 context 是 3 段相關，ER = 3/4 = 0.75、precision = 3/3 = 1.00", "note": "點數與分數皆對得上。"},
-      {"text": "乙（像 RAGU）4 段相關全撈到、也塞進 4 段雜訊；Evidence Recall 4/4 = 1.00、Precision 4/8 = 0.50", "verdict": "完全支持",
-       "card_quote": "RAGU 的 context 是 4 段相關加 4 段雜訊，ER = 4/4 = 1.00、precision = 4/8 = 0.50", "note": "圖註標明假設的例子，符合部落格舉例寫法。"},
-      {"text": "Evidence Recall 只算相關的撈到幾成；Precision 是撈到的東西有幾成相關", "verdict": "完全支持",
-       "card_quote": "Recall 是撈到的相關材料除以全部相關材料，ER 測的就是這個；Precision 是撈到的相關材料除以全部撈到的材料", "note": "定義正確。"}],
-     "errors": []},
-    {"block": "第 3 張", "atoms": [
-      {"text": "回顧頁（結構）", "verdict": "完全支持", "card_quote": "", "note": "結構元素，不對證卡。"}],
-     "errors": []},
-    {"block": "第 4 張", "atoms": [
-      {"text": "RAGU 是一套 GraphRAG：先請 LLM 把文件裡的實體和關係抽出來建成知識圖，查資料時沿著圖走", "verdict": "完全支持",
-       "card_quote": "GraphRAG 先請 LLM 把文件裡的實體跟關係抽出來建成知識圖，檢索時可以沿著圖上的邊走", "note": "白話轉述。"},
-      {"text": "論文用三個分數評它", "verdict": "部分支持",
-       "card_quote": "其中 ER 只評檢索，AC / Cov / Faith 評最終答案", "note": "卡上論文指標還有 Faith，且 c14 說論文列出的指標包含 Context Relevancy；「用三個分數評它」字面暗示只有三個。"},
-      {"text": "Evidence Recall：查資料這一步撈回了多少比例的相關材料；只評查資料，不評答案", "verdict": "完全支持",
-       "card_quote": "ER（Evidence Recall）測檢索階段撈回了多少比例的相關材料，只評檢索", "note": ""},
-      {"text": "答對率（AC）：由 LLM 當裁判，判斷答案語意上對不對", "verdict": "完全支持",
-       "card_quote": "AC（Answer Correctness）由 LLM-judge 判斷答案語意上對不對", "note": ""},
-      {"text": "Coverage：答案有沒有涵蓋所有該講的重點", "verdict": "完全支持",
-       "card_quote": "Cov（Coverage）測有沒有涵蓋所有該講的重點", "note": ""}],
-     "errors": ["其他"]},
-    {"block": "第 5 張", "atoms": [
-      {"text": "Evidence Recall 只測該撈的撈到沒有，完全不測不該撈的有沒有撈進來", "verdict": "完全支持",
-       "card_quote": "Evidence Recall 只測「該撈的撈到沒有」，完全不測「不該撈的有沒有撈進來」", "note": ""},
-      {"text": "撈得齊，答對率卻輸；論文裡最值得想清楚的張力", "verdict": "完全支持",
-       "card_quote": "blog 指出整篇論文最值得想清楚的張力：如果 RAGU 檢索到更完整的證據，為什麼最終答案正確率反而輸？", "note": "「撈得齊」另有 c9「更完整但濃度更低的資訊」支撐（部落格推論，可直述）。"},
-      {"text": "多撈怎麼傷到答案：干擾項，和中間被忽略", "verdict": "完全支持",
-       "card_quote": "一是干擾項…二是 lost in the middle，長 context 裡模型對開頭結尾敏感、中間容易被忽略", "note": ""},
-      {"text": "什麼題目反而吃香：題目性質決定誰吃虧", "verdict": "完全支持",
-       "card_quote": "blog 認為第三個機制是任務性質決定誰吃虧", "note": ""},
-      {"text": "最後：調系統時該盯哪個分數", "verdict": "完全支持",
-       "card_quote": "它會改變你調系統時盯哪個儀表板", "note": "路線圖導覽。"}],
-     "errors": []},
-    {"block": "第 6 張", "atoms": [
-      {"text": "Creative Generation 的 Coverage：RAGU 57.4 對 HippoRAG 2 34.7，多 22.7%", "verdict": "完全支持",
-       "card_quote": "Creative Generation 層級的 Coverage 是 LightRAG 3.9、HippoRAG 2 34.7、RAGU 57.4", "note": "差距重算 22.7，pp 寫成 % 為人定用語。"},
-      {"text": "Creative Generation 是「最難的」層級", "verdict": "找不到",
-       "card_quote": "", "note": "卡上沒有說 Creative Generation 是四個難度層級中最難的一級；c12 只說「最難的一格」AC 59.0 對 56.9，未指明是哪個層級。"},
-      {"text": "22.7 的差距不是雜訊、也不是格式造成的", "verdict": "完全支持",
-       "card_quote": "blog 認為 RAGU 對 HippoRAG 2 的 22.7 pp Coverage 差距不是雜訊，也不是格式造成的", "note": "部落格判斷，可直述。"},
-      {"text": "Fact Retrieval 的答對率 RAGU 54.2% 對 HippoRAG 2 72.4%", "verdict": "完全支持",
-       "card_quote": "Fact Retrieval 層級的 AC，RAGU 54.2、HippoRAG 2 72.4", "note": "比較對象寫明。"},
-      {"text": "圖註：答對率那組是醫療題庫、用 RAGU 附帶的抽取模型建圖", "verdict": "完全支持",
-       "card_quote": "這組 AC 是 GraphRAG-Bench Medical 的難度層級，都用 Meno-Lite-0.1（RAGU 附帶的抽取模型）建圖", "note": "c7#1 帶出。"},
-      {"text": "（應帶出）c7#2：AC 是單一 judge 單次評分、沒有 error bar、沒有人工驗證", "verdict": "不支持",
-       "card_quote": "AC 是單一 judge 模型的單次評分，論文沒有 error bar、也沒有人工驗證 judge 準確度", "note": "引用欄宣稱帶出 c7#2，但這張與 IG 輪播／caption 任何一處都沒有這個限定條件，只在 Threads 正文出現；IG 讀者看不到。"}],
-     "errors": ["限定條件掉了", "其他"]},
-    {"block": "第 7 張", "atoms": [
-      {"text": "RAGU 撈到的不是更正確的資訊，是更完整、但濃度更低的資訊，而且這是設計使然", "verdict": "完全支持",
-       "card_quote": "blog 推論 RAGU 撈到的不是「更正確的資訊」，是「更完整但濃度更低的資訊」，而且這是設計必然", "note": "部落格推論直述可；「使然」不比卡強。"},
-      {"text": "先把同一個實體的所有提及合起來（去重與摘要 consolidation）", "verdict": "完全支持",
-       "card_quote": "consolidation 把同一實體的所有提及合併起來", "note": "去重與摘要對應 c2 Step 3（Deduplication & Summarization，去重與摘要）。"},
-      {"text": "查資料時從實體擴展到關係（LocalSearch），再從關係擴展到原文段落", "verdict": "完全支持",
-       "card_quote": "LocalSearch 又從實體擴展到關係、再擴展到 chunk", "note": "chunk 白話為原文段落。"},
-      {"text": "整條路線的傾向就是多撈；RAGU 一路越撈越多", "verdict": "完全支持",
-       "card_quote": "整條路線的傾向就是多撈", "note": ""},
-      {"text": "圖註：Precision 這篇論文沒有人測", "verdict": "完全支持",
-       "card_quote": "Precision（撈到的相關材料除以全部撈到的材料）在這篇論文裡沒有人測", "note": "c9#1 帶出。"}],
-     "errors": []},
-    {"block": "第 8 張", "atoms": [
-      {"text": "「答案在資料裡」和「AI 會用到它」是兩回事：Evidence Recall 測前者，答對率測後者", "verdict": "完全支持",
-       "card_quote": "「答案在 context 裡」跟「模型會用到它」是兩回事，ER 測前者、AC 測後者", "note": ""},
-      {"text": "干擾項：找單一事實的題目只有一個正確答案；多塞幾段意思相關但答案不同的材料，AI 挑錯的機率就上升", "verdict": "完全支持",
-       "card_quote": "factoid 問題只有一個正確答案，context 裡多塞幾段語意相關但答案不同的材料，LLM 挑錯的機率就上升", "note": "部落格推論，直述可。"},
-      {"text": "中間被忽略：資料很長時，AI 對開頭和結尾敏感，中間容易被忽略", "verdict": "完全支持",
-       "card_quote": "長 context 裡模型對開頭結尾敏感、中間容易被忽略", "note": ""},
-      {"text": "圖註：撈到的資料有幾成相關，這篇論文沒有人測", "verdict": "完全支持",
-       "card_quote": "Precision 在這篇論文裡沒有人測", "note": "c10#1 帶出。"}],
-     "errors": []},
-    {"block": "第 9 張", "atoms": [
-      {"text": "Fact Retrieval 需要一個精確的事實，多餘材料是干擾，撈得準（Precision 高）吃香", "verdict": "完全支持",
-       "card_quote": "Fact Retrieval 需要一個精確的事實，多餘材料是干擾，有利於高 precision", "note": ""},
-      {"text": "Creative Generation 需要廣泛的相關材料，多餘材料是資產，撈得全（Recall 高）吃香", "verdict": "完全支持",
-       "card_quote": "Creative Generation 需要廣泛的相關材料，多餘材料是資產，有利於高 recall", "note": ""},
-      {"text": "這可能才是「越難越強」的真正原因：RAGU 不是在難題上變聰明，而是一路用同一種策略（多撈），在簡單題是負擔，到了綜合類的題目才變成優勢", "verdict": "完全支持",
-       "card_quote": "RAGU 不是在難任務上變聰明，而是一路用同一種策略（多撈），這個策略在簡單任務上是負擔、在合成類任務上才變成優勢", "note": "加「可能」不比卡強。"},
-      {"text": "圖註：最難那一級只贏 59.0% 對 56.9%，在 AI 裁判評分的雜訊範圍內", "verdict": "完全支持",
-       "card_quote": "最難那格 RAGU 贏的是 59.0 對 56.9，2.1 pp，blog 說落在 LLM-judge 的雜訊範圍內", "note": "c12#2 帶出。"},
-      {"text": "（宣稱帶出）c12#3 單一 judge 單次評分、無 error bar、個位數差距不宜當結論", "verdict": "不支持",
-       "card_quote": "AC 是單一 judge 模型的單次評分，論文沒有 error bar、也沒有人工驗證 judge 準確度，blog 提醒個位數 pp 的差距不宜當結論", "note": "引用欄列了 c12#3，但這張文字沒有出現；IG 輪播與 caption 他處也沒有。"}],
-     "errors": ["限定條件掉了"]},
-    {"block": "第 10 張", "atoms": [
-      {"text": "論文只用一句話帶過：HippoRAG 2 撈得少卻答對更多，是因為它找單一事實時撈得準", "verdict": "部分支持",
-       "card_quote": "論文只用一句話帶過這件事：HippoRAG 2 在 Evidence Recall 較低的情況下仍然贏得 factoid AC，反映的是它鏈式走訪在單一事實查詢上的 precision", "note": "卡是「Evidence Recall 較低」（相關材料撈回比例低），貼文寫成「撈得少」（撈回總量少），意思不同；「反映的是」寫成「是因為」略強。"},
-      {"text": "方向是對的，但沒有任何數據支持", "verdict": "完全支持",
-       "card_quote": "blog 認為方向是對的，但沒有任何數據支持", "note": "部落格判斷，直述可。"},
-      {"text": "能回答這件事的指標（Context Relevancy）論文列了，全篇沒有一個數值，也沒說明原因", "verdict": "完全支持",
-       "card_quote": "論文列出使用的指標時包含了 Context Relevancy，正好就是回答這個問題需要的那個數字，但它在所有表格與圖裡全部沒有出現，全篇沒有任何一個數值，論文也沒有說明原因", "note": "c1#4 一併帶出。"},
-      {"text": "圖：論文報了 Evidence Recall、答對率、Coverage", "verdict": "完全支持",
-       "card_quote": "論文的指標中，ER（Evidence Recall）測檢索階段撈回了多少比例的相關材料，只評檢索；AC（Answer Correctness）由 LLM-judge 判斷答案語意上對不對，Cov（Coverage）測有沒有涵蓋所有該講的重點", "note": "c5、c7、c13 皆有這些指標的數值或比較。"}],
-     "errors": ["措辭與卡不同"]},
-    {"block": "第 11 張", "atoms": [
-      {"text": "只盯 Evidence Recall，系統會一路往多撈走", "verdict": "完全支持",
-       "card_quote": "只盯著 recall 類指標（撈回率、hit rate）會系統性地把系統推向「撈更多」", "note": ""},
-      {"text": "要一起看撈進多少雜訊，最好直接看答案", "verdict": "完全支持",
-       "card_quote": "至少要同時看 context precision，最好直接看 end-to-end 的答案指標", "note": "factoid 限定（c1#1）在第 8、9 張有對應。"}],
-     "errors": []},
-    {"block": "第 12 張", "atoms": [
-      {"text": "系列地圖與導流行（結構）", "verdict": "完全支持", "card_quote": "", "note": "結構元素，不對證卡。"}],
-     "errors": []},
-    {"block": "Threads 正文", "atoms": [
-      {"text": "AI 查到的資料更齊，答案卻可能更差", "verdict": "完全支持",
-       "card_quote": "最終答案品質可能不動甚至下降", "note": ""},
-      {"text": "替 AI 查資料的系統（RAG），常用 Evidence Recall 打分數", "verdict": "找不到",
-       "card_quote": "", "note": "卡上沒有「RAG 常用 Evidence Recall」這種普遍使用頻率的說法；卡只說論文用 ER、以及只盯 recall 類指標的後果。"},
-      {"text": "Evidence Recall：該查到的相關資料，撈回了幾成；完全不測不該撈的有沒有撈進來", "verdict": "完全支持",
-       "card_quote": "Evidence Recall 只測「該撈的撈到沒有」，完全不測「不該撈的有沒有撈進來」", "note": ""},
-      {"text": "只盯著它，會把系統一路推向多撈", "verdict": "完全支持",
-       "card_quote": "會系統性地把系統推向「撈更多」", "note": ""},
-      {"text": "在醫療題庫最難的一級，RAGU 答案涵蓋的重點比 HippoRAG 2 多 22.7%", "verdict": "部分支持",
-       "card_quote": "Creative Generation 層級的 Coverage 是 LightRAG 3.9、HippoRAG 2 34.7、RAGU 57.4", "note": "數字對；但卡上的醫療題庫（GraphRAG-Bench Medical）限定只綁在 c7 的 AC 表上，c5 的 Coverage 沒說是哪個資料集；「最難的一級」卡上也沒有指明是 Creative Generation。"},
-      {"text": "找單一事實的題目，答對率是 54.2% 對 72.4%", "verdict": "完全支持",
-       "card_quote": "Fact Retrieval 層級的 AC，RAGU 54.2、HippoRAG 2 72.4", "note": ""},
-      {"text": "可能的原因是多撈進來的段落變成干擾，或在很長的資料中間被忽略", "verdict": "完全支持",
-       "card_quote": "blog 認為多撈會傷害答案的前兩個機制：一是干擾項", "note": "有「可能」，不比卡強。"},
-      {"text": "反過來，寫綜合答案時多撈是資產", "verdict": "完全支持",
-       "card_quote": "Creative Generation 需要廣泛的相關材料，多餘材料是資產", "note": ""},
-      {"text": "答對率是另一個 AI 當裁判、只打一次的分數，論文沒有誤差範圍，也沒有人工檢查裁判準不準", "verdict": "完全支持",
-       "card_quote": "AC 是單一 judge 模型的單次評分，論文沒有 error bar、也沒有人工驗證 judge 準確度", "note": "c7#2 帶出。"},
-      {"text": "撈到的資料有幾成相關，這篇論文沒有人測", "verdict": "完全支持",
-       "card_quote": "在 RAGU 這篇論文裡，Precision（撈到的相關材料除以全部撈到的材料）沒有人測", "note": ""}],
-     "errors": ["夾帶卡上沒有的判斷", "範圍被放大"]},
-    {"block": "Threads 最後一則", "atoms": [
-      {"text": "只盯 Evidence Recall，系統會一路往多撈走；調 RAG 要一起看撈進多少雜訊，最好直接看答案對不對", "verdict": "完全支持",
-       "card_quote": "至少要同時看 context precision，最好直接看 end-to-end 的答案指標", "note": "其餘為結構。"}],
-     "errors": []},
-    {"block": "IG caption", "atoms": [
-      {"text": "RAG 的 Evidence Recall 越高越好嗎？RAGU 論文撈得更齊，答對率卻輸了", "verdict": "完全支持",
-       "card_quote": "如果 RAGU 檢索到更完整的證據，為什麼最終答案正確率反而輸？", "note": "與 c7 的寫法相同；Fact Retrieval 範圍在下面條列與第 6 張出現。"},
-      {"text": "條列（重述各張主標）", "verdict": "完全支持", "card_quote": "", "note": "內容同各張投影片，已逐張審。"}],
-     "errors": []}
+    {
+      "block": "第 1 張",
+      "atoms": [
+        {
+          "text": "撈得多，不等於答得好",
+          "verdict": "完全支持",
+          "card_quote": "只盯著 recall 類指標（撈回率、hit rate）會系統性地把系統推向「撈更多」，而最終答案品質可能不動甚至下降",
+          "note": "封面以問句加否定回答，未比卡更強（卡說可能不動甚至下降）。"
+        },
+        {
+          "text": "只看「該找的找到沒」，系統會越撈越多",
+          "verdict": "完全支持",
+          "card_quote": "Evidence Recall 只測「該撈的撈到沒有」，完全不測「不該撈的有沒有撈進來」；只盯著 recall 類指標（撈回率、hit rate）會系統性地把系統推向「撈更多」",
+          "note": "對應 c1 原句。"
+        },
+        {
+          "text": "多塞的雜訊，可能讓 AI 挑錯",
+          "verdict": "完全支持",
+          "card_quote": "context 裡多塞幾段語意相關但答案不同的材料，LLM 挑錯的機率就上升",
+          "note": "c10 限於 factoid 問題，封面省略，但第 6 張有「問題只有一個正確答案」，符合封面可沒說完整的規則；有「可能」。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 2 張",
+      "atoms": [
+        {
+          "text": "假設同一題共有 4 段有用的資料",
+          "verdict": "完全支持",
+          "card_quote": "→ ER = 3/4 = 0.75    precision = 3/3 = 1.00",
+          "note": "分母 4 即全部相關材料；圖註標明是部落格舉的假設例子。"
+        },
+        {
+          "text": "A 撈 3 段相關、漏 1 段",
+          "verdict": "完全支持",
+          "card_quote": "HippoRAG 2 的 context:  [相關][相關][相關]",
+          "note": "卡上的示範 context 改稱 A，標為假設例子。"
+        },
+        {
+          "text": "B 4 段到齊，卻多了 4 段雜訊；一半是雜訊",
+          "verdict": "完全支持",
+          "card_quote": "RAGU 的 context:        [相關][相關][相關][相關][雜訊][雜訊][雜訊][雜訊]",
+          "note": "4/8 為一半。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 3 張",
+      "atoms": [
+        {
+          "text": "前情提要（系列標題與 summary）",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "結構元素，不需對證。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 4 張",
+      "atoms": [
+        {
+          "text": "幫找資料打分，常見的三種分數",
+          "verdict": "部分支持",
+          "card_quote": "其中 ER 只評檢索，AC / Cov / Faith 評最終答案",
+          "note": "卡上沒有說這三種分數「常見」；且第三種（答對率）在卡上是評最終答案，不是替「找資料」打分，標題把它歸為找資料的分數與卡不符。"
+        },
+        {
+          "text": "RAG 是先幫 AI 找資料，再讓它讀著回答",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "名詞的白話定義，未加卡上沒有的用途或範圍。"
+        },
+        {
+          "text": "RAGU 是 ITMO University 團隊的 GraphRAG 系統",
+          "verdict": "完全支持",
+          "card_quote": "RAGU 是 ITMO University 團隊在 2026 年 7 月[放上 arXiv](https://arxiv.org/abs/2607.11683)的 GraphRAG 引擎",
+          "note": "引擎改稱系統，意思相同。"
+        },
+        {
+          "text": "論文用了第一（Evidence Recall）和第三種（答對率），沒用 precision",
+          "verdict": "完全支持",
+          "card_quote": "Precision = 撈到的相關材料 / 全部撈到的材料    ← 沒有人測",
+          "note": "c3 列出 ER 與 AC 為論文指標，c4 指出 precision 沒有人測。"
+        },
+        {
+          "text": "Evidence Recall：該找的資料找回了幾成；只評找資料這一步",
+          "verdict": "完全支持",
+          "card_quote": "ER | Evidence Recall | 檢索階段撈回了多少比例的相關材料",
+          "note": "並有「其中 ER 只評檢索」。"
+        },
+        {
+          "text": "precision：撈回來的資料裡，有用的佔幾成",
+          "verdict": "完全支持",
+          "card_quote": "Precision = 撈到的相關材料 / 全部撈到的材料",
+          "note": "定義相符。"
+        },
+        {
+          "text": "答對率：另一個 AI 當裁判，判斷最後的答案對不對",
+          "verdict": "完全支持",
+          "card_quote": "AC | Answer Correctness | 答案語意上對不對（LLM-judge）",
+          "note": "LLM-judge 白話成另一個 AI 當裁判。"
+        }
+      ],
+      "errors": [
+        "夾帶卡上沒有的判斷",
+        "措辭與卡不同"
+      ]
+    },
+    {
+      "block": "第 5 張",
+      "atoms": [
+        {
+          "text": "Evidence Recall 只看「該找的找到沒」，不看「不該找的有沒有混進來」",
+          "verdict": "完全支持",
+          "card_quote": "關鍵在於，Evidence Recall 只測「該撈的撈到沒有」，完全不測「不該撈的有沒有撈進來」。",
+          "note": "對應 c1。"
+        },
+        {
+          "text": "A：撈 3 段，3 段相關；Evidence Recall 0.75、precision 1",
+          "verdict": "完全支持",
+          "card_quote": "→ ER = 3/4 = 0.75    precision = 3/3 = 1.00",
+          "note": "數字重算相符。"
+        },
+        {
+          "text": "B：撈 8 段，4 段相關；Evidence Recall 1、precision 0.5",
+          "verdict": "完全支持",
+          "card_quote": "→ ER = 4/4 = 1.00    precision = 4/8 = 0.50",
+          "note": "數字重算相符。"
+        },
+        {
+          "text": "Evidence Recall 說 B 好，precision 說 B 只有一半",
+          "verdict": "完全支持",
+          "card_quote": "兩者可以同時發生：",
+          "note": "B 的 ER 1.00 高於 A 0.75，precision 0.50；比較對象為 A，圖註標明假設例子，無單位比值已註明。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 6 張",
+      "atoms": [
+        {
+          "text": "部落格推論有兩個原因",
+          "verdict": "部分支持",
+          "card_quote": "多撈為什麼實際上會傷害答案，有三個機制。第一是干擾項",
+          "note": "卡上 blog 說有三個機制，c10 是其中前兩個；寫「有兩個原因」把數量說少，與卡措辭不同（第三個在第 7 張以任務性質呈現，但沒標成第三個原因）。"
+        },
+        {
+          "text": "這篇論文沒有人測 precision",
+          "verdict": "完全支持",
+          "card_quote": "Precision = 撈到的相關材料 / 全部撈到的材料    ← 沒有人測",
+          "note": "c10 限定條件已帶出。"
+        },
+        {
+          "text": "干擾：問題只有一個正確答案時，多塞幾段很像、答案卻不同的資料，模型挑錯的機率上升",
+          "verdict": "完全支持",
+          "card_quote": "第一是干擾項：factoid 問題只有一個正確答案，context 裡多塞幾段語意相關但答案不同的材料，LLM 挑錯的機率就上升",
+          "note": "factoid 條件以「問題只有一個正確答案」保留。"
+        },
+        {
+          "text": "中間被忽略：資料一長，模型對開頭結尾敏感，中間的段落容易被忽略",
+          "verdict": "完全支持",
+          "card_quote": "長 context 裡模型對開頭結尾敏感、中間容易被忽略",
+          "note": "白話相符。"
+        },
+        {
+          "text": "答案在資料裡，不代表模型會用到",
+          "verdict": "完全支持",
+          "card_quote": "「答案在 context 裡」跟「模型會用到它」是兩回事",
+          "note": "白話相符。"
+        },
+        {
+          "text": "雜訊為什麼會讓 AI 答錯？（標題）",
+          "verdict": "完全支持",
+          "card_quote": "多撈為什麼實際上會傷害答案",
+          "note": "以問句呈現部落格推論，未寫成已驗證事實。"
+        }
+      ],
+      "errors": [
+        "措辭與卡不同"
+      ]
+    },
+    {
+      "block": "第 7 張",
+      "atoms": [
+        {
+          "text": "部落格推論 RAGU 的設計就是傾向多撈",
+          "verdict": "完全支持",
+          "card_quote": "整條路線的傾向就是多撈",
+          "note": "c9 部落格推論，已標明；c9 限定條件（precision 沒人測）在圖註出現。"
+        },
+        {
+          "text": "HippoRAG 2 是另一套 GraphRAG 系統",
+          "verdict": "找不到",
+          "card_quote": "",
+          "note": "卡上沒有任何一處說 HippoRAG 2 是 GraphRAG 系統（c2 只說 RAGU 是 GraphRAG 引擎），屬卡外事實。"
+        },
+        {
+          "text": "兩種題目都用 RAGU 附帶的抽取模型建圖",
+          "verdict": "部分支持",
+          "card_quote": "GraphRAG-Bench Medical 上四個難度層級的 AC（都用 Meno-Lite-0.1 建圖）：",
+          "note": "卡上這個建圖條件只綁在 AC 表（c7）；c5 的 Coverage 數字卡上沒有說用什麼模型建圖，貼文把它套到兩種題目，範圍被放大。另 c7 限定條件中的「GraphRAG-Bench Medical」沒有出現在貼文任何地方。"
+        },
+        {
+          "text": "查一個事實：多的資料是干擾；寫綜合的內容：多的資料是資產",
+          "verdict": "完全支持",
+          "card_quote": "多餘材料是 | 干擾 | 資產",
+          "note": "c11 部落格推論，整張以「部落格推論」開頭。"
+        },
+        {
+          "text": "查一個事實的答對率：RAGU 54.2%，HippoRAG 2 72.4%",
+          "verdict": "完全支持",
+          "card_quote": "Fact Retrieval | 26.2 | **72.4** | 54.2",
+          "note": "數字相符，比較對象 HippoRAG 2 有寫。"
+        },
+        {
+          "text": "寫綜合內容涵蓋的重點：RAGU 57.4%，HippoRAG 2 34.7%",
+          "verdict": "完全支持",
+          "card_quote": "Creative Generation 的 Coverage：LightRAG 3.9、HippoRAG 2 34.7、RAGU 57.4。",
+          "note": "數字相符。"
+        },
+        {
+          "text": "答對率是另一個 AI 的單次評分；論文沒有測 precision",
+          "verdict": "部分支持",
+          "card_quote": "AC 是單一 judge 模型的單次評分，論文沒有 error bar、也沒有人工驗證 judge 準確度，個位數 pp 的差距不宜當結論。",
+          "note": "「單次評分」有出現，但同一條限定條件中的「沒有 error bar、也沒有人工驗證 judge 準確度」在貼文任何地方都沒有出現。"
+        }
+      ],
+      "errors": [
+        "夾帶卡上沒有的判斷",
+        "範圍被放大",
+        "限定條件掉了"
+      ]
+    },
+    {
+      "block": "第 8 張",
+      "atoms": [
+        {
+          "text": "調系統時，別只盯著撈回率",
+          "verdict": "完全支持",
+          "card_quote": "這條會改變你調系統時盯哪個儀表板，而且跟 GraphRAG 完全無關。",
+          "note": "與 c1「只盯著 recall 類指標」合看相符；部落格判斷以作者口吻寫。"
+        },
+        {
+          "text": "只盯撈回率，系統會被一路推向多撈",
+          "verdict": "完全支持",
+          "card_quote": "只盯著 recall 類指標（撈回率、hit rate）會系統性地把系統推向「撈更多」",
+          "note": "「一路」與「系統性地」等強。"
+        },
+        {
+          "text": "查單一事實的題目上，撈得全和答得對是互相拉扯的",
+          "verdict": "完全支持",
+          "card_quote": "優化 recall 跟優化最終正確率，在 factoid 任務上是互相拉扯的。",
+          "note": "c1#1 限定條件保留。"
+        },
+        {
+          "text": "寫綜合內容時，多的資料反而有用",
+          "verdict": "完全支持",
+          "card_quote": "多餘材料是 | 干擾 | 資產",
+          "note": "c1#2 限定條件保留。"
+        },
+        {
+          "text": "Evidence Recall、hit rate 只看該找的找到沒；加看 precision 看混進多少雜訊；最好直接看最後的答案",
+          "verdict": "完全支持",
+          "card_quote": "至少要同時看 context precision，最好直接看 end-to-end 的答案指標。",
+          "note": "對應 c1。"
+        },
+        {
+          "text": "RAGU 論文列了 Context Relevancy，卻沒給任何一個數字",
+          "verdict": "完全支持",
+          "card_quote": "但它在所有表格與圖裡全部沒有出現，全篇沒有任何一個數值",
+          "note": "c1#4。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "第 9 張",
+      "atoms": [
+        {
+          "text": "撈得多，不等於答得好",
+          "verdict": "完全支持",
+          "card_quote": "而最終答案品質可能不動甚至下降",
+          "note": "同第 1 張。"
+        },
+        {
+          "text": "多的雜訊可能讓 AI 挑錯",
+          "verdict": "完全支持",
+          "card_quote": "context 裡多塞幾段語意相關但答案不同的材料，LLM 挑錯的機率就上升",
+          "note": "有「可能」；factoid 條件在第 6 張。"
+        },
+        {
+          "text": "除了撈回率，也要看最後的答案",
+          "verdict": "完全支持",
+          "card_quote": "最好直接看 end-to-end 的答案指標",
+          "note": "對應 c1。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "Threads 正文",
+      "atoms": [
+        {
+          "text": "幫 AI 找資料，撈得越多，答得越好？撈得多，不等於答得好",
+          "verdict": "完全支持",
+          "card_quote": "只盯著 recall 類指標（撈回率、hit rate）會系統性地把系統推向「撈更多」，而最終答案品質可能不動甚至下降",
+          "note": "同封面。"
+        },
+        {
+          "text": "假設一題有 4 段有用的資料；A 撈 3 段全有用；B 撈 8 段，4 段有用、4 段雜訊",
+          "verdict": "完全支持",
+          "card_quote": "RAGU 的 context:        [相關][相關][相關][相關][雜訊][雜訊][雜訊][雜訊]",
+          "note": "有標「假設」。"
+        },
+        {
+          "text": "常見的 Evidence Recall 只看「該找的找到沒」",
+          "verdict": "部分支持",
+          "card_quote": "Evidence Recall 只測「該撈的撈到沒有」",
+          "note": "定義相符，但「常見的」卡上沒有。"
+        },
+        {
+          "text": "A 0.75、B 1.00，B 贏；precision A 1.00、B 0.50",
+          "verdict": "完全支持",
+          "card_quote": "→ ER = 4/4 = 1.00    precision = 4/8 = 0.50",
+          "note": "數字相符。"
+        },
+        {
+          "text": "部落格推論兩個原因：只有一個正確答案時多塞很像但答案不同的資料，AI 挑錯機率上升；資料一長中間段落容易被忽略",
+          "verdict": "部分支持",
+          "card_quote": "多撈為什麼實際上會傷害答案，有三個機制。",
+          "note": "兩個機制內容相符，但 blog 說有三個機制，寫「兩個原因」數量不符。"
+        },
+        {
+          "text": "RAGU 的設計就傾向多撈（部落格推論）",
+          "verdict": "完全支持",
+          "card_quote": "整條路線的傾向就是多撈",
+          "note": "已標部落格推論。"
+        },
+        {
+          "text": "和 HippoRAG 2 比（都用 RAGU 附帶的抽取模型建圖），查一個事實答對率 54.2% 對 72.4%；寫綜合內容涵蓋重點 57.4% 對 34.7%",
+          "verdict": "部分支持",
+          "card_quote": "GraphRAG-Bench Medical 上四個難度層級的 AC（都用 Meno-Lite-0.1 建圖）：",
+          "note": "數字相符；但建圖條件在卡上只綁 AC，套到 Coverage 是範圍放大；GraphRAG-Bench Medical 沒出現。"
+        },
+        {
+          "text": "答對率是另一個 AI 的單次評分，論文也沒測 precision，列了 Context Relevancy 卻沒給數字",
+          "verdict": "部分支持",
+          "card_quote": "AC 是單一 judge 模型的單次評分，論文沒有 error bar、也沒有人工驗證 judge 準確度",
+          "note": "「沒有 error bar、也沒有人工驗證 judge 準確度」沒出現；其餘相符。"
+        }
+      ],
+      "errors": [
+        "夾帶卡上沒有的判斷",
+        "範圍被放大",
+        "限定條件掉了",
+        "措辭與卡不同"
+      ]
+    },
+    {
+      "block": "Threads 最後一則（置頂）",
+      "atoms": [
+        {
+          "text": "調系統時別只盯撈回率：至少同時看 precision，最好直接看最後的答案",
+          "verdict": "完全支持",
+          "card_quote": "至少要同時看 context precision，最好直接看 end-to-end 的答案指標。",
+          "note": "對應 c1。"
+        },
+        {
+          "text": "文章連結與同系列列表",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "結構元素。"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "block": "IG caption",
+      "atoms": [
+        {
+          "text": "撈得多不等於答得好：只看「該找的找到沒」，系統會越撈越多",
+          "verdict": "完全支持",
+          "card_quote": "只盯著 recall 類指標（撈回率、hit rate）會系統性地把系統推向「撈更多」",
+          "note": "對應 c1。"
+        },
+        {
+          "text": "各張標題摘要（B 一段沒漏但一半是雜訊、Evidence Recall 說 B 好 precision 說 B 只有一半、雜訊為什麼會讓 AI 答錯、多撈是好是壞看題目要什麼）",
+          "verdict": "完全支持",
+          "card_quote": "→ ER = 4/4 = 1.00    precision = 4/8 = 0.50",
+          "note": "與內文各張一致，假設例子有標明。"
+        },
+        {
+          "text": "部落格推論 RAGU 的設計就是傾向多撈；只盯撈回率，系統會被一路推向多撈",
+          "verdict": "完全支持",
+          "card_quote": "整條路線的傾向就是多撈",
+          "note": "對應 c9、c1。"
+        },
+        {
+          "text": "導流行與 hashtag",
+          "verdict": "完全支持",
+          "card_quote": "",
+          "note": "結構元素。"
+        }
+      ],
+      "errors": []
+    }
   ],
   "recalculations": [
-    {"block": "第 6 張", "expression": "57.4 - 34.7", "result": "22.7"},
-    {"block": "第 6 張", "expression": "72.4 - 54.2", "result": "18.2"},
-    {"block": "第 9 張", "expression": "59.0 - 56.9", "result": "2.1"},
-    {"block": "第 2 張", "expression": "3/4, 4/4, 3/3, 4/8", "result": "0.75, 1.00, 1.00, 0.50"}
+    {
+      "block": "第 5 張",
+      "expression": "3/4, 3/3, 4/4, 4/8",
+      "result": "0.75, 1.0, 1.0, 0.5（與卡相符）"
+    },
+    {
+      "block": "第 7 張",
+      "expression": "57.4-34.7; 72.4-54.2",
+      "result": "22.7（與卡 c5 的 22.7 pp 相符）; 18.2（貼文未寫差距）"
+    }
   ],
   "gaps": [
-    {"description": "IG 輪播與 IG caption 全篇都沒有出現 AC 是單一 judge 單次評分、沒有 error bar、沒有人工驗證的限定條件（只在 Threads 正文出現）；第 6 張與第 9 張的引用欄都宣稱帶出了這條。", "card_quote": "AC 是單一 judge 模型的單次評分，論文沒有 error bar、也沒有人工驗證 judge 準確度，個位數 pp 的差距不宜當結論。"},
-    {"description": "卡上沒有指出 Creative Generation 是最難的難度層級，也沒有說 c5 的 Coverage 數字來自醫療題庫；第 6 張與 Threads 正文加了這兩個範圍。", "card_quote": "有一組數字是真的。Creative Generation 的 Coverage：LightRAG 3.9、HippoRAG 2 34.7、RAGU 57.4。"}
+    {
+      "description": "c7 限定條件中的資料集名稱（GraphRAG-Bench Medical）沒有出現在貼文任何地方",
+      "card_quote": "GraphRAG-Bench Medical 上四個難度層級的 AC（都用 Meno-Lite-0.1 建圖）："
+    },
+    {
+      "description": "c7 限定條件中「沒有 error bar、也沒有人工驗證 judge 準確度」沒有出現在貼文任何地方，只寫了單次評分",
+      "card_quote": "AC 是單一 judge 模型的單次評分，論文沒有 error bar、也沒有人工驗證 judge 準確度，個位數 pp 的差距不宜當結論。"
+    },
+    {
+      "description": "卡上的建圖條件（Meno-Lite-0.1）只綁在 AC 表，卡上沒有說 c5 的 Coverage 數字用什麼建圖",
+      "card_quote": "有一組數字是真的。Creative Generation 的 Coverage：LightRAG 3.9、HippoRAG 2 34.7、RAGU 57.4。"
+    }
   ]
 }

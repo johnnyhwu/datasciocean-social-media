@@ -1,0 +1,9 @@
+concept: retrieval-recall-not-answer-quality
+formats:
+  ig_carousel:
+    status: ready
+    pack: out/ragu/retrieval-recall-not-answer-quality
+  threads_thread:
+    status: ready
+    pack: out/ragu/retrieval-recall-not-answer-quality
+posts: []

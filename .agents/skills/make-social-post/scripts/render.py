@@ -950,18 +950,19 @@ def cl_bottom(x0, x1, ceil_y, depth, r):
     return ceil_y + 14 + r * 1.6 + max(v for _, v, _ in CL_NODES) * depth + r
 
 
-CL_COVER = (80, 1000, 200, 340, 30)       # 封面：天花板 y=200（貼齊兩側出血、粗 28），圖往下長到約 y=580
+CL_COVER = (80, 1000, 30, 1200)          # 封面：圖的左右界、節點半徑、圖最低點的上限（頁腳在 y=1262）
+CL_COVER_TITLE_TOP = 170                 # 封面標題的位置（2026-11-23 人說圖在上、字在下像上下顛倒 → 改成字在上、圖在下）
 
 
-def cl_cover(mi, text_h=0):
-    """封面：上方一道貼齊兩側的天花板，知識圖擠在它下面；標題與副標在下半。
-    text_h＝標題＋副標的高度：圖往下長，把多出的空白吃掉（文字底緣落在 y≈1170），避免下半大片留白。
-    節點（含金色那顆）都留在左右 80px 邊界內。回傳 (svg, 圖的最低點 y)。"""
-    x0, x1, cy, dp, r = CL_COVER
+def cl_cover(mi, text_bottom=600):
+    """封面：標題與副標在上；文字下方一道貼齊兩側的天花板，知識圖擠在它下面、往下長到 y≈1200。
+    text_bottom＝副標底緣。節點（含金色那顆）都留在左右 80px 邊界內。回傳 (svg, 天花板 y, 圖的最低點 y)。"""
+    x0, x1, r, floor = CL_COVER
     x0, x1 = x0 + r * 1.25, x1 - r * 1.25
-    spare = 1170 - (cl_bottom(x0, x1, cy, dp, r) + 60 + text_h)
-    dp = min(560, dp + max(0, spare))
-    return cl_graph(x0, x1, cy, dp, r, CL_TOPS[mi % len(CL_TOPS)], ceil_sw=28, bleed=True), cl_bottom(x0, x1, cy, dp, r)
+    cy = int(text_bottom + 70)
+    dp = floor - (cy + 14 + r * 1.6 + r) - 0
+    dp = dp / max(v for _, v, _ in CL_NODES)
+    return cl_graph(x0, x1, cy, dp, r, CL_TOPS[mi % len(CL_TOPS)], ceil_sw=28, bleed=True), cy, cl_bottom(x0, x1, cy, dp, r)
 
 
 def cl_corner(idx, n):
@@ -1206,16 +1207,17 @@ def build(spec: dict, series: dict, tag: str) -> dict:
         if 170 + tl_ + 36 + sl_ > stack_top - 30:      # 籌碼是背景圖形（程式 B 的重疊檢查量不到），這裡先擋
             raise ValueError(f"封面放不下：標題＋副標到 y={170 + tl_ + 36 + sl_:.0f}，會壓到下方籌碼（上限 {stack_top - 30:.0f}）；縮短主標或副標")
         kw["BODY"] = kw["BODY"].replace("\n", "<br>")
-    elif lay == "cover" and cl:        # 米色底，上方一道天花板、知識圖擠在它下面；標題接在圖下面、副標接著標題
+    elif lay == "cover" and cl:        # 米色底，標題在上、副標接著標題；下方一道天花板、知識圖擠在它下面（2026-11-23 改）
         tl_ = sum(est_lines(seg, 920 / 76 - 0.4) for seg in re.sub(r"\[\[|\]\]", "", spec.get("title", "")).split("\n")) * 95
         sl_ = sum(est_lines(seg, 920 / 40 - 0.4) for seg in spec.get("body", "").split("\n")) * 64
-        svg_, g_bot = cl_cover(mi, tl_ + 36 + sl_)
-        kw["SVG"] = svg_wrap(svg_)
-        top_ = int(g_bot + 60)
+        top_ = CL_COVER_TITLE_TOP
         kw["TITLE_TOP"] = top_
         kw["SUB_TOP"] = top_ + tl_ + 36
-        if top_ + tl_ + 36 + sl_ > 1230:      # 頁腳在 y=1262
-            raise ValueError(f"封面放不下：標題＋副標到 y={top_ + tl_ + 36 + sl_:.0f}，會壓到頁腳（上限 1230）；縮短主標或副標")
+        text_bot = top_ + tl_ + 36 + sl_
+        if text_bot > 820:      # 天花板下面至少要留 ~300px 給圖
+            raise ValueError(f"封面放不下：標題＋副標到 y={text_bot:.0f}，下方的圖會被擠扁（上限 820）；縮短主標或副標")
+        svg_, _, _ = cl_cover(mi, text_bot)
+        kw["SVG"] = svg_wrap(svg_)
         kw["BODY"] = kw["BODY"].replace("\n", "<br>")
     elif lay == "cover" and seesaw:    # 米色底，標題在上，下半一座蹺蹺板；副標固定在 y=400
         kw["SVG"] = svg_wrap(ss_cover())
